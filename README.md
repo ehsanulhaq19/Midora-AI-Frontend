@@ -7,5 +7,5 @@ This repository contains the frontend interface for FlexAI.ai, built with React,
 - Chat history persistence and inline code editing
 - Responsive layout for web and mobile
 
-Integrates directly with the FlexAI backend for secure communication and subscription gating.
+Integrates directly with the FlexAI backend for secure communication and subscription gating..
 
