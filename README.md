@@ -1,210 +1,329 @@
-<<<<<<< HEAD
-# Integration Guide: New ChatGPT-Style UI
+# Midora AI Frontend
 
-## Overview
-This guide helps you integrate the new ChatGPT-style UI components into your existing askwisetoday project.
+A modern, dockerized Next.js application built with TypeScript, Tailwind CSS, and best practices for optimal performance and developer experience.
 
-## Component Structure
+## 🚀 Features
 
-### New Components Created:
-1. **CollapsibleSidebar.jsx** - Replaces your existing Sidebar.jsx
-2. **WelcomeScreen.jsx** - New welcome screen with model selection
-3. **ChatContainer.jsx** - Updated chat interface
-4. **ModelIcon.jsx** - Component for model icons
-5. **ChatLayout.jsx** - Updated main layout
+- **Next.js 14** with App Router for modern React development
+- **TypeScript** for type safety and better developer experience
+- **Tailwind CSS** for utility-first styling
+- **Docker** support with multi-stage builds for production
+- **Frontend-Only Architecture** communicating with external backend services
+- **Responsive Design** with mobile-first approach
+- **Performance Optimized** with Next.js best practices and Redis caching
+- **SEO Ready** with metadata API and proper structure
+- **Error Handling** with error boundaries and loading states
+- **API Routes** with proper validation and error handling
+- **Backend Communication** utilities for both client and server-side API calls
+- **Testing Ready** with Jest and Testing Library setup
 
-## File Placement
+## 🏗️ Architecture
+
+This is a **frontend-only application** that communicates with external backend services (3rd party APIs or localhost:8000).
 
 ```
-frontend/src/components/
-├── chat/
-│   ├── ChatContainer.jsx          # ✅ Updated
-│   ├── ChatInput.jsx              # 🔄 Can be removed (functionality moved to ChatContainer)
-│   └── ChatMessage.jsx            # 🔄 Can be removed (functionality moved to ChatContainer)
-├── sidebar/
-│   ├── CollapsibleSidebar.jsx     # ✅ New (replaces Sidebar.jsx)
-│   ├── ChatList.jsx               # 🔄 Integrated into CollapsibleSidebar
-│   ├── ModelSelector.jsx          # 🔄 Integrated into WelcomeScreen
-│   └── Sidebar.jsx                # ❌ Can be removed
-└── ui/
-    ├── WelcomeScreen.jsx           # ✅ New
-    ├── ModelIcon.jsx               # ✅ New
-    └── ... (existing UI components)
+src/
+├── app/                    # App Router (Next.js 13+)
+│   ├── globals.css        # Global styles
+│   ├── layout.tsx         # Root layout
+│   ├── page.tsx           # Homepage
+│   ├── loading.tsx        # Loading states
+│   ├── error.tsx          # Error boundaries
+│   ├── not-found.tsx      # 404 page
+│   └── api/               # Frontend API routes
+├── components/            # Reusable components
+│   └── ui/               # UI components
+├── lib/                  # Utility functions
+│   └── backend-api.ts    # Backend communication utilities
+├── hooks/                # Custom React hooks
+├── types/                # TypeScript type definitions
+└── styles/               # Additional styles
 ```
 
-## Integration Steps
+### 🔗 Backend Communication
 
-### 1. Install Required Dependencies (if not already installed)
+- **Client-side**: Uses `NEXT_PUBLIC_BACKEND_URL` for browser API calls
+- **Server-side**: Uses `BACKEND_API_URL` for server-side API calls
+- **API Utilities**: Built-in functions in `src/lib/backend-api.ts`
+- **Caching**: Optional Redis for frontend caching and sessions
+
+## 🛠️ Tech Stack
+
+- **Framework**: Next.js 14
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **UI Components**: Custom components with class-variance-authority
+- **Validation**: Zod
+- **Containerization**: Docker
+- **Package Manager**: npm
+- **Linting**: ESLint
+- **Testing**: Jest + Testing Library
+
+## 📋 Prerequisites
+
+- Node.js 18+ 
+- npm 8+
+- Docker (for containerized deployment)
+- Docker Compose
+
+## 🚀 Quick Start
+
+### Development
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd midora.ai-frontend
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Set up environment variables**
+   ```bash
+   cp env.example .env.local
+   # Edit .env.local with your configuration
+   ```
+
+4. **Run the development server**
+   ```bash
+   npm run dev
+   ```
+
+5. **Open your browser**
+   Navigate to [http://localhost:3000](http://localhost:3000)
+
+### Production Build
+
+1. **Build the application**
+   ```bash
+   npm run build
+   ```
+
+2. **Start the production server**
+   ```bash
+   npm start
+   ```
+
+## 🐳 Docker Deployment
+
+### Using Docker Compose (Recommended)
+
+The project uses a **single multi-stage Dockerfile** with **three separate Docker Compose configurations** for different environments:
+
+#### Local Development (Recommended for developers)
 ```bash
-npm install @heroicons/react
+# Start local development with hot reloading
+docker-compose -f docker-compose.local.yml up --build
 ```
 
-### 2. Update Your SVG Icons
-
-Replace the placeholder icons in `ModelIcon.jsx` with your actual SVG files:
-
-```jsx
-// components/ui/ModelIcon.jsx
-import ClaudeIcon from '../../assets/icons/claude.svg';
-import ClaudeLightIcon from '../../assets/icons/claude symbol - Ivory.svg';
-import OpenAIIcon from '../../assets/icons/openai.svg';
-import GeminiIcon from '../../assets/icons/gemini.svg';
-
-export const ModelIconSVG = ({ modelId, className = "w-6 h-6" }) => {
-  const iconMap = {
-    claude: ClaudeIcon,
-    'gpt-4o': OpenAIIcon,
-    'gpt-4o-mini': OpenAIIcon,
-    gemini: GeminiIcon
-  };
-
-  const IconComponent = iconMap[modelId];
-  
-  if (!IconComponent) {
-    return <div className={`${className} bg-gray-200 rounded`} />;
-  }
-
-  return <img src={IconComponent} alt={modelId} className={className} />;
-};
+#### Development Environment (with Redis caching)
+```bash
+# Start development with Redis caching
+docker-compose -f docker-compose.dev.yml up --build
 ```
 
-### 3. Update Your App.jsx or Main Router
-
-Replace your existing routing with the new layout:
-
-```jsx
-// App.jsx
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import ChatLayout from './pages/ChatLayout';
-import Dashboard from './pages/Dashboard';
-import Login from './pages/Login';
-import Signup from './pages/Signup';
-
-function App() {
-  return (
-    <Router>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/chat" element={<ChatLayout />} />
-        <Route path="/chat/:chatId" element={<ChatLayout />} />
-        <Route path="/" element={<ChatLayout />} />
-      </Routes>
-    </Router>
-  );
-}
-
-export default App;
+#### Live Production (with Redis caching)
+```bash
+# Start live production environment
+docker-compose -f docker-compose.live.yml --env-file .env.live up --build
 ```
 
-### 4. Update Your Existing Services
+### Docker Compose Commands
 
-Ensure your existing services work with the new components:
+1. **Start services**
+   ```bash
+   docker-compose up --build
+   ```
 
-```jsx
-// services/modelService.js - Update to match new model IDs
-export const getAvailableModels = () => {
-  return [
-    { id: 'gpt-4o-mini', name: 'OpenAI GPT-4o mini', provider: 'openai' },
-    { id: 'gpt-4o', name: 'OpenAI GPT-4o', provider: 'openai' },
-    { id: 'gemini', name: 'Google Gemini', provider: 'google' },
-    { id: 'claude', name: 'Claude', provider: 'anthropic' }
-  ];
-};
+2. **Run in background**
+   ```bash
+   docker-compose up -d --build
+   ```
+
+3. **Stop services**
+   ```bash
+   docker-compose down
+   ```
+
+4. **View logs**
+   ```bash
+   docker-compose logs -f app
+   ```
+
+For detailed Docker setup and usage, see [Docker Setup Guide](./docs/docker-setup-guide.md).
+
+### Using Docker directly
+
+1. **Build the Docker image**
+   ```bash
+   docker build -t midora-ai-frontend .
+   ```
+
+2. **Run the container**
+   ```bash
+   docker run -p 3000:3000 midora-ai-frontend
+   ```
+
+## 📜 Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
+- `npm run type-check` - Run TypeScript type checking
+- `npm test` - Run tests
+- `npm run test:watch` - Run tests in watch mode
+- `npm run test:coverage` - Run tests with coverage
+
+## 🔧 Configuration
+
+### Environment Variables
+
+Create a `.env.local` file based on `env.example`:
+
+```bash
+# Application
+NODE_ENV=development
+NEXT_TELEMETRY_DISABLED=1
+
+# API Configuration
+NEXT_PUBLIC_API_URL=http://localhost:3000/api
+CUSTOM_KEY=your_custom_key_here
 ```
 
-### 5. Update Context Providers
+### Next.js Configuration
 
-Update your ModelProvider.jsx to work with the new model selection:
+The application uses a custom `next.config.js` with:
 
-```jsx
-// context/ModelProvider.jsx
-import React, { createContext, useContext, useState } from 'react';
+- App Router enabled
+- Standalone output for Docker optimization
+- Security headers
+- Image optimization settings
 
-const ModelContext = createContext();
+### Tailwind CSS Configuration
 
-export const useModel = () => {
-  const context = useContext(ModelContext);
-  if (!context) {
-    throw new Error('useModel must be used within ModelProvider');
-  }
-  return context;
-};
+Custom Tailwind configuration in `tailwind.config.js` with:
 
-export const ModelProvider = ({ children }) => {
-  const [selectedModel, setSelectedModel] = useState('gpt-4o-mini');
-  const [availableModels] = useState([
-    { id: 'gpt-4o-mini', name: 'OpenAI GPT-4o mini' },
-    { id: 'gpt-4o', name: 'OpenAI GPT-4o' },
-    { id: 'gemini', name: 'Google Gemini' },
-    { id: 'claude', name: 'Claude' }
-  ]);
+- Extended color palette
+- Custom spacing and typography
+- Component-specific utilities
 
-  return (
-    <ModelContext.Provider value={{
-      selectedModel,
-      setSelectedModel,
-      availableModels
-    }}>
-      {children}
-    </ModelContext.Provider>
-  );
-};
+## 🧪 Testing
+
+### Running Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Run tests with coverage
+npm run test:coverage
 ```
 
-## Key Features Implemented
+### Test Structure
 
-### ✅ Completed Features:
-- **Collapsible sidebar** with toggle functionality
-- **Welcome screen** with greeting and quick actions
-- **Model selector cards** with descriptions
-- **Responsive design** for mobile and desktop
-- **Chat interface** with message history
-- **Input area** with attachment and send buttons
-- **Model switching** during conversations
+```
+tests/
+├── __mocks__/           # Mock files
+├── components/          # Component tests
+└── utils/              # Utility function tests
+```
 
-### 🔄 Features to Customize:
-- **SVG icon integration** (replace placeholders with your actual icons)
-- **API integration** (connect to your backend endpoints)
-- **Authentication flow** (integrate with your auth system)
-- **Chat persistence** (connect to your chat storage service)
+## 📚 API Documentation
 
-## Styling Notes
+### Health Check
 
-The new design uses:
-- **Light theme** (vs your current dark theme)
-- **Tailwind CSS** utility classes
-- **Clean, minimal design** similar to ChatGPT
-- **Responsive breakpoints** for mobile/desktop
+```
+GET /api/health
+```
 
-## Next Steps
+Returns application health status and version information.
 
-1. **Test the components** in your development environment
-2. **Replace SVG placeholders** with your actual icons
-3. **Connect to your backend** API endpoints
-4. **Test responsiveness** on different screen sizes
-5. **Customize colors/styling** to match your brand
+### Hello API
 
-## Troubleshooting
+```
+GET /api/hello
+POST /api/hello
+```
 
-If you encounter issues:
-1. Ensure all dependencies are installed
-2. Check that file paths match your project structure
-3. Verify Tailwind CSS is properly configured
-4. Test components individually before full integration
+Simple API endpoint for testing and demonstration.
 
-The new design maintains all your existing functionality while providing a modern, clean interface similar to ChatGPT's user experience.
-=======
-# flexai-frontend
-This repository contains the frontend interface for FlexAI.ai, built with React, Tailwind CSS, and Vite. It provides users with:
+## 🎨 Component Library
 
-- Unified AI assistant interface (GPT, Claude, Gemini)
-- Model selector and side-by-side response comparison
-- Token usage display and cost-saving insights
-- Chat history persistence and inline code editing
-- Responsive layout for web and mobile
+### UI Components
 
-Integrates directly with the FlexAI backend for secure communication and subscription gating..
+- **Button** - Multiple variants and sizes
+- **LoadingSpinner** - Configurable loading indicators
+- **ErrorDisplay** - Error boundary display
+- **NotFoundDisplay** - 404 page display
 
->>>>>>> origin/main
+### Component Features
+
+- TypeScript interfaces for all props
+- Variant system using class-variance-authority
+- Responsive design with Tailwind CSS
+- Accessibility features (ARIA labels, keyboard navigation)
+
+## 🔒 Security Features
+
+- Security headers in Next.js config
+- Input validation with Zod schemas
+- Error boundaries for graceful error handling
+- Environment variable protection
+
+## 📱 Responsive Design
+
+- Mobile-first approach
+- Breakpoint system using Tailwind CSS
+- Flexible grid layouts
+- Touch-friendly interactions
+
+## 🚀 Performance Optimizations
+
+- Next.js Image component for optimized images
+- Code splitting and dynamic imports
+- Static generation where possible
+- Bundle optimization
+- Docker multi-stage builds
+
+## 📖 Documentation
+
+- [Component Documentation](./docs/components.md)
+- [API Documentation](./docs/api.md)
+- [Deployment Guide](./docs/deployment.md)
+- [Contributing Guidelines](./docs/contributing.md)
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🆘 Support
+
+- **Documentation**: Check the [docs](./docs/) folder
+- **Issues**: Report bugs and feature requests via GitHub Issues
+- **Discussions**: Join the conversation in GitHub Discussions
+
+## 🙏 Acknowledgments
+
+- Next.js team for the amazing framework
+- Vercel for hosting and deployment
+- Tailwind CSS team for the utility-first CSS framework
+- The open-source community for inspiration and tools
+
+---
+
+**Built with ❤️ by the Midora AI Team**
