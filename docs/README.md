@@ -12,6 +12,7 @@ Welcome to the comprehensive documentation for the Midora AI Frontend applicatio
 ### 🏗️ Architecture & Development
 - [Architecture Overview](./architecture.md) - System design and structure
 - [Component Library](./components.md) - UI components and their usage
+- [Custom Cursor System](./custom-cursor.md) - Custom mouse cursor implementation
 - [API Documentation](./api.md) - API endpoints and integration
 - [State Management](./state-management.md) - Data flow and state handling
 - [Styling Guide](./styling.md) - CSS and design system
@@ -37,6 +38,7 @@ Welcome to the comprehensive documentation for the Midora AI Frontend applicatio
 
 ### For Developers
 - [Component Library](./components.md) - Start building UI components
+- [Custom Cursor System](./custom-cursor.md) - Implement custom mouse interactions
 - [API Documentation](./api.md) - Integrate with backend services
 - [Testing Guide](./testing.md) - Write and run tests
 
@@ -47,6 +49,7 @@ Welcome to the comprehensive documentation for the Midora AI Frontend applicatio
 
 ### For Designers
 - [Styling Guide](./styling.md) - Design system and CSS
+- [Custom Cursor System](./custom-cursor.md) - Custom mouse cursor design
 - [Component Reference](./component-reference.md) - UI component library
 - [Responsive Design](./responsive-design.md) - Mobile-first approach
 

@@ -435,6 +435,117 @@ To add new component variants:
 4. **Update Tests**: Add tests for new variant
 5. **Document**: Update this documentation
 
+## Custom Cursor Components
+
+### CustomCursor
+**File**: `src/components/ui/CustomCursor.tsx`
+
+The main custom cursor component that replaces the default mouse cursor with a custom design.
+
+**Features**:
+- Mid-size purple dot with white border
+- Outer circle with subtle transparency
+- Smooth animations and transitions
+- Theme-based color scheme
+- Global cursor hiding
+
+**Props**:
+```tsx
+interface CustomCursorProps {
+  enabled?: boolean // Override theme setting
+}
+```
+
+**Usage**:
+```tsx
+import { CustomCursor } from '@/components/ui/CursorToggle'
+
+// In root layout
+<CustomCursor />
+
+// With custom enabled state
+<CustomCursor enabled={false} />
+```
+
+**Styling Classes**:
+- `.fixed` - Fixed positioning
+- `.pointer-events-none` - Prevents interaction
+- `.z-[9999]` - High z-index for visibility
+- `.transition-all` - Smooth transitions
+
+### CursorToggle
+**File**: `src/components/ui/CursorToggle.tsx`
+
+A toggle button component for enabling/disabling the custom cursor.
+
+**Features**:
+- Visual state indication
+- Smooth transitions
+- Icon representation of cursor states
+- Optional label display
+- Persistent preference storage
+
+**Props**:
+```tsx
+interface CursorToggleProps {
+  className?: string // Additional CSS classes
+  showLabel?: boolean // Show/hide text label
+}
+```
+
+**Usage**:
+```tsx
+import { CursorToggle } from '@/components/ui/CursorToggle'
+
+// Basic usage
+<CursorToggle />
+
+// With custom styling
+<CursorToggle className="absolute top-4 right-4" showLabel={false} />
+```
+
+**Styling Classes**:
+- `.bg-primary-600` - Primary button background
+- `.bg-neutral-200` - Secondary button background
+- `.transition-all` - Smooth transitions
+- `.focus:ring-2` - Focus ring styling
+
+### useCustomCursor Hook
+**File**: `src/hooks/useCustomCursor.ts`
+
+A React hook for managing cursor state and persistence.
+
+**Returns**:
+```tsx
+{
+  isEnabled: boolean
+  enable: () => void
+  disable: () => void
+  toggle: () => void
+}
+```
+
+**Usage**:
+```tsx
+import { useCustomCursor } from '@/hooks/useCustomCursor'
+
+function MyComponent() {
+  const { isEnabled, toggle } = useCustomCursor()
+  
+  return (
+    <button onClick={toggle}>
+      {isEnabled ? 'Disable' : 'Enable'} Custom Cursor
+    </button>
+  )
+}
+```
+
+**Features**:
+- Local storage persistence
+- Theme-based default state
+- Clean state management
+- Type-safe operations
+
 ## Best Practices
 
 1. **Consistent Naming**: Use consistent naming conventions

@@ -266,6 +266,27 @@ export const theme = {
       inOut: 'cubic-bezier(0.4, 0, 0.2, 1)',
     },
   },
+
+  // Mouse Cursor Configuration
+  cursor: {
+    enabled: true, // Flag to enable/disable custom mouse UI
+    dot: {
+      size: '8px',
+      color: '#a855f7', // primary-500
+      borderColor: '#ffffff',
+      borderWidth: '2px',
+    },
+    circle: {
+      size: '32px',
+      color: 'rgba(168, 85, 247, 0.2)', // primary-500 with opacity
+      borderColor: 'rgba(168, 85, 247, 0.4)',
+      borderWidth: '1px',
+    },
+    animation: {
+      duration: '150ms',
+      easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+    },
+  },
 } as const
 
 // Type exports for theme usage

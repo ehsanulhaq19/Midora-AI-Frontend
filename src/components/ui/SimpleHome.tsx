@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { CursorToggle } from './CursorToggle'
 
 export function SimpleHome() {
   const [currentStep, setCurrentStep] = useState(0)
@@ -87,6 +88,11 @@ export function SimpleHome() {
 
   return (
     <section className="min-h-screen bg-primary-950 flex items-center justify-center pt-16">
+      {/* Cursor Toggle - Top Right */}
+      <div className="absolute top-6 right-6 z-10">
+        <CursorToggle />
+      </div>
+      
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         {/* Welcome Message */}
         <div className="transition-all duration-1000 ease-out">
