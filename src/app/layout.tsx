@@ -1,20 +1,21 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
-import '@/styles/globals.css'
+import '@/app/globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Midora AI - Frontend',
-  description: 'A modern Next.js application with AI capabilities',
-  keywords: ['Next.js', 'React', 'TypeScript', 'AI', 'Frontend'],
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
+  title: 'Midora AI - Multi-Model AI Platform',
+  description: 'Access OpenAI, Gemini, Claude, DeepSeek and more AI models in one platform. Plus AI detection, plagiarism checking, and market intelligence tools.',
+  keywords: ['AI Platform', 'OpenAI', 'Gemini', 'Claude', 'DeepSeek', 'AI Detection', 'Plagiarism Checker', 'Market Tools', 'Stock Alerts'],
   authors: [{ name: 'Midora AI Team' }],
   creator: 'Midora AI',
   publisher: 'Midora AI',
   robots: 'index, follow',
   openGraph: {
-    title: 'Midora AI - Frontend',
-    description: 'A modern Next.js application with AI capabilities',
+    title: 'Midora AI - Multi-Model AI Platform',
+    description: 'Access OpenAI, Gemini, Claude, DeepSeek and more AI models in one platform. Plus AI detection, plagiarism checking, and market intelligence tools.',
     url: 'https://midora.ai',
     siteName: 'Midora AI',
     locale: 'en_US',
@@ -22,11 +23,15 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Midora AI - Frontend',
-    description: 'A modern Next.js application with AI capabilities',
+    title: 'Midora AI - Multi-Model AI Platform',
+    description: 'Access OpenAI, Gemini, Claude, DeepSeek and more AI models in one platform. Plus AI detection, plagiarism checking, and market intelligence tools.',
   },
-  viewport: 'width=device-width, initial-scale=1',
-  themeColor: '#3b82f6',
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#a855f7',
 }
 
 export default function RootLayout({
@@ -37,7 +42,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50">
+        <div className="min-h-screen bg-background-primary">
           {children}
         </div>
       </body>

@@ -1,311 +1,265 @@
-# Midora AI Frontend
+# Midora AI - Multi-Model AI Platform
 
-A modern, dockerized Next.js application built with TypeScript, Tailwind CSS, and best practices for optimal performance and developer experience.
+[![Next.js](https://img.shields.io/badge/Next.js-14.0.4-black)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.3.0-blue)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.3.0-38B2AC)](https://tailwindcss.com/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-## 🚀 Features
+Midora is a comprehensive AI platform that provides access to multiple AI models including OpenAI, Gemini, DeepSeek, and Claude. The platform also offers powerful tools like AI detection, plagiarism checking, AI humanization, and market intelligence features including stock alerts and financial analysis tools.
 
-- **Next.js 14** with App Router for modern React development
-- **TypeScript** for type safety and better developer experience
-- **Tailwind CSS** for utility-first styling
-- **Docker** support with multi-stage builds for production
-- **Frontend-Only Architecture** communicating with external backend services
-- **Responsive Design** with mobile-first approach
-- **Performance Optimized** with Next.js best practices and Redis caching
-- **SEO Ready** with metadata API and proper structure
-- **Error Handling** with error boundaries and loading states
-- **API Routes** with proper validation and error handling
-- **Backend Communication** utilities for both client and server-side API calls
-- **Testing Ready** with Jest and Testing Library setup
+## ✨ Features
 
-## 🏗️ Architecture
+### 🤖 AI Models
+- **OpenAI GPT-4** - Advanced language model for complex reasoning
+- **Google Gemini** - Multimodal AI for text, images, and code
+- **Anthropic Claude** - Constitutional AI focused on safety
+- **DeepSeek** - Specialized in code generation and technical tasks
 
-This is a **frontend-only application** that communicates with external backend services (3rd party APIs or localhost:8000).
+### 🛠️ AI Tools
+- **AI Detector** - Identify AI-generated content with high accuracy
+- **Plagiarism Checker** - Comprehensive plagiarism detection
+- **AI Humanizer** - Transform AI content to appear more natural
+- **Content Analyzer** - Deep content quality analysis
 
-```
-src/
-├── app/                    # App Router (Next.js 13+)
-│   ├── globals.css        # Global styles
-│   ├── layout.tsx         # Root layout
-│   ├── page.tsx           # Homepage
-│   ├── loading.tsx        # Loading states
-│   ├── error.tsx          # Error boundaries
-│   ├── not-found.tsx      # 404 page
-│   └── api/               # Frontend API routes
-├── components/            # Reusable components
-│   └── ui/               # UI components
-├── lib/                  # Utility functions
-│   └── backend-api.ts    # Backend communication utilities
-├── hooks/                # Custom React hooks
-├── types/                # TypeScript type definitions
-└── styles/               # Additional styles
-```
+### 📊 Market Intelligence
+- **Stock Alerts** - Real-time price movement notifications
+- **Market Analysis** - AI-powered insights and predictions
+- **Portfolio Tracking** - Comprehensive portfolio management
+- **Risk Assessment** - AI-driven risk analysis
 
-### 🔗 Backend Communication
+### 🎨 Design Philosophy
+- **Simplified & Elegant** - Clean, uncluttered interface
+- **Darkest Purple Theme** - Sophisticated dark purple background (`#3b0764`)
+- **Sequential Animations** - Content appears one by one with smooth transitions
+- **Hide & Show Effects** - Smooth transitions between content states
+- **High Contrast** - White text on dark background for maximum readability
+- **Minimal Elements** - Focus on content without visual clutter
 
-- **Client-side**: Uses `NEXT_PUBLIC_BACKEND_URL` for browser API calls
-- **Server-side**: Uses `BACKEND_API_URL` for server-side API calls
-- **API Utilities**: Built-in functions in `src/lib/backend-api.ts`
-- **Caching**: Optional Redis for frontend caching and sessions
+## 🚀 Getting Started
 
-## 🛠️ Tech Stack
+### Prerequisites
 
-- **Framework**: Next.js 14
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **UI Components**: Custom components with class-variance-authority
-- **Validation**: Zod
-- **Containerization**: Docker
-- **Package Manager**: npm
-- **Linting**: ESLint
-- **Testing**: Jest + Testing Library
+- Node.js 18.0 or later
+- npm or yarn package manager
 
-## 📋 Prerequisites
-
-- Node.js 18+ 
-- npm 8+
-- Docker (for containerized deployment)
-- Docker Compose
-
-## 🚀 Quick Start
-
-### Development
+### Installation
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/your-org/midora.ai-frontend.git
    cd midora.ai-frontend
    ```
 
 2. **Install dependencies**
    ```bash
    npm install
+   # or
+   yarn install
    ```
 
 3. **Set up environment variables**
    ```bash
    cp env.example .env.local
-   # Edit .env.local with your configuration
    ```
+   Edit `.env.local` with your configuration values.
 
 4. **Run the development server**
    ```bash
    npm run dev
+   # or
+   yarn dev
    ```
 
 5. **Open your browser**
    Navigate to [http://localhost:3000](http://localhost:3000)
 
-### Production Build
+## 🏗️ Project Structure
 
-1. **Build the application**
-   ```bash
-   npm run build
-   ```
-
-2. **Start the production server**
-   ```bash
-   npm start
-   ```
-
-## 🐳 Docker Deployment
-
-### Using Docker Compose (Recommended)
-
-The project uses a **single multi-stage Dockerfile** with **three separate Docker Compose configurations** for different environments:
-
-#### Local Development (Recommended for developers)
-```bash
-# Start local development with hot reloading
-docker-compose -f docker-compose.local.yml up --build
+```
+midora.ai-frontend/
+├── src/
+│   ├── app/                 # Next.js App Router
+│   │   ├── api/            # API routes
+│   │   ├── pages/          # Page components
+│   │   │   ├── home.tsx    # Home page component
+│   │   │   └── about.tsx   # About page component
+│   │   ├── globals.css     # Global styles
+│   │   ├── layout.tsx      # Root layout
+│   │   └── page.tsx        # Main page (imports from pages/)
+│   ├── components/         # React components
+│   │   └── ui/            # UI components
+│   │       ├── Header.tsx  # Simple navigation header
+│   │       └── SimpleHome.tsx # Animated home content
+│   ├── lib/               # Utility functions
+│   │   ├── theme.ts       # Theme configuration
+│   │   └── utils.ts       # General utilities
+│   └── types/             # TypeScript type definitions
+├── docs/                  # Documentation
+├── public/                # Static assets
+├── tailwind.config.js     # Tailwind CSS configuration
+└── package.json           # Dependencies and scripts
 ```
 
-#### Development Environment (with Redis caching)
-```bash
-# Start development with Redis caching
-docker-compose -f docker-compose.dev.yml up --build
+## 🎨 Design System
+
+### Simplified Dark Theme
+Midora uses a **simplified, elegant design approach** with:
+
+- **Primary Background**: **Darkest purple** (`#3b0764`) for sophisticated appearance
+- **Header Background**: Darkest purple (`#3b0764`) for navbar
+- **Text Colors**: White and light purple for maximum contrast and readability
+- **Minimal Elements**: Clean, focused design without visual clutter
+- **Sequential Animations**: Content appears one by one with smooth transitions and hide/show effects
+
+### Key Design Principles
+1. **Simplicity First** - Clean, uncluttered interface
+2. **High Contrast** - Dark background with white text for readability
+3. **Sequential Reveal** - Content appears in a logical, animated sequence
+4. **Hide & Show Effects** - Smooth transitions between content states
+5. **Elegant Typography** - Large, bold headlines with clear hierarchy
+6. **Smooth Animations** - Subtle, professional transitions
+
+### Theme Features
+- **Color Palette**: Darkest purple design with semantic colors
+- **Typography**: Inter font family with consistent sizing scale
+- **Spacing**: 8px grid system for consistent layouts
+- **Animations**: Custom keyframes and smooth transitions
+- **Components**: Minimal, focused UI components
+
+For detailed theme documentation, see [docs/theme-system.md](docs/theme-system.md).
+
+## 📄 Page Structure
+
+### Pages Directory
+All page components are organized in `src/app/pages/` for better code organization:
+
+- **`home.tsx`** - Main home page with animated content
+- **`about.tsx`** - About page example
+- **Future pages** - Will be added here following the same pattern
+
+### Main Page
+The main `src/app/page.tsx` imports and renders the appropriate page component:
+
+```typescript
+import HomePage from './pages/home'
+
+export default function Page() {
+  return <HomePage />
+}
 ```
 
-#### Live Production (with Redis caching)
-```bash
-# Start live production environment
-docker-compose -f docker-compose.live.yml --env-file .env.live up --build
-```
+This structure allows for:
+- **Better Organization** - Clear separation of page components
+- **Easier Maintenance** - Each page is self-contained
+- **Scalability** - Easy to add new pages following the same pattern
+- **Code Reusability** - Common components can be shared between pages
 
-### Docker Compose Commands
+## 🧪 Development
 
-1. **Start services**
-   ```bash
-   docker-compose up --build
-   ```
-
-2. **Run in background**
-   ```bash
-   docker-compose up -d --build
-   ```
-
-3. **Stop services**
-   ```bash
-   docker-compose down
-   ```
-
-4. **View logs**
-   ```bash
-   docker-compose logs -f app
-   ```
-
-For detailed Docker setup and usage, see [Docker Setup Guide](./docs/docker-setup-guide.md).
-
-### Using Docker directly
-
-1. **Build the Docker image**
-   ```bash
-   docker build -t midora-ai-frontend .
-   ```
-
-2. **Run the container**
-   ```bash
-   docker run -p 3000:3000 midora-ai-frontend
-   ```
-
-## 📜 Available Scripts
+### Available Scripts
 
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
 - `npm run start` - Start production server
 - `npm run lint` - Run ESLint
 - `npm run type-check` - Run TypeScript type checking
-- `npm test` - Run tests
+- `npm run test` - Run tests
 - `npm run test:watch` - Run tests in watch mode
-- `npm run test:coverage` - Run tests with coverage
+- `npm run test:coverage` - Generate test coverage report
 
-## 🔧 Configuration
+### Code Quality
 
-### Environment Variables
+- **TypeScript** - Full type safety
+- **ESLint** - Code linting and formatting
+- **Prettier** - Code formatting
+- **Jest** - Unit testing framework
 
-Create a `.env.local` file based on `env.example`:
+### Component Development
+
+Components are built using:
+- **React 18** - Latest React features
+- **TypeScript** - Type-safe component props
+- **Tailwind CSS** - Utility-first styling
+- **Class Variance Authority** - Component variants
+
+### Adding New Pages
+
+To add a new page:
+
+1. **Create the page component** in `src/app/pages/`
+2. **Follow the naming convention** - `pageName.tsx`
+3. **Include the Header component** for consistent navigation
+4. **Use the theme colors** from the design system
+5. **Update routing** if needed
+
+Example:
+```typescript
+// src/app/pages/features.tsx
+'use client'
+
+import { Header } from '@/components/ui/Header'
+
+export default function FeaturesPage() {
+  return (
+    <main className="min-h-screen">
+      <Header />
+      {/* Page content */}
+    </main>
+  )
+}
+```
+
+## 🐳 Docker
+
+### Development Environment
 
 ```bash
-# Application
-NODE_ENV=development
-NEXT_TELEMETRY_DISABLED=1
-
-# API Configuration
-NEXT_PUBLIC_API_URL=http://localhost:3000/api
-CUSTOM_KEY=your_custom_key_here
+docker-compose -f docker-compose.dev.yml up
 ```
 
-### Next.js Configuration
-
-The application uses a custom `next.config.js` with:
-
-- App Router enabled
-- Standalone output for Docker optimization
-- Security headers
-- Image optimization settings
-
-### Tailwind CSS Configuration
-
-Custom Tailwind configuration in `tailwind.config.js` with:
-
-- Extended color palette
-- Custom spacing and typography
-- Component-specific utilities
-
-## 🧪 Testing
-
-### Running Tests
+### Production Build
 
 ```bash
-# Run all tests
-npm test
-
-# Run tests in watch mode
-npm run test:watch
-
-# Run tests with coverage
-npm run test:coverage
+docker-compose -f docker-compose.live.yml up
 ```
 
-### Test Structure
+### Local Development
 
-```
-tests/
-├── __mocks__/           # Mock files
-├── components/          # Component tests
-└── utils/              # Utility function tests
+```bash
+docker-compose -f docker-compose.local.yml up
 ```
 
-## 📚 API Documentation
+For detailed Docker setup instructions, see [docs/docker-setup-guide.md](docs/docker-setup-guide.md).
 
-### Health Check
+## 📚 Documentation
 
-```
-GET /api/health
-```
-
-Returns application health status and version information.
-
-### Hello API
-
-```
-GET /api/hello
-POST /api/hello
-```
-
-Simple API endpoint for testing and demonstration.
-
-## 🎨 Component Library
-
-### UI Components
-
-- **Button** - Multiple variants and sizes
-- **LoadingSpinner** - Configurable loading indicators
-- **ErrorDisplay** - Error boundary display
-- **NotFoundDisplay** - 404 page display
-
-### Component Features
-
-- TypeScript interfaces for all props
-- Variant system using class-variance-authority
-- Responsive design with Tailwind CSS
-- Accessibility features (ARIA labels, keyboard navigation)
-
-## 🔒 Security Features
-
-- Security headers in Next.js config
-- Input validation with Zod schemas
-- Error boundaries for graceful error handling
-- Environment variable protection
-
-## 📱 Responsive Design
-
-- Mobile-first approach
-- Breakpoint system using Tailwind CSS
-- Flexible grid layouts
-- Touch-friendly interactions
-
-## 🚀 Performance Optimizations
-
-- Next.js Image component for optimized images
-- Code splitting and dynamic imports
-- Static generation where possible
-- Bundle optimization
-- Docker multi-stage builds
-
-## 📖 Documentation
-
-- [Component Documentation](./docs/components.md)
-- [API Documentation](./docs/api.md)
-- [Deployment Guide](./docs/deployment.md)
-- [Contributing Guidelines](./docs/contributing.md)
+- [Theme System](docs/theme-system.md) - Complete theme documentation
+- [Components](docs/components.md) - Component library documentation
+- [API Reference](docs/api.md) - API endpoints and usage
+- [Deployment](docs/deployment.md) - Deployment guides
+- [Docker Guide](docs/docker-setup-guide.md) - Docker setup and usage
 
 ## 🤝 Contributing
 
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+### Development Workflow
+
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+### Code Standards
+
+- Follow TypeScript best practices
+- Use consistent naming conventions
+- Write meaningful commit messages
+- Include JSDoc comments for complex functions
+- Ensure responsive design principles
+- **Maintain simplicity** - Keep the design clean and focused
+- **Follow page structure** - Use the pages directory for new pages
 
 ## 📄 License
 
@@ -313,17 +267,17 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🆘 Support
 
-- **Documentation**: Check the [docs](./docs/) folder
-- **Issues**: Report bugs and feature requests via GitHub Issues
-- **Discussions**: Join the conversation in GitHub Discussions
+- **Documentation**: [docs/](docs/)
+- **Issues**: [GitHub Issues](https://github.com/your-org/midora.ai-frontend/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/your-org/midora.ai-frontend/discussions)
 
 ## 🙏 Acknowledgments
 
-- Next.js team for the amazing framework
-- Vercel for hosting and deployment
-- Tailwind CSS team for the utility-first CSS framework
-- The open-source community for inspiration and tools
+- **Next.js** - React framework
+- **Tailwind CSS** - Utility-first CSS framework
+- **Inter Font** - Beautiful typography
+- **React Community** - Amazing ecosystem
 
 ---
 
-**Built with ❤️ by the Midora AI Team**
+Built with ❤️ by the Midora AI Team

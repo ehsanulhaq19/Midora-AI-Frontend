@@ -1,466 +1,529 @@
-# Component Library Documentation
+# Midora AI Platform - Component Library
 
-This document provides comprehensive documentation for all UI components in the Midora AI Frontend application.
+## Overview
 
-## 🎯 Overview
+The Midora AI Platform component library provides a comprehensive set of reusable UI components built with React, TypeScript, and Tailwind CSS. All components follow consistent design patterns and are fully responsive.
 
-The component library is built with:
-- **TypeScript** for type safety
-- **Tailwind CSS** for styling
-- **class-variance-authority (cva)** for variant management
-- **Accessibility** best practices
-- **Responsive design** principles
+## Component Categories
 
-## 🏗️ Component Architecture
+### 1. Layout Components
 
-### Component Structure
-```
-src/components/
-├── ui/                    # Base UI components
-│   ├── Button.tsx        # Button component
-│   ├── LoadingSpinner.tsx # Loading indicators
-│   ├── ErrorDisplay.tsx  # Error handling
-│   └── NotFoundDisplay.tsx # 404 displays
-├── forms/                # Form components
-├── layout/               # Layout components
-└── shared/               # Shared components
-```
+#### Header
+**File**: `src/components/ui/Header.tsx`
 
-### Design Principles
-- **Composable**: Components can be combined and nested
-- **Configurable**: Props allow customization
-- **Accessible**: ARIA labels and keyboard navigation
-- **Responsive**: Mobile-first design approach
-- **Consistent**: Unified design language
+The main navigation header with logo, navigation menu, and authentication buttons.
 
-## 🎨 UI Components
+**Features**:
+- Fixed positioning with backdrop blur
+- Responsive navigation menu
+- Mobile hamburger menu
+- Login and signup buttons
+- Brand logo with gradient text
 
-### Button Component
+**Props**: None (self-contained)
 
-A versatile button component with multiple variants and sizes.
+**Usage**:
+```tsx
+import { Header } from '@/components/ui/Header'
 
-#### Props
-```typescript
-interface ButtonProps {
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'destructive'
-  size?: 'sm' | 'md' | 'lg' | 'xl'
-  disabled?: boolean
-  loading?: boolean
-  onClick?: () => void
-  type?: 'button' | 'submit' | 'reset'
-  className?: string
-  children?: React.ReactNode
+export default function Layout() {
+  return (
+    <div>
+      <Header />
+      {/* Other content */}
+    </div>
+  )
 }
 ```
 
-#### Variants
-- **primary**: Blue background with white text
-- **secondary**: Gray background with white text
-- **outline**: Transparent with colored border
-- **ghost**: Transparent with hover effects
-- **destructive**: Red background for dangerous actions
+**Styling Classes**:
+- `.bg-white/80` - Semi-transparent white background
+- `.backdrop-blur-md` - Backdrop blur effect
+- `.border-primary-100` - Primary color border
 
-#### Sizes
-- **sm**: Small button (h-9, px-3)
-- **md**: Medium button (h-10, px-4) - Default
-- **lg**: Large button (h-12, px-8)
-- **xl**: Extra large button
+#### Footer
+**File**: `src/components/ui/Footer.tsx`
 
-#### Usage Examples
+Comprehensive footer with navigation links, social media, and company information.
 
+**Features**:
+- Multi-column navigation layout
+- Social media links
+- Company branding
+- Legal links
+- System status indicator
+
+**Props**: None (self-contained)
+
+**Usage**:
 ```tsx
-// Basic usage
-<Button>Click me</Button>
+import { Footer } from '@/components/ui/Footer'
 
-// With variants
-<Button variant="primary" size="lg">
-  Primary Button
-</Button>
-
-<Button variant="outline" onClick={handleClick}>
-  Outline Button
-</Button>
-
-// Loading state
-<Button loading disabled>
-  Processing...
-</Button>
-
-// Form submission
-<Button type="submit" variant="primary">
-  Submit Form
-</Button>
+export default function Layout() {
+  return (
+    <div>
+      {/* Main content */}
+      <Footer />
+    </div>
+  )
+}
 ```
 
-#### Styling
-The Button component uses Tailwind CSS classes and supports:
-- Hover effects
-- Focus states with ring
-- Disabled states
-- Loading animations
-- Custom className overrides
+**Styling Classes**:
+- `.bg-neutral-900` - Dark background
+- `.gradient-text` - Gradient text effect
+- `.text-neutral-300` - Light text color
 
-### LoadingSpinner Component
+### 2. Hero Components
 
-A configurable loading spinner for async operations.
+#### MidoraHero
+**File**: `src/components/ui/MidoraHero.tsx`
 
-#### Props
+The main hero section showcasing the platform's capabilities and call-to-action.
+
+**Features**:
+- Gradient background with animated elements
+- Main headline with gradient text
+- Call-to-action buttons
+- Feature highlights
+- Trust indicators
+- Animated background elements
+
+**Props**: None (self-contained)
+
+**Usage**:
+```tsx
+import { MidoraHero } from '@/components/ui/MidoraHero'
+
+export default function HomePage() {
+  return (
+    <main>
+      <MidoraHero />
+      {/* Other sections */}
+    </main>
+  )
+}
+```
+
+**Styling Classes**:
+- `.bg-gradient-hero` - Hero background gradient
+- `.gradient-text` - Gradient text effect
+- `.animate-float` - Floating animation
+- `.bg-grid-pattern` - Grid pattern background
+
+### 3. Feature Components
+
+#### AIFeatures
+**File**: `src/components/ui/AIFeatures.tsx`
+
+Comprehensive feature showcase for AI models, tools, and market intelligence.
+
+**Features**:
+- AI Models section (OpenAI, Gemini, Claude, DeepSeek)
+- AI Tools section (Detection, Plagiarism, Humanizer, Analyzer)
+- Market Tools section (Stock Alerts, Analysis, Portfolio, Risk)
+- Responsive grid layout
+- Icon-based feature cards
+
+**Props**: None (self-contained)
+
+**Usage**:
+```tsx
+import { AIFeatures } from '@/components/ui/AIFeatures'
+
+export default function HomePage() {
+  return (
+    <main>
+      <MidoraHero />
+      <AIFeatures />
+      {/* Other sections */}
+    </main>
+  )
+}
+```
+
+**Styling Classes**:
+- `.bg-gradient-features` - Features background gradient
+- `.ai-card` - AI-themed card styling
+- `.feature-icon` - Feature icon container
+
+### 4. Call-to-Action Components
+
+#### MidoraCTA
+**File**: `src/components/ui/MidoraCTA.tsx`
+
+Engaging call-to-action section with multiple CTAs and social proof.
+
+**Features**:
+- Gradient background with pattern overlay
+- Multiple call-to-action buttons
+- Feature highlights
+- Social proof indicators
+- Trust signals
+
+**Props**: None (self-contained)
+
+**Usage**:
+```tsx
+import { MidoraCTA } from '@/components/ui/MidoraCTA'
+
+export default function HomePage() {
+  return (
+    <main>
+      <MidoraHero />
+      <AIFeatures />
+      <MidoraCTA />
+      {/* Other sections */}
+    </main>
+  )
+}
+```
+
+**Styling Classes**:
+- `.bg-gradient-midora` - Midora gradient background
+- `.bg-dots-pattern` - Dots pattern overlay
+- `.animate-fade-in` - Fade in animation
+
+### 5. Base UI Components
+
+#### Button
+**File**: `src/components/ui/Button.tsx`
+
+Versatile button component with multiple variants and sizes.
+
+**Features**:
+- Multiple variants (default, destructive, outline, secondary, ghost, link)
+- Multiple sizes (default, sm, lg, icon)
+- TypeScript support with proper typing
+- Class variance authority for variants
+- Forwarded ref support
+
+**Props**:
+```typescript
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link'
+  size?: 'default' | 'sm' | 'lg' | 'icon'
+  asChild?: boolean
+}
+```
+
+**Usage**:
+```tsx
+import { Button } from '@/components/ui/Button'
+
+export default function MyComponent() {
+  return (
+    <div>
+      <Button variant="primary" size="lg">
+        Primary Button
+      </Button>
+      <Button variant="outline" size="sm">
+        Outline Button
+      </Button>
+      <Button variant="ghost">
+        Ghost Button
+      </Button>
+    </div>
+  )
+}
+```
+
+**Variants**:
+- **default**: Primary button with primary colors
+- **destructive**: Red button for destructive actions
+- **outline**: Outlined button with primary colors
+- **secondary**: Secondary button with secondary colors
+- **ghost**: Transparent button with hover effects
+- **link**: Link-style button with underline
+
+**Sizes**:
+- **default**: Standard button size
+- **sm**: Small button size
+- **lg**: Large button size
+- **icon**: Square button for icons
+
+#### LoadingSpinner
+**File**: `src/components/ui/LoadingSpinner.tsx`
+
+Configurable loading spinner component.
+
+**Features**:
+- Multiple sizes
+- Customizable colors
+- Smooth animations
+- Accessible loading states
+
+**Props**:
 ```typescript
 interface LoadingSpinnerProps {
-  size?: 'sm' | 'md' | 'lg' | 'xl'
-  color?: 'default' | 'secondary' | 'white'
+  size?: 'sm' | 'md' | 'lg'
   className?: string
 }
 ```
 
-#### Sizes
-- **sm**: 16x16 pixels
-- **md**: 24x24 pixels - Default
-- **lg**: 32x32 pixels
-- **xl**: 48x48 pixels
-
-#### Colors
-- **default**: Primary brand color
-- **secondary**: Secondary color
-- **white**: White color for dark backgrounds
-
-#### Usage Examples
-
+**Usage**:
 ```tsx
-// Basic usage
-<LoadingSpinner />
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 
-// Different sizes
-<LoadingSpinner size="lg" />
-<LoadingSpinner size="sm" />
-
-// Different colors
-<LoadingSpinner color="white" />
-<LoadingSpinner color="secondary" />
-
-// With custom styling
-<LoadingSpinner className="text-blue-500" />
+export default function MyComponent() {
+  return (
+    <div>
+      <LoadingSpinner size="lg" />
+      <LoadingSpinner size="md" />
+      <LoadingSpinner size="sm" />
+    </div>
+  )
+}
 ```
 
-### ErrorDisplay Component
+#### ErrorDisplay
+**File**: `src/components/ui/ErrorDisplay.tsx`
 
-A comprehensive error display component for error boundaries.
+Error boundary display component for graceful error handling.
 
-#### Props
+**Features**:
+- Error message display
+- Retry functionality
+- User-friendly error presentation
+- Fallback UI
+
+**Props**:
 ```typescript
 interface ErrorDisplayProps {
-  error: Error
-  onReset: () => void
-  title?: string
-  message?: string
+  error?: Error
+  resetError?: () => void
 }
 ```
 
-#### Features
-- Error icon and styling
-- Customizable title and message
-- Error details in development mode
-- Action buttons (Try Again, Go Home)
-- Responsive design
-
-#### Usage Examples
-
+**Usage**:
 ```tsx
-// Basic usage
-<ErrorDisplay 
-  error={error}
-  onReset={handleReset}
-/>
+import { ErrorDisplay } from '@/components/ui/ErrorDisplay'
 
-// With custom messages
-<ErrorDisplay 
-  error={error}
-  onReset={handleReset}
-  title="Something went wrong!"
-  message="We encountered an unexpected error."
-/>
-```
-
-### NotFoundDisplay Component
-
-A 404 page component for missing routes.
-
-#### Props
-```typescript
-interface NotFoundDisplayProps {
-  title?: string
-  message?: string
-  backUrl?: string
+export default function MyComponent() {
+  return (
+    <ErrorDisplay 
+      error={new Error('Something went wrong')}
+      resetError={() => window.location.reload()}
+    />
+  )
 }
 ```
 
-#### Features
-- 404 icon and styling
-- Customizable title and message
-- Navigation buttons (Go Back, Go Home)
+#### NotFoundDisplay
+**File**: `src/components/ui/NotFoundDisplay.tsx`
+
+404 page display component.
+
+**Features**:
+- User-friendly 404 message
+- Navigation options
+- Consistent styling
 - Responsive design
 
-#### Usage Examples
+**Props**: None (self-contained)
 
+**Usage**:
 ```tsx
-// Basic usage
-<NotFoundDisplay />
+import { NotFoundDisplay } from '@/components/ui/NotFoundDisplay'
 
-// With custom content
-<NotFoundDisplay 
-  title="Page Not Found"
-  message="The page you're looking for doesn't exist."
-  backUrl="/dashboard"
-/>
+export default function NotFoundPage() {
+  return <NotFoundDisplay />
+}
 ```
 
-## 🎭 Page Components
+## Component Styling
 
-### WelcomeHero Component
+### Design System Integration
 
-The main hero section for the homepage.
+All components use the Midora AI theme system defined in `src/lib/theme.ts`:
 
-#### Features
-- Gradient background
-- Welcome message with gradient text
-- Feature highlights
-- Call-to-action buttons
-- Responsive grid layout
+- **Colors**: Primary and secondary purple palettes
+- **Typography**: Inter font family with consistent sizing
+- **Spacing**: 8px grid system
+- **Shadows**: Consistent shadow system
+- **Transitions**: Smooth animations and hover effects
 
-#### Usage
+### Custom CSS Classes
+
+The following custom CSS classes are available in `src/app/globals.css`:
+
+#### Button Classes
+- `.btn` - Base button styles
+- `.btn-primary` - Primary button variant
+- `.btn-secondary` - Secondary button variant
+- `.btn-outline` - Outline button variant
+- `.btn-ghost` - Ghost button variant
+- `.btn-accent` - Accent button variant
+
+#### Card Classes
+- `.card` - Base card styles
+- `.card-hover` - Hover effects for cards
+- `.ai-card` - AI-themed card styling
+
+#### Utility Classes
+- `.gradient-text` - Gradient text effect
+- `.glass-effect` - Glass morphism effect
+- `.floating-element` - Floating animation
+- `.glow-effect` - Glowing animation
+
+#### Animation Classes
+- `.animate-fade-in` - Fade in animation
+- `.animate-slide-up` - Slide up animation
+- `.animate-slide-down` - Slide down animation
+- `.animate-scale-in` - Scale in animation
+- `.animate-bounce-gentle` - Gentle bounce animation
+- `.animate-float` - Floating animation
+- `.animate-glow` - Glowing animation
+
+## Responsive Design
+
+All components are built with mobile-first responsive design:
+
+- **Breakpoints**: sm (640px), md (768px), lg (1024px), xl (1280px), 2xl (1536px)
+- **Grid Systems**: Responsive grid layouts using Tailwind CSS
+- **Typography**: Responsive font sizing
+- **Spacing**: Responsive spacing and margins
+- **Navigation**: Mobile-friendly navigation patterns
+
+## Accessibility
+
+Components include accessibility features:
+
+- **ARIA Labels**: Proper labeling for screen readers
+- **Keyboard Navigation**: Full keyboard support
+- **Focus Management**: Visible focus indicators
+- **Semantic HTML**: Proper HTML structure
+- **Color Contrast**: WCAG compliant color ratios
+
+## Performance
+
+Components are optimized for performance:
+
+- **Code Splitting**: Dynamic imports where appropriate
+- **Lazy Loading**: Components load when needed
+- **Optimized Images**: Next.js Image component usage
+- **Minimal Re-renders**: Efficient React patterns
+- **Bundle Optimization**: Tree shaking and code splitting
+
+## Testing
+
+Components include testing support:
+
+- **Unit Tests**: Jest and Testing Library setup
+- **Component Tests**: Isolated component testing
+- **Accessibility Tests**: Screen reader and keyboard testing
+- **Visual Regression**: Component visual testing
+
+## Customization
+
+### Theme Customization
+
+To customize component appearance:
+
+1. **Modify Theme File**: Update `src/lib/theme.ts`
+2. **Update Tailwind Config**: Sync changes in `tailwind.config.js`
+3. **Update CSS Variables**: Modify `src/app/globals.css`
+4. **Test Changes**: Ensure components render correctly
+
+### Component Variants
+
+To add new component variants:
+
+1. **Update Component**: Add new variant to component
+2. **Update Types**: Add variant to TypeScript interface
+3. **Add Styles**: Include new variant styles
+4. **Update Tests**: Add tests for new variant
+5. **Document**: Update this documentation
+
+## Best Practices
+
+1. **Consistent Naming**: Use consistent naming conventions
+2. **TypeScript**: Always include proper type definitions
+3. **Props Interface**: Define clear props interfaces
+4. **Default Props**: Provide sensible defaults
+5. **Error Handling**: Include proper error boundaries
+6. **Accessibility**: Ensure ARIA compliance
+7. **Performance**: Optimize for performance
+8. **Testing**: Include comprehensive tests
+9. **Documentation**: Document all props and usage
+10. **Responsive**: Ensure mobile-first design
+
+## Examples
+
+### Complete Page Example
+
 ```tsx
-import { WelcomeHero } from '@/components/ui/WelcomeHero'
+import { Header } from '@/components/ui/Header'
+import { MidoraHero } from '@/components/ui/MidoraHero'
+import { AIFeatures } from '@/components/ui/AIFeatures'
+import { MidoraCTA } from '@/components/ui/MidoraCTA'
+import { Footer } from '@/components/ui/Footer'
 
 export default function HomePage() {
   return (
-    <main>
-      <WelcomeHero />
-      {/* Other content */}
+    <main className="min-h-screen">
+      <Header />
+      <MidoraHero />
+      <AIFeatures />
+      <MidoraCTA />
+      <Footer />
     </main>
   )
 }
 ```
 
-### FeatureGrid Component
+### Custom Component Example
 
-Displays application features in a responsive grid.
-
-#### Features
-- 6 feature cards
-- Icons and descriptions
-- Hover effects
-- Responsive layout (1-3 columns)
-
-#### Usage
 ```tsx
-import { FeatureGrid } from '@/components/ui/FeatureGrid'
+import { Button } from '@/components/ui/Button'
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 
-export default function HomePage() {
+interface CustomFeatureCardProps {
+  title: string
+  description: string
+  icon: React.ReactNode
+  loading?: boolean
+  onAction?: () => void
+}
+
+export function CustomFeatureCard({
+  title,
+  description,
+  icon,
+  loading = false,
+  onAction
+}: CustomFeatureCardProps) {
   return (
-    <main>
-      <WelcomeHero />
-      <FeatureGrid />
-      {/* Other content */}
-    </main>
+    <div className="ai-card">
+      <div className="feature-icon mb-4">
+        {loading ? <LoadingSpinner size="sm" /> : icon}
+      </div>
+      <h3 className="text-xl font-semibold text-text-primary mb-2">
+        {title}
+      </h3>
+      <p className="text-text-secondary mb-4">
+        {description}
+      </p>
+      {onAction && (
+        <Button 
+          variant="primary" 
+          size="sm" 
+          onClick={onAction}
+          disabled={loading}
+        >
+          {loading ? 'Loading...' : 'Learn More'}
+        </Button>
+      )}
+    </div>
   )
 }
 ```
 
-### CallToAction Component
+## Support
 
-Bottom call-to-action section for the homepage.
+For questions about components or to request new features:
 
-#### Features
-- Gradient background
-- Action buttons
-- Company information
-- Responsive design
-
-## 🎨 Styling System
-
-### CSS Classes
-Components use Tailwind CSS utility classes with custom extensions:
-
-```css
-/* Custom component classes */
-.btn {
-  @apply inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
-}
-
-.btn-primary {
-  @apply btn bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500 shadow-lg hover:shadow-xl;
-}
-```
-
-### Color Palette
-```css
-:root {
-  --primary-50: #eff6ff;
-  --primary-100: #dbeafe;
-  --primary-500: #3b82f6;
-  --primary-600: #2563eb;
-  --primary-700: #1d4ed8;
-  --primary-900: #1e3a8a;
-  
-  --secondary-50: #f8fafc;
-  --secondary-100: #f1f5f9;
-  --secondary-500: #64748b;
-  --secondary-600: #475569;
-  --secondary-700: #334155;
-  --secondary-900: #0f172a;
-}
-```
-
-### Spacing System
-```css
-:root {
-  --spacing-18: 4.5rem;
-  --spacing-88: 22rem;
-}
-```
-
-### Typography
-```css
-:root {
-  --font-family-sans: 'Inter', system-ui, sans-serif;
-}
-```
-
-## ♿ Accessibility Features
-
-### ARIA Labels
-- Proper button roles
-- Loading states
-- Error descriptions
-- Navigation landmarks
-
-### Keyboard Navigation
-- Tab order
-- Focus indicators
-- Keyboard shortcuts
-- Screen reader support
-
-### Color Contrast
-- WCAG AA compliance
-- High contrast ratios
-- Color-blind friendly
-
-## 📱 Responsive Design
-
-### Breakpoints
-```css
-/* Tailwind breakpoints */
-sm: 640px   /* Small devices */
-md: 768px   /* Medium devices */
-lg: 1024px  /* Large devices */
-xl: 1280px  /* Extra large devices */
-2xl: 1536px /* 2X large devices */
-```
-
-### Mobile-First Approach
-- Base styles for mobile
-- Progressive enhancement
-- Touch-friendly interactions
-- Optimized layouts
-
-## 🔧 Customization
-
-### Theme Overrides
-```typescript
-// Custom button variants
-const customButtonVariants = cva(
-  'base-classes',
-  {
-    variants: {
-      variant: {
-        custom: 'bg-custom-color text-white',
-      },
-      size: {
-        custom: 'h-16 px-12',
-      },
-    },
-  }
-)
-```
-
-### CSS Custom Properties
-```css
-:root {
-  --component-border-radius: 0.75rem;
-  --component-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-}
-```
-
-## 🧪 Testing Components
-
-### Component Testing
-```typescript
-import { render, screen } from '@testing-library/react'
-import { Button } from './Button'
-
-describe('Button', () => {
-  it('renders with correct text', () => {
-    render(<Button>Click me</Button>)
-    expect(screen.getByText('Click me')).toBeInTheDocument()
-  })
-
-  it('applies variant classes', () => {
-    render(<Button variant="primary">Button</Button>)
-    expect(screen.getByRole('button')).toHaveClass('bg-primary-600')
-  })
-})
-```
-
-### Accessibility Testing
-```typescript
-import { axe, toHaveNoViolations } from 'jest-axe'
-
-expect.extend(toHaveNoViolations)
-
-it('should not have accessibility violations', async () => {
-  const { container } = render(<Button>Button</Button>)
-  const results = await axe(container)
-  expect(results).toHaveNoViolations()
-})
-```
-
-## 📚 Best Practices
-
-### Component Design
-1. **Single Responsibility**: Each component has one clear purpose
-2. **Props Interface**: Define clear TypeScript interfaces
-3. **Default Values**: Provide sensible defaults
-4. **Error Handling**: Graceful fallbacks for edge cases
-
-### Performance
-1. **Memoization**: Use React.memo for expensive components
-2. **Lazy Loading**: Dynamic imports for heavy components
-3. **Bundle Size**: Minimize dependencies
-4. **Tree Shaking**: ES6 modules for better optimization
-
-### Accessibility
-1. **Semantic HTML**: Use proper HTML elements
-2. **ARIA Labels**: Provide context for screen readers
-3. **Keyboard Navigation**: Full keyboard support
-4. **Color Contrast**: Meet WCAG guidelines
-
-## 🔄 Component Updates
-
-### Version History
-- **v0.1.0**: Initial component library
-- **v0.2.0**: Added variant system
-- **v0.3.0**: Enhanced accessibility
-- **v0.4.0**: Performance optimizations
-
-### Migration Guide
-When updating components:
-1. Check breaking changes
-2. Update prop interfaces
-3. Test existing usage
-4. Update documentation
-
----
-
-**Last Updated**: December 2024  
-**Version**: 0.1.0  
-**Maintainer**: Midora AI Team
+- **Documentation**: Check this component documentation
+- **Issues**: Report bugs via GitHub Issues
+- **Discussions**: Join conversations in GitHub Discussions
+- **Contributing**: Submit pull requests for improvements
