@@ -91,6 +91,7 @@ module.exports = {
         sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
         mono: ['JetBrains Mono', 'Fira Code', 'Monaco', 'Consolas', 'monospace'],
         display: ['Inter', 'system-ui', 'sans-serif'],
+        serif: ['Playfair Display', 'Georgia', 'serif'],
       },
       spacing: {
         '18': '4.5rem',
@@ -104,6 +105,11 @@ module.exports = {
         'bounce-gentle': 'bounceGentle 2s infinite',
         'float': 'float 6s ease-in-out infinite',
         'glow': 'glow 2s ease-in-out infinite alternate',
+        'fade-in-down': 'fadeInDown 0.8s ease-out forwards',
+        'slide-up': 'slideUp 0.7s ease-out forwards',
+        'progress-bar': 'progressBar 0.8s ease-out forwards',
+        'bounce-in': 'bounceIn 0.8s ease-out forwards',
+        'float-chat': 'floatChat 3s ease-in-out infinite',
       },
       keyframes: {
         fadeIn: {
@@ -130,9 +136,31 @@ module.exports = {
           '0%, 100%': { transform: 'translateY(0px)' },
           '50%': { transform: 'translateY(-20px)' },
         },
+        floatChat: {
+          '0%, 100%': { opacity: '0', transform: 'scale(0) translate(0, 0)' },
+          '50%': { opacity: '0.5', transform: 'scale(1) translate(20px, -20px)' },
+        },
         glow: {
           '0%': { boxShadow: '0 0 20px rgba(168, 85, 247, 0.4)' },
           '100%': { boxShadow: '0 0 30px rgba(168, 85, 247, 0.8)' },
+        },
+        fadeInDown: {
+          '0%': { opacity: '0', transform: 'translateY(-20px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        slideUp: {
+          '0%': { opacity: '0', transform: 'translateY(20px) scale(0.95)' },
+          '100%': { opacity: '1', transform: 'translateY(0) scale(1)' },
+        },
+        progressBar: {
+          '0%': { width: '0' },
+          '100%': { width: '100%' },
+        },
+        bounceIn: {
+          '0%': { opacity: '0', transform: 'scale(0.3)' },
+          '50%': { opacity: '1', transform: 'scale(1.05)' },
+          '70%': { transform: 'scale(0.9)' },
+          '100%': { opacity: '1', transform: 'scale(1)' },
         },
       },
       backgroundImage: {

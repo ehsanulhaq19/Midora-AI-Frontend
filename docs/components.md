@@ -184,7 +184,208 @@ export default function HomePage() {
 - `.bg-dots-pattern` - Dots pattern overlay
 - `.animate-fade-in` - Fade in animation
 
-### 5. Base UI Components
+### 5. Authentication Components
+
+#### LoginForm
+**File**: `src/components/auth/LoginForm.tsx`
+
+The main login form component with email/password authentication and Google OAuth.
+
+**Features**:
+- Email and password fields
+- Form validation
+- Google OAuth integration
+- Error handling
+- Loading states
+- Navigation to signup
+
+**Props**:
+```typescript
+interface LoginFormProps {
+  className?: string
+  onLogin?: (credentials: { email: string; password: string }) => void
+  onGoogleLogin?: () => void
+  onSignupClick?: () => void
+  loading?: boolean
+}
+```
+
+**Usage**:
+```tsx
+import { LoginForm } from '@/components/auth/LoginForm'
+
+<LoginForm
+  onLogin={handleLogin}
+  onGoogleLogin={handleGoogleLogin}
+  onSignupClick={handleSignupClick}
+  loading={isLoading}
+/>
+```
+
+**Form Validation**:
+- Email format validation
+- Password length requirement (minimum 6 characters)
+- Required field validation
+- Real-time error clearing
+
+**Styling Features**:
+- Gradient background
+- Glass morphism effect
+- Responsive design
+- Consistent with theme system
+
+#### SignupForm
+**File**: `src/components/auth/SignupForm.tsx`
+
+The signup form component for new user registration.
+
+**Features**:
+- Full name, email, password, and confirm password fields
+- Comprehensive form validation
+- Google OAuth integration
+- Terms of service and privacy policy links
+- Navigation to login
+
+**Props**:
+```typescript
+interface SignupFormProps {
+  className?: string
+  onSignup?: (data: { email: string; password: string; confirmPassword: string; name: string }) => void
+  onGoogleSignup?: () => void
+  onLoginClick?: () => void
+  loading?: boolean
+}
+```
+
+**Usage**:
+```tsx
+import { SignupForm } from '@/components/auth/SignupForm'
+
+<SignupForm
+  onSignup={handleSignup}
+  onGoogleSignup={handleGoogleSignup}
+  onLoginClick={handleLoginClick}
+  loading={isLoading}
+/>
+```
+
+**Form Validation**:
+- Name requirement
+- Email format validation
+- Password strength (minimum 6 characters)
+- Password confirmation matching
+- Required field validation
+
+### 6. Base UI Components
+
+#### Input
+**File**: `src/components/ui/Input.tsx`
+
+A versatile form input component with validation support and multiple variants.
+
+**Features**:
+- Multiple input types (text, email, password, etc.)
+- Built-in validation error display
+- Helper text support
+- Multiple sizes (sm, default, lg)
+- Variants (default, error, success)
+- Accessible labels and error messages
+
+**Props**:
+```typescript
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  label?: string
+  error?: string
+  helperText?: string
+  variant?: 'default' | 'error' | 'success'
+  size?: 'sm' | 'default' | 'lg'
+}
+```
+
+**Usage**:
+```tsx
+import { Input } from '@/components/ui/Input'
+
+<Input
+  type="email"
+  label="Email Address"
+  placeholder="Enter your email"
+  error={errors.email}
+  helperText="We'll never share your email"
+/>
+```
+
+**Styling Classes**:
+- `.rounded-lg` - Rounded corners
+- `.border-neutral-200` - Default border color
+- `.focus-visible:ring-2` - Focus ring styling
+- `.text-sm` - Consistent typography
+
+#### Card
+**File**: `src/components/ui/Card.tsx`
+
+A flexible card component system for creating consistent layouts.
+
+**Features**:
+- Multiple card sections (header, content, footer)
+- Consistent spacing and typography
+- Responsive design
+- Shadow and border styling
+
+**Components**:
+- `Card` - Main container
+- `CardHeader` - Header section with title and description
+- `CardTitle` - Card title with proper typography
+- `CardDescription` - Descriptive text below title
+- `CardContent` - Main content area
+- `CardFooter` - Footer section for actions
+
+**Usage**:
+```tsx
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
+
+<Card>
+  <CardHeader>
+    <CardTitle>Card Title</CardTitle>
+  </CardHeader>
+  <CardContent>
+    <p>Card content goes here</p>
+  </CardContent>
+</Card>
+```
+
+**Styling Classes**:
+- `.rounded-xl` - Extra large border radius
+- `.border-neutral-200` - Subtle border
+- `.shadow-sm` - Light shadow
+- `.bg-white` - Clean white background
+
+#### Separator
+**File**: `src/components/ui/Separator.tsx`
+
+A visual separator component for dividing content sections.
+
+**Features**:
+- Horizontal and vertical orientations
+- Accessible ARIA attributes
+- Customizable styling
+- Decorative and semantic modes
+
+**Props**:
+```typescript
+interface SeparatorProps {
+  orientation?: 'horizontal' | 'vertical'
+  decorative?: boolean
+  className?: string
+}
+```
+
+**Usage**:
+```tsx
+import { Separator } from '@/components/ui/Separator'
+
+<Separator orientation="horizontal" className="my-4" />
+```
 
 #### Button
 **File**: `src/components/ui/Button.tsx`
