@@ -6,50 +6,67 @@ import { Input } from '@/components/ui/Input'
 import { Card, CardContent } from '@/components/ui/Card'
 import { Separator } from '@/components/ui/Separator'
 import { cn } from '@/lib/utils'
+import { useAuth } from '@/contexts/AuthContext'
+import { LoginFormData } from '@/api/auth/types'
+import { t } from '@/i18n'
 
 export interface LoginFormProps {
   className?: string
-  onLogin?: (credentials: { email: string; password: string }) => void
   onGoogleLogin?: () => void
   onSignupClick?: () => void
-  loading?: boolean
 }
 
 export function LoginForm({
   className,
-  onLogin,
   onGoogleLogin,
-  onSignupClick,
-  loading = false
+  onSignupClick
 }: LoginFormProps) {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const { login, isLoading, error, clearError } = useAuth()
+  const [formData, setFormData] = useState<LoginFormData>({
+    email: '',
+    password: ''
+  })
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({})
 
   const validateForm = () => {
     const newErrors: { email?: string; password?: string } = {}
 
-    if (!email) {
-      newErrors.email = 'Email is required'
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'Please enter a valid email'
+    if (!formData.email) {
+      newErrors.email = t('auth.emailRequired')
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = t('auth.validEmailRequired')
     }
 
-    if (!password) {
-      newErrors.password = 'Password is required'
-    } else if (password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters'
+    if (!formData.password) {
+      newErrors.password = t('auth.passwordRequired')
+    } else if (formData.password.length < 6) {
+      newErrors.password = t('auth.passwordMinLength')
     }
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
     if (validateForm()) {
-      onLogin?.({ email, password })
+      clearError()
+      await login(formData)
+    }
+  }
+
+  const handleInputChange = (field: keyof LoginFormData) => (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setFormData(prev => ({ ...prev, [field]: e.target.value }))
+    // Clear error when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: undefined }))
+    }
+    // Clear auth error when user starts typing
+    if (error) {
+      clearError()
     }
   }
 
@@ -67,10 +84,10 @@ export function LoginForm({
           </div>
         </div>
         <h1 className="text-4xl font-serif font-bold text-gray-900 mb-3">
-          Welcome Back
+          {t('auth.welcomeBack')}
         </h1>
         <p className="text-lg text-gray-700">
-          Sign in to your Midora AI account
+          {t('auth.signInToAccount')}
         </p>
       </div>
 
@@ -82,7 +99,7 @@ export function LoginForm({
             variant="outline"
             onClick={handleGoogleLogin}
             className="w-full h-12 text-base font-medium border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-400 rounded-lg transition-colors"
-            disabled={loading}
+            disabled={isLoading}
           >
             <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
               <path
@@ -102,7 +119,7 @@ export function LoginForm({
                 d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
               />
             </svg>
-            Continue with Google
+{t('auth.signInWithGoogle')}
           </Button>
 
           {/* Separator */}
@@ -115,22 +132,29 @@ export function LoginForm({
             </div>
           </div>
 
+          {/* Error Display */}
+          {error && (
+            <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-sm text-red-600">{error}</p>
+            </div>
+          )}
+
           {/* Email Login Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input
               type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              placeholder={t('auth.enterEmail')}
+              value={formData.email}
+              onChange={handleInputChange('email')}
               error={errors.email}
               className="h-12 text-base border-gray-300 focus:border-purple-500 focus:ring-purple-500"
             />
             
             <Input
               type="password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              placeholder={t('auth.enterPassword')}
+              value={formData.password}
+              onChange={handleInputChange('password')}
               error={errors.password}
               className="h-12 text-base border-gray-300 focus:border-purple-500 focus:ring-purple-500"
             />
@@ -138,21 +162,21 @@ export function LoginForm({
             <Button
               type="submit"
               className="w-full h-12 text-base font-medium bg-purple-800 text-white hover:bg-purple-900 rounded-lg transition-colors"
-              disabled={loading}
+              disabled={isLoading}
             >
-              {loading ? 'Signing in...' : 'Sign In'}
+              {isLoading ? t('auth.signingIn') : t('auth.login')}
             </Button>
           </form>
 
           {/* Sign Up Link */}
           <div className="text-center text-sm text-gray-600">
-            Don't have an account?{' '}
+            {t('auth.dontHaveAccount')}{' '}
             <button
               type="button"
               onClick={onSignupClick}
               className="text-purple-600 hover:text-purple-700 font-medium underline underline-offset-2"
             >
-              Sign up
+              {t('auth.signup')}
             </button>
           </div>
         </CardContent>

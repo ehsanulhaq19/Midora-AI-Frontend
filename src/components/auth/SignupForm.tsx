@@ -6,30 +6,32 @@ import { Input } from '@/components/ui/Input'
 import { Card, CardContent } from '@/components/ui/Card'
 import { Separator } from '@/components/ui/Separator'
 import { cn } from '@/lib/utils'
+import { useAuth } from '@/contexts/AuthContext'
+import { SignupFormData } from '@/api/auth/types'
+import { t } from '@/i18n'
 
 export interface SignupFormProps {
   className?: string
-  onSignup?: (data: { email: string; password: string; confirmPassword: string; name: string }) => void
   onGoogleSignup?: () => void
   onLoginClick?: () => void
-  loading?: boolean
 }
 
 export function SignupForm({
   className,
-  onSignup,
   onGoogleSignup,
-  onLoginClick,
-  loading = false
+  onLoginClick
 }: SignupFormProps) {
-  const [formData, setFormData] = useState({
-    name: '',
+  const { register, isLoading, error, clearError } = useAuth()
+  const [formData, setFormData] = useState<SignupFormData>({
     email: '',
+    first_name: '',
+    last_name: '',
     password: '',
     confirmPassword: ''
   })
   const [errors, setErrors] = useState<{
-    name?: string
+    first_name?: string
+    last_name?: string
     email?: string
     password?: string
     confirmPassword?: string
@@ -38,47 +40,57 @@ export function SignupForm({
   const validateForm = () => {
     const newErrors: typeof errors = {}
 
-    if (!formData.name.trim()) {
-      newErrors.name = 'Name is required'
+    if (!formData.first_name.trim()) {
+      newErrors.first_name = t('auth.nameRequired')
+    }
+
+    if (!formData.last_name.trim()) {
+      newErrors.last_name = t('auth.nameRequired')
     }
 
     if (!formData.email) {
-      newErrors.email = 'Email is required'
+      newErrors.email = t('auth.emailRequired')
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email'
+      newErrors.email = t('auth.validEmailRequired')
     }
 
     if (!formData.password) {
-      newErrors.password = 'Password is required'
+      newErrors.password = t('auth.passwordRequired')
     } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters'
+      newErrors.password = t('auth.passwordMinLength')
     }
 
     if (!formData.confirmPassword) {
-      newErrors.confirmPassword = 'Please confirm your password'
+      newErrors.confirmPassword = t('auth.confirmPasswordRequired')
     } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match'
+      newErrors.confirmPassword = t('auth.passwordsDoNotMatch')
     }
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
     if (validateForm()) {
-      onSignup?.(formData)
+      clearError()
+      const { confirmPassword, ...userData } = formData
+      await register(userData)
     }
   }
 
-  const handleInputChange = (field: keyof typeof formData) => (
+  const handleInputChange = (field: keyof SignupFormData) => (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     setFormData(prev => ({ ...prev, [field]: e.target.value }))
     // Clear error when user starts typing
-    if (errors[field]) {
+    if (errors[field as keyof typeof errors]) {
       setErrors(prev => ({ ...prev, [field]: undefined }))
+    }
+    // Clear auth error when user starts typing
+    if (error) {
+      clearError()
     }
   }
 
@@ -96,10 +108,10 @@ export function SignupForm({
           </div>
         </div>
         <h1 className="text-4xl font-serif font-bold text-gray-900 mb-3">
-          Create Account
+          {t('auth.createAccount')}
         </h1>
         <p className="text-lg text-gray-700">
-          Join Midora AI and start your journey
+          {t('auth.startJourney')}
         </p>
       </div>
 
@@ -111,7 +123,7 @@ export function SignupForm({
             variant="outline"
             onClick={handleGoogleSignup}
             className="w-full h-12 text-base font-medium border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-400 rounded-lg transition-colors"
-            disabled={loading}
+            disabled={isLoading}
           >
             <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
               <path
@@ -131,7 +143,7 @@ export function SignupForm({
                 d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
               />
             </svg>
-            Continue with Google
+{t('auth.signUpWithGoogle')}
           </Button>
 
           {/* Separator */}
@@ -144,20 +156,37 @@ export function SignupForm({
             </div>
           </div>
 
+          {/* Error Display */}
+          {error && (
+            <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-sm text-red-600">{error}</p>
+            </div>
+          )}
+
           {/* Email Signup Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
-            <Input
-              type="text"
-              placeholder="Enter your full name"
-              value={formData.name}
-              onChange={handleInputChange('name')}
-              error={errors.name}
-              className="h-12 text-base border-gray-300 focus:border-purple-500 focus:ring-purple-500"
-            />
+            <div className="grid grid-cols-2 gap-4">
+              <Input
+                type="text"
+                placeholder={t('auth.enterFirstName')}
+                value={formData.first_name}
+                onChange={handleInputChange('first_name')}
+                error={errors.first_name}
+                className="h-12 text-base border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+              />
+              <Input
+                type="text"
+                placeholder={t('auth.enterLastName')}
+                value={formData.last_name}
+                onChange={handleInputChange('last_name')}
+                error={errors.last_name}
+                className="h-12 text-base border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+              />
+            </div>
 
             <Input
               type="email"
-              placeholder="Enter your email"
+              placeholder={t('auth.enterEmail')}
               value={formData.email}
               onChange={handleInputChange('email')}
               error={errors.email}
@@ -166,7 +195,7 @@ export function SignupForm({
             
             <Input
               type="password"
-              placeholder="Create a password"
+              placeholder={t('auth.createPassword')}
               value={formData.password}
               onChange={handleInputChange('password')}
               error={errors.password}
@@ -175,7 +204,7 @@ export function SignupForm({
 
             <Input
               type="password"
-              placeholder="Confirm your password"
+              placeholder={t('auth.confirmYourPassword')}
               value={formData.confirmPassword}
               onChange={handleInputChange('confirmPassword')}
               error={errors.confirmPassword}
@@ -185,21 +214,21 @@ export function SignupForm({
             <Button
               type="submit"
               className="w-full h-12 text-base font-medium bg-purple-800 text-white hover:bg-purple-900 rounded-lg transition-colors"
-              disabled={loading}
+              disabled={isLoading}
             >
-              {loading ? 'Creating account...' : 'Create Account'}
+              {isLoading ? t('auth.creatingAccount') : t('auth.createAccount')}
             </Button>
           </form>
 
           {/* Sign In Link */}
           <div className="text-center text-sm text-gray-600">
-            Already have an account?{' '}
+            {t('auth.alreadyHaveAccount')}{' '}
             <button
               type="button"
               onClick={onLoginClick}
               className="text-purple-600 hover:text-purple-700 font-medium underline underline-offset-2"
             >
-              Sign in
+              {t('auth.login')}
             </button>
           </div>
         </CardContent>

@@ -2,12 +2,10 @@
 
 import { SignupForm } from '@/components/auth/SignupForm'
 import { AuthLandingPage } from '@/components/auth/AuthLandingPage'
+import { useRouter } from 'next/navigation'
 
 export default function SignupPage() {
-  const handleSignup = (data: { email: string; password: string; confirmPassword: string; name: string }) => {
-    // TODO: Implement signup logic
-    console.log('Signup attempt:', data)
-  }
+  const router = useRouter()
 
   const handleGoogleSignup = () => {
     // TODO: Implement Google OAuth
@@ -15,15 +13,13 @@ export default function SignupPage() {
   }
 
   const handleLoginClick = () => {
-    // TODO: Navigate to login page
-    window.location.href = '/login'
+    router.push('/login')
   }
 
   return (
     <AuthLandingPage>
       <div className="w-full max-w-md">
         <SignupForm
-          onSignup={handleSignup}
           onGoogleSignup={handleGoogleSignup}
           onLoginClick={handleLoginClick}
         />

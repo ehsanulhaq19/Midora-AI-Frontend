@@ -2,6 +2,9 @@ import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import '@/app/globals.css'
 import { CustomCursor } from '@/components/ui/CustomCursor'
+import { AuthProvider } from '@/contexts/AuthContext'
+import { initializeI18n } from '@/i18n'
+import { initializeInterceptors } from '@/api/interceptors'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -40,13 +43,21 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  // Initialize i18n and interceptors
+  if (typeof window !== 'undefined') {
+    initializeI18n()
+    initializeInterceptors()
+  }
+
   return (
     <html lang="en">
       <body className={inter.className}>
-        <CustomCursor />
-        <div className="min-h-screen bg-background-primary">
-          {children}
-        </div>
+        <AuthProvider>
+          <CustomCursor />
+          <div className="min-h-screen bg-background-primary">
+            {children}
+          </div>
+        </AuthProvider>
       </body>
     </html>
   )
