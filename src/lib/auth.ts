@@ -13,8 +13,8 @@ export const COOKIE_NAMES = {
 
 // Token expiration times (in days for cookies)
 export const TOKEN_EXPIRY = {
-  ACCESS_TOKEN: 1, // 1 day
-  REFRESH_TOKEN: 7, // 7 days
+  ACCESS_TOKEN: process.env.NEXT_PUBLIC_ACCESS_TOKEN_EXPIRY,
+  REFRESH_TOKEN: process.env.NEXT_PUBLIC_ACCESS_TOKEN_EXPIRY,
 } as const
 
 // Cookie configuration
@@ -89,6 +89,7 @@ export function removeCookie(name: string, path: string = '/'): void {
  * Set access token in cookie
  */
 export function setAccessToken(token: string): void {
+  console.log('Setting access token in cookies', COOKIE_NAMES.ACCESS_TOKEN, token, TOKEN_EXPIRY, COOKIE_CONFIG)
   setCookie({
     name: COOKIE_NAMES.ACCESS_TOKEN,
     value: token,

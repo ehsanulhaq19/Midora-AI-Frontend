@@ -96,9 +96,9 @@ const title = t('auth.welcomeBack')
 const message = tWithParams('chat.stepOfWelcome', { step: 1 })
 ```
 
-### 4. Frontend Route Middleware (`/middleware.ts`)
+### 4. Frontend Route Middleware (`/src/middleware/RoutesMiddleware.ts`)
 
-Simplified middleware that only checks for access token presence.
+Simplified middleware that only checks for access token presence for Next.js routes.
 
 **Features:**
 - Route protection

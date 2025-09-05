@@ -5,18 +5,24 @@
 
 import { appConfig } from '@/config/app'
 import { requestInterceptor } from './interceptors'
+import { errorHandler, ProcessedError } from '@/lib/error-handler'
 
 export interface ApiResponse<T = any> {
   data?: T
   error?: string
   status: number
   message?: string
+  processedError?: ProcessedError
+  success?: boolean
+  error_type?: string
+  error_message?: string
 }
 
 export interface ApiError {
   message: string
   status: number
   details?: any
+  processedError?: ProcessedError
 }
 
 class BaseApiClient {
@@ -26,6 +32,37 @@ class BaseApiClient {
   constructor() {
     this.baseUrl = appConfig.backendUrl
     this.timeout = appConfig.apiTimeout
+  }
+
+  /**
+   * Process response data according to new backend format
+   */
+  private processResponseData<T>(responseData: any, response: Response): ApiResponse<T> {
+    // Handle new backend response format
+    if (responseData && typeof responseData === 'object') {
+      if (responseData.success === true && responseData.data !== undefined) {
+        // Success response format: { success: true, data: {...} }
+        return { 
+          data: responseData.data, 
+          status: response.status,
+          success: true
+        }
+      } else if (responseData.success === false) {
+        // Error response format: { success: false, error_type: "...", error_message: "..." }
+        const processedError = errorHandler.handleResponseError(response, responseData)
+        return { 
+          error: processedError.message, 
+          status: response.status,
+          processedError,
+          success: false,
+          error_type: responseData.error_type,
+          error_message: responseData.error_message
+        }
+      }
+    }
+    
+    // Fallback for legacy format or unexpected response structure
+    return { data: responseData, status: response.status }
   }
 
   /**
@@ -54,16 +91,43 @@ class BaseApiClient {
       clearTimeout(timeoutId)
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        // Try to parse error response from backend
+        let errorData: any = null
+        try {
+          const contentType = response.headers.get('content-type')
+          if (contentType && contentType.includes('application/json')) {
+            errorData = await response.json()
+          }
+        } catch (parseError) {
+          console.warn('Failed to parse error response:', parseError)
+        }
+
+        const processedError = errorHandler.handleResponseError(response, errorData)
+        return { 
+          error: processedError.message, 
+          status: response.status,
+          processedError
+        }
       }
 
-      const data = await response.json()
-      return { data, status: response.status }
+      const responseData = await response.json()
+      return this.processResponseData<T>(responseData, response)
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
-        return { error: 'Request timeout', status: 408 }
+        const processedError = errorHandler.handleNetworkError(error)
+        return { 
+          error: processedError.message, 
+          status: 408,
+          processedError
+        }
       }
-      return { error: error instanceof Error ? error.message : 'Unknown error', status: 500 }
+      
+      const processedError = errorHandler.handleNetworkError(error)
+      return { 
+        error: processedError.message, 
+        status: 500,
+        processedError
+      }
     }
   }
 
@@ -92,16 +156,43 @@ class BaseApiClient {
       clearTimeout(timeoutId)
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        // Try to parse error response from backend
+        let errorData: any = null
+        try {
+          const contentType = response.headers.get('content-type')
+          if (contentType && contentType.includes('application/json')) {
+            errorData = await response.json()
+          }
+        } catch (parseError) {
+          console.warn('Failed to parse error response:', parseError)
+        }
+
+        const processedError = errorHandler.handleResponseError(response, errorData)
+        return { 
+          error: processedError.message, 
+          status: response.status,
+          processedError
+        }
       }
 
       const responseData = await response.json()
-      return { data: responseData, status: response.status }
+      return responseData
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
-        return { error: 'Request timeout', status: 408 }
+        const processedError = errorHandler.handleNetworkError(error)
+        return { 
+          error: processedError.message, 
+          status: 408,
+          processedError
+        }
       }
-      return { error: error instanceof Error ? error.message : 'Unknown error', status: 500 }
+      
+      const processedError = errorHandler.handleNetworkError(error)
+      return { 
+        error: processedError.message, 
+        status: 500,
+        processedError
+      }
     }
   }
 
@@ -130,16 +221,43 @@ class BaseApiClient {
       clearTimeout(timeoutId)
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        // Try to parse error response from backend
+        let errorData: any = null
+        try {
+          const contentType = response.headers.get('content-type')
+          if (contentType && contentType.includes('application/json')) {
+            errorData = await response.json()
+          }
+        } catch (parseError) {
+          console.warn('Failed to parse error response:', parseError)
+        }
+
+        const processedError = errorHandler.handleResponseError(response, errorData)
+        return { 
+          error: processedError.message, 
+          status: response.status,
+          processedError
+        }
       }
 
       const responseData = await response.json()
       return { data: responseData, status: response.status }
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
-        return { error: 'Request timeout', status: 408 }
+        const processedError = errorHandler.handleNetworkError(error)
+        return { 
+          error: processedError.message, 
+          status: 408,
+          processedError
+        }
       }
-      return { error: error instanceof Error ? error.message : 'Unknown error', status: 500 }
+      
+      const processedError = errorHandler.handleNetworkError(error)
+      return { 
+        error: processedError.message, 
+        status: 500,
+        processedError
+      }
     }
   }
 
@@ -167,16 +285,43 @@ class BaseApiClient {
       clearTimeout(timeoutId)
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        // Try to parse error response from backend
+        let errorData: any = null
+        try {
+          const contentType = response.headers.get('content-type')
+          if (contentType && contentType.includes('application/json')) {
+            errorData = await response.json()
+          }
+        } catch (parseError) {
+          console.warn('Failed to parse error response:', parseError)
+        }
+
+        const processedError = errorHandler.handleResponseError(response, errorData)
+        return { 
+          error: processedError.message, 
+          status: response.status,
+          processedError
+        }
       }
 
-      const data = await response.json()
-      return { data, status: response.status }
+      const responseData = await response.json()
+      return this.processResponseData<T>(responseData, response)
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
-        return { error: 'Request timeout', status: 408 }
+        const processedError = errorHandler.handleNetworkError(error)
+        return { 
+          error: processedError.message, 
+          status: 408,
+          processedError
+        }
       }
-      return { error: error instanceof Error ? error.message : 'Unknown error', status: 500 }
+      
+      const processedError = errorHandler.handleNetworkError(error)
+      return { 
+        error: processedError.message, 
+        status: 500,
+        processedError
+      }
     }
   }
 

@@ -101,7 +101,21 @@ export interface SignupFormData {
   confirmPassword: string
 }
 
-// API error types
+// Backend response types
+export interface BackendSuccessResponse<T = any> {
+  success: true
+  data: T
+}
+
+export interface BackendErrorResponse {
+  success: false
+  error_type: string
+  error_message: string
+}
+
+export type BackendResponse<T = any> = BackendSuccessResponse<T> | BackendErrorResponse
+
+// API error types (legacy - keeping for backward compatibility)
 export interface ValidationError {
   loc: (string | number)[]
   msg: string
@@ -119,6 +133,29 @@ export interface TokenPayload {
   exp: number
   iat: number
   jti?: string
+}
+
+// Authentication state types
+export interface AuthState {
+  user: User | null
+  accessToken: string | null
+  refreshToken: string | null
+  isAuthenticated: boolean
+  isLoading: boolean
+  error: string | null
+}
+
+// Authentication context types
+export interface AuthContextType extends AuthState {
+  login: (credentials: UserLogin) => Promise<void>
+  register: (userData: UserCreate) => Promise<void>
+  logout: () => Promise<void>
+  refreshAccessToken: () => Promise<string>
+  forgotPassword: (email: string) => Promise<void>
+  resetPassword: (data: PasswordResetRequest) => Promise<void>
+  verifyOTP: (data: OTPVerificationRequest) => Promise<void>
+  regenerateOTP: (email: string) => Promise<void>
+  clearError: () => void
 }
 
 // Authentication hook types

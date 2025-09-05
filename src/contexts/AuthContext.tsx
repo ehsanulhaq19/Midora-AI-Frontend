@@ -117,10 +117,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const response = await authApi.login(credentials)
       
       if (response.error) {
-        throw new Error(response.error)
+        // Use the processed error message if available, otherwise use the raw error
+        const errorMessage = response.processedError?.message || response.error
+        throw new Error(errorMessage)
       }
 
       if (response.data) {
+        console.log('Login successful, storing tokens...', response.data)
         const { access_token, refresh_token } = response.data
         
         console.log('Login successful, storing tokens...')
@@ -129,7 +132,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         console.log('Tokens stored, now getting user data...')
         
         // Small delay to ensure cookies are set
-        await new Promise(resolve => setTimeout(resolve, 100))
+        await new Promise(resolve => setTimeout(resolve, 1000))
         
         // Now get user data (interceptor will find the access token in cookies)
         const userResponse = await authApi.getCurrentUser()
@@ -179,7 +182,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const response = await authApi.register(userData)
       
       if (response.error) {
-        throw new Error(response.error)
+        // Use the processed error message if available, otherwise use the raw error
+        const errorMessage = response.processedError?.message || response.error
+        throw new Error(errorMessage)
       }
 
       if (response.data) {
@@ -239,7 +244,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const response = await authApi.refreshToken(refreshToken)
       
       if (response.error || !response.data) {
-        throw new Error('Token refresh failed')
+        // Use the processed error message if available, otherwise use a generic message
+        const errorMessage = response.processedError?.message || 'Token refresh failed'
+        throw new Error(errorMessage)
       }
 
       const { access_token, refresh_token: newRefreshToken } = response.data
@@ -270,7 +277,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const response = await authApi.forgotPassword(email)
       
       if (response.error) {
-        throw new Error(response.error)
+        // Use the processed error message if available, otherwise use the raw error
+        const errorMessage = response.processedError?.message || response.error
+        throw new Error(errorMessage)
       }
 
       setState(prev => ({
@@ -295,7 +304,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const response = await authApi.resetPassword(data)
       
       if (response.error) {
-        throw new Error(response.error)
+        // Use the processed error message if available, otherwise use the raw error
+        const errorMessage = response.processedError?.message || response.error
+        throw new Error(errorMessage)
       }
 
       setState(prev => ({
@@ -320,7 +331,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const response = await authApi.verifyOTP(data)
       
       if (response.error) {
-        throw new Error(response.error)
+        // Use the processed error message if available, otherwise use the raw error
+        const errorMessage = response.processedError?.message || response.error
+        throw new Error(errorMessage)
       }
 
       setState(prev => ({
@@ -345,7 +358,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const response = await authApi.regenerateOTP(email)
       
       if (response.error) {
-        throw new Error(response.error)
+        // Use the processed error message if available, otherwise use the raw error
+        const errorMessage = response.processedError?.message || response.error
+        throw new Error(errorMessage)
       }
 
       setState(prev => ({

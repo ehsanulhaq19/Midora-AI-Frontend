@@ -5,13 +5,14 @@
 
 import { appConfig } from '@/config/app'
 import { COOKIE_NAMES } from '@/lib/auth'
+import { errorHandler, ProcessedError } from '@/lib/error-handler'
 
 /**
  * Get access token from cookies
  */
 function getAccessToken(): string | null {
   if (typeof document === 'undefined') return null
-  
+  console.log('Getting access token from cookies', COOKIE_NAMES)
   const cookies = document.cookie.split(';')
   for (const cookie of cookies) {
     const [name, value] = cookie.trim().split('=')
@@ -68,6 +69,19 @@ export function responseInterceptor(response: Response): Response {
 }
 
 /**
+ * Enhanced response interceptor that processes error responses
+ */
+export async function enhancedResponseInterceptor(response: Response): Promise<Response> {
+  // If response is not ok, we'll let the base API client handle it
+  // This interceptor is mainly for logging and monitoring
+  if (!response.ok) {
+    console.warn(`API Error Response: ${response.status} ${response.statusText}`)
+  }
+  
+  return response
+}
+
+/**
  * Error interceptor to handle common errors
  */
 export function errorInterceptor(error: any): any {
@@ -76,6 +90,16 @@ export function errorInterceptor(error: any): any {
   
   console.error('API Error:', error)
   return error
+}
+
+/**
+ * Enhanced error interceptor that processes errors with our error handler
+ */
+export function enhancedErrorInterceptor(error: any): ProcessedError {
+  console.error('API Error:', error)
+  
+  // Process the error using our error handler
+  return errorHandler.handleNetworkError(error)
 }
 
 /**

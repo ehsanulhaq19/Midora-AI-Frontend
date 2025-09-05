@@ -44,4 +44,39 @@ export const auth = {
   passwordMinLength: 'Password must be at least 6 characters',
   passwordsDoNotMatch: 'Passwords do not match',
   confirmPasswordRequired: 'Please confirm your password',
+  
+  // Forgot Password
+  forgotPasswordTitle: 'Forgot Password?',
+  forgotPasswordSubtitle: 'No worries! Enter your email and we\'ll send you a reset code.',
+  enterEmailForReset: 'Enter your email address',
+  sendResetCode: 'Send Reset Code',
+  sendingResetCode: 'Sending reset code...',
+  resetCodeSent: 'Reset code sent successfully',
+  resetCodeSentMessage: 'We\'ve sent a reset code to your email address. Please check your inbox and enter the code below.',
+  backToLogin: 'Back to Sign In',
+  rememberPassword: 'Remember your password?',
+  
+  // Reset Password
+  resetPasswordTitle: 'Reset Password',
+  resetPasswordSubtitle: 'Enter the code we sent to your email and your new password.',
+  enterResetCode: 'Enter reset code',
+  enterNewPassword: 'Enter new password',
+  confirmNewPassword: 'Confirm new password',
+  resetPassword: 'Reset Password',
+  resettingPassword: 'Resetting password...',
+  passwordResetSuccess: 'Password reset successfully',
+  passwordResetSuccessMessage: 'Your password has been reset successfully. You can now sign in with your new password.',
+  
+  // OTP Verification
+  otpCode: 'OTP Code',
+  enterOtpCode: 'Enter OTP code',
+  verifyOtp: 'Verify OTP',
+  verifyingOtp: 'Verifying OTP...',
+  resendOtp: 'Resend OTP',
+  resendingOtp: 'Resending OTP...',
+  otpVerified: 'OTP verified successfully',
+  otpExpired: 'OTP has expired',
+  invalidOtp: 'Invalid OTP code',
+  otpRequired: 'OTP code is required',
+  otpMinLength: 'OTP code must be 6 digits',
 }

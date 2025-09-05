@@ -159,6 +159,17 @@ export function LoginForm({
               className="h-12 text-base border-gray-300 focus:border-purple-500 focus:ring-purple-500"
             />
 
+            {/* Forgot Password Link */}
+            <div className="text-right">
+              <button
+                type="button"
+                onClick={() => window.location.href = '/forgot-password'}
+                className="text-sm text-purple-600 hover:text-purple-700 font-medium underline underline-offset-2"
+              >
+                {t('auth.forgotPassword')}
+              </button>
+            </div>
+
             <Button
               type="submit"
               className="w-full h-12 text-base font-medium bg-purple-800 text-white hover:bg-purple-900 rounded-lg transition-colors"
