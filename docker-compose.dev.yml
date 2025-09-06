@@ -9,7 +9,7 @@ services:
       args:
         BUILD_TARGET: development
     ports:
-      - "3001:3000"
+      - "3000:3000"
     environment:
       - NODE_ENV=development
       - NEXT_TELEMETRY_DISABLED=1
