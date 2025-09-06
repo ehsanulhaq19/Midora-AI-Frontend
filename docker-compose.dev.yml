@@ -33,17 +33,6 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
-  # Redis for development (optional, for caching)
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_dev_data:/data
-    networks:
-      - midora-dev-network
-    restart: unless-stopped
-
 networks:
   midora-dev-network:
     driver: bridge

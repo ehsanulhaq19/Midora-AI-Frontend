@@ -29,17 +29,6 @@ services:
       - ./logs:/app/logs
       - ./uploads:/app/uploads
 
-  # Redis for production caching
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_live_data:/data
-    networks:
-      - midora-live-network
-    restart: unless-stopped
-
 networks:
   midora-live-network:
     driver: bridge
