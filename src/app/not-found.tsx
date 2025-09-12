@@ -1,13 +1,11 @@
-import { NotFoundDisplay } from '@/components/ui/NotFoundDisplay'
+'use client'
+
+import { NotFoundScreen } from '@/components/errors'
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <NotFoundDisplay 
-        title="Page Not Found"
-        message="The page you're looking for doesn't exist."
-        backUrl="/"
-      />
-    </div>
+    <NotFoundScreen 
+      onGoHome={() => window.location.href = '/'}
+    />
   )
 }

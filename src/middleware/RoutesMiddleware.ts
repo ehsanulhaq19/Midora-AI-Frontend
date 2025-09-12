@@ -7,20 +7,16 @@ const ROUTES = {
   // Public routes that don't require authentication
   PUBLIC: [
     '/',
-    '/login',
     '/signup',
-    '/about',
     '/api/health',
     '/api/hello',
   ],
   // Authentication routes (redirect to dashboard if already authenticated)
   AUTH: [
-    '/login',
     '/signup',
   ],
   // Protected routes that require authentication
   PROTECTED: [
-    '/chat',
     '/dashboard',
     '/profile',
     '/settings',
@@ -93,10 +89,10 @@ export function RoutesMiddleware(request: NextRequest) {
   // Handle protected routes
   if (matchesPattern(pathname, ROUTES.PROTECTED)) {
     if (!hasToken) {
-      // Redirect to login page with return URL
-      const loginUrl = new URL('/login', request.url)
-      loginUrl.searchParams.set('returnUrl', pathname)
-      return NextResponse.redirect(loginUrl)
+      // Redirect to signup page with return URL
+      const signupUrl = new URL('/signup', request.url)
+      signupUrl.searchParams.set('returnUrl', pathname)
+      return NextResponse.redirect(signupUrl)
     }
   }
   
@@ -105,7 +101,7 @@ export function RoutesMiddleware(request: NextRequest) {
     if (hasToken) {
       // Redirect to dashboard or return URL
       const returnUrl = request.nextUrl.searchParams.get('returnUrl')
-      const redirectUrl = returnUrl || '/chat'
+      const redirectUrl = returnUrl || '/dashboard'
       return NextResponse.redirect(new URL(redirectUrl, request.url))
     }
   }

@@ -41,7 +41,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     error: null,
   })
 
-  // Initialize auth state from cookies
   useEffect(() => {
     const initializeAuth = async () => {
       try {
@@ -50,10 +49,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         const userData = getUserData()
 
         if (accessToken && refreshToken && userData) {
-          // Check if access token is expired
           if (isTokenExpired(accessToken)) {
-            // If access token is expired but refresh token exists, user is still authenticated
-            // The app should attempt to refresh the access token
             if (!isTokenExpired(refreshToken)) {
               setState(prev => ({
                 ...prev,
@@ -64,7 +60,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 isLoading: false,
               }))
             } else {
-              // Both tokens expired, clear auth
               clearAuthCookies()
               setState(prev => ({
                 ...prev,
@@ -76,7 +71,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
               }))
             }
           } else {
-            // Tokens are valid, set user state
             setState(prev => ({
               ...prev,
               user: userData,
@@ -117,7 +111,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const response = await authApi.login(credentials)
       
       if (response.error) {
-        // Use the processed error message if available, otherwise use the raw error
         const errorMessage = response.processedError?.message || response.error
         throw new Error(errorMessage)
       }
@@ -126,22 +119,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
         console.log('Login successful, storing tokens...', response.data)
         const { access_token, refresh_token } = response.data
         
-        console.log('Login successful, storing tokens...')
-        // Store tokens FIRST before making any API calls
         setTokens(access_token, refresh_token)
-        console.log('Tokens stored, now getting user data...')
         
-        // Small delay to ensure cookies are set
         await new Promise(resolve => setTimeout(resolve, 1000))
         
-        // Now get user data (interceptor will find the access token in cookies)
         const userResponse = await authApi.getCurrentUser()
         if (userResponse.error || !userResponse.data) {
           throw new Error('Failed to get user data')
         }
-        console.log('User data retrieved successfully')
 
-        // Store user data
         setUserData(userResponse.data)
 
         setState(prev => ({
@@ -154,15 +140,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
           error: null,
         }))
 
-        // Redirect to chat or return URL
         try {
           const urlParams = new URLSearchParams(window.location.search)
-          const returnUrl = urlParams.get('returnUrl') || '/chat'
+          const returnUrl = urlParams.get('returnUrl') || '/dashboard'
           router.push(returnUrl)
         } catch (redirectError) {
           console.error('Redirect error:', redirectError)
-          // Fallback redirect
-          router.push('/chat')
+          router.push('/dashboard')
         }
       }
     } catch (error) {
@@ -182,21 +166,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const response = await authApi.register(userData)
       
       if (response.error) {
-        // Use the processed error message if available, otherwise use the raw error
         const errorMessage = response.processedError?.message || response.error
         throw new Error(errorMessage)
       }
 
       if (response.data) {
-        // Registration successful, but user needs to verify email
         setState(prev => ({
           ...prev,
           isLoading: false,
           error: null,
         }))
         
-        // You might want to redirect to a verification page
-        router.push('/login?message=Registration successful. Please check your email for verification.')
       }
     } catch (error) {
       console.error('Registration error:', error)
@@ -212,13 +192,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       setState(prev => ({ ...prev, isLoading: true }))
 
-      // Call logout API
       await authApi.logout()
     } catch (error) {
       console.error('Logout API error:', error)
-      // Continue with logout even if API call fails
     } finally {
-      // Clear local state and cookies
       clearAuthCookies()
       setState({
         user: null,
@@ -229,7 +206,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
         error: null,
       })
       
-      // Redirect to home page
       router.push('/')
     }
   }, [router])
@@ -244,14 +220,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const response = await authApi.refreshToken(refreshToken)
       
       if (response.error || !response.data) {
-        // Use the processed error message if available, otherwise use a generic message
         const errorMessage = response.processedError?.message || 'Token refresh failed'
         throw new Error(errorMessage)
       }
 
       const { access_token, refresh_token: newRefreshToken } = response.data
       
-      // Update tokens
       setTokens(access_token, newRefreshToken)
 
       setState(prev => ({
@@ -264,7 +238,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       return access_token
     } catch (error) {
       console.error('Token refresh error:', error)
-      // If refresh fails, logout user
       await logout()
       throw error
     }
@@ -277,7 +250,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const response = await authApi.forgotPassword(email)
       
       if (response.error) {
-        // Use the processed error message if available, otherwise use the raw error
         const errorMessage = response.processedError?.message || response.error
         throw new Error(errorMessage)
       }
@@ -304,7 +276,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const response = await authApi.resetPassword(data)
       
       if (response.error) {
-        // Use the processed error message if available, otherwise use the raw error
         const errorMessage = response.processedError?.message || response.error
         throw new Error(errorMessage)
       }
@@ -331,7 +302,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const response = await authApi.verifyOTP(data)
       
       if (response.error) {
-        // Use the processed error message if available, otherwise use the raw error
         const errorMessage = response.processedError?.message || response.error
         throw new Error(errorMessage)
       }
@@ -358,7 +328,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const response = await authApi.regenerateOTP(email)
       
       if (response.error) {
-        // Use the processed error message if available, otherwise use the raw error
         const errorMessage = response.processedError?.message || response.error
         throw new Error(errorMessage)
       }

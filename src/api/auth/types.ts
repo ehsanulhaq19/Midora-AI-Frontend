@@ -14,11 +14,7 @@ export interface User {
   is_verified: boolean
 }
 
-// Authentication request types
-export interface UserLogin {
-  email: string
-  password: string
-}
+// Authentication request types (removed UserLogin since login functionality is removed)
 
 export interface UserCreate {
   email: string
@@ -87,11 +83,7 @@ export interface OTPRegenerationResponse {
   email: string
 }
 
-// Form data types for components
-export interface LoginFormData {
-  email: string
-  password: string
-}
+// Form data types for components (removed LoginFormData since login functionality is removed)
 
 export interface SignupFormData {
   email: string
@@ -147,7 +139,6 @@ export interface AuthState {
 
 // Authentication context types
 export interface AuthContextType extends AuthState {
-  login: (credentials: UserLogin) => Promise<void>
   register: (userData: UserCreate) => Promise<void>
   logout: () => Promise<void>
   refreshAccessToken: () => Promise<string>
@@ -166,7 +157,6 @@ export interface UseAuthReturn {
   isAuthenticated: boolean
   isLoading: boolean
   error: string | null
-  login: (credentials: UserLogin) => Promise<void>
   register: (userData: UserCreate) => Promise<void>
   logout: () => Promise<void>
   refreshAccessToken: () => Promise<void>

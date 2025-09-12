@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect } from 'react'
-import { ErrorDisplay } from '@/components/ui/ErrorDisplay'
+import React, { useEffect } from 'react'
+import { ErrorScreen } from '@/components/errors'
 
 export default function Error({
   error,
@@ -16,13 +16,9 @@ export default function Error({
   }, [error])
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <ErrorDisplay 
-        error={error} 
-        onReset={reset}
-        title="Something went wrong!"
-        message="We encountered an unexpected error. Please try again."
-      />
-    </div>
+    <ErrorScreen 
+      onRetry={reset}
+      onGoHome={() => window.location.href = '/'}
+    />
   )
 }

@@ -185,4 +185,23 @@ export const errors = {
   VALIDATION_ERROR: 'Please check your input and try again',
   SERVER_ERROR: 'Server error. Please try again later',
   CLIENT_ERROR: 'Invalid request. Please check your input',
+
+  // Error Screen Messages
+  generic: {
+    title: 'Something went wrong',
+    message: 'We encountered an unexpected error. Please try again later.',
+    retry: 'Try Again',
+    goHome: 'Go Home'
+  },
+  notFound: {
+    title: 'Page Not Found',
+    message: 'The page you are looking for does not exist or has been moved.',
+    goHome: 'Go Home'
+  },
+  unauthorized: {
+    title: 'Access Denied',
+    message: 'You do not have permission to access this page.',
+    login: 'Sign In',
+    goHome: 'Go Home'
+  }
 }

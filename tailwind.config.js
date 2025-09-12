@@ -8,7 +8,114 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Primary Purple Colors
+        // ===== BRAND COLORS =====
+        brand: {
+          primary: 'var(--brand-primary)',
+          secondary: 'var(--brand-secondary)',
+          accent: 'var(--brand-accent)',
+          80: 'var(--brand-80)',
+        },
+        
+        // ===== PRIMITIVE COLORS =====
+        primitive: {
+          'dark-purple': {
+            1000: 'var(--primitive-dark-purple-1000)',
+            900: 'var(--primitive-dark-purple-900)',
+            800: 'var(--primitive-dark-purple-800)',
+            600: 'var(--primitive-dark-purple-600)',
+            400: 'var(--primitive-dark-purple-400)',
+            200: 'var(--primitive-dark-purple-200)',
+            100: 'var(--primitive-dark-purple-100)',
+          },
+          'light-purple': {
+            1000: 'var(--primitive-light-purple-1000)',
+            800: 'var(--primitive-light-purple-800)',
+            600: 'var(--primitive-light-purple-600)',
+            400: 'var(--primitive-light-purple-400)',
+            200: 'var(--primitive-light-purple-200)',
+            100: 'var(--primitive-light-purple-100)',
+          },
+          gray: {
+            1000: 'var(--primitive-gray-1000)',
+            900: 'var(--primitive-gray-900)',
+            800: 'var(--primitive-gray-800)',
+            600: 'var(--primitive-gray-600)',
+            400: 'var(--primitive-gray-400)',
+            200: 'var(--primitive-gray-200)',
+            100: 'var(--primitive-gray-100)',
+          },
+          'light-gray': {
+            1000: 'var(--primitive-light-gray-1000)',
+            800: 'var(--primitive-light-gray-800)',
+            600: 'var(--primitive-light-gray-600)',
+            400: 'var(--primitive-light-gray-400)',
+            300: 'var(--primitive-light-gray-300)',
+            200: 'var(--primitive-light-gray-200)',
+            100: 'var(--primitive-light-gray-100)',
+          },
+        },
+        
+        // ===== SEMANTIC SURFACE COLORS =====
+        surface: {
+          primary: 'var(--surface-primary)',
+          secondary: 'var(--surface-secondary)',
+          tertiary: 'var(--surface-tertiary)',
+          card: 'var(--surface-card)',
+          overlay: 'var(--surface-overlay)',
+          backdrop: 'var(--surface-backdrop)',
+          button: 'var(--surface-button)',
+          'button-hover': 'var(--surface-button-hover)',
+          'button-active': 'var(--surface-button-active)',
+          'button-inactive': 'var(--surface-button-inactive)',
+          'button-disabled': 'var(--surface-button-disabled)',
+        },
+        
+        // ===== SEMANTIC TEXT COLORS =====
+        text: {
+          primary: 'var(--text-primary)',
+          secondary: 'var(--text-secondary)',
+          tertiary: 'var(--text-tertiary)',
+          inverse: 'var(--text-inverse)',
+          muted: 'var(--text-muted)',
+          brand: 'var(--text-brand)',
+          accent: 'var(--text-accent)',
+          success: 'var(--text-success)',
+          warning: 'var(--text-warning)',
+          error: 'var(--text-error)',
+          info: 'var(--text-info)',
+        },
+        
+        // ===== BORDER COLORS =====
+        border: {
+          primary: 'var(--border-primary)',
+          secondary: 'var(--border-secondary)',
+          focus: 'var(--border-focus)',
+          error: 'var(--border-error)',
+          success: 'var(--border-success)',
+        },
+        
+        // ===== LEGACY COMPATIBILITY =====
+        'gray0-white': 'var(--gray0-white)',
+        'premitives-color-light-gray-1000': 'var(--premitives-color-light-gray-1000)',
+        'premitives-color-light-gray-300': 'var(--premitives-color-light-gray-300)',
+        'tokens-color-surface-surface-button': 'var(--tokens-color-surface-surface-button)',
+        'tokens-color-surface-surface-button-inactive': 'var(--tokens-color-surface-surface-button-inactive)',
+        'tokens-color-surface-surface-button-pressed': 'var(--tokens-color-surface-surface-button-pressed)',
+        'tokens-color-surface-surface-dark': 'var(--tokens-color-surface-surface-dark)',
+        'tokens-color-surface-surface-tertiary': 'var(--tokens-color-surface-surface-tertiary)',
+        'tokens-color-text-text-neutral': 'var(--tokens-color-text-text-neutral)',
+        'tokens-color-text-text-primary': 'var(--tokens-color-text-text-primary)',
+        'tokens-color-text-text-seconary': 'var(--tokens-color-text-text-seconary)',
+        'tokens-color-text-text-brand': 'var(--tokens-color-text-text-brand)',
+        'premitives-color-dark-puprle-1000': 'var(--premitives-color-dark-puprle-1000)',
+        'premitives-color-dark-puprle-900': 'var(--premitives-color-dark-puprle-900)',
+        'premitives-color-darkgray-900': 'var(--premitives-color-darkgray-900)',
+        'premitives-color-light-gray-2000': 'var(--premitives-color-light-gray-2000)',
+        'premitives-color-light-purple-1000': 'var(--premitives-color-light-purple-1000)',
+        'premitives-color-light-purple-200': 'var(--premitives-color-light-purple-200)',
+        'premitives-color-light-purple-400': 'var(--premitives-color-light-purple-400)',
+        
+        // ===== STANDARD TAILWIND COLORS (for compatibility) =====
         primary: {
           50: '#faf5ff',
           100: '#f3e8ff',
@@ -22,7 +129,6 @@ module.exports = {
           900: '#581c87',
           950: '#3b0764',
         },
-        // Secondary Purple Colors
         secondary: {
           50: '#fdf4ff',
           100: '#fae8ff',
@@ -36,7 +142,6 @@ module.exports = {
           900: '#701a75',
           950: '#4a044e',
         },
-        // Accent Colors
         accent: {
           blue: '#3b82f6',
           green: '#10b981',
@@ -47,7 +152,6 @@ module.exports = {
           indigo: '#6366f1',
           pink: '#ec4899',
         },
-        // Neutral Colors
         neutral: {
           50: '#fafafa',
           100: '#f5f5f5',
@@ -61,12 +165,10 @@ module.exports = {
           900: '#171717',
           950: '#0a0a0a',
         },
-        // Semantic Colors
         success: '#10b981',
         warning: '#f59e0b',
         error: '#ef4444',
         info: '#3b82f6',
-        // Background Colors
         background: {
           primary: '#ffffff',
           secondary: '#fafafa',
@@ -74,28 +176,37 @@ module.exports = {
           dark: '#0f0f23',
           card: '#ffffff',
         },
-        // Text Colors
-        text: {
-          primary: '#171717',
-          secondary: '#525252',
-          tertiary: '#737373',
-          inverse: '#ffffff',
-          muted: '#a3a3a3',
-          accent: '#a855f7',
-        },
         ring: {
           DEFAULT: '#a855f7',
         },
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-        mono: ['JetBrains Mono', 'Fira Code', 'Monaco', 'Consolas', 'monospace'],
-        display: ['Inter', 'system-ui', 'sans-serif'],
-        serif: ['Playfair Display', 'Georgia', 'serif'],
+        // Centralized Font System
+        'heading-primary': 'var(--font-heading-primary)',
+        'heading-secondary': 'var(--font-heading-secondary)',
+        'body-primary': 'var(--font-body-primary)',
+        'body-secondary': 'var(--font-body-secondary)',
+        'mono': 'var(--font-mono)',
+        
+        // Legacy Signup Module Fonts (for backward compatibility)
+        'h01-heading-01': 'var(--h01-heading-01-font-family)',
+        'h02-heading02': 'var(--h02-heading02-font-family)',
+        'text': 'var(--text-font-family)',
+        'text-large': 'var(--text-large-font-family)',
+        'text-xs-bold': 'var(--text-xs-bold-font-family)',
+        
+        // Standard Tailwind fonts
+        sans: ['var(--font-body-primary)'],
+        display: ['var(--font-heading-primary)'],
+        serif: ['var(--font-heading-secondary)'],
       },
       spacing: {
         '18': '4.5rem',
         '88': '22rem',
+      },
+      borderRadius: {
+        'corner-radius-3': 'var(--premitives-corner-radius-corner-radius-3)',
+        'corner-radius-5': 'var(--premitives-corner-radius-corner-radius-5)',
       },
       animation: {
         'fade-in': 'fadeIn 0.6s ease-out',
@@ -167,8 +278,14 @@ module.exports = {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
         'gradient-purple': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        'gradient-midora': 'linear-gradient(135deg, #a855f7 0%, #d946ef 100%)',
+        'gradient-midora': 'var(--gradient-primary)',
         'gradient-dark': 'linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%)',
+        'gradient-primary': 'var(--gradient-primary)',
+        'gradient-secondary': 'var(--gradient-secondary)',
+        'gradient-hero': 'var(--gradient-hero)',
+        'gradient-features': 'var(--gradient-features)',
+        'gradient-button': 'var(--gradient-button)',
+        'gradient-glass': 'var(--gradient-glass)',
       },
       backdropBlur: {
         xs: '2px',

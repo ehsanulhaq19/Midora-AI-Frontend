@@ -29,12 +29,7 @@ class AuthApiClient {
     return this.baseClient.post<UserResponse>('/api/v1/auth/register', userData)
   }
 
-  /**
-   * Login user and get tokens
-   */
-  async login(credentials: UserLogin): Promise<ApiResponse<Token>> {
-    return this.baseClient.post<Token>('/api/v1/auth/login', credentials)
-  }
+  // Login method removed since login functionality is removed
 
   /**
    * Refresh access token
@@ -58,12 +53,7 @@ class AuthApiClient {
     return this.baseClient.get<UserResponse>('/api/v1/auth/me')
   }
 
-  /**
-   * Forgot password - send OTP to email
-   */
-  async forgotPassword(email: string): Promise<ApiResponse<ForgotPasswordResponse>> {
-    return this.baseClient.post<ForgotPasswordResponse>('/api/v1/auth/forgot-password', { email })
-  }
+  // Forgot password method removed since forgot password functionality is removed
 
   /**
    * Reset password with OTP

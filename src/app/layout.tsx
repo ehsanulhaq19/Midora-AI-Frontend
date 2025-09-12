@@ -1,10 +1,10 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import '@/app/globals.css'
-import { CustomCursor } from '@/components/ui/CustomCursor'
 import { AuthProvider } from '@/contexts/AuthContext'
 import { initializeI18n } from '@/i18n'
 import { initializeInterceptors } from '@/api/interceptors'
+import { ThemeInitializer } from '@/components/ui/theme-initializer'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -52,9 +52,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
+        <ThemeInitializer />
         <AuthProvider>
-          <CustomCursor />
-          <div className="min-h-screen bg-background-primary">
+          <div className="min-h-screen bg-surface-primary">
             {children}
           </div>
         </AuthProvider>

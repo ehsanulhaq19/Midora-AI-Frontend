@@ -79,4 +79,16 @@ export const auth = {
   invalidOtp: 'Invalid OTP code',
   otpRequired: 'OTP code is required',
   otpMinLength: 'OTP code must be 6 digits',
+  
+  // Multi-step signup
+  welcomeTitle: 'Welcome to Midora AI!',
+  welcomeSubtitle: 'We\'re excited to have you join our community. Let\'s get you set up with a few quick questions.',
+  fullNameTitle: 'What\'s your full name?',
+  fullNameSubtitle: 'This helps us personalize your experience.',
+  fullNamePlaceholder: 'Enter your full name',
+  professionTitle: 'What\'s your profession?',
+  professionSubtitle: 'This helps us tailor content and features for you.',
+  professionPlaceholder: 'Enter your profession',
+  fullNameRequired: 'Full name is required',
+  professionRequired: 'Profession is required',
 }

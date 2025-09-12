@@ -1,7 +1,6 @@
 'use client'
 
-import { ErrorDisplay } from '@/components/ui/ErrorDisplay'
-import { AuthLandingPage } from '@/components/auth/AuthLandingPage'
+import { ErrorScreen } from '@/components/errors'
 
 export default function SignupError({
   error,
@@ -11,13 +10,9 @@ export default function SignupError({
   reset: () => void
 }) {
   return (
-    <AuthLandingPage>
-      <div className="w-full max-w-md">
-        <ErrorDisplay 
-          error={error}
-          resetError={reset}
-        />
-      </div>
-    </AuthLandingPage>
+    <ErrorScreen 
+      onRetry={reset}
+      onGoHome={() => window.location.href = '/signup'}
+    />
   )
 }

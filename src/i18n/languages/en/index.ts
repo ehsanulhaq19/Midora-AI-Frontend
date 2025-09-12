@@ -6,15 +6,17 @@
 import { common } from './common'
 import { auth } from './auth'
 import { navigation } from './navigation'
-import { chat } from './chat'
 import { errors } from './errors'
 import { success } from './success'
+import { pricing } from './pricing'
+import { hero } from './hero'
 
 export const enTranslations = {
   common,
   auth,
   navigation,
-  chat,
   errors,
   success,
+  pricing,
+  hero,
 }
