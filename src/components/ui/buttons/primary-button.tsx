@@ -1,0 +1,46 @@
+'use client'
+
+import React from 'react'
+
+interface PrimaryButtonProps {
+  property1?: 'pressed' | 'active'
+  className?: string
+  text?: string
+  onClick?: () => void
+  disabled?: boolean
+  divClassName?: string
+  loading?: boolean
+}
+
+export const PrimaryButton: React.FC<PrimaryButtonProps> = ({ 
+  property1, 
+  className, 
+  text, 
+  onClick, 
+  disabled, 
+  divClassName,
+  loading = false
+}) => {
+  return (
+    <button 
+      type="button"
+      disabled={disabled || loading}
+      className={`flex w-full h-[54px] items-center justify-center gap-2.5 px-[74px] py-[18px] relative bg-tokens-color-surface-surface-button-pressed rounded-xl hover:bg-opacity-90 transition-colors duration-200 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+      onClick={onClick || (() => {})}
+      aria-label={text || "Continue with email"}
+    >
+      {loading ? (
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+          <span className="relative w-fit mt-[-1.50px] font-body-primary font-normal text-[#fffdfd] text-base tracking-[-0.48px] leading-[normal] whitespace-nowrap">
+            Loading...
+          </span>
+        </div>
+      ) : (
+        <span className={`relative w-fit mt-[-1.50px] font-body-primary font-normal text-[#fffdfd] text-base tracking-[-0.48px] leading-[normal] whitespace-nowrap ${divClassName}`}>
+          {text || "Continue with email"}
+        </span>
+      )}
+    </button>
+  )
+}

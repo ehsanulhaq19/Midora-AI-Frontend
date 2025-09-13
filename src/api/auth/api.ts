@@ -16,11 +16,20 @@ import {
   OTPVerificationRequest,
   OTPVerificationResponse,
   OTPRegenerationRequest,
-  OTPRegenerationResponse
+  OTPRegenerationResponse,
+  EmailCheckRequest,
+  EmailCheckResponse
 } from './types'
 
 class AuthApiClient {
   private baseClient = baseApiClient
+
+  /**
+   * Check if email already exists in the system
+   */
+  async checkEmail(email: string): Promise<ApiResponse<EmailCheckResponse>> {
+    return this.baseClient.post<EmailCheckResponse>('/api/v1/auth/check-email', { email })
+  }
 
   /**
    * Register a new user
@@ -29,7 +38,12 @@ class AuthApiClient {
     return this.baseClient.post<UserResponse>('/api/v1/auth/register', userData)
   }
 
-  // Login method removed since login functionality is removed
+  /**
+   * Login user
+   */
+  async login(credentials: UserLogin): Promise<ApiResponse<Token>> {
+    return this.baseClient.post<Token>('/api/v1/auth/login', credentials)
+  }
 
   /**
    * Refresh access token

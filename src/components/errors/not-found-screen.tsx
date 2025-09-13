@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { Button } from '@/components/ui/buttons'
+import { Button } from '@/components/ui'
 import { t } from '@/i18n'
 
 interface NotFoundScreenProps {

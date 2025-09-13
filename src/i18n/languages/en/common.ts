@@ -22,4 +22,5 @@ export const common = {
   sort: 'Sort',
   refresh: 'Refresh',
   retry: 'Retry',
+  theme: 'Theme',
 }

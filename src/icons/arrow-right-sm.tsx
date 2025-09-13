@@ -1,14 +1,12 @@
-import React from 'react'
-
 interface ArrowRightSmProps {
   color?: string
   className?: string
 }
 
-export const ArrowRightSm: React.FC<ArrowRightSmProps> = ({ 
-  color = "black", 
+export const ArrowRightSm = ({ 
+  color = "white", 
   className 
-}) => {
+}: ArrowRightSmProps) => {
   return (
     <svg
       className={className}

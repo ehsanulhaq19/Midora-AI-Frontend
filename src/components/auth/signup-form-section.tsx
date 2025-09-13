@@ -3,10 +3,15 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ButtonGroup } from './button-group'
-import { Buttons } from '../ui/buttons'
+import { Buttons } from '../ui'
 import { CaretDown } from '@/icons'
 import { t } from '@/i18n'
-import { useSignupData } from '@/hooks/use-signup-data'
+import { useSignupData } from '@/contexts/signup-context'
+import { EmailInput } from '@/components/ui/inputs/email-input'
+import { LoginPasswordInput } from '@/components/ui/inputs/login-password-input'
+import { authApi } from '@/api/auth/api'
+import { handleApiError } from '@/lib/error-handler'
+import { useLogin } from '@/hooks/useLogin'
 
 interface SignupFormSectionProps {
   className?: string
@@ -15,10 +20,16 @@ interface SignupFormSectionProps {
 export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className }) => {
   const router = useRouter()
   const { updateData } = useSignupData()
+  const { login, isLoading: isLoggingIn, error: loginError, clearError: clearLoginError } = useLogin()
   const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [emailError, setEmailError] = useState('')
+  const [passwordError, setPasswordError] = useState('')
+  const [isCheckingEmail, setIsCheckingEmail] = useState(false)
+  const [showPasswordField, setShowPasswordField] = useState(false)
+  const [isTransitioning, setIsTransitioning] = useState(false)
 
-  const handleEmailSubmit = () => {
+  const handleEmailSubmit = async () => {
     if (!email.trim()) {
       setEmailError(t('auth.emailRequired'))
       return
@@ -31,18 +42,77 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className 
       return
     }
     
+    setIsCheckingEmail(true)
     setEmailError('')
     
-    // Store email using the custom hook
-    updateData({ email })
+    try {
+      // Check if email already exists
+      const response = await authApi.checkEmail(email)
+      
+      if (response.error) {
+        setEmailError(response.error)
+        return
+      }
+      
+      if (response.data?.exists) {
+        // Email exists, transition to password field
+        setIsTransitioning(true)
+        setTimeout(() => {
+          setShowPasswordField(true)
+          setIsTransitioning(false)
+        }, 300) // Match the transition duration
+        return
+      }
+      
+      // Store email using the custom hook
+      updateData({ email })
+      
+      // Navigate to welcome page
+      router.push('/signup/welcome')
+    } catch (err: any) {
+      setEmailError('Failed to verify email. Please try again.')
+    } finally {
+      setIsCheckingEmail(false)
+    }
+  }
+
+  const handlePasswordSubmit = async () => {
+    if (!password.trim()) {
+      setPasswordError(t('auth.passwordRequired'))
+      return
+    }
     
-    // Navigate to welcome page
-    router.push('/signup/welcome')
+    setPasswordError('')
+    clearLoginError()
+    
+    try {
+      // Use the custom login hook
+      await login(email, password)
+    } catch (err: any) {
+      setPasswordError(err.message)
+    }
   }
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value)
     if (emailError) setEmailError('')
+    if (loginError) clearLoginError()
+  }
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value)
+    if (passwordError) setPasswordError('')
+    if (loginError) clearLoginError()
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      if (showPasswordField) {
+        handlePasswordSubmit()
+      } else {
+        handleEmailSubmit()
+      }
+    }
   }
 
   return (
@@ -135,33 +205,67 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className 
           </div>
 
           <div className="flex flex-col items-start gap-4 relative self-stretch w-full flex-[0_0_auto]">
-            <div className={`flex h-[54px] items-center gap-3 relative self-stretch w-full rounded-xl border border-solid transition-all duration-200 focus-within:ring-offset-2 ${
-              emailError 
-                ? 'border-red-500 focus-within:ring-red-500' 
-                : 'border-[#dbdbdb] focus-within:ring-blue-500'
-            }`}>
-              <input
-                type="email"
-                value={email}
-                onChange={handleEmailChange}
-                placeholder="Enter your personal or work email"
-                className="relative w-full font-body-primary font-normal text-black text-base tracking-[-0.48px] leading-[normal] bg-transparent border-none outline-none placeholder:text-[#a0a0a0] px-6 py-3"
-                aria-label="Email address"
-                required
-              />
-            </div>
-            
-            {emailError && (
-              <p className="text-red-500 text-sm font-body-primary font-normal tracking-[-0.48px] leading-[normal]">
-                {emailError}
-              </p>
+            {/* Email Field */}
+            {!showPasswordField && (
+              <div className={`transition-all duration-300 ease-in-out w-full ${
+                isTransitioning 
+                  ? 'opacity-0 transform -translate-y-2' 
+                  : 'opacity-100 transform translate-y-0'
+              }`}>
+                <EmailInput
+                  value={email}
+                  onChange={handleEmailChange}
+                  onKeyDown={handleKeyDown}
+                  error={emailError}
+                  disabled={isCheckingEmail || isTransitioning}
+                  placeholder="Enter your personal or work email"
+                />
+                
+                {emailError && (
+                  <p className="text-red-500 text-sm font-body-primary font-normal tracking-[-0.48px] leading-[normal] mt-2">
+                    {emailError}
+                  </p>
+                )}
+              </div>
             )}
 
-            <Buttons 
-              property1="pressed" 
-              onClick={handleEmailSubmit}
-              text="Continue with email"
-            />
+            {/* Password Field */}
+            <div className={`transition-all duration-300 ease-in-out w-full ${
+              showPasswordField 
+                ? 'opacity-100 transform translate-y-0' 
+                : 'opacity-0 transform translate-y-2 pointer-events-none absolute'
+            }`}>
+              <LoginPasswordInput
+                value={password}
+                onChange={handlePasswordChange}
+                onKeyDown={handleKeyDown}
+                error={passwordError}
+                disabled={isLoggingIn}
+                placeholder="Enter your password"
+              />
+              
+              {(passwordError || loginError) && (
+                <p className="text-red-500 text-sm font-body-primary font-normal tracking-[-0.48px] leading-[normal] mt-2">
+                  {passwordError || loginError}
+                </p>
+              )}
+            </div>
+
+            {/* Submit Button */}
+            <div className={`transition-all duration-300 ease-in-out w-full ${
+              isTransitioning ? 'opacity-0' : 'opacity-100'
+            }`}>
+              <Buttons 
+                property1="pressed" 
+                onClick={showPasswordField ? handlePasswordSubmit : handleEmailSubmit}
+                text={
+                  showPasswordField 
+                    ? (isLoggingIn ? t('auth.loggingIn') : t('auth.loginWithPassword'))
+                    : (isCheckingEmail ? "Checking..." : "Continue with email")
+                }
+                disabled={isCheckingEmail || isLoggingIn || isTransitioning}
+              />
+            </div>
           </div>
 
           <div className="inline-flex items-center justify-center gap-2.5 relative flex-[0_0_auto]">

@@ -1,89 +1,92 @@
 import React, { useState } from 'react'
 import { t } from '@/i18n'
-import { Buttons } from '../../ui/buttons'
+import { Search, Star, Lightbulb, Stars, Scale, Code } from '@/icons'
+import { TopicCard, NameInput, Buttons } from '../../ui'
+import { LogoOnly } from '@/icons'
 
 interface ProfessionStepProps {
-  onNext: (profession: string) => void
+  onNext: (profession: string, selectedTopics?: number[]) => void
   onBack: () => void
   className?: string
 }
 
-export const ProfessionStep: React.FC<ProfessionStepProps> = ({ onNext, onBack, className }) => {
-  const [profession, setProfession] = useState('')
-  const [error, setError] = useState('')
+export const ProfessionStep = ({ 
+  onNext, 
+  onBack, 
+  className 
+}: ProfessionStepProps) => {
+  const [selectedTopics, setSelectedTopics] = useState<string[]>([])
 
-  const handleNext = () => {
-    if (!profession.trim()) {
-      setError(t('auth.professionRequired'))
-      return
+  const topics = [
+    { id: "Research & Analysis", icon: Search, text: "Research & Analysis" },
+    { id: "Content & Creativity", icon: Star, text: "Content & Creativity" },
+    { id: "Strategy & Problem Solving", icon: Lightbulb, text: "Strategy & Problem Solving" },
+    { id: "Productivity & Automation", icon: Stars, text: "Productivity & Automation" },
+    { id: "Design & Creativity", icon: Scale, text: "Design & Creativity" },
+    { id: "Coding & Developing", icon: Code, text: "Coding & Developing" },
+  ]
+
+  const handleTopicToggle = (topicId: string) => {
+    setSelectedTopics((prev: string[]) => {
+      if (prev.indexOf(topicId) !== -1) {
+        return prev.filter((id: string) => id !== topicId)
+      } else if (prev.length < 3) {
+        return [...prev, topicId]
+      }
+      return prev
+    })
+  }
+
+  const handleContinue = () => {
+    if (selectedTopics.length === 3) {
+      onNext(selectedTopics)
     }
-    setError('')
-    onNext(profession.trim())
   }
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setProfession(e.target.value)
-    if (error) setError('')
-  }
+  const isFormValid = selectedTopics.length === 3
 
   return (
-    <div className={`flex flex-col items-center gap-9 relative self-stretch w-full flex-[0_0_auto] ${className}`}>
-      <div className="flex flex-col items-center gap-6 text-center">
-        <h1 className="relative w-full max-w-[400px] mt-[-1.00px] font-heading-primary font-normal text-[color:var(--tokens-color-text-text-seconary)] text-3xl sm:text-4xl tracking-[-1.80px] leading-9">
-          <span className="font-light tracking-[-0.65px]">
-            {t('auth.professionTitle')}
-          </span>
-        </h1>
+    <div className={`relative w-full bg-tokens-color-surface-surface-primary ${className}`}>
+      <div className="flex flex-col items-start gap-6">
+        <LogoOnly
+          className="!h-14 !aspect-[1.02] !w-[57px] mx-auto ml-0"
+        />    
+        <div className="flex items-center gap-2.5 relative self-stretch w-full">
+          <h1 className="relative w-fit [font-family:'Poppins',Helvetica] font-normal text-[color:var(--tokens-color-text-text-seconary)] text-lg sm:text-xl md:text-2xl tracking-[-1.80px] leading-tight sm:leading-8 md:leading-9">
+            What are you into? Pick any three topics to explore
+          </h1>
+        </div>
         
-        <p className="relative w-full max-w-[350px] font-body-primary font-normal text-[#a0a0a0] text-base tracking-[-0.48px] leading-6">
-          {t('auth.professionSubtitle')}
-        </p>
-      </div>
-
-      <div className="flex flex-col items-center gap-4 p-6 relative self-stretch w-full flex-[0_0_auto] bg-[color:var(--tokens-color-surface-surface-primary)] rounded-3xl shadow-[-6px_4px_33.2px_#4d30711a]">
-        <div className="flex flex-col items-start gap-4 relative self-stretch w-full flex-[0_0_auto]">
-          <div className={`flex h-[54px] items-center gap-3 relative self-stretch w-full rounded-xl border border-solid transition-all duration-200 focus-within:ring-offset-2 ${
-            error 
-              ? 'border-red-500 focus-within:ring-red-500' 
-              : 'border-[#dbdbdb] focus-within:ring-blue-500'
-          }`}>
-            <input
-              type="text"
-              value={profession}
-              onChange={handleInputChange}
-              placeholder={t('auth.professionPlaceholder')}
-              className="relative w-full font-body-primary font-normal text-black text-base tracking-[-0.48px] leading-[normal] bg-transparent border-none outline-none placeholder:text-[#a0a0a0] px-6 py-3"
-              aria-label="Profession"
-              required
-            />
-          </div>
-          
-          {error && (
-            <p className="text-red-500 text-sm font-body-primary font-normal tracking-[-0.48px] leading-[normal]">
-              {error}
-            </p>
-          )}
+        <div className="flex items-center gap-2.5 relative self-stretch w-full">
+          <p className="relative w-full font-text font-[number:var(--text-font-weight)] text-tokens-color-text-text-inactive-2 text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
+            {t('auth.professionTitle')}
+          </p>
         </div>
 
-        <div className="flex gap-3 w-full">
-          <button
-            type="button"
-            onClick={onBack}
-            className="flex-1 h-[54px] items-center justify-center rounded-xl border border-solid border-[#dbdbdb] hover:border-[#bbb] hover:bg-gray-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          >
-            <span className="font-body-primary font-normal text-black text-base tracking-[-0.48px] leading-[normal]">
-              {t('common.back')}
-            </span>
-          </button>
-          
-          <div className="flex-1">
-            <Buttons 
-              property1="pressed" 
-              onClick={handleNext}
-              text={t('common.next')}
+        <div className="flex flex-wrap w-full max-w-[475px] items-start gap-3 relative flex-[0_0_auto]">
+          {topics.map((topic) => (
+            <TopicCard
+              key={topic.id}
+              icon={topic.icon}
+              text={topic.text}
+              isSelected={selectedTopics.indexOf(topic.id) !== -1}
+              onClick={() => handleTopicToggle(topic.id)}
             />
-          </div>
+          ))}
         </div>
+
+        <div className="text-sm text-tokens-color-text-text-inactive-2 mt-2">
+          {selectedTopics.length}/3 topics selected
+        </div>
+
+        <Buttons
+          className={`w-full sm:w-36 ${!isFormValid ? '!bg-tokens-color-surface-surface-button opacity-50' : '!bg-tokens-color-surface-surface-button-pressed'}`}
+          divClassName="!mr-0 !ml-0 sm:!mr-[-48.00px] sm:!ml-[-48.00px]"
+          property1="active"
+          text={t('auth.letsGoNext')}
+          onClick={handleContinue}
+          disabled={!isFormValid}
+        />
       </div>
     </div>
   )

@@ -54,6 +54,25 @@ export function t(key: string): string {
 }
 
 /**
+ * Get translation array for a key
+ */
+export function tArray(key: string): string[] {
+  const keys = key.split('.')
+  let value: any = translations[currentLanguage]
+  
+  for (const k of keys) {
+    if (value && typeof value === 'object' && k in value) {
+      value = value[k]
+    } else {
+      console.warn(`Translation key not found: ${key}`)
+      return []
+    }
+  }
+  
+  return Array.isArray(value) ? value : []
+}
+
+/**
  * Get translation with parameters
  */
 export function tWithParams(key: string, params: Record<string, string | number>): string {

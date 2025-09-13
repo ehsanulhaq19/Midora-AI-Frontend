@@ -176,7 +176,7 @@ class BaseApiClient {
       }
 
       const responseData = await response.json()
-      return responseData
+      return this.processResponseData<T>(responseData, response)
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
         const processedError = errorHandler.handleNetworkError(error)

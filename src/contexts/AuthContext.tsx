@@ -142,11 +142,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
         try {
           const urlParams = new URLSearchParams(window.location.search)
-          const returnUrl = urlParams.get('returnUrl') || '/dashboard'
+          const returnUrl = urlParams.get('returnUrl') || '/chat'
           router.push(returnUrl)
         } catch (redirectError) {
           console.error('Redirect error:', redirectError)
-          router.push('/dashboard')
+          router.push('/chat')
         }
       }
     } catch (error) {

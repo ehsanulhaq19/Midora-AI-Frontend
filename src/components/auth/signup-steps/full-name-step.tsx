@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { t } from '@/i18n'
-import { Buttons } from '../../ui/buttons'
+import { LogoOnly } from '@/icons'
+import { InputWithButton } from '../../ui'
 
 interface FullNameStepProps {
   onNext: (fullName: string) => void
@@ -8,82 +9,51 @@ interface FullNameStepProps {
   className?: string
 }
 
-export const FullNameStep: React.FC<FullNameStepProps> = ({ onNext, onBack, className }) => {
+export const FullNameStep = ({ 
+  onNext, 
+  onBack, 
+  className 
+}: FullNameStepProps) => {
   const [fullName, setFullName] = useState('')
-  const [error, setError] = useState('')
 
-  const handleNext = () => {
-    if (!fullName.trim()) {
-      setError(t('auth.fullNameRequired'))
-      return
+  const handleNameSubmit = (name: string) => {
+    if (name.trim()) {
+      onNext(name.trim())
     }
-    setError('')
-    onNext(fullName.trim())
   }
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFullName(e.target.value)
-    if (error) setError('')
+  const handlePrivacyPolicyClick = () => {
+    console.log("Privacy Policy clicked")
+    // Add your privacy policy navigation logic here
   }
 
   return (
-    <div className={`flex flex-col items-center gap-9 relative self-stretch w-full flex-[0_0_auto] ${className}`}>
-      <div className="flex flex-col items-center gap-6 text-center">
-        <h1 className="relative w-full max-w-[400px] mt-[-1.00px] font-heading-primary font-normal text-[color:var(--tokens-color-text-text-seconary)] text-3xl sm:text-4xl tracking-[-1.80px] leading-9">
-          <span className="font-light tracking-[-0.65px]">
-            {t('auth.fullNameTitle')}
-          </span>
-        </h1>
-        
-        <p className="relative w-full max-w-[350px] font-body-primary font-normal text-[#a0a0a0] text-base tracking-[-0.48px] leading-6">
-          {t('auth.fullNameSubtitle')}
-        </p>
-      </div>
-
-      <div className="flex flex-col items-center gap-4 p-6 relative self-stretch w-full flex-[0_0_auto] bg-[color:var(--tokens-color-surface-surface-primary)] rounded-3xl shadow-[-6px_4px_33.2px_#4d30711a]">
+    <div className={`relative w-full bg-tokens-color-surface-surface-primary flex flex-col justify-center ${className}`}>
+      <div className="inline-flex flex-col items-start gap-9 max-w-[475px] w-full px-4">   
+        <LogoOnly
+            className="!h-14 !aspect-[1.02] !w-[57px] mx-auto ml-0"
+        />     
         <div className="flex flex-col items-start gap-4 relative self-stretch w-full flex-[0_0_auto]">
-          <div className={`flex h-[54px] items-center gap-3 relative self-stretch w-full rounded-xl border border-solid transition-all duration-200 focus-within:ring-offset-2 ${
-            error 
-              ? 'border-red-500 focus-within:ring-red-500' 
-              : 'border-[#dbdbdb] focus-within:ring-blue-500'
-          }`}>
-            <input
-              type="text"
-              value={fullName}
-              onChange={handleInputChange}
-              placeholder={t('auth.fullNamePlaceholder')}
-              className="relative w-full font-body-primary font-normal text-black text-base tracking-[-0.48px] leading-[normal] bg-transparent border-none outline-none placeholder:text-[#a0a0a0] px-6 py-3"
-              aria-label="Full name"
-              required
-            />
+          <div className="flex items-center gap-2.5 relative self-stretch w-full">
+            <h1 className="relative w-fit [font-family:'Poppins',Helvetica] font-normal text-[color:var(--tokens-color-text-text-seconary)] text-[24px] tracking-[-1.80px] leading-[36px]">
+            Before we get started what we call you?
+            </h1>
           </div>
           
-          {error && (
-            <p className="text-red-500 text-sm font-body-primary font-normal tracking-[-0.48px] leading-[normal]">
-              {error}
+          <div className="flex items-center gap-2.5 relative self-stretch w-full">
+            <p className="relative w-full font-text font-[number:var(--text-font-weight)] text-tokens-color-text-text-inactive-2 text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
+            Tell your name to start your journey with us.
             </p>
-          )}
+          </div>
         </div>
 
-        <div className="flex gap-3 w-full">
-          <button
-            type="button"
-            onClick={onBack}
-            className="flex-1 h-[54px] items-center justify-center rounded-xl border border-solid border-[#dbdbdb] hover:border-[#bbb] hover:bg-gray-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          >
-            <span className="font-body-primary font-normal text-black text-base tracking-[-0.48px] leading-[normal]">
-              {t('common.back')}
-            </span>
-          </button>
-          
-          <div className="flex-1">
-            <Buttons 
-              property1="pressed" 
-              onClick={handleNext}
-              text={t('common.next')}
-            />
-          </div>
-        </div>
+        <InputWithButton
+          className="!self-stretch !w-full"
+          placeholder={t('auth.fullNamePlaceholder')}
+          onSubmit={handleNameSubmit}
+          value={fullName}
+          onChange={setFullName}
+        />
       </div>
     </div>
   )

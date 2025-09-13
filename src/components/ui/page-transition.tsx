@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState, useRef } from 'react'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 
 interface PageTransitionProps {
   children: React.ReactNode
@@ -9,53 +9,57 @@ interface PageTransitionProps {
 
 export const PageTransition: React.FC<PageTransitionProps> = ({ children }) => {
   const pathname = usePathname()
-  const router = useRouter()
-  const [isVisible, setIsVisible] = useState(false)
-  const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('right')
+  const [currentChildren, setCurrentChildren] = useState(children)
+  const [isAnimating, setIsAnimating] = useState(false)
+  const [isExiting, setIsExiting] = useState(false)
   const previousPathname = useRef(pathname)
+  const isInitialLoad = useRef(true)
 
   useEffect(() => {
-    const currentStep = getStepNumber(pathname)
-    const previousStep = getStepNumber(previousPathname.current)
+    // Skip transition on initial load
+    if (isInitialLoad.current) {
+      isInitialLoad.current = false
+      setCurrentChildren(children)
+      return
+    }
+
+    // Skip if same pathname
+    if (previousPathname.current === pathname) {
+      return
+    }
     
-    if (currentStep > previousStep) {
-      setSlideDirection('right')
-    } else if (currentStep < previousStep) {
-      setSlideDirection('left')
-    }
-
-    setIsVisible(false)
-
-    const timer = setTimeout(() => {
-      setIsVisible(true)
+    // Start exit animation
+    setIsExiting(true)
+    setIsAnimating(true)
+    
+    // After exit animation, update content and start enter animation
+    const exitTimer = setTimeout(() => {
+      setCurrentChildren(children)
       previousPathname.current = pathname
-    }, 50)
-
-    return () => clearTimeout(timer)
-  }, [pathname])
-
-  const getStepNumber = (path: string): number => {
-    if (path.includes('/welcome')) return 1
-    if (path.includes('/full-name')) return 2
-    if (path.includes('/profession')) return 3
-    return 0
-  }
-
-  const getTransformClass = () => {
-    if (isVisible) {
-      return 'opacity-100 transform translate-x-0'
-    } else {
-      return slideDirection === 'right' 
-        ? 'opacity-0 transform translate-x-full'
-        : 'opacity-0 transform -translate-x-full'
-    }
-  }
+      setIsExiting(false)
+      
+      // Start enter animation
+      const enterTimer = setTimeout(() => {
+        setIsAnimating(false)
+      }, 50) // Small delay to ensure DOM update
+      
+      return () => clearTimeout(enterTimer)
+    }, 250) // Half of total animation duration
+      
+    return () => clearTimeout(exitTimer)
+  }, [pathname, children])
 
   return (
-    <div 
-      className={`transition-all duration-500 ease-in-out ${getTransformClass()}`}
-    >
-      {children}
+    <div className="relative w-full h-full overflow-hidden">
+      <div 
+        className={`w-full h-full transition-all duration-500 ease-in-out ${
+          isAnimating 
+            ? (isExiting ? 'opacity-0 scale-95' : 'opacity-100 scale-100')
+            : 'opacity-100 scale-100'
+        }`}
+      >
+        {currentChildren}
+      </div>
     </div>
   )
 }

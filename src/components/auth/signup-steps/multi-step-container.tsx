@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { WelcomeStep, FullNameStep, ProfessionStep } from './'
+import { LogoOnly } from '@/icons/logo-only';
 
 interface MultiStepContainerProps {
   onComplete: (data: { email: string; fullName: string; profession: string }) => void
@@ -105,6 +106,9 @@ export const MultiStepContainer: React.FC<MultiStepContainerProps> = ({
   return (
     <div className={`relative overflow-hidden ${className}`}>
       <div className="relative w-full">
+      <LogoOnly
+          className="!h-14 !aspect-[1.02] !w-[57px] mx-auto"
+        />
         {getStepComponent()}
       </div>
     </div>

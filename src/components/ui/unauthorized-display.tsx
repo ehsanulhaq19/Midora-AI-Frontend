@@ -1,7 +1,7 @@
 'use client'
 
-import { Button } from '@/components/ui/buttons'
-import { Card, CardContent } from '@/components/ui/Card'
+import { Button } from '@/components/ui'
+import { Card, CardContent } from './card'
 import { useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 

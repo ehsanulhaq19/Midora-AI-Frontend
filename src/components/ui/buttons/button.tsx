@@ -50,26 +50,4 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 )
 Button.displayName = 'Button'
 
-interface PrimaryButtonProps {
-  property1?: 'pressed'
-  className?: string
-  text?: string
-  onClick?: () => void
-}
-
-export const PrimaryButton: React.FC<PrimaryButtonProps> = ({ property1, className, text, onClick }) => {
-  return (
-    <button 
-      type="button"
-      className={`flex w-full max-w-[360px] h-[54px] items-center justify-center gap-2.5 px-[74px] py-[18px] relative bg-tokens-color-surface-surface-button-pressed rounded-xl hover:bg-opacity-90 transition-colors duration-200 focus:outline-none ${className}`}
-      onClick={onClick || (() => {})}
-      aria-label={text || "Continue with email"}
-    >
-      <span className="relative w-fit mt-[-1.50px] font-body-primary font-normal text-[#fffdfd] text-base tracking-[-0.48px] leading-[normal] whitespace-nowrap">
-        {text || "Continue with email"}
-      </span>
-    </button>
-  )
-}
-
-export { Button, buttonVariants, PrimaryButton as Buttons }
+export { Button, buttonVariants }

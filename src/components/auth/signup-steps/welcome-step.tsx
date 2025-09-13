@@ -1,59 +1,93 @@
-import React from 'react'
+'use client'
+
 import { t } from '@/i18n'
-import { Buttons } from '../../ui/buttons'
+import { Buttons } from '../../ui'
+import { Paperclip, Lightbulb, Lightning, Grid, LogoOnly } from '@/icons'
 
 interface WelcomeStepProps {
   onNext: () => void
   className?: string
 }
 
-export const WelcomeStep: React.FC<WelcomeStepProps> = ({ onNext, className }) => {
-  return (
-    <div className={`flex flex-col items-center gap-9 relative self-stretch w-full flex-[0_0_auto] ${className}`}>
-      <div className="flex flex-col items-center gap-6 text-center">
-        <h1 className="relative w-full max-w-[400px] mt-[-1.00px] font-heading-primary font-normal text-[color:var(--tokens-color-text-text-seconary)] text-3xl sm:text-4xl tracking-[-1.80px] leading-9">
-          <span className="font-light tracking-[-0.65px]">
-            {t('auth.welcomeTitle')}
-          </span>
-        </h1>
-        
-        <p className="relative w-full max-w-[350px] font-body-primary font-normal text-[#a0a0a0] text-base tracking-[-0.48px] leading-6">
-          {t('auth.welcomeSubtitle')}
-        </p>
-      </div>
+export const WelcomeStep = ({ 
+  onNext, 
+  className 
+}: WelcomeStepProps) => {
+  const handleContinueClick = () => {
+    onNext()
+  }
 
-      <div className="flex flex-col items-center gap-4 p-6 relative self-stretch w-full flex-[0_0_auto] bg-[color:var(--tokens-color-surface-surface-primary)] rounded-3xl shadow-[-6px_4px_33.2px_#4d30711a]">
-        <div className="flex flex-col items-center gap-6 w-full">
-          <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-            <svg 
-              className="w-8 h-8 text-white" 
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
-            >
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                strokeWidth={2} 
-                d="M5 13l4 4L19 7" 
-              />
-            </svg>
+  const handlePrivacyClick = () => {
+    console.log("Privacy Policy clicked")
+    // Add your privacy policy navigation logic here
+  } 
+
+  return (
+    <div className={`flex flex-col w-full items-center justify-between bg-tokens-color-surface-surface-primary ${className}`}>
+      <div className="flex flex-col w-full max-w-[430px] items-start gap-[30px]">
+        <LogoOnly
+            className="!h-14 !aspect-[1.02] !w-[57px] mx-auto ml-0"
+        />
+        <div className="flex items-center gap-2.5 relative self-stretch w-full">
+          <h1 className="relative w-fit [font-family:'Poppins',Helvetica] font-normal text-[color:var(--tokens-color-text-text-seconary)] text-[36px] tracking-[-1.80px] leading-[36px]">
+            {t('auth.welcomeOnboardingTitle')}
+          </h1>
+        </div>
+        
+        <div className="flex items-center gap-2.5 relative self-stretch w-full">
+          <p className="relative w-full font-text font-[number:var(--text-font-weight)] text-tokens-color-text-text-inactive-2 text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
+            {t('auth.welcomeOnboardingSubtitle')}
+          </p>
+        </div>
+
+        <div className="flex flex-col w-full items-start gap-[18px] relative">
+          <div className="inline-flex items-start gap-[13px] relative">
+            <Paperclip className="relative mt-[2px] flex-shrink-0" />
+            <p className="relative w-fit font-text font-[number:var(--text-font-weight)] text-tokens-color-text-text-inactive-2 text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
+              {t('auth.featureDocumentSummary')}
+            </p>
           </div>
-          
-          <div className="text-center">
-            <p className="font-body-primary font-normal text-black text-base tracking-[-0.48px] leading-6">
-              Email verified successfully!
+
+          <div className="inline-flex items-start gap-[13px] relative">
+            <Lightbulb className="relative mt-[2px] flex-shrink-0" />
+            <p className="relative w-fit font-text font-[number:var(--text-font-weight)] text-tokens-color-text-text-inactive-2 text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
+              {t('auth.featureCreativeContent')}
+            </p>
+          </div>
+
+          <div className="inline-flex items-start gap-[13px] relative">
+            <Lightning className="relative mt-[2px] flex-shrink-0" />
+            <p className="relative w-fit font-text font-[number:var(--text-font-weight)] text-tokens-color-text-text-inactive-2 text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
+              {t('auth.featureTaskAutomation')}
+            </p>
+          </div>
+
+          <div className="inline-flex items-start gap-[13px] relative">
+            <Grid className="relative mt-[2px] flex-shrink-0" />
+            <p className="relative w-fit font-text font-[number:var(--text-font-weight)] text-tokens-color-text-text-inactive-2 text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
+              {t('auth.featureAICollaboration')}
             </p>
           </div>
         </div>
 
-        <div className="w-full">
-          <Buttons 
-            property1="pressed" 
-            onClick={onNext}
-            text={t('common.next')}
-          />
-        </div>
+        <p className="relative w-full [font-family:'SF_Pro-Regular',Helvetica] font-normal text-[#a0a0a0] text-[14px] tracking-[0] leading-[normal]">
+          <span className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-[#a0a0a0] tracking-[0]">
+            {t('auth.privacyNoticeText')}{' '}
+          </span>
+          <button 
+            onClick={handlePrivacyClick}
+            className="underline hover:text-gray-700 transition-colors cursor-pointer"
+          >
+            {t('auth.privacySection')}
+          </button>
+        </p>
+
+        <Buttons 
+          className="!self-stretch !w-full !max-w-none" 
+          property1="pressed"
+          onClick={handleContinueClick}
+          text={t('auth.continueWithEmail')}
+        />
       </div>
     </div>
   )

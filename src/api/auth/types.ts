@@ -14,13 +14,18 @@ export interface User {
   is_verified: boolean
 }
 
-// Authentication request types (removed UserLogin since login functionality is removed)
+// Authentication request types
+export interface UserLogin {
+  email: string
+  password: string
+}
 
 export interface UserCreate {
   email: string
   first_name: string
   last_name: string
   password: string
+  meta_data?: Record<string, any>
 }
 
 
@@ -39,6 +44,7 @@ export interface UserResponse {
   username: string
   is_active: boolean
   is_verified: boolean
+  meta_data?: Record<string, any>
 }
 
 // Password reset types
@@ -81,6 +87,16 @@ export interface OTPRegenerationRequest {
 export interface OTPRegenerationResponse {
   message: string
   email: string
+}
+
+// Email check types
+export interface EmailCheckRequest {
+  email: string
+}
+
+export interface EmailCheckResponse {
+  exists: boolean
+  message: string
 }
 
 // Form data types for components (removed LoginFormData since login functionality is removed)

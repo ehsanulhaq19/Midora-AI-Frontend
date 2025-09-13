@@ -7,5 +7,5 @@ export { Faqs } from './faqs'
 export { FooterSection } from './footer-section'
 export { GroupWrapper } from './group-wrapper'
 
-// Export signup steps
+// Export signup steps and onboarding sections
 export * from './signup-steps'

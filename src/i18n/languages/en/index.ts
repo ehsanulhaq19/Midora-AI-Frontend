@@ -10,6 +10,7 @@ import { errors } from './errors'
 import { success } from './success'
 import { pricing } from './pricing'
 import { hero } from './hero'
+import { chat } from './chat'
 
 export const enTranslations = {
   common,
@@ -19,4 +20,5 @@ export const enTranslations = {
   success,
   pricing,
   hero,
+  chat,
 }

@@ -269,6 +269,52 @@ import { SignupForm } from '@/components/auth/SignupForm'
 />
 ```
 
+#### WelcomeOnboardingSection
+**File**: `src/components/auth/welcome-onboarding-section.tsx`
+
+The welcome onboarding section component that introduces users to Midora AI features during the signup process.
+
+**Features**:
+- Brand logo display
+- Welcome message with AI partner introduction
+- Feature highlights with icons (document summarization, creative content, task automation, AI collaboration)
+- Privacy notice with clickable privacy section link
+- Continue button for email signup
+- Footer with privacy policy link
+- Full-screen responsive design
+- i18n support for all text content
+
+**Props**:
+```typescript
+interface WelcomeOnboardingSectionProps {
+  onContinue: () => void
+  onPrivacyClick: () => void
+  className?: string
+}
+```
+
+**Usage**:
+```tsx
+import { WelcomeOnboardingSection } from '@/components/auth'
+
+<WelcomeOnboardingSection 
+  onContinue={handleContinue}
+  onPrivacyClick={handlePrivacyClick}
+/>
+```
+
+**Features Displayed**:
+- Document summarization (Paperclip icon)
+- Creative content generation (Lightbulb icon)
+- Task automation (Lightning icon)
+- AI collaboration (Grid icon)
+
+**Styling Classes**:
+- `.bg-tokens-color-surface-surface-primary` - Primary surface background
+- `.text-tokens-color-text-text-seconary` - Secondary text color
+- `.text-tokens-color-text-text-inactive-2` - Inactive text color
+- `.bg-tokens-color-surface-surface-button-pressed` - Button background
+
 **Form Validation**:
 - Name requirement
 - Email format validation
@@ -650,6 +696,108 @@ To add new component variants:
 10. **Responsive**: Ensure mobile-first design
 
 ## Examples
+
+### 7. Icon Components
+
+#### Paperclip
+**File**: `src/icons/paperclip.tsx`
+
+Paperclip icon component for document-related features.
+
+**Features**:
+- SVG-based icon
+- Customizable className
+- TypeScript support
+- Consistent sizing (24x24)
+
+**Props**:
+```typescript
+interface PaperclipProps {
+  className?: string
+}
+```
+
+**Usage**:
+```tsx
+import { Paperclip } from '@/icons'
+
+<Paperclip className="w-6 h-6 text-gray-600" />
+```
+
+#### Lightbulb
+**File**: `src/icons/lightbulb.tsx`
+
+Lightbulb icon component for creative and idea-related features.
+
+**Features**:
+- SVG-based icon
+- Customizable className
+- TypeScript support
+- Consistent sizing (24x24)
+
+**Props**:
+```typescript
+interface LightbulbProps {
+  className?: string
+}
+```
+
+**Usage**:
+```tsx
+import { Lightbulb } from '@/icons'
+
+<Lightbulb className="w-6 h-6 text-gray-600" />
+```
+
+#### Lightning
+**File**: `src/icons/lightning.tsx`
+
+Lightning icon component for speed and automation features.
+
+**Features**:
+- SVG-based icon
+- Customizable className
+- TypeScript support
+- Consistent sizing (24x24)
+
+**Props**:
+```typescript
+interface LightningProps {
+  className?: string
+}
+```
+
+**Usage**:
+```tsx
+import { Lightning } from '@/icons'
+
+<Lightning className="w-6 h-6 text-gray-600" />
+```
+
+#### Grid
+**File**: `src/icons/grid.tsx`
+
+Grid icon component for organization and collaboration features.
+
+**Features**:
+- SVG-based icon
+- Customizable className
+- TypeScript support
+- Consistent sizing (24x24)
+
+**Props**:
+```typescript
+interface GridProps {
+  className?: string
+}
+```
+
+**Usage**:
+```tsx
+import { Grid } from '@/icons'
+
+<Grid className="w-6 h-6 text-gray-600" />
+```
 
 ### Complete Page Example
 
