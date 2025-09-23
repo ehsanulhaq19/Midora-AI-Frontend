@@ -143,6 +143,34 @@ export interface TokenPayload {
   jti?: string
 }
 
+// SSO Types
+export interface SSOProvider {
+  uuid: string
+  provider: string
+  provider_user_id: string
+  name?: string
+  first_name?: string
+  last_name?: string
+  picture_url?: string
+  is_active: boolean
+}
+
+export interface SSOUser extends User {
+  sso_provider?: SSOProvider
+}
+
+export interface SSOAuthResponse {
+  access_token: string
+  refresh_token: string
+  token_type: string
+  user: SSOUser
+}
+
+export interface SSOAuthUrlResponse {
+  auth_url: string
+  provider: string
+}
+
 // Authentication state types
 export interface AuthState {
   user: User | null

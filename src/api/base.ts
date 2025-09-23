@@ -5,14 +5,13 @@
 
 import { appConfig } from '@/config/app'
 import { requestInterceptor } from './interceptors'
-import { errorHandler, ProcessedError } from '@/lib/error-handler'
+import { handleApiError } from '@/lib/error-handler'
 
 export interface ApiResponse<T = any> {
   data?: T
   error?: string
   status: number
   message?: string
-  processedError?: ProcessedError
   success?: boolean
   error_type?: string
   error_message?: string
@@ -22,7 +21,6 @@ export interface ApiError {
   message: string
   status: number
   details?: any
-  processedError?: ProcessedError
 }
 
 class BaseApiClient {
@@ -49,11 +47,10 @@ class BaseApiClient {
         }
       } else if (responseData.success === false) {
         // Error response format: { success: false, error_type: "...", error_message: "..." }
-        const processedError = errorHandler.handleResponseError(response, responseData)
+        const errorMessage = handleApiError(responseData || response)
         return { 
-          error: processedError.message, 
+          error: errorMessage, 
           status: response.status,
-          processedError,
           success: false,
           error_type: responseData.error_type,
           error_message: responseData.error_message
@@ -102,11 +99,10 @@ class BaseApiClient {
           console.warn('Failed to parse error response:', parseError)
         }
 
-        const processedError = errorHandler.handleResponseError(response, errorData)
+        const errorMessage = handleApiError(errorData || response)
         return { 
-          error: processedError.message, 
-          status: response.status,
-          processedError
+          error: errorMessage, 
+          status: response.status
         }
       }
 
@@ -114,19 +110,17 @@ class BaseApiClient {
       return this.processResponseData<T>(responseData, response)
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
-        const processedError = errorHandler.handleNetworkError(error)
+        const errorMessage = handleApiError(error)
         return { 
-          error: processedError.message, 
-          status: 408,
-          processedError
+          error: errorMessage, 
+          status: 408
         }
       }
       
-      const processedError = errorHandler.handleNetworkError(error)
+      const errorMessage = handleApiError(error)
       return { 
-        error: processedError.message, 
-        status: 500,
-        processedError
+        error: errorMessage, 
+        status: 500
       }
     }
   }
@@ -167,11 +161,10 @@ class BaseApiClient {
           console.warn('Failed to parse error response:', parseError)
         }
 
-        const processedError = errorHandler.handleResponseError(response, errorData)
+        const errorMessage = handleApiError(errorData || response)
         return { 
-          error: processedError.message, 
-          status: response.status,
-          processedError
+          error: errorMessage, 
+          status: response.status
         }
       }
 
@@ -179,19 +172,17 @@ class BaseApiClient {
       return this.processResponseData<T>(responseData, response)
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
-        const processedError = errorHandler.handleNetworkError(error)
+        const errorMessage = handleApiError(error)
         return { 
-          error: processedError.message, 
-          status: 408,
-          processedError
+          error: errorMessage, 
+          status: 408
         }
       }
       
-      const processedError = errorHandler.handleNetworkError(error)
+      const errorMessage = handleApiError(error)
       return { 
-        error: processedError.message, 
-        status: 500,
-        processedError
+        error: errorMessage, 
+        status: 500
       }
     }
   }
@@ -232,11 +223,10 @@ class BaseApiClient {
           console.warn('Failed to parse error response:', parseError)
         }
 
-        const processedError = errorHandler.handleResponseError(response, errorData)
+        const errorMessage = handleApiError(errorData || response)
         return { 
-          error: processedError.message, 
-          status: response.status,
-          processedError
+          error: errorMessage, 
+          status: response.status
         }
       }
 
@@ -244,19 +234,17 @@ class BaseApiClient {
       return { data: responseData, status: response.status }
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
-        const processedError = errorHandler.handleNetworkError(error)
+        const errorMessage = handleApiError(error)
         return { 
-          error: processedError.message, 
-          status: 408,
-          processedError
+          error: errorMessage, 
+          status: 408
         }
       }
       
-      const processedError = errorHandler.handleNetworkError(error)
+      const errorMessage = handleApiError(error)
       return { 
-        error: processedError.message, 
-        status: 500,
-        processedError
+        error: errorMessage, 
+        status: 500
       }
     }
   }
@@ -296,11 +284,10 @@ class BaseApiClient {
           console.warn('Failed to parse error response:', parseError)
         }
 
-        const processedError = errorHandler.handleResponseError(response, errorData)
+        const errorMessage = handleApiError(errorData || response)
         return { 
-          error: processedError.message, 
-          status: response.status,
-          processedError
+          error: errorMessage, 
+          status: response.status
         }
       }
 
@@ -308,19 +295,17 @@ class BaseApiClient {
       return this.processResponseData<T>(responseData, response)
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
-        const processedError = errorHandler.handleNetworkError(error)
+        const errorMessage = handleApiError(error)
         return { 
-          error: processedError.message, 
-          status: 408,
-          processedError
+          error: errorMessage, 
+          status: 408
         }
       }
       
-      const processedError = errorHandler.handleNetworkError(error)
+      const errorMessage = handleApiError(error)
       return { 
-        error: processedError.message, 
-        status: 500,
-        processedError
+        error: errorMessage, 
+        status: 500
       }
     }
   }

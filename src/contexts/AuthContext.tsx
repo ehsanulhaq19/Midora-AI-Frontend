@@ -2,6 +2,17 @@
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import { useAppDispatch, useAppSelector } from '@/store/hooks'
+import { 
+  setLoading,
+  setError,
+  clearError,
+  loginSuccess,
+  updateUser,
+  updateTokens,
+  logout as logoutAction,
+  initializeAuth
+} from '@/store/slices/authSlice'
 import { 
   AuthContextType, 
   AuthState, 
@@ -16,11 +27,7 @@ import { authApi } from '@/api/auth/api'
 import { 
   setTokens,
   setUserData, 
-  getAccessToken, 
-  getRefreshToken,
-  getUserData,
-  clearAuthCookies,
-  isTokenExpired
+  clearAuthCookies
 } from '@/lib/auth'
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -31,82 +38,23 @@ interface AuthProviderProps {
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const router = useRouter()
+  const dispatch = useAppDispatch()
   
-  const [state, setState] = useState<AuthState>({
-    user: null,
-    accessToken: null,
-    refreshToken: null,
-    isAuthenticated: false,
-    isLoading: true,
-    error: null,
-  })
+  // Get auth state from Redux
+  const authState = useAppSelector((state) => state.auth)
 
-  useEffect(() => {
-    const initializeAuth = async () => {
-      try {
-        const accessToken = getAccessToken()
-        const refreshToken = getRefreshToken()
-        const userData = getUserData()
-
-        if (accessToken && refreshToken && userData) {
-          if (isTokenExpired(accessToken)) {
-            if (!isTokenExpired(refreshToken)) {
-              setState(prev => ({
-                ...prev,
-                user: userData,
-                accessToken,
-                refreshToken,
-                isAuthenticated: true,
-                isLoading: false,
-              }))
-            } else {
-              clearAuthCookies()
-              setState(prev => ({
-                ...prev,
-                user: null,
-                accessToken: null,
-                refreshToken: null,
-                isAuthenticated: false,
-                isLoading: false,
-              }))
-            }
-          } else {
-            setState(prev => ({
-              ...prev,
-              user: userData,
-              accessToken,
-              refreshToken,
-              isAuthenticated: true,
-              isLoading: false,
-            }))
-          }
-        } else {
-          setState(prev => ({
-            ...prev,
-            isLoading: false,
-          }))
-        }
-      } catch (error) {
-        console.error('Auth initialization error:', error)
-        setState(prev => ({
-          ...prev,
-          isLoading: false,
-          error: 'Failed to initialize authentication',
-        }))
-      }
-    }
-
-    initializeAuth()
-  }, [])
+  // Auth initialization is now handled by AuthInitializer component
+  // This prevents conflicts between multiple initialization systems
 
 
-  const clearError = useCallback(() => {
-    setState(prev => ({ ...prev, error: null }))
-  }, [])
+  const clearErrorCallback = useCallback(() => {
+    dispatch(clearError())
+  }, [dispatch])
 
   const login = useCallback(async (credentials: UserLogin) => {
     try {
-      setState(prev => ({ ...prev, isLoading: true, error: null }))
+      dispatch(setLoading(true))
+      dispatch(clearError())
 
       const response = await authApi.login(credentials)
       
@@ -130,14 +78,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
         setUserData(userResponse.data)
 
-        setState(prev => ({
-          ...prev,
+        // Dispatch login success to Redux
+        dispatch(loginSuccess({
           user: userResponse.data,
           accessToken: access_token,
           refreshToken: refresh_token,
-          isAuthenticated: true,
-          isLoading: false,
-          error: null,
         }))
 
         try {
@@ -151,17 +96,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
     } catch (error) {
       console.error('Login error:', error)
-      setState(prev => ({
-        ...prev,
-        isLoading: false,
-        error: error instanceof Error ? error.message : 'Login failed',
-      }))
+      dispatch(setError(error instanceof Error ? error.message : 'Login failed'))
+      dispatch(setLoading(false))
     }
-  }, [router])
+  }, [router, dispatch])
 
   const register = useCallback(async (userData: UserCreate) => {
     try {
-      setState(prev => ({ ...prev, isLoading: true, error: null }))
+      dispatch(setLoading(true))
+      dispatch(clearError())
 
       const response = await authApi.register(userData)
       
@@ -171,44 +114,28 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
 
       if (response.data) {
-        setState(prev => ({
-          ...prev,
-          isLoading: false,
-          error: null,
-        }))
-        
+        dispatch(setLoading(false))
       }
     } catch (error) {
       console.error('Registration error:', error)
-      setState(prev => ({
-        ...prev,
-        isLoading: false,
-        error: error instanceof Error ? error.message : 'Registration failed',
-      }))
+      dispatch(setError(error instanceof Error ? error.message : 'Registration failed'))
+      dispatch(setLoading(false))
     }
-  }, [router])
+  }, [dispatch])
 
   const logout = useCallback(async () => {
     try {
-      setState(prev => ({ ...prev, isLoading: true }))
+      dispatch(setLoading(true))
 
       await authApi.logout()
     } catch (error) {
       console.error('Logout API error:', error)
     } finally {
       clearAuthCookies()
-      setState({
-        user: null,
-        accessToken: null,
-        refreshToken: null,
-        isAuthenticated: false,
-        isLoading: false,
-        error: null,
-      })
-      
+      dispatch(logoutAction())
       router.push('/')
     }
-  }, [router])
+  }, [router, dispatch])
 
   const refreshAccessToken = useCallback(async () => {
     try {
@@ -228,11 +155,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       
       setTokens(access_token, newRefreshToken)
 
-      setState(prev => ({
-        ...prev,
+      dispatch(updateTokens({
         accessToken: access_token,
         refreshToken: newRefreshToken,
-        error: null,
       }))
 
       return access_token
@@ -241,11 +166,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
       await logout()
       throw error
     }
-  }, [logout])
+  }, [logout, dispatch])
 
   const forgotPassword = useCallback(async (email: string) => {
     try {
-      setState(prev => ({ ...prev, isLoading: true, error: null }))
+      dispatch(setLoading(true))
+      dispatch(clearError())
 
       const response = await authApi.forgotPassword(email)
       
@@ -254,24 +180,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
         throw new Error(errorMessage)
       }
 
-      setState(prev => ({
-        ...prev,
-        isLoading: false,
-        error: null,
-      }))
+      dispatch(setLoading(false))
     } catch (error) {
       console.error('Forgot password error:', error)
-      setState(prev => ({
-        ...prev,
-        isLoading: false,
-        error: error instanceof Error ? error.message : 'Failed to send reset email',
-      }))
+      dispatch(setError(error instanceof Error ? error.message : 'Failed to send reset email'))
+      dispatch(setLoading(false))
     }
-  }, [])
+  }, [dispatch])
 
   const resetPassword = useCallback(async (data: PasswordResetRequest) => {
     try {
-      setState(prev => ({ ...prev, isLoading: true, error: null }))
+      dispatch(setLoading(true))
+      dispatch(clearError())
 
       const response = await authApi.resetPassword(data)
       
@@ -280,24 +200,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
         throw new Error(errorMessage)
       }
 
-      setState(prev => ({
-        ...prev,
-        isLoading: false,
-        error: null,
-      }))
+      dispatch(setLoading(false))
     } catch (error) {
       console.error('Reset password error:', error)
-      setState(prev => ({
-        ...prev,
-        isLoading: false,
-        error: error instanceof Error ? error.message : 'Password reset failed',
-      }))
+      dispatch(setError(error instanceof Error ? error.message : 'Password reset failed'))
+      dispatch(setLoading(false))
     }
-  }, [])
+  }, [dispatch])
 
   const verifyOTP = useCallback(async (data: OTPVerificationRequest) => {
     try {
-      setState(prev => ({ ...prev, isLoading: true, error: null }))
+      dispatch(setLoading(true))
+      dispatch(clearError())
 
       const response = await authApi.verifyOTP(data)
       
@@ -306,24 +220,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
         throw new Error(errorMessage)
       }
 
-      setState(prev => ({
-        ...prev,
-        isLoading: false,
-        error: null,
-      }))
+      dispatch(setLoading(false))
     } catch (error) {
       console.error('OTP verification error:', error)
-      setState(prev => ({
-        ...prev,
-        isLoading: false,
-        error: error instanceof Error ? error.message : 'OTP verification failed',
-      }))
+      dispatch(setError(error instanceof Error ? error.message : 'OTP verification failed'))
+      dispatch(setLoading(false))
     }
-  }, [])
+  }, [dispatch])
 
   const regenerateOTP = useCallback(async (email: string) => {
     try {
-      setState(prev => ({ ...prev, isLoading: true, error: null }))
+      dispatch(setLoading(true))
+      dispatch(clearError())
 
       const response = await authApi.regenerateOTP(email)
       
@@ -332,23 +240,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
         throw new Error(errorMessage)
       }
 
-      setState(prev => ({
-        ...prev,
-        isLoading: false,
-        error: null,
-      }))
+      dispatch(setLoading(false))
     } catch (error) {
       console.error('OTP regeneration error:', error)
-      setState(prev => ({
-        ...prev,
-        isLoading: false,
-        error: error instanceof Error ? error.message : 'Failed to regenerate OTP',
-      }))
+      dispatch(setError(error instanceof Error ? error.message : 'Failed to regenerate OTP'))
+      dispatch(setLoading(false))
     }
-  }, [])
+  }, [dispatch])
 
   const contextValue: AuthContextType = {
-    ...state,
+    ...authState,
     login,
     register,
     logout,
@@ -357,7 +258,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     resetPassword,
     verifyOTP,
     regenerateOTP,
-    clearError,
+    clearError: clearErrorCallback,
   }
 
   return (

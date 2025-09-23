@@ -4,26 +4,16 @@
  */
 
 import { appConfig } from '@/config/app'
-import { COOKIE_NAMES } from '@/lib/auth'
-import { errorHandler, ProcessedError } from '@/lib/error-handler'
+import { handleApiError } from '@/lib/error-handler'
+import { tokenManager } from '@/lib/token-manager'
 
 /**
- * Get access token from cookies
+ * Get access token using token manager
  */
 function getAccessToken(): string | null {
-  if (typeof document === 'undefined') return null
-  console.log('Getting access token from cookies', COOKIE_NAMES)
-  const cookies = document.cookie.split(';')
-  for (const cookie of cookies) {
-    const [name, value] = cookie.trim().split('=')
-    if (name === COOKIE_NAMES.ACCESS_TOKEN) {
-      const token = decodeURIComponent(value)
-      console.log('Found access token in cookies:', token ? 'Yes' : 'No')
-      return token
-    }
-  }
-  console.log('No access token found in cookies')
-  return null
+  const token = tokenManager.getAccessToken()
+  console.log('Found access token:', token ? 'Yes' : 'No')
+  return token
 }
 
 /**
@@ -95,11 +85,11 @@ export function errorInterceptor(error: any): any {
 /**
  * Enhanced error interceptor that processes errors with our error handler
  */
-export function enhancedErrorInterceptor(error: any): ProcessedError {
+export function enhancedErrorInterceptor(error: any): any {
   console.error('API Error:', error)
   
   // Process the error using our error handler
-  return errorHandler.handleNetworkError(error)
+  return handleApiError(error)
 }
 
 /**
@@ -108,13 +98,16 @@ export function enhancedErrorInterceptor(error: any): ProcessedError {
 export function createFetchWithInterceptors() {
   const originalFetch = window.fetch
   
-  return async (url: string, options: RequestInit = {}) => {
+  return async (input: RequestInfo | URL, init?: RequestInit) => {
     try {
+      const url = typeof input === 'string' ? input : input.toString()
+      const options = init || {}
+      
       // Apply request interceptor
       const interceptedOptions = requestInterceptor(url, options)
       
       // Make the request
-      const response = await originalFetch(url, interceptedOptions)
+      const response = await originalFetch(input, interceptedOptions)
       
       // Apply response interceptor
       const interceptedResponse = responseInterceptor(response)

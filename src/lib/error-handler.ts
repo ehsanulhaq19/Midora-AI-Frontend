@@ -126,37 +126,17 @@ export const handleApiError = (error: any): string => {
   console.error('API Error:', error)
   
   // Handle network errors
-  if (!error.response) {
+  if (!error.detail) {
     return t('errors.NETWORK_ERROR')
   }
   
-  // Handle HTTP errors
-  const status = error.response?.status
-  const data = error.response?.data
+  const data = error.detail
   
   if (data && typeof data === 'object') {
     return getErrorMessage(data)
   }
   
-  // Handle status code based errors
-  switch (status) {
-    case 400:
-      return t('errors.CLIENT_ERROR')
-    case 401:
-      return t('errors.UNAUTHENTICATED')
-    case 403:
-      return t('errors.UNAUTHORIZED')
-    case 404:
-      return t('errors.notFound.message')
-    case 429:
-      return t('errors.TOO_MANY_REQUESTS')
-    case 500:
-      return t('errors.SERVER_ERROR')
-    case 503:
-      return t('errors.SERVICE_UNAVAILABLE')
-    default:
-      return t('errors.UNKNOWN_ERROR')
-  }
+  return t('errors.UNKNOWN_ERROR')
 }
 
 /**

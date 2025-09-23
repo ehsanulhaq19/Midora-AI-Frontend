@@ -1,8 +1,10 @@
 import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { authApi } from '@/api/auth/api'
-import { setAuthTokens } from '@/lib/cookies'
+import { loginSuccess, setLoading, setError, clearError } from '@/store/slices/authSlice'
 import { handleApiError } from '@/lib/error-handler'
+import { tokenManager } from '@/lib/token-manager'
 
 interface UseLoginReturn {
   login: (email: string, password: string) => Promise<void>
@@ -17,47 +19,68 @@ interface UseLoginReturn {
  */
 export const useLogin = (): UseLoginReturn => {
   const router = useRouter()
+  const dispatch = useAppDispatch()
   const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  
+  // Get error from Redux store
+  const error = useAppSelector((state) => state.auth.error)
 
-  const clearError = useCallback(() => {
-    setError(null)
-  }, [])
+  const clearErrorCallback = useCallback(() => {
+    dispatch(clearError())
+  }, [dispatch])
 
   const login = useCallback(async (email: string, password: string) => {
-    if (isLoading) return
-    
-    setIsLoading(true)
-    setError(null)
+    if (isLoading) {
+      console.warn('Login already in progress')
+      return
+    }
     
     try {
-      // Call login API
-      const response = await authApi.login({ email, password })
+      setIsLoading(true)
+      dispatch(setLoading(true))
+      dispatch(clearError())
       
+      const response = await authApi.login({ email, password })
       if (response.error) {
         throw new Error(response.error)
       }
       
       if (response.data) {
-        // Save tokens to cookies
-        setAuthTokens(response.data.access_token, response.data.refresh_token)
+        tokenManager.storeTokens(
+          response.data.access_token,
+          response.data.refresh_token,
+          'email'
+        )
+
+        const userResponse = await authApi.getCurrentUser()
         
-        // Redirect to chat page
-        router.push('/chat')
+        if (userResponse.data) {
+          dispatch(loginSuccess({
+            user: userResponse.data,
+            accessToken: response.data.access_token,
+            refreshToken: response.data.refresh_token,
+            authMethod: 'email'
+          }))
+          
+          router.push('/chat')
+        } else {
+          throw new Error('Failed to get user information')
+        }
       }
     } catch (err: any) {
       const errorMessage = handleApiError(err)
-      setError(errorMessage)
-      throw new Error(errorMessage)
+      dispatch(setError(errorMessage))
+      throw err 
     } finally {
       setIsLoading(false)
+      dispatch(setLoading(false))
     }
-  }, [isLoading, router])
+  }, [isLoading, router, dispatch])
 
   return {
     login,
     isLoading,
     error,
-    clearError
+    clearError: clearErrorCallback
   }
 }

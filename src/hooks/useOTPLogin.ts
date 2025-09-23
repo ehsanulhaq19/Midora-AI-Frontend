@@ -1,8 +1,11 @@
 import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { authApi } from '@/api/auth/api'
 import { setAuthTokens } from '@/lib/cookies'
 import { handleApiError } from '@/lib/error-handler'
+import { loginSuccess, setLoading, setError, clearError } from '@/store/slices/authSlice'
+import { tokenManager } from '@/lib/token-manager'
 
 interface UseOTPLoginReturn {
   verifyOTPAndLogin: (email: string, password: string, otpCode: string) => Promise<void>
@@ -17,18 +20,22 @@ interface UseOTPLoginReturn {
  */
 export const useOTPLogin = (): UseOTPLoginReturn => {
   const router = useRouter()
+  const dispatch = useAppDispatch()
   const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  
+  // Get error from Redux store
+  const error = useAppSelector((state) => state.auth.error)
 
-  const clearError = useCallback(() => {
-    setError(null)
-  }, [])
+  const clearErrorCallback = useCallback(() => {
+    dispatch(clearError())
+  }, [dispatch])
 
   const verifyOTPAndLogin = useCallback(async (email: string, password: string, otpCode: string) => {
     if (isLoading) return
     
     setIsLoading(true)
-    setError(null)
+    dispatch(setLoading(true))
+    dispatch(clearError())
     
     try {
       // First verify OTP
@@ -49,25 +56,48 @@ export const useOTPLogin = (): UseOTPLoginReturn => {
       }
       
       if (loginResponse.data) {
-        // Save tokens to cookies
-        setAuthTokens(loginResponse.data.access_token, loginResponse.data.refresh_token)
+        // Get user info from the token or make a separate API call
+        const userResponse = await authApi.getCurrentUser()
         
-        // Redirect to chat page
-        router.push('/chat')
+        if (userResponse.data) {
+          // Store auth data in Redux
+          dispatch(loginSuccess({
+            user: userResponse.data,
+            accessToken: loginResponse.data.access_token,
+            refreshToken: loginResponse.data.refresh_token,
+            authMethod: 'email'
+          }))
+
+          // Store tokens using token manager
+          tokenManager.storeTokens(
+            loginResponse.data.access_token,
+            loginResponse.data.refresh_token,
+            'email'
+          )
+          
+          // Also save tokens to cookies for backward compatibility
+          setAuthTokens(loginResponse.data.access_token, loginResponse.data.refresh_token)
+          
+          // Redirect to chat page
+          router.push('/chat')
+        } else {
+          throw new Error('Failed to get user information')
+        }
       }
     } catch (err: any) {
       const errorMessage = handleApiError(err)
-      setError(errorMessage)
+      dispatch(setError(errorMessage))
       throw new Error(errorMessage)
     } finally {
       setIsLoading(false)
+      dispatch(setLoading(false))
     }
-  }, [isLoading, router])
+  }, [isLoading, router, dispatch])
 
   return {
     verifyOTPAndLogin,
     isLoading,
     error,
-    clearError
+    clearError: clearErrorCallback
   }
 }

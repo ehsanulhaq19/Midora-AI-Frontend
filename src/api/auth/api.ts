@@ -18,7 +18,9 @@ import {
   OTPRegenerationRequest,
   OTPRegenerationResponse,
   EmailCheckRequest,
-  EmailCheckResponse
+  EmailCheckResponse,
+  SSOAuthUrlResponse,
+  SSOAuthResponse
 } from './types'
 
 class AuthApiClient {
@@ -88,6 +90,59 @@ class AuthApiClient {
    */
   async regenerateOTP(email: string): Promise<ApiResponse<OTPRegenerationResponse>> {
     return this.baseClient.post<OTPRegenerationResponse>('/api/v1/otp/registration/regenerate', { email })
+  }
+
+  // SSO Methods
+
+  /**
+   * Get Google OAuth authorization URL
+   */
+  async getGoogleAuthUrl(state?: string): Promise<ApiResponse<SSOAuthUrlResponse>> {
+    const params = state ? `?state=${encodeURIComponent(state)}` : ''
+    return this.baseClient.get<SSOAuthUrlResponse>(`/api/v1/auth/google/auth-url${params}`)
+  }
+
+  /**
+   * Get Microsoft OAuth authorization URL
+   */
+  async getMicrosoftAuthUrl(state?: string): Promise<ApiResponse<SSOAuthUrlResponse>> {
+    const params = state ? `?state=${encodeURIComponent(state)}` : ''
+    return this.baseClient.get<SSOAuthUrlResponse>(`/api/v1/auth/microsoft/auth-url${params}`)
+  }
+
+  /**
+   * Get GitHub OAuth authorization URL
+   */
+  async getGitHubAuthUrl(state?: string): Promise<ApiResponse<SSOAuthUrlResponse>> {
+    const params = state ? `?state=${encodeURIComponent(state)}` : ''
+    return this.baseClient.get<SSOAuthUrlResponse>(`/api/v1/auth/github/auth-url${params}`)
+  }
+
+  /**
+   * Handle Google OAuth callback
+   */
+  async handleGoogleCallback(code: string, state?: string): Promise<ApiResponse<SSOAuthResponse>> {
+    const params = new URLSearchParams({ code })
+    if (state) params.append('state', state)
+    return this.baseClient.get<SSOAuthResponse>(`/api/v1/auth/google/callback?${params.toString()}`)
+  }
+
+  /**
+   * Handle Microsoft OAuth callback
+   */
+  async handleMicrosoftCallback(code: string, state?: string): Promise<ApiResponse<SSOAuthResponse>> {
+    const params = new URLSearchParams({ code })
+    if (state) params.append('state', state)
+    return this.baseClient.get<SSOAuthResponse>(`/api/v1/auth/microsoft/callback?${params.toString()}`)
+  }
+
+  /**
+   * Handle GitHub OAuth callback
+   */
+  async handleGitHubCallback(code: string, state?: string): Promise<ApiResponse<SSOAuthResponse>> {
+    const params = new URLSearchParams({ code })
+    if (state) params.append('state', state)
+    return this.baseClient.get<SSOAuthResponse>(`/api/v1/auth/github/callback?${params.toString()}`)
   }
 }
 

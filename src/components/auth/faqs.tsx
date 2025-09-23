@@ -16,10 +16,10 @@ export const Faqs: React.FC<FaqsProps> = ({ property1, className }) => {
         className="inline-flex items-center justify-between w-full text-left hover:bg-gray-50 rounded-lg p-2 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         onClick={() => {}}
         aria-expanded={property1 === "expanded"}
-        aria-label="Toggle FAQ: What is medora and how does it work?"
+        aria-label="Toggle FAQ: What is midora and how does it work?"
       >
         <p className="font-text-large w-full max-w-[509px] mt-[-1.00px] tracking-[var(--text-large-letter-spacing)] text-lg sm:text-xl lg:text-[length:var(--text-large-font-size)] [font-style:var(--text-large-font-style)] text-tokens-color-text-text-primary font-[number:var(--text-large-font-weight)] leading-[var(--text-large-line-height)] relative text-left">
-          What is medora and how does it work?
+          What is midora and how does it work?
         </p>
 
         <Plus01_5

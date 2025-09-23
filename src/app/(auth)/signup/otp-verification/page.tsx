@@ -7,13 +7,11 @@ import { useSignupData } from '@/contexts/signup-context'
 import { authApi } from '@/api/auth/api'
 import { handleApiError } from '@/lib/error-handler'
 import { useOTPLogin } from '@/hooks/useOTPLogin'
-import { useLogin } from '@/hooks/useLogin'
 
 export default function OTPVerificationPage() {
   const router = useRouter()
   const { data } = useSignupData()
   const { verifyOTPAndLogin, isLoading: isVerifyingOTP, error: otpError, clearError: clearOTPError } = useOTPLogin()
-  const { login, isLoading: isLoggingIn, error: loginError, clearError: clearLoginError } = useLogin()
   const [isRegistering, setIsRegistering] = useState(false)
 
   React.useEffect(() => {
@@ -29,7 +27,7 @@ export default function OTPVerificationPage() {
     clearOTPError()
     
     try {
-      // Use the custom OTP login hook
+      // Use the custom OTP login hook - this will handle both OTP verification and login
       await verifyOTPAndLogin(
         data.email,
         data.password,
@@ -41,16 +39,10 @@ export default function OTPVerificationPage() {
       throw error // Re-throw to let the component handle the error display
     } finally {
       setIsRegistering(false)
-      handleLogin(data.email, data.password)
     }
   }
 
 
-  const handleLogin = async (email: string, password: string) => {
-    if (isLoggingIn) return
-    clearLoginError()
-    await login(email, password)
-  }
 
   const handleBack = () => {
     router.push('/signup/password')

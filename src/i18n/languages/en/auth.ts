@@ -130,16 +130,16 @@ export const auth = {
   seconds: 's',
   
   // Welcome onboarding
-  welcomeOnboardingTitle: 'Hey there, I\'m medora',
+  welcomeOnboardingTitle: 'Hey there, I\'m midora',
   welcomeOnboardingSubtitle: 'Your all-in-one AI partner, powered by GPT, Gemini, and Claude. Smarter answers. Faster workflows. Deeper insights.',
   featureDocumentSummary: 'Summarize complex documents in seconds',
   featureCreativeContent: 'Generate fresh ideas and creative content',
   featureTaskAutomation: 'Automate repetitive tasks to save time',
   featureAICollaboration: 'Collaborate with AI that adapts to your goals',
-  privacyNoticeText: 'We use chat and code sessions to train medora.ai, You can settings in anytime in your',
+  privacyNoticeText: 'We use chat and code sessions to train midora.ai, You can settings in anytime in your',
   privacySection: 'Privacy section.',
   continueWithEmail: 'Continue with email',
-  footerRightsReserved: 'All rights reserved@ 2025, medora.ai, You can view our',
+  footerRightsReserved: 'All rights reserved@ 2025, midora.ai, You can view our',
   privacyPolicy: 'Privacy Policy',
   footerHere: 'here',
   
@@ -151,4 +151,26 @@ export const auth = {
   switchToLogin: 'Switch to Login',
   continue: 'Continue',
   back: 'Back',
+
+  // SSO Authentication
+  signInWithGoogle: 'Continue with Google',
+  signInWithMicrosoft: 'Continue with Microsoft',
+  signInWithGitHub: 'Continue with GitHub',
+  ssoSigningIn: 'Signing in with {provider}...',
+  ssoError: 'SSO authentication failed',
+  ssoCancelled: 'SSO authentication was cancelled',
+  ssoInvalidState: 'Invalid authentication state',
+  ssoNoCode: 'No authorization code received',
+  ssoGenericError: 'An error occurred during authentication',
+  
+  // Authentication methods
+  authMethodEmail: 'Email',
+  authMethodGoogle: 'Google',
+  authMethodMicrosoft: 'Microsoft',
+  authMethodGitHub: 'GitHub',
+  
+  // Auth guard messages
+  checkingAuthentication: 'Checking authentication...',
+  authenticationRequired: 'Authentication required',
+  redirectingToSignup: 'Redirecting to signup...',
 }

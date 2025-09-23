@@ -1,7 +1,8 @@
 'use client'
 
-import React, { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import React, { useState, useEffect, useCallback } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useAppDispatch } from '@/store/hooks'
 import { ButtonGroup } from './button-group'
 import { Buttons } from '../ui'
 import { CaretDown } from '@/icons'
@@ -12,6 +13,9 @@ import { LoginPasswordInput } from '@/components/ui/inputs/login-password-input'
 import { authApi } from '@/api/auth/api'
 import { handleApiError } from '@/lib/error-handler'
 import { useLogin } from '@/hooks/useLogin'
+import { useSSO } from '@/hooks/useSSO'
+import { loginSuccess, setLoading, setError } from '@/store/slices/authSlice'
+import { tokenManager } from '@/lib/token-manager'
 
 interface SignupFormSectionProps {
   className?: string
@@ -19,8 +23,11 @@ interface SignupFormSectionProps {
 
 export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className }) => {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const dispatch = useAppDispatch()
   const { updateData } = useSignupData()
   const { login, isLoading: isLoggingIn, error: loginError, clearError: clearLoginError } = useLogin()
+  const { signInWithGoogle, signInWithMicrosoft, signInWithGitHub } = useSSO()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [emailError, setEmailError] = useState('')
@@ -28,6 +35,97 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className 
   const [isCheckingEmail, setIsCheckingEmail] = useState(false)
   const [showPasswordField, setShowPasswordField] = useState(false)
   const [isTransitioning, setIsTransitioning] = useState(false)
+  const [isProcessingSSO, setIsProcessingSSO] = useState(false)
+
+  // Handle SSO callback with tokens in query parameters
+  useEffect(() => {
+    const processSSOCallback = async () => {
+      const accessToken = searchParams.get('access_token')
+      const refreshToken = searchParams.get('refresh_token')
+      const authMethod = searchParams.get('auth_method')
+      const error = searchParams.get('error')
+      const errorMessage = searchParams.get('message')
+
+      // Handle SSO error
+      if (error) {
+        console.error('SSO Error:', errorMessage)
+        setEmailError(errorMessage || t('auth.ssoError'))
+        
+        // Remove error query params
+        const newUrl = new URL(window.location.href)
+        newUrl.searchParams.delete('error')
+        newUrl.searchParams.delete('message')
+        window.history.replaceState({}, '', newUrl.toString())
+        return
+      }
+
+      // Process SSO success with tokens
+      if (accessToken && refreshToken && authMethod) {
+        setIsProcessingSSO(true)
+        dispatch(setLoading(true))
+        dispatch(setError(null))
+
+        try {
+          // Store tokens using token manager
+          tokenManager.storeTokens(accessToken, refreshToken, authMethod)
+
+          // Get user details from backend
+          const userResponse = await authApi.getCurrentUser()
+          
+          if (userResponse.data) {
+            // Store auth data in Redux
+            dispatch(loginSuccess({
+              user: userResponse.data,
+              accessToken,
+              refreshToken,
+              authMethod: authMethod as 'google' | 'microsoft' | 'github'
+            }))
+
+            // Remove query params
+            const newUrl = new URL(window.location.href)
+            newUrl.searchParams.delete('access_token')
+            newUrl.searchParams.delete('refresh_token')
+            newUrl.searchParams.delete('auth_method')
+            window.history.replaceState({}, '', newUrl.toString())
+
+            // Redirect to chat page
+            router.push('/chat')
+          } else {
+            throw new Error('Failed to get user information')
+          }
+        } catch (err: any) {
+          console.error('SSO callback processing error:', err)
+          
+          // Clear tokens on error
+          tokenManager.clearTokens()
+          
+          // Remove query params
+          const newUrl = new URL(window.location.href)
+          newUrl.searchParams.delete('access_token')
+          newUrl.searchParams.delete('refresh_token')
+          newUrl.searchParams.delete('auth_method')
+          window.history.replaceState({}, '', newUrl.toString())
+          
+          // Show error
+          const errorMessage = handleApiError(err)
+          setEmailError(errorMessage)
+          dispatch(setError(errorMessage))
+        } finally {
+          setIsProcessingSSO(false)
+          dispatch(setLoading(false))
+        }
+      }
+    }
+
+    // Only run if there are relevant search params
+    if (searchParams.has('access_token') || searchParams.has('error')) {
+      processSSOCallback().catch((error) => {
+        console.error('SSO callback error:', error)
+        dispatch(setError('SSO authentication failed'))
+        dispatch(setLoading(false))
+      })
+    }
+  }, [searchParams, dispatch, router])
 
   const handleEmailSubmit = async () => {
     if (!email.trim()) {
@@ -76,7 +174,7 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className 
     }
   }
 
-  const handlePasswordSubmit = async () => {
+  const handlePasswordSubmit = useCallback(async () => {
     if (!password.trim()) {
       setPasswordError(t('auth.passwordRequired'))
       return
@@ -89,9 +187,10 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className 
       // Use the custom login hook
       await login(email, password)
     } catch (err: any) {
-      setPasswordError(err.message)
+      console.error('Password submit error:', err)
+      setPasswordError(err.message || 'Login failed')
     }
-  }
+  }, [password, email, login, clearLoginError])
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value)
@@ -135,8 +234,9 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className 
             <div className="flex items-center justify-center gap-3 relative self-stretch w-full flex-[0_0_auto]">
               <button 
                 type="button"
-                className="inline-flex items-center gap-2 p-3 relative flex-[0_0_auto] rounded-xl border border-solid border-[#dbdbdb] hover:border-[#bbb] hover:bg-gray-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                onClick={() => {}}
+                className="inline-flex items-center gap-2 p-3 relative flex-[0_0_auto] rounded-xl border border-solid border-[#dbdbdb] hover:border-[#bbb] hover:bg-gray-50 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={signInWithGitHub}
+                disabled={isProcessingSSO}
                 aria-label="Sign up with Github"
               >
                 <img
@@ -152,8 +252,9 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className 
 
               <button 
                 type="button"
-                className="inline-flex items-center gap-2 p-3 relative flex-[0_0_auto] rounded-xl border border-solid border-[#dbdbdb] hover:border-[#bbb] hover:bg-gray-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                onClick={() => {}}
+                className="inline-flex items-center gap-2 p-3 relative flex-[0_0_auto] rounded-xl border border-solid border-[#dbdbdb] hover:border-[#bbb] hover:bg-gray-50 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={signInWithMicrosoft}
+                disabled={isProcessingSSO}
                 aria-label="Sign up with Microsoft"
               >
                 <img
@@ -169,8 +270,9 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className 
 
               <button 
                 type="button"
-                className="inline-flex items-center gap-2 p-3 relative flex-[0_0_auto] rounded-xl border border-solid border-[#dbdbdb] hover:border-[#bbb] hover:bg-gray-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                onClick={() => {}}
+                className="inline-flex items-center gap-2 p-3 relative flex-[0_0_auto] rounded-xl border border-solid border-[#dbdbdb] hover:border-[#bbb] hover:bg-gray-50 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={signInWithGoogle}
+                disabled={isProcessingSSO}
                 aria-label="Sign up with Google"
               >
                 <img
@@ -259,11 +361,13 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className 
                 property1="pressed" 
                 onClick={showPasswordField ? handlePasswordSubmit : handleEmailSubmit}
                 text={
-                  showPasswordField 
-                    ? (isLoggingIn ? t('auth.loggingIn') : t('auth.loginWithPassword'))
-                    : (isCheckingEmail ? "Checking..." : "Continue with email")
+                  isProcessingSSO 
+                    ? t('auth.ssoSigningIn').replace('{provider}', 'SSO')
+                    : showPasswordField 
+                      ? (isLoggingIn ? t('auth.loggingIn') : t('auth.loginWithPassword'))
+                      : (isCheckingEmail ? "Checking..." : "Continue with email")
                 }
-                disabled={isCheckingEmail || isLoggingIn || isTransitioning}
+                disabled={isCheckingEmail || isLoggingIn || isTransitioning || isProcessingSSO}
               />
             </div>
           </div>

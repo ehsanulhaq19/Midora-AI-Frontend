@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import '@/app/globals.css'
 import { AuthProvider } from '@/contexts/AuthContext'
+import { ReduxProvider } from '@/components/providers/ReduxProvider'
+import { AuthInitializer } from '@/components/auth/AuthInitializer'
 import { initializeI18n } from '@/i18n'
 import { initializeInterceptors } from '@/api/interceptors'
 import { ThemeInitializer } from '@/components/ui/theme-initializer'
@@ -53,11 +55,14 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <ThemeInitializer />
-        <AuthProvider>
-          <div className="min-h-screen bg-surface-primary">
-            {children}
-          </div>
-        </AuthProvider>
+        <ReduxProvider>
+          <AuthInitializer />
+          <AuthProvider>
+            <div className="min-h-screen bg-surface-primary">
+              {children}
+            </div>
+          </AuthProvider>
+        </ReduxProvider>
       </body>
     </html>
   )
