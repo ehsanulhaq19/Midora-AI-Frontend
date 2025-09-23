@@ -2,6 +2,7 @@ import React from 'react'
 import { CheckBroken4 } from '@/icons'
 import { pricingData } from '@/lib/pricing-data'
 import { PricingPlan } from '@/types/pricing'
+import { Slider } from '@/components/ui'
 
 interface PricingSectionProps {
   className?: string
@@ -13,7 +14,7 @@ interface PricingCardProps {
 
 const PricingCard: React.FC<PricingCardProps> = ({ plan }) => {
   const isPopular = plan.isPopular
-  const baseClasses = "flex flex-col items-start gap-[88px] p-12 relative rounded-[var(--premitives-corner-radius-corner-radius-5)] transition-all duration-300 ease-in-out cursor-pointer group max-h-[525px] max-w-[383px]"
+  const baseClasses = "flex flex-col items-start gap-[88px] p-12 relative rounded-[var(--premitives-corner-radius-corner-radius-5)] transition-all duration-300 ease-in-out cursor-pointer group max-h-[525px] w-full max-w-[383px] mx-auto"
   
   const cardClasses = isPopular 
     ? `${baseClasses} bg-[linear-gradient(150deg,rgba(31,23,64,1)_0%,rgba(94,77,116,1)_100%)] bg-tokens-color-surface-surface-button`
@@ -97,10 +98,43 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ className }) => 
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center justify-center gap-[48px_48px] relative self-stretch w-full flex-[0_0_auto]">
+      {/* Desktop Grid Layout */}
+      <div className="hidden lg:flex flex-wrap items-center justify-center gap-[48px_48px] relative self-stretch w-full flex-[0_0_auto]">
         {pricingData.plans.map((plan) => (
           <PricingCard key={plan.id} plan={plan} />
         ))}
+      </div>
+
+      {/* Tablet Slider Layout - Center mode with partial adjacent cards */}
+      <div className="hidden md:block lg:hidden w-full">
+        <Slider
+          slidesToShow={1}
+          slidesToScroll={1}
+          showArrows={true}
+          infinite={true}
+          centerMode={true}
+          centerPadding="60px"
+          className="px-4"
+        >
+          {pricingData.plans.map((plan) => (
+            <PricingCard key={plan.id} plan={plan} />
+          ))}
+        </Slider>
+      </div>
+
+      {/* Mobile Slider Layout - Single card per slide */}
+      <div className="md:hidden w-full">
+        <Slider
+          slidesToShow={1}
+          slidesToScroll={1}
+          showArrows={true}
+          infinite={true}
+          className="px-4"
+        >
+          {pricingData.plans.map((plan) => (
+            <PricingCard key={plan.id} plan={plan} />
+          ))}
+        </Slider>
       </div>
     </div>
   )

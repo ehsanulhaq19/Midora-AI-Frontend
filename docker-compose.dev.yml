@@ -10,12 +10,14 @@ services:
         BUILD_TARGET: development
     ports:
       - "3000:3000"
+    env_file:
+      - .env
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=${NODE_ENV:-development}
       - NEXT_TELEMETRY_DISABLED=1
-      - NEXT_PUBLIC_API_URL=http://localhost:8000/api
-      - NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
-      - CUSTOM_KEY=dev_key_here
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_BACKEND_URL}/api
+      - NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL}
+      - CUSTOM_KEY=${CUSTOM_KEY:-dev_key_here}
     volumes:
       - .:/app
       - /app/node_modules

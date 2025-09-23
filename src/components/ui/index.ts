@@ -7,6 +7,9 @@ export { InputWithButton, PasswordInput, OTPInput } from './inputs'
 // Loader components
 export { Spinner, ButtonLoader } from './loaders'
 
+// Slider components
+export { Slider } from './slider'
+
 // Other components
 export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from './card'
 export { ErrorDisplay } from './error-display'
