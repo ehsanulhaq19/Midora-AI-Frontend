@@ -173,4 +173,17 @@ export const auth = {
   checkingAuthentication: 'Checking authentication...',
   authenticationRequired: 'Authentication required',
   redirectingToSignup: 'Redirecting to signup...',
+  
+  // SSO Onboarding
+  ssoOnboardingWelcome: 'Welcome to Midora AI!',
+  ssoOnboardingWelcomeSubtitle: 'Your account has been created successfully. Let\'s complete your profile to get started.',
+  ssoOnboardingCompleteProfile: 'Complete Profile',
+  ssoOnboardingWhatShouldWeCallYou: 'What should we call you?',
+  ssoOnboardingNameSubtitle: 'Please provide your full name to personalize your experience.',
+  ssoOnboardingWhatAreYouInto: 'What are you into? Pick any three topics to explore',
+  ssoOnboardingProfessionSubtitle: 'Tell us about your interests to customize your experience.',
+  ssoOnboardingProfileComplete: 'Profile Complete!',
+  ssoOnboardingProfileCompleteSubtitle: 'Your profile has been set up successfully. You\'ll be redirected to your dashboard in {countdown} seconds.',
+  ssoOnboardingGoToChat: 'Go to Chat',
+  ssoOnboardingLoading: 'Loading...',
 }

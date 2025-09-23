@@ -20,7 +20,9 @@ import {
   EmailCheckRequest,
   EmailCheckResponse,
   SSOAuthUrlResponse,
-  SSOAuthResponse
+  SSOAuthResponse,
+  SSOOnboardingRequest,
+  SSOOnboardingResponse
 } from './types'
 
 class AuthApiClient {
@@ -143,6 +145,13 @@ class AuthApiClient {
     const params = new URLSearchParams({ code })
     if (state) params.append('state', state)
     return this.baseClient.get<SSOAuthResponse>(`/api/v1/auth/github/callback?${params.toString()}`)
+  }
+
+  /**
+   * Complete SSO user onboarding
+   */
+  async onboardSSOUser(data: SSOOnboardingRequest): Promise<ApiResponse<SSOOnboardingResponse>> {
+    return this.baseClient.post<SSOOnboardingResponse>('/api/v1/auth/sso/onboard', data)
   }
 }
 

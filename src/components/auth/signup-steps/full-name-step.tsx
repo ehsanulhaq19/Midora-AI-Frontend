@@ -7,14 +7,16 @@ interface FullNameStepProps {
   onNext: (fullName: string) => void
   onBack: () => void
   className?: string
+  initialName?: string
 }
 
 export const FullNameStep = ({ 
   onNext, 
   onBack, 
-  className 
+  className,
+  initialName = ''
 }: FullNameStepProps) => {
-  const [fullName, setFullName] = useState('')
+  const [fullName, setFullName] = useState(initialName)
 
   const handleNameSubmit = (name: string) => {
     if (name.trim()) {

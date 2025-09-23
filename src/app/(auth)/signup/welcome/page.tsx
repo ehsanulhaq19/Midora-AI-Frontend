@@ -1,23 +1,37 @@
 'use client'
 
 import React from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { WelcomeStep } from '@/components/auth/signup-steps'
 import { useSignupData } from '@/contexts/signup-context'
 
 export default function WelcomePage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { data } = useSignupData()
 
-  // Check if user has completed email step
+  // Check if this is SSO onboarding or regular signup
   React.useEffect(() => {
-    if (!data.email) {
-      router.push('/signup')
+    const onboardingType = searchParams.get('type')
+    if (onboardingType === 'sso') {
+      // For SSO onboarding, we don't need to check email from signup data
+      // The user is already authenticated via SSO
+      return
+    } else {
+      // For regular signup, check if user has completed email step
+      if (!data.email) {
+        router.push('/signup')
+      }
     }
-  }, [data, router])
+  }, [data, router, searchParams])
 
   const handleContinue = () => {
-    router.push('/signup/full-name')
+    const onboardingType = searchParams.get('type')
+    if (onboardingType === 'sso') {
+      router.push('/signup/full-name?type=sso')
+    } else {
+      router.push('/signup/full-name')
+    }
   }
 
   return (

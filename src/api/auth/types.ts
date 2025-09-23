@@ -12,6 +12,7 @@ export interface User {
   username: string
   is_active: boolean
   is_verified: boolean
+  is_onboarded: boolean
 }
 
 // Authentication request types
@@ -44,6 +45,7 @@ export interface UserResponse {
   username: string
   is_active: boolean
   is_verified: boolean
+  is_onboarded: boolean
   meta_data?: Record<string, any>
 }
 
@@ -169,6 +171,17 @@ export interface SSOAuthResponse {
 export interface SSOAuthUrlResponse {
   auth_url: string
   provider: string
+}
+
+// SSO Onboarding types
+export interface SSOOnboardingRequest {
+  full_name: string
+  profession: string
+}
+
+export interface SSOOnboardingResponse {
+  message: string
+  is_onboarded: boolean
 }
 
 // Authentication state types

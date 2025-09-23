@@ -88,8 +88,14 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className 
             newUrl.searchParams.delete('auth_method')
             window.history.replaceState({}, '', newUrl.toString())
 
-            // Redirect to chat page
-            router.push('/chat')
+            // Check if user needs onboarding
+            if (!userResponse.data.is_onboarded) {
+              // Redirect to SSO onboarding flow
+              router.push('/signup/welcome?type=sso')
+            } else {
+              // Redirect to chat page
+              router.push('/chat')
+            }
           } else {
             throw new Error('Failed to get user information')
           }
