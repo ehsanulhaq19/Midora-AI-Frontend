@@ -24,7 +24,9 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   if (isCompact) {
     return (
       <div className="p-4">
-        <MessageInput onSend={onSendMessage} />
+        <div className="max-w-[698px] mx-auto">
+          <MessageInput onSend={onSendMessage} />
+        </div>
       </div>
     )
   }

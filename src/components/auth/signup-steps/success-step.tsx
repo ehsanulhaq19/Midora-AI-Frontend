@@ -8,6 +8,8 @@ import { tokenManager } from '@/lib/token-manager'
 import { authApi } from '@/api/auth/api'
 import { useToast } from '@/hooks/useToast'
 import { handleApiError } from '@/lib/error-handler'
+import { useAppDispatch } from '@/store/hooks'
+import { loginSuccess } from '@/store/slices/authSlice'
 
 interface SuccessStepProps {
   onNext?: () => void
@@ -19,6 +21,7 @@ interface SuccessStepProps {
 
 export const SuccessStep = ({ onNext, className, email, password, isSSOOnboarding }: SuccessStepProps) => {
   const router = useRouter()
+  const dispatch = useAppDispatch()
   const [isLoading, setIsLoading] = useState(true)
   const [loadingMessage, setLoadingMessage] = useState(t('auth.settingUpAccount'))
   const { success: showSuccessToast, error: showErrorToast } = useToast()
@@ -28,6 +31,18 @@ export const SuccessStep = ({ onNext, className, email, password, isSSOOnboardin
       try {
         // For SSO onboarding, tokens are already set, just show completion
         if (isSSOOnboarding) {
+          // Get current user data and store in Redux
+          const userResponse = await authApi.getCurrentUser()
+          if (userResponse.data) {
+            const tokens = tokenManager.getTokens()
+            dispatch(loginSuccess({
+              user: userResponse.data,
+              accessToken: tokens.accessToken!,
+              refreshToken: tokens.refreshToken!,
+              authMethod: (tokens.authMethod as 'email' | 'google' | 'microsoft' | 'github') || 'email'
+            }))
+          }
+          
           setLoadingMessage(t('auth.accountSetupComplete'))
           setTimeout(() => {
             if (onNext) {
@@ -41,6 +56,18 @@ export const SuccessStep = ({ onNext, className, email, password, isSSOOnboardin
 
         // Check if tokens are already set
         if (tokenManager.hasValidTokens()) {
+          // Get current user data and store in Redux
+          const userResponse = await authApi.getCurrentUser()
+          if (userResponse.data) {
+            const tokens = tokenManager.getTokens()
+            dispatch(loginSuccess({
+              user: userResponse.data,
+              accessToken: tokens.accessToken!,
+              refreshToken: tokens.refreshToken!,
+              authMethod: (tokens.authMethod as 'email' | 'google' | 'microsoft' | 'github') || 'email'
+            }))
+          }
+          
           setLoadingMessage(t('auth.accountSetupComplete'))
           setTimeout(() => {
             router.push('/chat')
@@ -65,6 +92,17 @@ export const SuccessStep = ({ onNext, className, email, password, isSSOOnboardin
               'email'
             )
 
+            // Get user data and store in Redux
+            const userResponse = await authApi.getCurrentUser()
+            if (userResponse.data) {
+              dispatch(loginSuccess({
+                user: userResponse.data,
+                accessToken: response.data.access_token,
+                refreshToken: response.data.refresh_token,
+                authMethod: 'email'
+              }))
+            }
+
             setLoadingMessage(t('auth.accountSetupComplete'))
             showSuccessToast('Login Successful', 'Welcome to Midora!')
             
@@ -85,7 +123,7 @@ export const SuccessStep = ({ onNext, className, email, password, isSSOOnboardin
     }
 
     setupAccount()
-  }, [email, password, onNext, router, showSuccessToast, showErrorToast, isSSOOnboarding])
+  }, [email, password, onNext, router, showSuccessToast, showErrorToast, isSSOOnboarding, dispatch])
 
   return (
     <main className={`w-full flex items-center justify-center px-4 sm:px-6 lg:px-8 ${className}`}>

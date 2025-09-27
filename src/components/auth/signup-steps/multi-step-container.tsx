@@ -4,6 +4,9 @@ import { LogoOnly } from '@/icons/logo-only';
 import { authApi } from '@/api/auth/api'
 import { useToast } from '@/hooks/useToast'
 import { handleApiError } from '@/lib/error-handler'
+import { useAppDispatch } from '@/store/hooks'
+import { loginSuccess } from '@/store/slices/authSlice'
+import { tokenManager } from '@/lib/token-manager'
 
 interface MultiStepContainerProps {
   onComplete: (data: { email: string; fullName: string; profession: string }) => void
@@ -22,6 +25,7 @@ export const MultiStepContainer: React.FC<MultiStepContainerProps> = ({
   isSSOOnboarding = false,
   className 
 }) => {
+  const dispatch = useAppDispatch()
   const [currentStep, setCurrentStep] = useState<Step>(isSSOOnboarding ? 'welcome' : 'welcome')
   const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('right')
   const [formData, setFormData] = useState({
@@ -171,6 +175,18 @@ export const MultiStepContainer: React.FC<MultiStepContainerProps> = ({
           const completeResponse = await authApi.completeOnboarding()
           
           if (completeResponse.success) {
+            // Get updated user data and store in Redux
+            const userResponse = await authApi.getCurrentUser()
+            if (userResponse.data) {
+              const tokens = tokenManager.getTokens()
+              dispatch(loginSuccess({
+                user: userResponse.data,
+                accessToken: tokens.accessToken!,
+                refreshToken: tokens.refreshToken!,
+                authMethod: (tokens.authMethod as 'email' | 'google' | 'microsoft' | 'github') || 'email'
+              }))
+            }
+            
             showSuccessToast('Profile Complete', 'Welcome to Midora!')
             // Redirect to chat
             window.location.href = '/chat'
