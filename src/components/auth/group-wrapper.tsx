@@ -28,8 +28,8 @@ export const GroupWrapper: React.FC<GroupWrapperProps> = ({ className }) => {
     }
   }, [])
   return (
-    <div className={`flex flex-col w-full min-h-[300px] sm:min-h-[400px] lg:h-[854px] items-start gap-2.5 px-4 sm:px-8 lg:px-[158px] py-4 sm:py-8 lg:py-[235px] bg-tokens-color-surface-surface-tertiary rounded-[13px] ${className}`}>
-      <div className="relative w-full max-w-[280px] sm:max-w-[350px] lg:max-w-[402.44px] h-[250px] sm:h-[300px] lg:h-[365px] mx-auto">
+    <div className={`flex flex-col w-full min-h-[300px] sm:min-h-[400px] lg:h-[854px] items-start gap-2.5 py-4 sm:py-8 lg:py-[235px] bg-tokens-color-surface-surface-tertiary rounded-[13px] ${className}`}>
+      <div className="relative w-full max-w-[280px] lg:min-w-[350px] sm:max-w-[350px] lg:max-w-[402.44px] h-[250px] sm:h-[300px] lg:h-[365px] mx-auto">
         <div className="absolute w-full max-w-[300px] sm:max-w-[380px] lg:max-w-[424px] h-[200px] sm:h-[250px] lg:h-[298px] top-[40px] sm:top-[50px] lg:top-[67px] left-0">
           {/* Section 3 */}
           <div className={`absolute w-full max-w-[280px] sm:max-w-[350px] lg:max-w-[388px] h-[160px] sm:h-[200px] lg:h-[275px] top-[10px] sm:top-[15px] lg:top-[22px] left-2 sm:left-4 lg:left-9 transition-all duration-700 ease-out transform ${

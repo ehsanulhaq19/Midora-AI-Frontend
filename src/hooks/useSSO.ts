@@ -10,6 +10,7 @@ import { authApi } from '@/api/auth/api'
 import { loginSuccess, setLoading, setError } from '@/store/slices/authSlice'
 import { handleApiError } from '@/lib/error-handler'
 import { tokenManager } from '@/lib/token-manager'
+import { setTokens } from '@/lib/auth'
 import { t } from '@/i18n'
 
 export const useSSO = () => {
@@ -114,6 +115,9 @@ export const useSSO = () => {
           response.data.refresh_token,
           provider
         )
+        
+        // Also store in cookies for middleware access
+        setTokens(response.data.access_token, response.data.refresh_token)
 
         // Clear the state from sessionStorage
         sessionStorage.removeItem('sso_state')

@@ -40,11 +40,12 @@ export function ThemeProvider({ children, defaultTheme = 'light' }: ThemeProvide
 
     const root = window.document.documentElement
     
-    // Remove previous theme classes
-    root.classList.remove('light', 'dark')
-    
-    // Add current theme class
-    root.classList.add(theme)
+    // Set data-theme attribute
+    if (theme === 'dark') {
+      root.setAttribute('data-theme', 'dark')
+    } else {
+      root.removeAttribute('data-theme')
+    }
     
     // Save theme preference
     localStorage.setItem('theme', theme)

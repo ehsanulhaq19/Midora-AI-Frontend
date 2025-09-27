@@ -5,6 +5,7 @@ import { authApi } from '@/api/auth/api'
 import { loginSuccess, setLoading, setError, clearError } from '@/store/slices/authSlice'
 import { handleApiError } from '@/lib/error-handler'
 import { tokenManager } from '@/lib/token-manager'
+import { setTokens } from '@/lib/auth'
 
 interface UseLoginReturn {
   login: (email: string, password: string) => Promise<void>
@@ -51,6 +52,8 @@ export const useLogin = (): UseLoginReturn => {
           response.data.refresh_token,
           'email'
         )
+        
+        setTokens(response.data.access_token, response.data.refresh_token)
 
         const userResponse = await authApi.getCurrentUser()
         

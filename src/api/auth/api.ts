@@ -153,6 +153,20 @@ class AuthApiClient {
   async onboardSSOUser(data: SSOOnboardingRequest): Promise<ApiResponse<SSOOnboardingResponse>> {
     return this.baseClient.post<SSOOnboardingResponse>('/api/v1/auth/sso/onboard', data)
   }
+
+  /**
+   * Update user profile
+   */
+  async updateProfile(data: { first_name: string; last_name: string; profession: string }): Promise<ApiResponse<UserResponse>> {
+    return this.baseClient.put<UserResponse>('/api/v1/auth/profile', data)
+  }
+
+  /**
+   * Complete user onboarding
+   */
+  async completeOnboarding(): Promise<ApiResponse<{ success: boolean }>> {
+    return this.baseClient.post<{ success: boolean }>('/api/v1/auth/complete-onboarding', {})
+  }
 }
 
 // Export singleton instance

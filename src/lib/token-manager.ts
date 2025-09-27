@@ -34,6 +34,20 @@ class TokenManager {
     // For now, we'll also store in localStorage as fallback
     // In production, remove this line and let backend handle cookies
     localStorage.setItem(this.REFRESH_TOKEN_COOKIE, refreshToken)
+    
+    // Also set refresh token in cookie for API requests
+    this.setRefreshTokenCookie(refreshToken)
+  }
+
+  /**
+   * Set refresh token in cookie
+   */
+  private setRefreshTokenCookie(refreshToken: string): void {
+    if (typeof document === 'undefined') return
+    
+    const maxAge = 7 * 24 * 60 * 60 // 7 days in seconds
+    const cookieString = `${this.REFRESH_TOKEN_COOKIE}=${encodeURIComponent(refreshToken)}; max-age=${maxAge}; path=/; secure; samesite=strict`
+    document.cookie = cookieString
   }
 
   /**
@@ -50,7 +64,29 @@ class TokenManager {
    */
   getRefreshToken(): string | null {
     if (typeof window === 'undefined') return null
+    
+    // Try to get from cookie first
+    const cookieToken = this.getRefreshTokenFromCookie()
+    if (cookieToken) return cookieToken
+    
+    // Fallback to localStorage
     return localStorage.getItem(this.REFRESH_TOKEN_COOKIE)
+  }
+
+  /**
+   * Get refresh token from cookie
+   */
+  private getRefreshTokenFromCookie(): string | null {
+    if (typeof document === 'undefined') return null
+    
+    const cookies = document.cookie.split(';')
+    for (const cookie of cookies) {
+      const [name, value] = cookie.trim().split('=')
+      if (name === this.REFRESH_TOKEN_COOKIE) {
+        return decodeURIComponent(value)
+      }
+    }
+    return null
   }
 
   /**
@@ -80,8 +116,20 @@ class TokenManager {
     localStorage.removeItem(this.REFRESH_TOKEN_COOKIE)
     localStorage.removeItem(this.AUTH_METHOD_KEY)
     
+    // Clear refresh token cookie
+    this.clearRefreshTokenCookie()
+    
     // Clear sessionStorage as well
     sessionStorage.removeItem('sso_state')
+  }
+
+  /**
+   * Clear refresh token cookie
+   */
+  private clearRefreshTokenCookie(): void {
+    if (typeof document === 'undefined') return
+    
+    document.cookie = `${this.REFRESH_TOKEN_COOKIE}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; secure; samesite=strict`
   }
 
   /**

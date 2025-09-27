@@ -56,3 +56,8 @@ describe('LogoutButton', () => {
     expect(screen.queryByText('auth.logout')).not.toBeInTheDocument()
   })
 })
+
+
+
+
+

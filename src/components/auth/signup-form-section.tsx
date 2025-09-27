@@ -16,18 +16,23 @@ import { useLogin } from '@/hooks/useLogin'
 import { useSSO } from '@/hooks/useSSO'
 import { loginSuccess, setLoading, setError } from '@/store/slices/authSlice'
 import { tokenManager } from '@/lib/token-manager'
+import { setTokens } from '@/lib/auth'
+import { MultiStepContainer } from './signup-steps/multi-step-container'
+import { useToast } from '@/hooks/useToast'
 
 interface SignupFormSectionProps {
   className?: string
+  onShowOnboarding?: () => void
 }
 
-export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className }) => {
+export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className, onShowOnboarding }) => {
   const router = useRouter()
   const searchParams = useSearchParams()
   const dispatch = useAppDispatch()
   const { updateData } = useSignupData()
   const { login, isLoading: isLoggingIn, error: loginError, clearError: clearLoginError } = useLogin()
   const { signInWithGoogle, signInWithMicrosoft, signInWithGitHub } = useSSO()
+  const { error: showErrorToast, success: showSuccessToast } = useToast()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [emailError, setEmailError] = useState('')
@@ -36,6 +41,8 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className 
   const [showPasswordField, setShowPasswordField] = useState(false)
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [isProcessingSSO, setIsProcessingSSO] = useState(false)
+  const [showOnboarding, setShowOnboarding] = useState(false)
+  const [isSSOOnboarding, setIsSSOOnboarding] = useState(false)
 
   // Handle SSO callback with tokens in query parameters
   useEffect(() => {
@@ -49,7 +56,7 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className 
       // Handle SSO error
       if (error) {
         console.error('SSO Error:', errorMessage)
-        setEmailError(errorMessage || t('auth.ssoError'))
+        showErrorToast('SSO Error', errorMessage || t('auth.ssoError'))
         
         // Remove error query params
         const newUrl = new URL(window.location.href)
@@ -68,6 +75,9 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className 
         try {
           // Store tokens using token manager
           tokenManager.storeTokens(accessToken, refreshToken, authMethod)
+          
+          // Also store in cookies for middleware access
+          setTokens(accessToken, refreshToken)
 
           // Get user details from backend
           const userResponse = await authApi.getCurrentUser()
@@ -90,8 +100,9 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className 
 
             // Check if user needs onboarding
             if (!userResponse.data.is_onboarded) {
-              // Redirect to SSO onboarding flow
-              router.push('/signup/welcome?type=sso')
+              // Show SSO onboarding flow in same page
+              setIsSSOOnboarding(true)
+              setShowOnboarding(true)
             } else {
               // Redirect to chat page
               router.push('/chat')
@@ -114,7 +125,7 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className 
           
           // Show error
           const errorMessage = handleApiError(err)
-          setEmailError(errorMessage)
+          showErrorToast('Authentication Error', errorMessage)
           dispatch(setError(errorMessage))
         } finally {
           setIsProcessingSSO(false)
@@ -154,7 +165,7 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className 
       const response = await authApi.checkEmail(email)
       
       if (response.error) {
-        setEmailError(response.error)
+        showErrorToast('Email Check Failed', response.error)
         return
       }
       
@@ -171,10 +182,14 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className 
       // Store email using the custom hook
       updateData({ email })
       
-      // Navigate to welcome page
-      router.push('/signup/welcome')
+      // Show onboarding flow in same page
+      if (onShowOnboarding) {
+        onShowOnboarding()
+      } else {
+        setShowOnboarding(true)
+      }
     } catch (err: any) {
-      setEmailError('Failed to verify email. Please try again.')
+      showErrorToast('Email Verification Failed', 'Failed to verify email. Please try again.')
     } finally {
       setIsCheckingEmail(false)
     }
@@ -194,9 +209,25 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className 
       await login(email, password)
     } catch (err: any) {
       console.error('Password submit error:', err)
-      setPasswordError(err.message || 'Login failed')
+      console.log('Password submit error:', err)
+      
+      // Check if error is NOT_VERIFIED_USER
+      if (err.detail && err.detail.error_type === 'NOT_VERIFIED_USER') {
+        // Store email and password for onboarding flow
+        updateData({ email, password })
+        
+        // Show onboarding flow with email verification
+        if (onShowOnboarding) {
+          onShowOnboarding()
+        } else {
+          setShowOnboarding(true)
+        }
+        return
+      }
+      
+      showErrorToast('Login Failed', err.message || 'Login failed')
     }
-  }, [password, email, login, clearLoginError])
+  }, [password, email, login, clearLoginError, updateData, onShowOnboarding])
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value)
@@ -218,6 +249,51 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className 
         handleEmailSubmit()
       }
     }
+  }
+
+  const handleOnboardingComplete = async (data: { email: string; fullName: string; profession: string }) => {
+    try {
+      // For SSO onboarding, we need to update the user profile
+      if (isSSOOnboarding) {
+        const [firstName, ...lastNameParts] = data.fullName.split(' ')
+        const lastName = lastNameParts.join(' ')
+        
+        const response = await authApi.updateProfile({
+          first_name: firstName,
+          last_name: lastName,
+          profession: data.profession
+        })
+        
+        if (response.error) {
+          throw new Error(response.error)
+        }
+        
+        // Mark user as onboarded
+        await authApi.completeOnboarding()
+        
+        // Redirect to chat
+        router.push('/chat')
+      } else {
+        // For regular signup, proceed to password step
+        setShowOnboarding(false)
+        // The password step will be handled by the existing flow
+      }
+    } catch (err: any) {
+      console.error('Onboarding completion error:', err)
+      showErrorToast('Onboarding Failed', handleApiError(err))
+    }
+  }
+
+  // Show onboarding flow if needed
+  if (showOnboarding) {
+    return (
+      <div className={`flex flex-col w-full max-w-[408px] items-center gap-12 lg:gap-[197px] ${className}`}>
+        <MultiStepContainer 
+          onComplete={handleOnboardingComplete}
+          initialEmail={email}
+        />
+      </div>
+    )
   }
 
   return (
@@ -329,11 +405,6 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className 
                   placeholder="Enter your personal or work email"
                 />
                 
-                {emailError && (
-                  <p className="text-red-500 text-sm font-body-primary font-normal tracking-[-0.48px] leading-[normal] mt-2">
-                    {emailError}
-                  </p>
-                )}
               </div>
             )}
 
@@ -352,11 +423,6 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className 
                 placeholder="Enter your password"
               />
               
-              {(passwordError || loginError) && (
-                <p className="text-red-500 text-sm font-body-primary font-normal tracking-[-0.48px] leading-[normal] mt-2">
-                  {passwordError || loginError}
-                </p>
-              )}
             </div>
 
             {/* Submit Button */}

@@ -16,7 +16,7 @@ export const chat = {
   shareChat: 'Share Chat',
   
   // New chat interface translations
-  welcomeBack: 'Welcome back at it, {{name}}',
+  welcomeBack: 'Welcome back at it, {name}',
   howCanIHelp: 'How can i help you today?',
   searchChat: 'Search Chat',
   midoras: 'Midoras',
@@ -35,4 +35,17 @@ export const chat = {
   manual: 'Manual',
   claude: 'Claude',
   upgradeToPro: 'Upgrade to Pro+',
+  
+  // Conversation related translations
+  selectConversation: 'Select a conversation to start chatting',
+  copyMessage: 'Copy message',
+  typing: 'AI is typing...',
+  loading: 'Loading...',
+  loadingMoreMessages: 'Loading more messages...',
+  loadingMoreConversations: 'Loading more conversations...',
+  noConversations: 'Start a new chat!',
+  sendMessageError: 'Failed to send message',
+  loadConversationsError: 'Failed to load conversations',
+  createConversationError: 'Failed to create conversation',
+  loadMoreMessagesError: 'Failed to load more messages',
 }

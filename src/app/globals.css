@@ -23,6 +23,18 @@
   --h02-heading02-font-weight: 400;
   --h02-heading02-letter-spacing: -1.8px;
   --h02-heading02-line-height: 100%;
+  --h05-heading05-font-family: "Poppins", Helvetica;
+  --h05-heading05-font-size: 16px;
+  --h05-heading05-font-style: normal;
+  --h05-heading05-font-weight: 500;
+  --h05-heading05-letter-spacing: 0px;
+  --h05-heading05-line-height: 139.9999976158142%;
+  --text-small-font-family: "SF Pro", Helvetica;
+  --text-small-font-size: 14px;
+  --text-small-font-style: normal;
+  --text-small-font-weight: 400;
+  --text-small-letter-spacing: 0px;
+  --text-small-line-height: 139.9999976158142%;
   --premitives-color-dark-puprle-1000: rgba(31, 23, 64, 1);
   --premitives-color-dark-puprle-900: rgba(31, 23, 64, 0.9);
   --premitives-color-darkgray-900: rgba(41, 50, 65, 0.9);
@@ -32,6 +44,9 @@
   --premitives-color-light-purple-1000: rgba(94, 77, 116, 1);
   --premitives-color-light-purple-200: rgba(94, 77, 116, 0.2);
   --premitives-color-light-purple-400: rgba(94, 77, 116, 0.4);
+  --premitives-color-brand-purple-1000: #6B4392;
+  --premitives-corner-radius-corner-radius: 8px;
+  --premitives-corner-radius-corner-radius-2: 12px;
   --premitives-corner-radius-corner-radius-3: 16px;
   --premitives-corner-radius-corner-radius-5: 24px;
   --text-font-family: "SF Pro", Helvetica;
@@ -62,6 +77,14 @@
   --tokens-color-text-text-neutral: var(--premitives-color-light-gray-2000);
   --tokens-color-text-text-primary: var(--premitives-color-darkgray-900);
   --tokens-color-text-text-seconary: var(--premitives-color-dark-puprle-1000);
+  --tokens-color-text-text-inactive-2: rgba(107, 114, 128, 0.6);
+  --tokens-color-surface-surface-neutral: var(--premitives-color-light-gray-1000);
+  --tokens-color-surface-surface-secondary: var(--premitives-color-light-gray-300);
+  --tokens-color-surface-surface-brand: var(--premitives-color-light-purple-1000);
+  --tokens-color-icon-surface-icon-inactive-brand: var(--premitives-color-brand-purple-1000);
+  --tokens-color-border-border-inactive: var(--premitives-color-light-gray-300);
+  --tokens-color-border-border-active: var(--premitives-color-light-purple-1000);
+  --tokens-color-border-border-subtle: rgba(41, 50, 65, 0.10);
   
   /* Surface colors for Tailwind config */
   --surface-primary: var(--premitives-color-light-gray-2000);
@@ -98,7 +121,7 @@
 }
 
 /* Dark Mode CSS Variables */
-.dark {
+[data-theme="dark"] {
   --tokens-color-text-text-primary: #ffffff;
   --tokens-color-text-text-seconary: #e5e7eb;
   --tokens-color-text-text-neutral: #ffffff;
@@ -108,6 +131,14 @@
   --tokens-color-surface-surface-button-pressed: #1F1740;
   --tokens-color-surface-surface-dark: #0f0f23;
   --tokens-color-surface-surface-tertiary: rgba(94, 77, 116, 0.2);
+  --tokens-color-text-text-inactive-2: rgba(156, 163, 175, 0.6);
+  --tokens-color-surface-surface-neutral: #374151;
+  --tokens-color-surface-surface-secondary: #4b5563;
+  --tokens-color-surface-surface-brand: #5E4D74;
+  --tokens-color-icon-surface-icon-inactive-brand: #6B4392;
+  --tokens-color-border-border-inactive: #4b5563;
+  --tokens-color-border-border-active: #5E4D74;
+  --tokens-color-border-border-subtle: rgba(41, 50, 65, 0.10);
   
   /* Dark mode surface colors */
   --surface-primary: #1F1740;
@@ -181,34 +212,35 @@
     @apply text-base font-medium;
   }
 
-  /* Custom scrollbar */
+  /* Custom scrollbar - removed purple styling */
   ::-webkit-scrollbar {
     width: 8px;
   }
   
   ::-webkit-scrollbar-track {
-    @apply bg-surface-secondary;
+    background: transparent;
   }
   
   ::-webkit-scrollbar-thumb {
-    @apply bg-primary-300 rounded-full;
+    background: #d1d5db;
+    border-radius: 4px;
   }
   
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-primary-400;
+    background: #9ca3af;
   }
 
   /* Dark mode scrollbar */
-  .dark ::-webkit-scrollbar-track {
-    @apply bg-tokens-color-surface-surface-dark;
+  [data-theme="dark"] ::-webkit-scrollbar-track {
+    background: transparent;
   }
   
-  .dark ::-webkit-scrollbar-thumb {
-    @apply bg-primary-600;
+  [data-theme="dark"] ::-webkit-scrollbar-thumb {
+    background: #4b5563;
   }
   
-  .dark ::-webkit-scrollbar-thumb:hover {
-    @apply bg-primary-500;
+  [data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+    background: #6b7280;
   }
 }
 
@@ -279,15 +311,15 @@
   }
 
   /* Dark mode component overrides */
-  .dark .card {
+  [data-theme="dark"] .card {
     @apply bg-gray-800 border-gray-700;
   }
 
-  .dark .input {
+  [data-theme="dark"] .input {
     @apply bg-gray-800 border-gray-700 text-gray-100;
   }
 
-  .dark .glass-effect {
+  [data-theme="dark"] .glass-effect {
     @apply bg-gray-800/80 border-gray-700/20;
   }
 }
@@ -442,5 +474,14 @@
   to {
     opacity: 1;
     transform: translateX(0);
+  }
+}
+
+@keyframes blink {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0;
   }
 }

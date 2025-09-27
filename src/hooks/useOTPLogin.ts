@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { authApi } from '@/api/auth/api'
-import { setAuthTokens } from '@/lib/cookies'
+import { setTokens } from '@/lib/auth'
 import { handleApiError } from '@/lib/error-handler'
 import { loginSuccess, setLoading, setError, clearError } from '@/store/slices/authSlice'
 import { tokenManager } from '@/lib/token-manager'
@@ -75,8 +75,8 @@ export const useOTPLogin = (): UseOTPLoginReturn => {
             'email'
           )
           
-          // Also save tokens to cookies for backward compatibility
-          setAuthTokens(loginResponse.data.access_token, loginResponse.data.refresh_token)
+          // Also save tokens to cookies for middleware access
+          setTokens(loginResponse.data.access_token, loginResponse.data.refresh_token)
           
           // Redirect to chat page
           router.push('/chat')

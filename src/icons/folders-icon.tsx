@@ -1,0 +1,29 @@
+import React from 'react'
+
+interface FoldersIconProps {
+  className?: string
+  color?: string
+}
+
+export const FoldersIcon: React.FC<FoldersIconProps> = ({ 
+  className = "w-6 h-6", 
+  color = "#1F1740" 
+}) => (
+  <svg 
+    width="24" 
+    height="24" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    xmlns="http://www.w3.org/2000/svg"
+    className={className}
+  >
+    <path 
+      d="M12 16.7998L12 13.4057M12 13.4057L12 10.0116M12 13.4057L8.60587 13.4057M12 13.4057L15.3941 13.4057M2.40093 17.5408L2.40102 8.41649C2.40102 7.50257 2.40068 6.20083 2.40039 5.25829C2.40019 4.59537 2.93752 4.05859 3.60044 4.05859H9.31865L12.0837 7.01223H20.4C21.0627 7.01223 21.6 7.54951 21.6 8.21227L21.5997 17.5409C21.5996 18.8664 20.5251 19.9409 19.1997 19.9409L4.80092 19.9408C3.47543 19.9408 2.40091 18.8663 2.40093 17.5408Z" 
+      stroke={color} 
+      strokeOpacity="0.9" 
+      strokeWidth="2" 
+      strokeLinecap="round" 
+      strokeLinejoin="round"
+    />
+  </svg>
+)

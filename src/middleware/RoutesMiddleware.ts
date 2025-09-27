@@ -11,15 +11,18 @@ const ROUTES = {
     '/api/health',
     '/api/hello',
   ],
-  // Authentication routes (redirect to dashboard if already authenticated)
+  // Authentication routes (redirect to chat if already authenticated)
   AUTH: [
     '/signup',
+    '/signup/*',
   ],
   // Protected routes that require authentication
   PROTECTED: [
     '/dashboard',
     '/profile',
     '/settings',
+    '/chat',
+    '/app-documents',
   ],
 } as const
 
@@ -99,9 +102,9 @@ export function RoutesMiddleware(request: NextRequest) {
   // Handle auth routes (redirect if already authenticated)
   if (matchesPattern(pathname, ROUTES.AUTH)) {
     if (hasToken) {
-      // Redirect to dashboard or return URL
+      // Redirect to chat or return URL
       const returnUrl = request.nextUrl.searchParams.get('returnUrl')
-      const redirectUrl = returnUrl || '/dashboard'
+      const redirectUrl = returnUrl || '/chat'
       return NextResponse.redirect(new URL(redirectUrl, request.url))
     }
   }

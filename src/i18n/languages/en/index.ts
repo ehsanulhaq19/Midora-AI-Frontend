@@ -11,6 +11,7 @@ import { success } from './success'
 import { pricing } from './pricing'
 import { hero } from './hero'
 import { chat } from './chat'
+import { documentation } from './documentation'
 
 export const enTranslations = {
   common,
@@ -21,4 +22,5 @@ export const enTranslations = {
   pricing,
   hero,
   chat,
+  documentation,
 }

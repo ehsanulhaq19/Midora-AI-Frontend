@@ -10,6 +10,7 @@ import { authApi } from '@/api/auth/api'
 import { logout, setLoading, setError } from '@/store/slices/authSlice'
 import { handleApiError } from '@/lib/error-handler'
 import { clearAuthCookies } from '@/lib/auth'
+import { tokenManager } from '@/lib/token-manager'
 
 export const useLogout = () => {
   const dispatch = useAppDispatch()
@@ -36,6 +37,9 @@ export const useLogout = () => {
 
       // Clear all authentication cookies
       clearAuthCookies()
+      
+      // Clear localStorage tokens
+      tokenManager.clearTokens()
 
       // Redirect to signup page
       router.push('/signup')

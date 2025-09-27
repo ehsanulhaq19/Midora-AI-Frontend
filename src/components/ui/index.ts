@@ -1,14 +1,17 @@
 // Button components
-export { Button, buttonVariants, PrimaryButton } from './buttons'
+export { Button, buttonVariants, PrimaryButton, IconButton } from './buttons'
 
 // Input components
-export { InputWithButton, PasswordInput, OTPInput } from './inputs'
+export { InputWithButton, PasswordInput, OTPInput, TextareaInput } from './inputs'
 
 // Loader components
 export { Spinner, ButtonLoader } from './loaders'
 
 // Slider components
 export { Slider } from './slider'
+
+// Toast components
+export { Toast, ToastContainer, showSuccessToast, showErrorToast, showWarningToast, showInfoToast } from './toast'
 
 // Other components
 export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from './card'

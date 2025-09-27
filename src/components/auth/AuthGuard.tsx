@@ -4,6 +4,7 @@ import React, { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAppSelector } from '@/store/hooks'
 import { Spinner } from '@/components/ui/loaders'
+import { tokenManager } from '@/lib/token-manager'
 
 interface AuthGuardProps {
   children: React.ReactNode
@@ -25,23 +26,24 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
   const { isAuthenticated, isLoading } = useAppSelector((state) => state.auth)
 
   useEffect(() => {
-    // Check if user is authenticated
-    if (!isLoading && !isAuthenticated) {
-      // Redirect to signup page if not authenticated
-      router.push('/signup')
+    if (!isLoading) {
+      const hasValidTokens = tokenManager.hasValidTokens()
+      
+      if (!isAuthenticated && !hasValidTokens) {
+        const currentPath = window.location.pathname
+        const signupUrl = `/signup${currentPath !== '/signup' ? `?returnUrl=${encodeURIComponent(currentPath)}` : ''}`
+        router.push(signupUrl)
+      }
     }
   }, [isAuthenticated, isLoading, router])
 
-  // Show loading state while checking authentication
   if (isLoading) {
     return <>{fallback}</>
   }
 
-  // Show children only if authenticated
-  if (isAuthenticated) {
+  if (isAuthenticated || tokenManager.hasValidTokens()) {
     return <>{children}</>
   }
 
-  // Return null while redirecting
   return null
 }

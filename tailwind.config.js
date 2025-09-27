@@ -35,6 +35,9 @@ module.exports = {
             200: 'var(--primitive-light-purple-200)',
             100: 'var(--primitive-light-purple-100)',
           },
+          'brand-purple': {
+            1000: 'var(--primitive-brand-purple-1000)',
+          },
           gray: {
             1000: 'var(--primitive-gray-1000)',
             900: 'var(--primitive-gray-900)',

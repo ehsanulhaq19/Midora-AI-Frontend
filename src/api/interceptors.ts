@@ -17,6 +17,22 @@ function getAccessToken(): string | null {
 }
 
 /**
+ * Get refresh token from cookie
+ */
+function getRefreshToken(): string | null {
+  if (typeof document === 'undefined') return null
+  
+  const cookies = document.cookie.split(';')
+  for (const cookie of cookies) {
+    const [name, value] = cookie.trim().split('=')
+    if (name === 'refresh_token') {
+      return decodeURIComponent(value)
+    }
+  }
+  return null
+}
+
+/**
  * Check if the URL is a backend API call
  */
 function isBackendApiCall(url: string): boolean {
@@ -24,24 +40,33 @@ function isBackendApiCall(url: string): boolean {
 }
 
 /**
- * Request interceptor to add authorization headers
+ * Request interceptor to add authorization headers and refresh token
  */
 export function requestInterceptor(url: string, options: RequestInit = {}): RequestInit {
   // Only add authorization header for backend API calls
   if (isBackendApiCall(url)) {
     const accessToken = getAccessToken()
+    const refreshToken = getRefreshToken()
+    
+    const headers: Record<string, string> = {
+      ...options.headers as Record<string, string>,
+    }
     
     if (accessToken) {
       console.log('Adding authorization header to request:', url)
-      return {
-        ...options,
-        headers: {
-          ...options.headers,
-          'Authorization': `Bearer ${accessToken}`,
-        },
-      }
+      headers['Authorization'] = `Bearer ${accessToken}`
     } else {
       console.log('No access token available for request:', url)
+    }
+    
+    if (refreshToken) {
+      console.log('Adding refresh token to request:', url)
+      headers['X-Refresh-Token'] = refreshToken
+    }
+    
+    return {
+      ...options,
+      headers,
     }
   }
   

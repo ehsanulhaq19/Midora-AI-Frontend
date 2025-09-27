@@ -29,6 +29,7 @@ import {
   setUserData, 
   clearAuthCookies
 } from '@/lib/auth'
+import { tokenManager } from '@/lib/token-manager'
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
@@ -78,7 +79,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
         setUserData(userResponse.data)
 
-        // Dispatch login success to Redux
         dispatch(loginSuccess({
           user: userResponse.data,
           accessToken: access_token,
@@ -132,6 +132,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       console.error('Logout API error:', error)
     } finally {
       clearAuthCookies()
+      tokenManager.clearTokens()
       dispatch(logoutAction())
       router.push('/')
     }
@@ -154,6 +155,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const { access_token, refresh_token: newRefreshToken } = response.data
       
       setTokens(access_token, newRefreshToken)
+      
+      tokenManager.storeTokens(access_token, newRefreshToken, 'email')
 
       dispatch(updateTokens({
         accessToken: access_token,

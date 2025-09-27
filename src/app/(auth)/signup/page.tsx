@@ -1,6 +1,7 @@
 'use client'
 
-import React from 'react'
+import React, { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { 
   HeroSection, 
   SignupFormSection, 
@@ -9,14 +10,207 @@ import {
   FooterSection,
   GroupWrapper
 } from '@/components/auth'
+import { MultiStepContainer } from '@/components/auth/signup-steps/multi-step-container'
+import { useSignupData } from '@/contexts/signup-context'
+import { authApi } from '@/api/auth/api'
+import { handleApiError } from '@/lib/error-handler'
+import { useToast } from '@/hooks/useToast'
+import { useAppDispatch } from '@/store/hooks'
+import { loginSuccess, setLoading, setError } from '@/store/slices/authSlice'
+import { tokenManager } from '@/lib/token-manager'
+import { setTokens } from '@/lib/auth'
+import { useRouter } from 'next/navigation'
 
 export default function SignupPage() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const dispatch = useAppDispatch()
+  const { data, updateData } = useSignupData()
+  const { error: showErrorToast, success: showSuccessToast } = useToast()
+  const [showOnboarding, setShowOnboarding] = useState(false)
+  const [isSSOOnboarding, setIsSSOOnboarding] = useState(false)
+  const [isProcessingSSO, setIsProcessingSSO] = useState(false)
+
+  // Handle SSO callback with tokens in query parameters
+  useEffect(() => {
+    const processSSOCallback = async () => {
+      const accessToken = searchParams.get('access_token')
+      const refreshToken = searchParams.get('refresh_token')
+      const authMethod = searchParams.get('auth_method')
+      const error = searchParams.get('error')
+      const errorMessage = searchParams.get('message')
+
+      // Handle SSO error
+      if (error) {
+        console.error('SSO Error:', errorMessage)
+        showErrorToast('SSO Error', errorMessage || 'SSO authentication failed')
+        
+        // Remove error query params
+        const newUrl = new URL(window.location.href)
+        newUrl.searchParams.delete('error')
+        newUrl.searchParams.delete('message')
+        window.history.replaceState({}, '', newUrl.toString())
+        return
+      }
+
+      // Process SSO success with tokens
+      if (accessToken && refreshToken && authMethod) {
+        setIsProcessingSSO(true)
+        dispatch(setLoading(true))
+        dispatch(setError(null))
+
+        try {
+          // Store tokens using token manager
+          tokenManager.storeTokens(accessToken, refreshToken, authMethod)
+          
+          // Also store in cookies for middleware access
+          setTokens(accessToken, refreshToken)
+
+          // Get user details from backend
+          const userResponse = await authApi.getCurrentUser()
+          
+          if (userResponse.data) {
+            // Store auth data in Redux
+            dispatch(loginSuccess({
+              user: userResponse.data,
+              accessToken,
+              refreshToken,
+              authMethod: authMethod as 'google' | 'microsoft' | 'github'
+            }))
+
+            // Remove query params
+            const newUrl = new URL(window.location.href)
+            newUrl.searchParams.delete('access_token')
+            newUrl.searchParams.delete('refresh_token')
+            newUrl.searchParams.delete('auth_method')
+            window.history.replaceState({}, '', newUrl.toString())
+
+            // Check if user needs onboarding
+            if (!userResponse.data.is_onboarded) {
+              // Store user data for SSO onboarding
+              updateData({ 
+                email: userResponse.data.email,
+                fullName: `${userResponse.data.first_name} ${userResponse.data.last_name}`.trim()
+              })
+              
+              // Show SSO onboarding flow in same page
+              setIsSSOOnboarding(true)
+              setShowOnboarding(true)
+            } else {
+              // Redirect to chat page
+              router.push('/chat')
+            }
+          } else {
+            throw new Error('Failed to get user information')
+          }
+        } catch (err: any) {
+          console.error('SSO callback processing error:', err)
+          
+          // Clear tokens on error
+          tokenManager.clearTokens()
+          
+          // Remove query params
+          const newUrl = new URL(window.location.href)
+          newUrl.searchParams.delete('access_token')
+          newUrl.searchParams.delete('refresh_token')
+          newUrl.searchParams.delete('auth_method')
+          window.history.replaceState({}, '', newUrl.toString())
+          
+          // Show error
+          const errorMessage = handleApiError(err)
+          showErrorToast('Authentication Error', errorMessage)
+          dispatch(setError(errorMessage))
+        } finally {
+          setIsProcessingSSO(false)
+          dispatch(setLoading(false))
+        }
+      }
+    }
+
+    // Only run if there are relevant search params
+    if (searchParams.has('access_token') || searchParams.has('error')) {
+      processSSOCallback().catch((error) => {
+        console.error('SSO callback error:', error)
+        dispatch(setError('SSO authentication failed'))
+        dispatch(setLoading(false))
+      })
+    }
+  }, [searchParams, dispatch, router, showErrorToast])
+
+  const handleOnboardingComplete = async (onboardingData: { email: string; fullName: string; profession: string }) => {
+    try {
+      // For SSO onboarding, we need to update the user profile
+      if (isSSOOnboarding) {
+        const [firstName, ...lastNameParts] = onboardingData.fullName.split(' ')
+        const lastName = lastNameParts.join(' ')
+        
+        const response = await authApi.updateProfile({
+          first_name: firstName,
+          last_name: lastName,
+          profession: onboardingData.profession
+        })
+        
+        if (response.error) {
+          throw new Error(response.error)
+        }
+        
+        // Mark user as onboarded
+        await authApi.completeOnboarding()
+        
+        // Redirect to chat
+        router.push('/chat')
+      } else {
+        // For regular signup, proceed to password step
+        setShowOnboarding(false)
+        // The password step will be handled by the existing flow
+      }
+    } catch (err: any) {
+      console.error('Onboarding completion error:', err)
+      showErrorToast('Onboarding Failed', handleApiError(err))
+    }
+  }
+
+  // Show onboarding flow in full screen blank layout if needed
+  if (showOnboarding) {
+    return (
+      <div className="fixed inset-0 w-full h-full bg-[color:var(--tokens-color-surface-surface-primary)] flex flex-col justify-between">
+        {/* Main content area */}
+        <div className="flex-1 flex justify-center px-4 py-8">
+          <div className="w-full">
+            <MultiStepContainer 
+              onComplete={handleOnboardingComplete}
+              initialEmail={data.email}
+              initialFullName={data.fullName}
+              isSSOOnboarding={isSSOOnboarding}
+            />
+          </div>
+        </div>
+        
+        {/* Footer */}
+        <div className="flex justify-center px-4 pb-8">
+          <p className="font-text font-[number:var(--text-font-weight)] text-tokens-color-text-text-inactive-2 text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-center max-w-full">
+            <span className="font-text font-[number:var(--text-font-weight)] text-[#29324180] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
+              All rights reserved@ 2025, midora.ai, You can view our{" "}
+            </span>
+            <span className="underline font-text [font-style:var(--text-font-style)] font-[number:var(--text-font-weight)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] text-[length:var(--text-font-size)]">
+              Privacy Policy
+            </span>
+            <span className="font-text font-[number:var(--text-font-weight)] text-[#29324180] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
+              {" "}here
+            </span>
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  // Show original signup page content
   return (
-    <div className="relative min-h-screen w-full bg-[color:var(--tokens-color-surface-surface-primary)]">
+    <div className="relative min-h-screen w-auto bg-[color:var(--tokens-color-surface-surface-primary)]">
       {/* Header with Logo */}
-      <header className="absolute top-[37px] left-[44px] w-auto">
+      <header className="relative top-[37px] left-[44px] w-auto md:absolute h-[60px]">
         <div className="max-w-7xl mx-auto ml-0">
-          <div className="flex justify-start">
+          <div className="flex justify-start md:justify-center">
             <a 
               href="/" 
               className="flex flex-col w-[120px] sm:w-[140px] lg:w-[154px] items-start gap-2.5 cursor-pointer hover:opacity-80 transition-opacity duration-200"
@@ -35,14 +229,14 @@ export default function SignupPage() {
       <main className="w-full">
         {/* Top Section - Signup Form and Sales Chart */}
         <section className="w-full pt-4 lg:pt-8 pb-8 lg:pb-16">
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 lg:gap-12 xl:gap-16 min-h-[600px]">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 xl:gap-16 min-h-[600px]">
             {/* Signup Form Section */}
-            <div className="order-2 xl:order-1 flex justify-center xl:justify-center px-4 sm:px-6 lg:px-8 m-auto items-end w-full h-full">
-              <SignupFormSection />
+            <div className="order-2 lg:order-1 flex justify-center lg:justify-center px-4 sm:px-6 lg:px-8 m-auto items-end w-full h-full">
+              <SignupFormSection onShowOnboarding={() => setShowOnboarding(true)} />
             </div>
 
             {/* Group Wrapper - Sales Funnel Chart */}
-            <div className="order-1 xl:order-2 flex justify-center xl:justify-end px-4 sm:px-6 lg:px-8">
+            <div className="order-1 lg:order-2 flex justify-center lg:justify-end px-4 sm:px-6 lg:px-8">
               <GroupWrapper />
             </div>
           </div>

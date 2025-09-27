@@ -186,4 +186,10 @@ export const auth = {
   ssoOnboardingProfileCompleteSubtitle: 'Your profile has been set up successfully. You\'ll be redirected to your dashboard in {countdown} seconds.',
   ssoOnboardingGoToChat: 'Go to Chat',
   ssoOnboardingLoading: 'Loading...',
+  
+  // Success screen
+  successTitle: 'Welcome to Midora AI!',
+  successSubtitle: 'Your account has been created successfully. We\'re setting up your account for you.',
+  settingUpAccount: 'Setting up your account...',
+  accountSetupComplete: 'Account setup complete!',
 }

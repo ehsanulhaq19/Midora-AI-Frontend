@@ -9,6 +9,7 @@ import { authApi } from '@/api/auth/api'
 import { initializeAuth, setLoading, setError } from '@/store/slices/authSlice'
 import { handleApiError } from '@/lib/error-handler'
 import { tokenManager } from '@/lib/token-manager'
+import { setTokens } from '@/lib/auth'
 
 export const useAuthInit = () => {
   const dispatch = useAppDispatch()
@@ -18,18 +19,14 @@ export const useAuthInit = () => {
       try {
         dispatch(setLoading(true))
 
-        // Check if we have stored tokens using token manager
         const tokens = tokenManager.getTokens()
 
         if (tokens.accessToken && tokens.refreshToken) {
-          // Set the token in the API client for subsequent requests
-          // This should be done in the base API client
+          setTokens(tokens.accessToken, tokens.refreshToken)
           
-          // Verify the token by getting current user
           const userResponse = await authApi.getCurrentUser()
           
           if (userResponse.data) {
-            // Initialize auth state with stored data
             dispatch(initializeAuth({
               user: userResponse.data,
               accessToken: tokens.accessToken,
@@ -37,12 +34,10 @@ export const useAuthInit = () => {
               authMethod: (tokens.authMethod as 'email' | 'google' | 'microsoft' | 'github') || 'email'
             }))
           } else {
-            // Token is invalid, clear stored data
             tokenManager.clearTokens()
           }
         }
       } catch (error: any) {
-        // Token is invalid or expired, clear stored data
         tokenManager.clearTokens()
         
         const errorMessage = handleApiError(error)
