@@ -32,11 +32,7 @@ export const ModelSelection: React.FC<ModelSelectionProps> = ({
     }
   }, [])
 
-  useEffect(() => {
-    if (!selectProvider) {
-      setAuto(true)
-    }
-  }, [serviceProviders])
+  // Auto mode is now the default, no need for this effect
 
   const handleProviderChange = (value: string) => {
     if (value === 'auto') {

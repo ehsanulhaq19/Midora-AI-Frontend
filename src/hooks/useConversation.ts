@@ -4,6 +4,7 @@ import { RootState } from '@/store'
 import { conversationApi } from '@/api/conversation/api'
 import { aiApi } from '@/api/ai/api'
 import { useAuthRedux } from '@/hooks/useAuthRedux'
+import { setAutoMode } from '@/store/slices/aiModelsSlice'
 import {
   setLoading,
   setError,
@@ -318,6 +319,8 @@ export const useConversation = () => {
   // Start new chat
   const startNewChat = useCallback(() => {
     dispatch(setCurrentConversation(null))
+    // Reset to auto mode when starting a new chat
+    dispatch(setAutoMode(true))
   }, [dispatch])
 
   // Convert conversations object to array for components that expect array format

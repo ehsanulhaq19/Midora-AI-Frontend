@@ -7,7 +7,7 @@ const initialState: AIModelsState = {
   selectedProvider: null,
   selectedProviderModels: [],
   selectedModel: null,
-  isAutoMode: false,
+  isAutoMode: true, // Set auto mode as default
   isLoading: false,
   error: null,
 }
