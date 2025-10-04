@@ -367,6 +367,49 @@ import { Input } from '@/components/ui/Input'
 - `.focus-visible:ring-2` - Focus ring styling
 - `.text-sm` - Consistent typography
 
+#### MessageInput
+**File**: `src/components/chat/sections/message-input.tsx`
+
+A specialized message input component for chat interfaces with streaming response protection.
+
+**Features**:
+- Rich text input with auto-resize
+- Model selection dropdown integration
+- Attachment and voice input buttons
+- Streaming protection (disables input during AI response)
+- Keyboard shortcuts (Enter to send, Shift+Enter for new line)
+- Internationalization support
+
+**Props**:
+```typescript
+interface MessageInputProps {
+  onSend: (message: string, modelUuid?: string) => void
+  isStreaming?: boolean
+}
+```
+
+**Usage**:
+```tsx
+import { MessageInput } from '@/components/chat/sections/message-input'
+
+<MessageInput 
+  onSend={handleSendMessage}
+  isStreaming={isStreaming}
+/>
+```
+
+**Streaming Behavior**:
+- When `isStreaming` is `true`, all input controls are disabled
+- Placeholder text changes to "Waiting for AI response..."
+- Submit button shows disabled state with appropriate ARIA label
+- Users cannot submit new messages until streaming completes
+
+**Styling Classes**:
+- `.bg-[color:var(--tokens-color-surface-surface-neutral)]` - Neutral background
+- `.rounded-[var(--premitives-corner-radius-corner-radius-3)]` - Design system border radius
+- `.min-h-[120px]` - Minimum height for textarea
+- `.border-[color:var(--tokens-color-border-border-subtle)]` - Subtle border styling
+
 #### Card
 **File**: `src/components/ui/Card.tsx`
 

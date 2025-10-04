@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation'
 import { t } from '@/i18n'
 import { LogoOnly } from '@/icons/logo-only'
 import { tokenManager } from '@/lib/token-manager'
-import { authApi } from '@/api/auth/api'
 import { useToast } from '@/hooks/useToast'
+import { useAuth } from '@/hooks/use-auth'
 import { handleApiError } from '@/lib/error-handler'
 import { useAppDispatch } from '@/store/hooks'
 import { loginSuccess } from '@/store/slices/authSlice'
@@ -25,6 +25,7 @@ export const SuccessStep = ({ onNext, className, email, password, isSSOOnboardin
   const [isLoading, setIsLoading] = useState(true)
   const [loadingMessage, setLoadingMessage] = useState(t('auth.settingUpAccount'))
   const { success: showSuccessToast, error: showErrorToast } = useToast()
+  const { login, getCurrentUser, completeOnboarding } = useAuth()
 
   useEffect(() => {
     const setupAccount = async () => {
@@ -32,42 +33,46 @@ export const SuccessStep = ({ onNext, className, email, password, isSSOOnboardin
         // For SSO onboarding, tokens are already set, just show completion
         if (isSSOOnboarding) {
           // Get current user data and store in Redux
-          const userResponse = await authApi.getCurrentUser()
-          if (userResponse.data) {
+          const userData = await getCurrentUser()
+          if (userData) {
             const tokens = tokenManager.getTokens()
             dispatch(loginSuccess({
-              user: userResponse.data,
+              user: userData,
               accessToken: tokens.accessToken!,
               refreshToken: tokens.refreshToken!,
               authMethod: (tokens.authMethod as 'email' | 'google' | 'microsoft' | 'github') || 'email'
             }))
           }
           
-          setLoadingMessage(t('auth.accountSetupComplete'))
-          setTimeout(() => {
-            if (onNext) {
-              onNext()
-            } else {
-              router.push('/chat')
-            }
-          }, 1000)
+            // Complete onboarding
+            await completeOnboarding()
+            setLoadingMessage(t('auth.accountSetupComplete'))
+            setTimeout(() => {
+              if (onNext) {
+                onNext()
+              } else {
+                router.push('/chat')
+              }
+            }, 1000)
           return
         }
 
         // Check if tokens are already set
         if (tokenManager.hasValidTokens()) {
           // Get current user data and store in Redux
-          const userResponse = await authApi.getCurrentUser()
-          if (userResponse.data) {
+          const userData = await getCurrentUser()
+          if (userData) {
             const tokens = tokenManager.getTokens()
             dispatch(loginSuccess({
-              user: userResponse.data,
+              user: userData,
               accessToken: tokens.accessToken!,
               refreshToken: tokens.refreshToken!,
               authMethod: (tokens.authMethod as 'email' | 'google' | 'microsoft' | 'github') || 'email'
             }))
           }
           
+          // Complete onboarding
+          await completeOnboarding()
           setLoadingMessage(t('auth.accountSetupComplete'))
           setTimeout(() => {
             router.push('/chat')
@@ -79,41 +84,37 @@ export const SuccessStep = ({ onNext, className, email, password, isSSOOnboardin
         if (email && password) {
           setLoadingMessage(t('auth.settingUpAccount'))
           
-          const response = await authApi.login({
+          await login({
             email,
             password
           })
 
-          if (response.success && response.data) {
-            // Store tokens
-            tokenManager.storeTokens(
-              response.data.access_token,
-              response.data.refresh_token,
-              'email'
-            )
-
-            // Get user data and store in Redux
-            const userResponse = await authApi.getCurrentUser()
-            if (userResponse.data) {
-              dispatch(loginSuccess({
-                user: userResponse.data,
-                accessToken: response.data.access_token,
-                refreshToken: response.data.refresh_token,
-                authMethod: 'email'
-              }))
-            }
-
-            setLoadingMessage(t('auth.accountSetupComplete'))
-            showSuccessToast('Login Successful', 'Welcome to Midora!')
-            
-            setTimeout(() => {
-              router.push('/chat')
-            }, 1000)
-          } else {
-            throw new Error(response.error || 'Login failed')
+          // Get user data and store in Redux
+          const userData = await getCurrentUser()
+          if (userData) {
+            const tokens = tokenManager.getTokens()
+            dispatch(loginSuccess({
+              user: userData,
+              accessToken: tokens.accessToken!,
+              refreshToken: tokens.refreshToken!,
+              authMethod: 'email'
+            }))
           }
+
+          // Complete onboarding
+          await completeOnboarding()
+          setLoadingMessage(t('auth.accountSetupComplete'))
+          setTimeout(() => {
+            router.push('/chat')
+          }, 1000)
         } else {
-          throw new Error('Missing email or password for login')
+          const errorObject = {
+            error_type: 'MISSING_CREDENTIALS',
+            error_message: 'Missing email or password for login',
+            error_id: undefined,
+            status: 400
+          }
+          throw new Error(JSON.stringify(errorObject))
         }
       } catch (err: any) {
         console.error('Account setup error:', err)
@@ -123,7 +124,7 @@ export const SuccessStep = ({ onNext, className, email, password, isSSOOnboardin
     }
 
     setupAccount()
-  }, [email, password, onNext, router, showSuccessToast, showErrorToast, isSSOOnboarding, dispatch])
+  }, [email, password, onNext, router, showSuccessToast, showErrorToast, isSSOOnboarding, dispatch, login, getCurrentUser, completeOnboarding])
 
   return (
     <main className={`w-full flex items-center justify-center px-4 sm:px-6 lg:px-8 ${className}`}>
@@ -137,22 +138,6 @@ export const SuccessStep = ({ onNext, className, email, password, isSSOOnboardin
           </div>
 
           <div className="flex flex-col items-center gap-6 text-center">
-            <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-blue-600 rounded-full flex items-center justify-center mb-4">
-              <svg 
-                className="w-10 h-10 text-white" 
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
-              >
-                <path 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  strokeWidth={2} 
-                  d="M5 13l4 4L19 7" 
-                />
-              </svg>
-            </div>
-            
             <h1 className="relative w-full max-w-[400px] mt-[-1.00px] font-heading-primary font-normal text-[color:var(--tokens-color-text-text-seconary)] text-3xl sm:text-4xl tracking-[-1.80px] leading-9">
               <span className="font-light tracking-[-0.65px]">
                 {t('auth.successTitle')}

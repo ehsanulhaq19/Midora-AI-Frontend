@@ -6,24 +6,27 @@ import { ChatInterface } from './sections/chat-interface'
 import { ConversationContainer } from './sections/conversation-container'
 import { ChatHeader } from './sections/chat-header'
 import { useConversation } from '@/hooks/useConversation'
+import { useAIModels } from '@/hooks'
 
 export const ChatScreen: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const {
     currentConversation,
     loadConversations,
-    loadAIModels,
     sendMessage,
     startNewChat,
     isLoading,
     error,
+    isStreaming,
   } = useConversation()
+
+  const { fetchServiceProviders } = useAIModels()
 
   useEffect(() => {
     // Load initial data
     loadConversations()
-    loadAIModels()
-  }, [loadConversations, loadAIModels])
+    fetchServiceProviders()
+  }, [loadConversations, fetchServiceProviders])
 
   const handleMenuClick = () => {
     setSidebarOpen(true)
@@ -33,8 +36,8 @@ export const ChatScreen: React.FC = () => {
     setSidebarOpen(false)
   }
 
-  const handleSendMessage = async (message: string) => {
-    await sendMessage(message)
+  const handleSendMessage = async (message: string, modelUuid?: string) => {
+    await sendMessage(message, modelUuid)
   }
 
   return (
@@ -56,11 +59,12 @@ export const ChatScreen: React.FC = () => {
               conversationUuid={currentConversation.uuid}
               className="flex-1"
             />
-            <div className="border-t border-[color:var(--tokens-color-border-border-subtle)]">
+            <div className="">
               <ChatInterface 
                 onMenuClick={handleMenuClick} 
                 onSendMessage={handleSendMessage}
                 isCompact={true}
+                isStreaming={isStreaming}
               />
             </div>
           </>
@@ -69,6 +73,7 @@ export const ChatScreen: React.FC = () => {
             onMenuClick={handleMenuClick} 
             onSendMessage={handleSendMessage}
             isCompact={false}
+            isStreaming={isStreaming}
           />
         )}
       </div>

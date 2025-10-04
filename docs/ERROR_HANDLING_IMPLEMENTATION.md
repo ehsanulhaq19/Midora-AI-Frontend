@@ -1,287 +1,185 @@
 # Error Handling Implementation
 
-This document describes the comprehensive error handling system implemented in the Midora AI frontend application.
-
 ## Overview
 
-The error handling system provides:
-- Centralized error processing for all API responses
-- User-friendly error messages based on backend error types
-- Internationalization support for error messages
-- Automatic error categorization and handling
-- Consistent error display across the application
+This document describes the implementation of structured error handling across all API calls in the frontend application. The system ensures that all errors are returned as structured objects containing system-defined error types and backend error responses.
 
-## Architecture
+## Error Object Structure
 
-### 1. Error Message Definitions (`src/i18n/languages/en/errors.ts`)
-
-Contains user-friendly error messages for all possible backend error types:
+All errors are now returned as structured objects with the following format:
 
 ```typescript
-export const errors = {
-  // Authentication errors
-  UNAUTHENTICATED: 'Please sign in to continue',
-  INVALID_CREDENTIALS: 'Invalid email or password',
-  TOKEN_EXPIRED: 'Your session has expired. Please sign in again',
-  
-  // Validation errors
-  INVALID_EMAIL_FORMAT: 'Please enter a valid email address',
-  PASSWORD_TOO_WEAK: 'Password is too weak. Please use a stronger password',
-  
-  // Business logic errors
-  PLAN_LIMIT_EXCEEDED: 'You have exceeded your plan limits',
-  DAILY_QUOTA_EXCEEDED: 'Daily usage limit exceeded. Please try again tomorrow',
-  
-  // AI service errors
-  AI_SERVICE_UNAVAILABLE: 'AI service is temporarily unavailable',
-  AI_RATE_LIMIT_EXCEEDED: 'AI service rate limit exceeded. Please try again later',
-  
-  // System errors
-  INTERNAL_SERVER_ERROR: 'An internal server error occurred. Please try again later',
-  SERVICE_UNAVAILABLE: 'Service is temporarily unavailable',
-  
-  // Generic fallback errors
-  NETWORK_ERROR: 'Network error. Please check your connection',
-  UNKNOWN_ERROR: 'An unexpected error occurred. Please try again',
+interface ErrorObject {
+  error_type: string        // System-defined error type
+  error_message: string     // Backend error response
+  error_id?: string        // Backend error ID for tracking
+  status?: number          // HTTP status code
 }
 ```
 
-### 2. Error Handler Service (`src/lib/error-handler.ts`)
+## Implementation Details
 
-The core error processing service that:
+### 1. Base API Client Updates
 
-#### Processes Backend Error Responses
-```typescript
-const backendError = {
-  success: false,
-  error_type: 'INVALID_CREDENTIALS',
-  error_message: 'Invalid email or password provided'
-}
+The base API client (`src/api/base.ts`) has been updated to:
 
-const processedError = processBackendError(backendError, 401)
-// Result: { message: 'Invalid email or password', type: 'INVALID_CREDENTIALS', ... }
-```
+- Include `processedError` field in `ApiResponse` interface
+- Process backend error responses and create structured error objects
+- Handle different error scenarios (network errors, timeouts, etc.)
 
-#### Processes Generic Errors
-```typescript
-const networkError = new Error('Failed to fetch')
-const processedError = processGenericError(networkError)
-// Result: { message: 'Network error. Please check your connection', type: 'NETWORK_ERROR', ... }
-```
+### 2. API Type Definitions
 
-#### Provides Error Utilities
-- `shouldRetryError()` - Determines if an error should trigger automatic retry
-- `requiresAuthentication()` - Checks if error requires user re-authentication
-- `isValidationError()` - Identifies validation errors
+Each API module now includes error object types:
 
-### 3. Enhanced API Client (`src/api/base.ts`)
+- `src/api/auth/types.ts` - `AuthErrorObject`
+- `src/api/ai/types.ts` - `AIErrorObject` 
+- `src/api/conversation/types.ts` - `ConversationErrorObject`
 
-The base API client now includes comprehensive error handling:
+### 3. Hook Updates
 
-```typescript
-// Before: Generic error handling
-if (!response.ok) {
-  throw new Error(`HTTP error! status: ${response.status}`)
-}
+All hooks have been updated to throw structured error objects:
 
-// After: Processed error handling
-if (!response.ok) {
-  let errorData: any = null
-  try {
-    const contentType = response.headers.get('content-type')
-    if (contentType && contentType.includes('application/json')) {
-      errorData = await response.json()
-    }
-  } catch (parseError) {
-    console.warn('Failed to parse error response:', parseError)
-  }
+#### useAuth Hook (`src/hooks/use-auth.ts`)
+- All API calls now throw structured error objects
+- Error types include: `LOGIN_FAILED`, `USER_DATA_FETCH_FAILED`, `SSO_AUTH_URL_FAILED`, etc.
 
-  const processedError = errorHandler.handleResponseError(response, errorData)
-  return { 
-    error: processedError.message, 
-    status: response.status,
-    processedError
-  }
-}
-```
+#### useConversation Hook (`src/hooks/useConversation.ts`)
+- Error handling for conversation and AI operations
+- Error types include: `CONVERSATIONS_LOAD_FAILED`, `CONVERSATION_CREATION_FAILED`, `AI_MODELS_LOAD_FAILED`, etc.
 
-### 4. Updated Auth Context (`src/contexts/AuthContext.tsx`)
+### 4. Error Handler Updates
 
-The authentication context now uses processed error messages:
+The error handler (`src/lib/error-handler.ts`) has been enhanced to:
+
+- Parse JSON stringified error objects from Error instances
+- Map backend error types to user-friendly messages using i18n
+- Provide fallback handling for unknown error types
+
+### 5. Component Updates
+
+Components have been updated to use structured error handling:
+
+- `src/components/auth/signup-steps/multi-step-container.tsx`
+- `src/components/auth/signup-form-section.tsx`
+- `src/components/auth/signup-steps/success-step.tsx`
+
+### 6. Internationalization
+
+New error messages have been added to `src/i18n/languages/en/errors.ts`:
 
 ```typescript
-const response = await authApi.login(credentials)
-
-if (response.error) {
-  // Use the processed error message if available, otherwise use the raw error
-  const errorMessage = response.processedError?.message || response.error
-  throw new Error(errorMessage)
-}
+// New error types for structured error handling
+TOKEN_REFRESH_FAILED: 'Session refresh failed. Please sign in again',
+USER_DATA_FETCH_FAILED: 'Failed to load user information. Please try again',
+SSO_AUTH_URL_FAILED: 'Failed to get authorization URL. Please try again',
+// ... and many more
 ```
 
-## Error Categories
+## Error Flow
 
-The system categorizes errors into the following types:
+1. **API Call**: Backend returns error response
+2. **Base Client**: Processes error and creates structured error object
+3. **Hook**: Throws Error with JSON stringified error object
+4. **Error Handler**: Parses error object and maps to user-friendly message
+5. **Component**: Displays localized error message to user
 
-- **AUTHENTICATION** - Login, token, permission errors
-- **VALIDATION** - Input validation, format errors
-- **BUSINESS_LOGIC** - Plan limits, quotas, content policy
-- **AI_SERVICES** - AI provider, model, rate limit errors
-- **INFRASTRUCTURE** - Database, Redis, file system errors
-- **SYSTEM** - Server, timeout, maintenance errors
-- **SUBSCRIPTION** - Billing, plan, payment errors
-- **PERMISSIONS** - Access control, role errors
-- **API** - Rate limiting, version, integration errors
-- **NETWORK** - Connection, timeout errors
+## Error Types
+
+### Authentication Errors
+- `UNAUTHENTICATED` - User not signed in
+- `UNAUTHORIZED` - Insufficient permissions
+- `INVALID_TOKEN` - Token expired or invalid
+- `LOGIN_FAILED` - Login attempt failed
+- `USER_DATA_FETCH_FAILED` - Failed to load user information
+
+### SSO Errors
+- `SSO_AUTH_URL_FAILED` - Failed to get authorization URL
+- `INVALID_STATE_PARAMETER` - Invalid CSRF state parameter
+- `UNSUPPORTED_SSO_PROVIDER` - Provider not supported
+- `INVALID_SSO_RESPONSE` - Invalid response from provider
+
+### Conversation Errors
+- `CONVERSATIONS_LOAD_FAILED` - Failed to load conversations
+- `CONVERSATION_CREATION_FAILED` - Failed to create conversation
+- `MESSAGES_LOAD_FAILED` - Failed to load messages
+
+### AI Service Errors
+- `AI_MODELS_LOAD_FAILED` - Failed to load AI models
+- `AI_SERVICE_UNAVAILABLE` - AI service temporarily unavailable
+- `AI_PROVIDER_ERROR` - AI provider error occurred
+
+### Validation Errors
+- `INVALID_INPUT` - Invalid input provided
+- `MISSING_REQUIRED_FIELD` - Required field missing
+- `INVALID_EMAIL_FORMAT` - Invalid email format
+- `PASSWORD_TOO_WEAK` - Password doesn't meet requirements
 
 ## Usage Examples
 
-### 1. In API Calls
+### In Hooks
+
+```typescript
+// Before
+if (response.error) {
+  throw new Error(response.error)
+}
+
+// After
+if (response.error) {
+  const errorObject = response.processedError || {
+    error_type: 'OPERATION_FAILED',
+    error_message: response.error,
+    status: response.status
+  }
+  throw new Error(JSON.stringify(errorObject))
+}
+```
+
+### In Components
 
 ```typescript
 try {
-  const response = await authApi.login(credentials)
-  if (response.error) {
-    // Error is already processed and user-friendly
-    setError(response.error)
-  }
+  await someApiCall()
 } catch (error) {
-  // Network or other errors are also processed
-  setError(error.message)
+  // handleApiError automatically parses structured error objects
+  const userMessage = handleApiError(error)
+  showErrorToast('Operation Failed', userMessage)
 }
 ```
 
-### 2. In Components
+## Benefits
 
-```typescript
-const { login, error } = useAuth()
+1. **Consistency**: All errors follow the same structure
+2. **Localization**: Error messages are properly internationalized
+3. **Debugging**: Structured error types make debugging easier
+4. **User Experience**: Users see consistent, helpful error messages
+5. **Maintainability**: Centralized error handling logic
 
-const handleLogin = async (credentials) => {
-  try {
-    await login(credentials)
-    // Success handling
-  } catch (error) {
-    // Error is already user-friendly and localized
-    console.log('Login failed:', error.message)
-  }
-}
+## Backend Integration
 
-// Display error in UI
-{error && (
-  <div className="error-message">
-    {error} {/* Already user-friendly and localized */}
-  </div>
-)}
-```
-
-### 3. Error Processing in Custom Hooks
-
-```typescript
-const useApiCall = () => {
-  const [error, setError] = useState<string | null>(null)
-  
-  const makeApiCall = async () => {
-    try {
-      const response = await apiClient.get('/endpoint')
-      if (response.error) {
-        setError(response.error) // Already processed
-      }
-    } catch (error) {
-      setError(error.message) // Already processed
-    }
-  }
-  
-  return { makeApiCall, error }
-}
-```
-
-## Backend Error Response Format
-
-The system expects backend errors in this format:
+The frontend expects backend error responses in this format:
 
 ```json
 {
   "success": false,
-  "error_type": "INVALID_CREDENTIALS",
-  "error_message": "Invalid email or password provided",
-  "details": {
-    "field": "email",
-    "code": "AUTH_001"
-  }
+  "error_type": "NOT_VERIFIED_USER",
+  "error_message": "Please verify your email before accessing this feature.",
+  "error_id": "LOGIN_003"
 }
 ```
 
-## Error Message Mapping
+The `error_type` should match the constants defined in `midora.ai-backend/app/constants/error_types.py`.
 
-The system maps backend error types to user-friendly messages:
+## Migration Notes
 
-| Backend Error Type | User Message |
-|-------------------|--------------|
-| `INVALID_CREDENTIALS` | "Invalid email or password" |
-| `EMAIL_ALREADY_REGISTERED` | "An account with this email already exists" |
-| `TOKEN_EXPIRED` | "Your session has expired. Please sign in again" |
-| `PLAN_LIMIT_EXCEEDED` | "You have exceeded your plan limits" |
-| `AI_SERVICE_UNAVAILABLE` | "AI service is temporarily unavailable" |
-| `NETWORK_ERROR` | "Network error. Please check your connection" |
-
-## Benefits
-
-1. **Consistent User Experience** - All errors are displayed in a user-friendly format
-2. **Internationalization Ready** - Error messages are defined in i18n structure
-3. **Centralized Management** - All error handling logic is in one place
-4. **Type Safety** - Full TypeScript support with proper error types
-5. **Automatic Processing** - No need to manually handle errors in components
-6. **Extensible** - Easy to add new error types and messages
-7. **Debugging Friendly** - Original error details are preserved for debugging
-
-## Testing
-
-The error handling system includes comprehensive tests in `src/lib/error-handler.test.ts` that demonstrate:
-
-- Backend error processing
-- Generic error handling
-- Network error detection
-- Error categorization
-- Utility function behavior
+- All existing error handling continues to work
+- New structured errors are backward compatible
+- Error messages are automatically localized
+- No breaking changes to component APIs
 
 ## Future Enhancements
 
-1. **Error Analytics** - Track error frequency and types
-2. **Retry Logic** - Automatic retry for retryable errors
-3. **Error Boundaries** - React error boundaries for component errors
-4. **Toast Notifications** - Automatic error notifications
-5. **Error Recovery** - Suggested actions for common errors
-
-## Migration Guide
-
-### Before (Old Error Handling)
-```typescript
-// Generic error messages
-if (response.error) {
-  setError('Login failed') // Generic message
-}
-
-// Manual error processing
-catch (error) {
-  if (error.message.includes('401')) {
-    setError('Please sign in again')
-  } else {
-    setError('Something went wrong')
-  }
-}
-```
-
-### After (New Error Handling)
-```typescript
-// User-friendly, localized error messages
-if (response.error) {
-  setError(response.error) // Already processed and user-friendly
-}
-
-// Automatic error processing
-catch (error) {
-  setError(error.message) // Already processed and user-friendly
-}
-```
-
-The new system automatically handles all error processing, providing consistent, user-friendly error messages throughout the application.
+1. Add error tracking and analytics
+2. Implement retry mechanisms for specific error types
+3. Add error recovery suggestions
+4. Enhance error logging for debugging

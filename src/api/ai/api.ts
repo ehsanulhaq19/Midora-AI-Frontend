@@ -9,6 +9,8 @@ import { tokenManager } from '@/lib/token-manager'
 import {
   AIModel,
   AIModelsResponse,
+  AIServiceProvider,
+  AIServiceProvidersResponse,
   GenerateContentRequest,
   GenerateContentResponse,
   StreamingChunkCallback,
@@ -20,10 +22,10 @@ class AIApiClient {
   private baseClient = baseApiClient
 
   /**
-   * Get all available AI models
+   * Get AI service providers with active models
    */
-  async getModels(): Promise<ApiResponse<AIModelsResponse>> {
-    return this.baseClient.get<AIModelsResponse>('/api/v1/ai/models')
+  async getServiceProviders(): Promise<ApiResponse<AIServiceProvidersResponse>> {
+    return this.baseClient.get<AIServiceProvidersResponse>('/api/v1/ai-service-providers/with-active-models')
   }
 
   /**

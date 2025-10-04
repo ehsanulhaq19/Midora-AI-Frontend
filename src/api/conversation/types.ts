@@ -81,3 +81,11 @@ export interface CreateMessageResponse {
 export interface DeleteConversationResponse {
   success: boolean
 }
+
+// Error object structure for throw new Error
+export interface ConversationErrorObject {
+  error_type: string
+  error_message: string
+  error_id?: string
+  status?: number
+}

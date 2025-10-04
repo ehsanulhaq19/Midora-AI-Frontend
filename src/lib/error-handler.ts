@@ -8,13 +8,14 @@ import { t } from '@/i18n'
 export interface ApiError {
   error_type: string
   error_message: string
+  error_id?: string
   status?: number
 }
 
 /**
  * Maps backend error types to user-friendly error messages
  */
-export const getErrorMessage = (error: ApiError | Error | string): string => {
+export const getErrorMessage = (error: ApiError | Error | string | object): string => {
   // Handle string errors
   if (typeof error === 'string') {
     return error
@@ -125,15 +126,21 @@ export const getErrorMessage = (error: ApiError | Error | string): string => {
 export const handleApiError = (error: any): string => {
   console.error('API Error:', error)
   
-  // Handle network errors
-  if (!error.detail) {
-    return t('errors.NETWORK_ERROR')
+  // Handle Error objects with JSON stringified error objects
+  if (error instanceof Error) {
+    try {
+      const parsedError = JSON.parse(error.message)
+      if (parsedError && typeof parsedError === 'object' && parsedError.error_type) {
+        return getErrorMessage(parsedError)
+      }
+    } catch (parseError) {
+      // If parsing fails, treat as regular error message
+      return error.message
+    }
   }
-  
-  const data = error.detail
-  
-  if (data && typeof data === 'object') {
-    return getErrorMessage(data)
+
+  if (error && typeof error === 'object') {
+    return getErrorMessage(error)
   }
   
   return t('errors.UNKNOWN_ERROR')

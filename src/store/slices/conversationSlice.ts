@@ -140,15 +140,11 @@ const conversationSlice = createSlice({
       }
     },
 
-    // Set AI models
-    setAIModels: (state, action: PayloadAction<AIModel[]>) => {
-      state.aiModels = action.payload
-    },
-
     // Set selected model
     setSelectedModel: (state, action: PayloadAction<AIModel | null>) => {
       state.selectedModel = action.payload
     },
+
 
     // Start streaming
     startStreaming: (state) => {

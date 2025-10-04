@@ -21,8 +21,8 @@ import {
   EmailCheckResponse,
   SSOAuthUrlResponse,
   SSOAuthResponse,
-  SSOOnboardingRequest,
-  SSOOnboardingResponse
+  CompleteOnboardingRequest,
+  CompleteOnboardingResponse
 } from './types'
 
 class AuthApiClient {
@@ -39,6 +39,8 @@ class AuthApiClient {
    * Register a new user
    */
   async register(userData: UserCreate): Promise<ApiResponse<UserResponse>> {
+    console.log('Auth API - Register request data:', userData)
+    console.log('Auth API - Email in request:', userData.email)
     return this.baseClient.post<UserResponse>('/api/v1/auth/register', userData)
   }
 
@@ -148,10 +150,10 @@ class AuthApiClient {
   }
 
   /**
-   * Complete SSO user onboarding
+   * Complete user onboarding
    */
-  async onboardSSOUser(data: SSOOnboardingRequest): Promise<ApiResponse<SSOOnboardingResponse>> {
-    return this.baseClient.post<SSOOnboardingResponse>('/api/v1/auth/sso/onboard', data)
+  async completeOnboarding(data?: CompleteOnboardingRequest): Promise<ApiResponse<CompleteOnboardingResponse>> {
+    return this.baseClient.post<CompleteOnboardingResponse>('/api/v1/auth/onboard', data || {})
   }
 
   /**
@@ -161,12 +163,6 @@ class AuthApiClient {
     return this.baseClient.put<UserResponse>('/api/v1/auth/profile', data)
   }
 
-  /**
-   * Complete user onboarding
-   */
-  async completeOnboarding(): Promise<ApiResponse<{ success: boolean }>> {
-    return this.baseClient.post<{ success: boolean }>('/api/v1/auth/complete-onboarding', {})
-  }
 }
 
 // Export singleton instance

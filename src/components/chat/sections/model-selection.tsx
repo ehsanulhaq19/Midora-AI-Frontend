@@ -1,8 +1,10 @@
 'use client'
 
-import React from 'react'
-import { ArrowDownSm } from '@/icons'
-import Image from 'next/image'
+import React, { useEffect } from 'react'
+import { useAIModels } from '@/hooks'
+import { Dropdown } from '@/components/ui'
+import { t } from '@/i18n'
+import { LogoOnly } from '@/icons/logo-only'
 
 interface ModelSelectionProps {
   className?: string
@@ -13,32 +15,84 @@ export const ModelSelection: React.FC<ModelSelectionProps> = ({
   className,
   divClassName 
 }) => {
+  // Using t function from i18n
+  const {
+    serviceProviders,
+    selectedProvider,
+    isAutoMode,
+    isLoading,
+    fetchServiceProviders,
+    selectProvider,
+    setAuto
+  } = useAIModels()
+
+  useEffect(() => {
+    if (!serviceProviders) {
+      fetchServiceProviders()
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!selectProvider) {
+      setAuto(true)
+    }
+  }, [serviceProviders])
+
+  const handleProviderChange = (value: string) => {
+    if (value === 'auto') {
+      setAuto(true)
+    } else {
+      const provider = serviceProviders.find(p => p.uuid === value)
+      selectProvider(provider || null)
+    }
+  }
+
+  const getCurrentValue = () => {
+    if (isAutoMode) return 'auto'
+    return selectedProvider?.uuid || ''
+  }
+
+  const getDropdownOptions = () => {
+    const options = [
+      {
+        value: 'auto',
+        label: 'Midroa AI',
+        icon: <LogoOnly color="#FFFFFF" className="w-4 h-4" />
+      }
+    ]
+
+    serviceProviders.forEach(provider => {
+      const firstModel = provider.active_models[0]
+      options.push({
+        value: provider.uuid,
+        label: provider.name,
+        image: firstModel?.image_path || '/images/providers/default.png'
+      })
+    })
+
+    return options
+  }
+
+  if (isLoading) {
+    return (
+      <div className={`inline-flex items-center justify-center gap-1 p-2 relative rounded-[var(--premitives-corner-radius-corner-radius-2)] bg-[color:var(--tokens-color-surface-surface-button-pressed)] ${className}`}>
+        <div className="text-tokens-color-text-text-neutral text-sm">Loading...</div>
+      </div>
+    )
+  }
+
   return (
     <div
       className={`inline-flex items-center justify-center gap-1 p-2 relative rounded-[var(--premitives-corner-radius-corner-radius-2)] bg-[color:var(--tokens-color-surface-surface-button-pressed)] ${className}`}
     >
-      <div className="inline-flex items-center gap-2 relative flex-[0_0_auto]">
-        <div
-          className={`relative w-fit mt-[-1.00px] font-text-small font-[number:var(--text-small-font-weight)] text-tokens-color-text-text-neutral text-[length:var(--text-small-font-size)] tracking-[var(--text-small-letter-spacing)] leading-[var(--text-small-line-height)] whitespace-nowrap [font-style:var(--text-small-font-style)] ${divClassName}`}
-        >
-          Manual
-        </div>
-
-        <ArrowDownSm color="#FFFFFF"/>
-      </div>
-
       <div className="inline-flex items-center gap-1.5 p-1 relative flex-[0_0_auto] bg-tokens-color-surface-surface-tertiary rounded-[var(--premitives-corner-radius-corner-radius-2)]">
-        <Image
-          className="relative w-[16.5px] h-[16.5px] ml-[-0.25px] aspect-[1]"
-          alt="Vector"
-          src="/img/vector-1.svg"
-          width={16.5}
-          height={16.5}
+        <Dropdown
+          options={getDropdownOptions()}
+          value={getCurrentValue()}
+          onChange={handleProviderChange}
+          className="min-w-[120px]"
+          modeText={isAutoMode ? 'Auto' : 'Manual'}
         />
-
-        <div className="relative w-fit mt-[-1.00px] font-text-small font-[number:var(--text-small-font-weight)] text-tokens-color-text-text-neutral text-[length:var(--text-small-font-size)] tracking-[var(--text-small-letter-spacing)] leading-[var(--text-small-line-height)] whitespace-nowrap [font-style:var(--text-small-font-style)]">
-          Claude
-        </div>
       </div>
     </div>
   )

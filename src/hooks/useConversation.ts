@@ -18,16 +18,14 @@ import {
   appendConversations,
   addMessage,
   removeMessage,
-  setAIModels,
   startStreaming,
-  updateStreamingContent,
   setStreamingContent,
   completeStreaming,
   stopStreaming,
 } from '@/store/slices/conversationSlice'
 import { Conversation, Message } from '@/api/conversation/types'
-import { AIModel } from '@/api/ai/types'
 import { useToast } from './useToast'
+import { handleApiError } from '@/lib/error-handler'
 
 export const useConversation = () => {
   const dispatch = useDispatch()
@@ -41,7 +39,6 @@ export const useConversation = () => {
     error,
     isStreaming,
     streamingContent,
-    aiModels,
     pagination,
     isLoadingMore,
     conversationPagination,
@@ -51,17 +48,22 @@ export const useConversation = () => {
   // Load conversations
   const loadConversations = useCallback(async () => {
     try {
-      dispatch(setLoading(true))
       dispatch(clearError())
       
       const response = await conversationApi.getConversations(1, 20)
       console.log("response = ", response)
       if (response.error) {
-        throw new Error(response.error)
+        const errorObject = response.processedError || {
+          error_type: 'CONVERSATIONS_LOAD_FAILED',
+          error_message: response.error,
+          error_id: response.error_id,
+          status: response.status
+        }
+        throw new Error(JSON.stringify(errorObject))
       }
       dispatch(setConversations(response.data || { conversations: [], pagination: { page: 1, per_page: 20, total: 0, total_pages: 0 } }))
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to load conversations'
+      const errorMessage = handleApiError(err)
       dispatch(setError(errorMessage))
       showErrorToast('Failed to Load Conversations', errorMessage)
     } finally {
@@ -76,14 +78,20 @@ export const useConversation = () => {
       
       const response = await conversationApi.createConversation({ name })
       if (response.error) {
-        throw new Error(response.error)
+        const errorObject = response.processedError || {
+          error_type: 'CONVERSATION_CREATION_FAILED',
+          error_message: response.error,
+          error_id: response.error_id,
+          status: response.status
+        }
+        throw new Error(JSON.stringify(errorObject))
       }
       const conversation = response.data!
       dispatch(addConversation(conversation))
       dispatch(setCurrentConversation(conversation))
       return conversation
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to create conversation'
+      const errorMessage = handleApiError(err)
       dispatch(setError(errorMessage))
       showErrorToast('Failed to Create Conversation', errorMessage)
       return null
@@ -132,7 +140,7 @@ export const useConversation = () => {
         }))
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to load conversation'
+      const errorMessage = handleApiError(err)
       dispatch(setError(errorMessage))
       showErrorToast('Failed to Load Conversation', errorMessage)
     } finally {
@@ -140,7 +148,7 @@ export const useConversation = () => {
   }, [dispatch, conversations, messages])
 
   // Send a message
-  const sendMessage = useCallback(async (content: string, conversationUuid?: string) => {
+  const sendMessage = useCallback(async (content: string, modelUuid?: string, conversationUuid?: string) => {
     try {
       dispatch(clearError())
       
@@ -150,7 +158,12 @@ export const useConversation = () => {
       if (!targetConversationUuid) {
         const response = await conversationApi.createConversation({ name: `Chat - ${content.substring(0, 50)}...` })
         if (response.error) {
-          throw new Error(response.error)
+          const errorObject = response.processedError || {
+            error_type: 'CONVERSATION_CREATION_FAILED',
+            error_message: response.error,
+            status: response.status
+          }
+          throw new Error(JSON.stringify(errorObject))
         }
         const newConversation = response.data!
         dispatch(addConversation(newConversation))
@@ -188,7 +201,7 @@ export const useConversation = () => {
       
       // Generate AI response with streaming
       await aiApi.generateContentStream(
-        { query: content, conversation_uuid: targetConversationUuid, stream: true },
+        { query: content, conversation_uuid: targetConversationUuid, stream: true, ai_model_uuid: modelUuid },
         (chunk: string) => {
           accumulatedContent += chunk
           streamingBuffer += chunk
@@ -223,39 +236,11 @@ export const useConversation = () => {
       
     } catch (err) {
       dispatch(stopStreaming())
-      const errorMessage = err instanceof Error ? err.message : 'Failed to send message'
+      const errorMessage = handleApiError(err)
       dispatch(setError(errorMessage))
       showErrorToast('Failed to Send Message', errorMessage)
     }
   }, [dispatch, currentConversation, createConversation])
-
-  // Load AI models
-  const loadAIModels = useCallback(async () => {
-    try {
-      dispatch(clearError())
-      
-      const response = await aiApi.getModels()
-      if (response.error) {
-        throw new Error(response.error)
-      }
-      // Convert the response to a flat array of models
-      const modelsArray: AIModel[] = []
-      if (response.data) {
-        Object.keys(response.data).forEach((key: string) => {
-          const providerModels = (response.data as any)[key]
-          if (Array.isArray(providerModels)) {
-            modelsArray.push(...providerModels)
-          }
-        })
-      }
-      dispatch(setAIModels(modelsArray))
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to load AI models'
-      dispatch(setError(errorMessage))
-      showErrorToast('Failed to Load AI Models', errorMessage)
-    } finally {
-    }
-  }, [dispatch])
 
   // Load more messages for pagination
   const loadMoreMessages = useCallback(async (conversationUuid: string) => {
@@ -272,7 +257,13 @@ export const useConversation = () => {
       const response = await conversationApi.getMessages(conversationUuid, nextPage, currentPagination.per_page)
       
       if (response.error) {
-        throw new Error(response.error)
+        const errorObject = response.processedError || {
+          error_type: 'MESSAGES_LOAD_FAILED',
+          error_message: response.error,
+          error_id: response.error_id,
+          status: response.status
+        }
+        throw new Error(JSON.stringify(errorObject))
       }
       
       dispatch(prependMessages({
@@ -282,7 +273,7 @@ export const useConversation = () => {
       }))
       
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to load more messages'
+      const errorMessage = handleApiError(err)
       dispatch(setError(errorMessage))
       showErrorToast('Failed to Load More Messages', errorMessage)
     } finally {
@@ -304,13 +295,19 @@ export const useConversation = () => {
       const response = await conversationApi.getConversations(nextPage, conversationPagination.per_page)
       
       if (response.error) {
-        throw new Error(response.error)
+        const errorObject = response.processedError || {
+          error_type: 'CONVERSATIONS_LOAD_FAILED',
+          error_message: response.error,
+          error_id: response.error_id,
+          status: response.status
+        }
+        throw new Error(JSON.stringify(errorObject))
       }
       
       dispatch(appendConversations(response.data || { conversations: [], pagination: conversationPagination }))
       
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to load more conversations'
+      const errorMessage = handleApiError(err)
       dispatch(setError(errorMessage))
       showErrorToast('Failed to Load More Conversations', errorMessage)
     } finally {
@@ -336,7 +333,6 @@ export const useConversation = () => {
     error,
     isStreaming,
     streamingContent,
-    aiModels,
     pagination: currentConversation ? pagination[currentConversation.uuid] : null,
     isLoadingMore,
     conversationPagination,
@@ -347,7 +343,6 @@ export const useConversation = () => {
     createConversation,
     selectConversation,
     sendMessage,
-    loadAIModels,
     loadMoreMessages,
     loadMoreConversations,
     startNewChat,

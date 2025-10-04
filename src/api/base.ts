@@ -15,12 +15,20 @@ export interface ApiResponse<T = any> {
   success?: boolean
   error_type?: string
   error_message?: string
+  error_id?: string
+  processedError?: {
+    error_type: string
+    error_message: string
+    error_id?: string
+    status?: number
+  }
 }
 
 export interface ApiError {
-  message: string
-  status: number
-  details?: any
+  error_type: string
+  error_message: string
+  error_id?: string
+  status?: number
 }
 
 class BaseApiClient {
@@ -46,14 +54,21 @@ class BaseApiClient {
           success: true
         }
       } else if (responseData.success === false) {
-        // Error response format: { success: false, error_type: "...", error_message: "..." }
+        // Error response format: { success: false, error_type: "...", error_message: "...", error_id: "..." }
         const errorMessage = handleApiError(responseData || response)
         return { 
           error: errorMessage, 
           status: response.status,
           success: false,
           error_type: responseData.error_type,
-          error_message: responseData.error_message
+          error_message: responseData.error_message,
+          error_id: responseData.error_id,
+          processedError: {
+            error_type: responseData.error_type || 'UNKNOWN_ERROR',
+            error_message: responseData.error_message || errorMessage,
+            error_id: responseData.error_id,
+            status: response.status
+          }
         }
       }
     }
@@ -93,7 +108,8 @@ class BaseApiClient {
         try {
           const contentType = response.headers.get('content-type')
           if (contentType && contentType.includes('application/json')) {
-            errorData = await response.json()
+            const jsonResponse = await response.json()
+            errorData = jsonResponse?.detail || jsonResponse
           }
         } catch (parseError) {
           console.warn('Failed to parse error response:', parseError)
@@ -102,7 +118,13 @@ class BaseApiClient {
         const errorMessage = handleApiError(errorData || response)
         return { 
           error: errorMessage, 
-          status: response.status
+          status: response.status,
+          processedError: {
+            error_type: errorData?.error_type || 'UNKNOWN_ERROR',
+            error_message: errorData?.error_message || errorMessage,
+            error_id: errorData?.error_id,
+            status: response.status
+          }
         }
       }
 
@@ -113,14 +135,26 @@ class BaseApiClient {
         const errorMessage = handleApiError(error)
         return { 
           error: errorMessage, 
-          status: 408
+          status: 408,
+          processedError: {
+            error_type: 'REQUEST_TIMEOUT',
+            error_message: errorMessage,
+            error_id: undefined,
+            status: 408
+          }
         }
       }
       
       const errorMessage = handleApiError(error)
       return { 
         error: errorMessage, 
-        status: 500
+        status: 500,
+        processedError: {
+          error_type: 'INTERNAL_SERVER_ERROR',
+          error_message: errorMessage,
+          error_id: undefined,
+          status: 500
+        }
       }
     }
   }
@@ -149,22 +183,31 @@ class BaseApiClient {
 
       clearTimeout(timeoutId)
 
+      console.log('--------Response:', response)
       if (!response.ok) {
         // Try to parse error response from backend
         let errorData: any = null
         try {
           const contentType = response.headers.get('content-type')
           if (contentType && contentType.includes('application/json')) {
-            errorData = await response.json()
+            const jsonResponse = await response.json()
+            errorData = jsonResponse?.detail || jsonResponse
           }
         } catch (parseError) {
           console.warn('Failed to parse error response:', parseError)
         }
-
+        
+        console.log('--------Error data:', errorData)
         const errorMessage = handleApiError(errorData || response)
         return { 
           error: errorMessage, 
-          status: response.status
+          status: response.status,
+          processedError: {
+            error_type: errorData?.error_type || 'UNKNOWN_ERROR',
+            error_message: errorData?.error_message || errorMessage,
+            error_id: errorData?.error_id,
+            status: response.status
+          }
         }
       }
 
@@ -175,14 +218,26 @@ class BaseApiClient {
         const errorMessage = handleApiError(error)
         return { 
           error: errorMessage, 
-          status: 408
+          status: 408,
+          processedError: {
+            error_type: 'REQUEST_TIMEOUT',
+            error_message: errorMessage,
+            error_id: undefined,
+            status: 408
+          }
         }
       }
       
       const errorMessage = handleApiError(error)
       return { 
         error: errorMessage, 
-        status: 500
+        status: 500,
+        processedError: {
+          error_type: 'INTERNAL_SERVER_ERROR',
+          error_message: errorMessage,
+          error_id: undefined,
+          status: 500
+        }
       }
     }
   }
@@ -217,7 +272,8 @@ class BaseApiClient {
         try {
           const contentType = response.headers.get('content-type')
           if (contentType && contentType.includes('application/json')) {
-            errorData = await response.json()
+            const jsonResponse = await response.json()
+            errorData = jsonResponse?.detail || jsonResponse
           }
         } catch (parseError) {
           console.warn('Failed to parse error response:', parseError)
@@ -226,7 +282,13 @@ class BaseApiClient {
         const errorMessage = handleApiError(errorData || response)
         return { 
           error: errorMessage, 
-          status: response.status
+          status: response.status,
+          processedError: {
+            error_type: errorData?.error_type || 'UNKNOWN_ERROR',
+            error_message: errorData?.error_message || errorMessage,
+            error_id: errorData?.error_id,
+            status: response.status
+          }
         }
       }
 
@@ -237,14 +299,26 @@ class BaseApiClient {
         const errorMessage = handleApiError(error)
         return { 
           error: errorMessage, 
-          status: 408
+          status: 408,
+          processedError: {
+            error_type: 'REQUEST_TIMEOUT',
+            error_message: errorMessage,
+            error_id: undefined,
+            status: 408
+          }
         }
       }
       
       const errorMessage = handleApiError(error)
       return { 
         error: errorMessage, 
-        status: 500
+        status: 500,
+        processedError: {
+          error_type: 'INTERNAL_SERVER_ERROR',
+          error_message: errorMessage,
+          error_id: undefined,
+          status: 500
+        }
       }
     }
   }
@@ -278,7 +352,8 @@ class BaseApiClient {
         try {
           const contentType = response.headers.get('content-type')
           if (contentType && contentType.includes('application/json')) {
-            errorData = await response.json()
+            const jsonResponse = await response.json()
+            errorData = jsonResponse?.detail || jsonResponse
           }
         } catch (parseError) {
           console.warn('Failed to parse error response:', parseError)
@@ -287,7 +362,13 @@ class BaseApiClient {
         const errorMessage = handleApiError(errorData || response)
         return { 
           error: errorMessage, 
-          status: response.status
+          status: response.status,
+          processedError: {
+            error_type: errorData?.error_type || 'UNKNOWN_ERROR',
+            error_message: errorData?.error_message || errorMessage,
+            error_id: errorData?.error_id,
+            status: response.status
+          }
         }
       }
 
@@ -298,14 +379,26 @@ class BaseApiClient {
         const errorMessage = handleApiError(error)
         return { 
           error: errorMessage, 
-          status: 408
+          status: 408,
+          processedError: {
+            error_type: 'REQUEST_TIMEOUT',
+            error_message: errorMessage,
+            error_id: undefined,
+            status: 408
+          }
         }
       }
       
       const errorMessage = handleApiError(error)
       return { 
         error: errorMessage, 
-        status: 500
+        status: 500,
+        processedError: {
+          error_type: 'INTERNAL_SERVER_ERROR',
+          error_message: errorMessage,
+          error_id: undefined,
+          status: 500
+        }
       }
     }
   }

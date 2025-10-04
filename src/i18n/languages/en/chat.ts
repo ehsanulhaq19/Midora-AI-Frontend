@@ -9,6 +9,7 @@ export const chat = {
   startChatting: 'Start Chatting',
   typeMessage: 'Type your message...',
   sendMessage: 'Send Message',
+  waitingForResponse: 'Waiting for AI response...',
   newChat: 'New Chat',
   chatHistory: 'Chat History',
   clearChat: 'Clear Chat',
@@ -35,6 +36,14 @@ export const chat = {
   manual: 'Manual',
   claude: 'Claude',
   upgradeToPro: 'Upgrade to Pro+',
+  
+  // AI Model Selection
+  auto: 'Auto',
+  selectProvider: 'Select Provider',
+  selectModel: 'Select Model',
+  aiModels: 'AI Models',
+  serviceProviders: 'Service Providers',
+  defaultModel: 'Default Model',
   
   // Conversation related translations
   selectConversation: 'Select a conversation to start chatting',

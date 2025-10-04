@@ -7,22 +7,20 @@ import { ButtonGroup } from './button-group'
 import { Buttons } from '../ui'
 import { CaretDown } from '@/icons'
 import { t } from '@/i18n'
-import { useSignupData } from '@/contexts/signup-context'
+import { useSignupData } from '@/contexts/SignupDataContext'
 import { EmailInput } from '@/components/ui/inputs/email-input'
 import { LoginPasswordInput } from '@/components/ui/inputs/login-password-input'
 import { authApi } from '@/api/auth/api'
 import { handleApiError } from '@/lib/error-handler'
-import { useLogin } from '@/hooks/useLogin'
-import { useSSO } from '@/hooks/useSSO'
+import { useAuth } from '@/hooks/use-auth'
 import { loginSuccess, setLoading, setError } from '@/store/slices/authSlice'
 import { tokenManager } from '@/lib/token-manager'
 import { setTokens } from '@/lib/auth'
-import { MultiStepContainer } from './signup-steps/multi-step-container'
 import { useToast } from '@/hooks/useToast'
 
 interface SignupFormSectionProps {
   className?: string
-  onShowOnboarding?: () => void
+  onShowOnboarding?: (step?: string) => void
 }
 
 export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className, onShowOnboarding }) => {
@@ -30,8 +28,15 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
   const searchParams = useSearchParams()
   const dispatch = useAppDispatch()
   const { updateData } = useSignupData()
-  const { login, isLoading: isLoggingIn, error: loginError, clearError: clearLoginError } = useLogin()
-  const { signInWithGoogle, signInWithMicrosoft, signInWithGitHub } = useSSO()
+  const { 
+    login, 
+    isLoading: isLoggingIn, 
+    error: loginError, 
+    clearError: clearLoginError,
+    signInWithGoogle, 
+    signInWithMicrosoft, 
+    signInWithGitHub 
+  } = useAuth()
   const { error: showErrorToast, success: showSuccessToast } = useToast()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -41,108 +46,112 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
   const [showPasswordField, setShowPasswordField] = useState(false)
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [isProcessingSSO, setIsProcessingSSO] = useState(false)
-  const [showOnboarding, setShowOnboarding] = useState(false)
-  const [isSSOOnboarding, setIsSSOOnboarding] = useState(false)
 
-  // Handle SSO callback with tokens in query parameters
-  useEffect(() => {
-    const processSSOCallback = async () => {
-      const accessToken = searchParams.get('access_token')
-      const refreshToken = searchParams.get('refresh_token')
-      const authMethod = searchParams.get('auth_method')
-      const error = searchParams.get('error')
-      const errorMessage = searchParams.get('message')
+  // // Handle SSO callback with tokens in query parameters
+  // useEffect(() => {
+  //   const processSSOCallback = async () => {
+  //     const accessToken = searchParams.get('access_token')
+  //     const refreshToken = searchParams.get('refresh_token')
+  //     const authMethod = searchParams.get('auth_method')
+  //     const error = searchParams.get('error')
+  //     const errorMessage = searchParams.get('message')
 
-      // Handle SSO error
-      if (error) {
-        console.error('SSO Error:', errorMessage)
-        showErrorToast('SSO Error', errorMessage || t('auth.ssoError'))
+  //     // Handle SSO error
+  //     if (error) {
+  //       console.error('SSO Error:', errorMessage)
+  //       const errorMsg = errorMessage || t('auth.ssoError')
+  //       showErrorToast('SSO Error', errorMsg)
         
-        // Remove error query params
-        const newUrl = new URL(window.location.href)
-        newUrl.searchParams.delete('error')
-        newUrl.searchParams.delete('message')
-        window.history.replaceState({}, '', newUrl.toString())
-        return
-      }
+  //       // Remove error query params
+  //       const newUrl = new URL(window.location.href)
+  //       newUrl.searchParams.delete('error')
+  //       newUrl.searchParams.delete('message')
+  //       window.history.replaceState({}, '', newUrl.toString())
+  //       return
+  //     }
 
-      // Process SSO success with tokens
-      if (accessToken && refreshToken && authMethod) {
-        setIsProcessingSSO(true)
-        dispatch(setLoading(true))
-        dispatch(setError(null))
+  //     // Process SSO success with tokens
+  //     if (accessToken && refreshToken && authMethod) {
+  //       setIsProcessingSSO(true)
+  //       dispatch(setLoading(true))
+  //       dispatch(setError(null))
 
-        try {
-          // Store tokens using token manager
-          tokenManager.storeTokens(accessToken, refreshToken, authMethod)
+  //       try {
+  //         // Store tokens using token manager
+  //         tokenManager.storeTokens(accessToken, refreshToken, authMethod)
           
-          // Also store in cookies for middleware access
-          setTokens(accessToken, refreshToken)
+  //         // Also store in cookies for middleware access
+  //         setTokens(accessToken, refreshToken)
 
-          // Get user details from backend
-          const userResponse = await authApi.getCurrentUser()
+  //         // Get user details from backend
+  //         const userResponse = await authApi.getCurrentUser()
           
-          if (userResponse.data) {
-            // Store auth data in Redux
-            dispatch(loginSuccess({
-              user: userResponse.data,
-              accessToken,
-              refreshToken,
-              authMethod: authMethod as 'google' | 'microsoft' | 'github'
-            }))
+  //         if (userResponse.data) {
+  //           // Store auth data in Redux
+  //           dispatch(loginSuccess({
+  //             user: userResponse.data,
+  //             accessToken,
+  //             refreshToken,
+  //             authMethod: authMethod as 'google' | 'microsoft' | 'github'
+  //           }))
 
-            // Remove query params
-            const newUrl = new URL(window.location.href)
-            newUrl.searchParams.delete('access_token')
-            newUrl.searchParams.delete('refresh_token')
-            newUrl.searchParams.delete('auth_method')
-            window.history.replaceState({}, '', newUrl.toString())
+  //           // Remove query params
+  //           const newUrl = new URL(window.location.href)
+  //           newUrl.searchParams.delete('access_token')
+  //           newUrl.searchParams.delete('refresh_token')
+  //           newUrl.searchParams.delete('auth_method')
+  //           window.history.replaceState({}, '', newUrl.toString())
 
-            // Check if user needs onboarding
-            if (!userResponse.data.is_onboarded) {
-              // Show SSO onboarding flow in same page
-              setIsSSOOnboarding(true)
-              setShowOnboarding(true)
-            } else {
-              // Redirect to chat page
-              router.push('/chat')
-            }
-          } else {
-            throw new Error('Failed to get user information')
-          }
-        } catch (err: any) {
-          console.error('SSO callback processing error:', err)
+  //           // Check if user needs onboarding
+  //           if (!userResponse.data.is_onboarded) {
+  //             // For SSO users, redirect to signup page for onboarding
+  //             router.push('/signup')
+  //           } else {
+  //             // Redirect to chat page
+  //             router.push('/chat')
+  //           }
+  //         } else {
+  //           const errorObject = {
+  //             error_type: 'USER_DATA_FETCH_FAILED',
+  //             error_message: 'Failed to get user information',
+  //             error_id: undefined,
+  //             status: 500
+  //           }
+  //           throw new Error(JSON.stringify(errorObject))
+  //         }
+  //       } catch (err: any) {
+  //         console.error('SSO callback processing error:', err)
           
-          // Clear tokens on error
-          tokenManager.clearTokens()
+  //         // Clear tokens on error
+  //         tokenManager.clearTokens()
           
-          // Remove query params
-          const newUrl = new URL(window.location.href)
-          newUrl.searchParams.delete('access_token')
-          newUrl.searchParams.delete('refresh_token')
-          newUrl.searchParams.delete('auth_method')
-          window.history.replaceState({}, '', newUrl.toString())
+  //         // Remove query params
+  //         const newUrl = new URL(window.location.href)
+  //         newUrl.searchParams.delete('access_token')
+  //         newUrl.searchParams.delete('refresh_token')
+  //         newUrl.searchParams.delete('auth_method')
+  //         window.history.replaceState({}, '', newUrl.toString())
           
-          // Show error
-          const errorMessage = handleApiError(err)
-          showErrorToast('Authentication Error', errorMessage)
-          dispatch(setError(errorMessage))
-        } finally {
-          setIsProcessingSSO(false)
-          dispatch(setLoading(false))
-        }
-      }
-    }
+  //         // Show error
+  //         const errorMessage = handleApiError(err)
+  //         showErrorToast('Authentication Error', errorMessage)
+  //         dispatch(setError(errorMessage))
+  //       } finally {
+  //         setIsProcessingSSO(false)
+  //         dispatch(setLoading(false))
+  //       }
+  //     }
+  //   }
 
-    // Only run if there are relevant search params
-    if (searchParams.has('access_token') || searchParams.has('error')) {
-      processSSOCallback().catch((error) => {
-        console.error('SSO callback error:', error)
-        dispatch(setError('SSO authentication failed'))
-        dispatch(setLoading(false))
-      })
-    }
-  }, [searchParams, dispatch, router])
+  //   // Only run if there are relevant search params
+  //   if (searchParams.has('access_token') || searchParams.has('error')) {
+  //     processSSOCallback().catch((error) => {
+  //       console.error('SSO callback error:', error)
+  //       dispatch(setError('SSO authentication failed'))
+  //       dispatch(setLoading(false))
+  //     })
+  //   }
+  // }, [searchParams, dispatch, router])
 
   const handleEmailSubmit = async () => {
     if (!email.trim()) {
@@ -165,7 +174,8 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
       const response = await authApi.checkEmail(email)
       
       if (response.error) {
-        showErrorToast('Email Check Failed', response.error)
+        const errorMessage = handleApiError(response)
+        showErrorToast('Email Check Failed', errorMessage)
         return
       }
       
@@ -182,14 +192,13 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
       // Store email using the custom hook
       updateData({ email })
       
-      // Show onboarding flow in same page
+      // Show onboarding flow via callback
       if (onShowOnboarding) {
         onShowOnboarding()
-      } else {
-        setShowOnboarding(true)
       }
     } catch (err: any) {
-      showErrorToast('Email Verification Failed', 'Failed to verify email. Please try again.')
+      const errorMessage = handleApiError(err)
+      showErrorToast('Email Verification Failed', errorMessage)
     } finally {
       setIsCheckingEmail(false)
     }
@@ -205,29 +214,23 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
     clearLoginError()
     
     try {
-      // Use the custom login hook
-      await login(email, password)
+      await login({ email, password })
     } catch (err: any) {
-      console.error('Password submit error:', err)
-      console.log('Password submit error:', err)
+      const errorObject = JSON.parse(err.message)
       
-      // Check if error is NOT_VERIFIED_USER
-      if (err.detail && err.detail.error_type === 'NOT_VERIFIED_USER') {
-        // Store email and password for onboarding flow
+      if (errorObject && errorObject.error_type === 'NOT_VERIFIED_USER') {
         updateData({ email, password })
         
-        // Show onboarding flow with email verification
         if (onShowOnboarding) {
-          onShowOnboarding()
-        } else {
-          setShowOnboarding(true)
+          onShowOnboarding('otp')
         }
         return
+      } else {
+        const errorMessage = handleApiError(errorObject)
+        showErrorToast('Login Failed', errorMessage)
       }
-      
-      showErrorToast('Login Failed', err.message || 'Login failed')
     }
-  }, [password, email, login, clearLoginError, updateData, onShowOnboarding])
+  }, [password, email, login, clearLoginError, updateData, showErrorToast])
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value)
@@ -251,50 +254,7 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
     }
   }
 
-  const handleOnboardingComplete = async (data: { email: string; fullName: string; profession: string }) => {
-    try {
-      // For SSO onboarding, we need to update the user profile
-      if (isSSOOnboarding) {
-        const [firstName, ...lastNameParts] = data.fullName.split(' ')
-        const lastName = lastNameParts.join(' ')
-        
-        const response = await authApi.updateProfile({
-          first_name: firstName,
-          last_name: lastName,
-          profession: data.profession
-        })
-        
-        if (response.error) {
-          throw new Error(response.error)
-        }
-        
-        // Mark user as onboarded
-        await authApi.completeOnboarding()
-        
-        // Redirect to chat
-        router.push('/chat')
-      } else {
-        // For regular signup, proceed to password step
-        setShowOnboarding(false)
-        // The password step will be handled by the existing flow
-      }
-    } catch (err: any) {
-      console.error('Onboarding completion error:', err)
-      showErrorToast('Onboarding Failed', handleApiError(err))
-    }
-  }
 
-  // Show onboarding flow if needed
-  if (showOnboarding) {
-    return (
-      <div className={`flex flex-col w-full max-w-[408px] items-center gap-12 lg:gap-[197px] ${className}`}>
-        <MultiStepContainer 
-          onComplete={handleOnboardingComplete}
-          initialEmail={email}
-        />
-      </div>
-    )
-  }
 
   return (
     <div className={`flex flex-col w-full max-w-[408px] items-center gap-12 lg:gap-[197px] ${className}`}>

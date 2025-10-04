@@ -249,6 +249,10 @@ export interface PerformanceMetrics {
   lighthouseScore: number
 }
 
+// Re-export specific types
+export type { AIModelsState } from './ai-models'
+export type { ConversationState } from './conversation'
+
 // Export all types
 export type {
   User,

@@ -2,12 +2,12 @@
 
 import { useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { useSSO } from '@/hooks/useSSO'
+import { useAuth } from '@/hooks/use-auth'
 import { Spinner } from '@/components/ui/loaders'
 
 export default function GitHubCallbackPage() {
   const searchParams = useSearchParams()
-  const { handleSSOCallback } = useSSO()
+  const { handleSSOCallback } = useAuth()
 
   useEffect(() => {
     const code = searchParams.get('code')

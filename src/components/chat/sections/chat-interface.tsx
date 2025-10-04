@@ -10,14 +10,16 @@ import { useAuthRedux } from '@/hooks/useAuthRedux'
 
 interface ChatInterfaceProps {
   onMenuClick: () => void
-  onSendMessage: (message: string) => void
+  onSendMessage: (message: string, modelUuid?: string) => void
   isCompact?: boolean
+  isStreaming?: boolean
 }
 
 export const ChatInterface: React.FC<ChatInterfaceProps> = ({ 
   onMenuClick, 
   onSendMessage,
-  isCompact = false
+  isCompact = false,
+  isStreaming = false
 }) => {
   const { userName } = useAuthRedux()
   
@@ -25,7 +27,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     return (
       <div className="p-4">
         <div className="max-w-[698px] mx-auto">
-          <MessageInput onSend={onSendMessage} />
+          <MessageInput onSend={onSendMessage} isStreaming={isStreaming} />
         </div>
       </div>
     )
@@ -66,7 +68,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
           </p>
         </div>
 
-        <MessageInput onSend={onSendMessage} />
+        <MessageInput onSend={onSendMessage} isStreaming={isStreaming} />
       </div>
     </div>
   )

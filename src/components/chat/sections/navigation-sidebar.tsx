@@ -211,7 +211,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
       <div className={`
         fixed lg:relative top-0 left-0 w-[282px] bg-[color:var(--tokens-color-surface-surface-neutral)] z-50 transform transition-transform duration-300 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-        flex flex-col
+        flex flex-col h-[100vh]
       `}>
         {/* Header */}
         <div className="flex flex-col items-start gap-3 flex-shrink-0">

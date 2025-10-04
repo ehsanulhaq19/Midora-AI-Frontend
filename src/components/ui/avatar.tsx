@@ -1,14 +1,16 @@
 import React from 'react'
 import Image from 'next/image'
+import { LogoOnly } from '@/icons/logo-only'
 
 interface AvatarProps {
   size?: 'sm' | 'md' | 'lg'
-  type?: 'image' | 'initials'
+  type?: 'image' | 'initials' | 'auto'
   indicator?: 'none' | 'online' | 'offline'
   src?: string
   alt?: string
   className?: string
   fallbackText?: string
+  showLabel?: boolean
 }
 
 export const Avatar: React.FC<AvatarProps> = ({
@@ -18,7 +20,8 @@ export const Avatar: React.FC<AvatarProps> = ({
   src,
   alt = 'Avatar',
   className = '',
-  fallbackText = 'U'
+  fallbackText = 'U',
+  showLabel = false
 }) => {
   const sizeClasses = {
     sm: 'w-8 h-8',
@@ -33,6 +36,24 @@ export const Avatar: React.FC<AvatarProps> = ({
   }
 
   const baseClasses = `relative rounded-full overflow-hidden ${sizeClasses[size]} ${indicatorClasses[indicator]} ${className}`
+
+  if (type === 'auto') {
+    return (
+      <div className="flex items-center gap-2">
+        <div className={baseClasses}>
+          <LogoOnly 
+            color="#FFFFFF" 
+            className="w-full h-full object-cover"
+          />
+        </div>
+        {showLabel && (
+          <span className="font-text-small font-[number:var(--text-small-font-weight)] text-tokens-color-text-text-neutral text-[length:var(--text-small-font-size)] tracking-[var(--text-small-letter-spacing)] leading-[var(--text-small-line-height)] whitespace-nowrap [font-style:var(--text-small-font-style)]">
+            Midroa AI
+          </span>
+        )}
+      </div>
+    )
+  }
 
   if (type === 'image' && src) {
     return (

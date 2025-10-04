@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
 
 interface SignupData {
   email: string
@@ -9,22 +9,22 @@ interface SignupData {
   password: string
 }
 
-interface SignupContextType {
+interface SignupDataContextType {
   data: SignupData
   updateData: (updates: Partial<SignupData>) => void
   clearData: () => void
   isComplete: () => boolean
 }
 
-const SignupContext = createContext<SignupContextType | undefined>(undefined)
+const SignupDataContext = createContext<SignupDataContextType | undefined>(undefined)
 
 const STORAGE_KEY = 'signupData'
 
-interface SignupProviderProps {
+interface SignupDataProviderProps {
   children: ReactNode
 }
 
-export const SignupProvider: React.FC<SignupProviderProps> = ({ children }) => {
+export const SignupDataProvider: React.FC<SignupDataProviderProps> = ({ children }) => {
   const [data, setData] = useState<SignupData>({
     email: '',
     fullName: '',
@@ -56,24 +56,24 @@ export const SignupProvider: React.FC<SignupProviderProps> = ({ children }) => {
     }
   }, [data])
 
-  const updateData = (updates: Partial<SignupData>) => {
+  const updateData = useCallback((updates: Partial<SignupData>) => {
     console.log('Updating signup data:', updates)
     setData(prev => ({ ...prev, ...updates }))
-  }
+  }, [])
 
-  const clearData = () => {
+  const clearData = useCallback(() => {
     console.log('Clearing signup data')
     setData({ email: '', fullName: '', profession: '', password: '' })
     if (typeof window !== 'undefined') {
       sessionStorage.removeItem(STORAGE_KEY)
     }
-  }
+  }, [])
 
-  const isComplete = () => {
+  const isComplete = useCallback(() => {
     return data.email && data.fullName && data.profession && data.password
-  }
+  }, [data])
 
-  const value: SignupContextType = {
+  const value: SignupDataContextType = {
     data,
     updateData,
     clearData,
@@ -81,16 +81,16 @@ export const SignupProvider: React.FC<SignupProviderProps> = ({ children }) => {
   }
 
   return (
-    <SignupContext.Provider value={value}>
+    <SignupDataContext.Provider value={value}>
       {children}
-    </SignupContext.Provider>
+    </SignupDataContext.Provider>
   )
 }
 
-export const useSignupData = (): SignupContextType => {
-  const context = useContext(SignupContext)
+export const useSignupData = (): SignupDataContextType => {
+  const context = useContext(SignupDataContext)
   if (context === undefined) {
-    throw new Error('useSignupData must be used within a SignupProvider')
+    throw new Error('useSignupData must be used within a SignupDataProvider')
   }
   return context
 }

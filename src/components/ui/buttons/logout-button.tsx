@@ -3,7 +3,7 @@
 import React from 'react'
 import { Button } from './button'
 import { Logout } from '@/icons'
-import { useLogout } from '@/hooks/useLogout'
+import { useAuth } from '@/hooks/use-auth'
 import { t } from '@/i18n'
 import { cn } from '@/lib/utils'
 
@@ -22,11 +22,11 @@ export const LogoutButton: React.FC<LogoutButtonProps> = ({
   showIcon = true,
   showText = true,
 }) => {
-  const { logoutUser } = useLogout()
+  const { logout } = useAuth()
 
   const handleLogout = async () => {
     try {
-      await logoutUser()
+      await logout()
     } catch (error) {
       console.error('Logout failed:', error)
     }

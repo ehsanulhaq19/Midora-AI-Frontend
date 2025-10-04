@@ -111,6 +111,17 @@ export interface SignupFormData {
   confirmPassword: string
 }
 
+export interface CompleteOnboardingRequest {
+  first_name?: string
+  last_name?: string
+  profession?: string[]
+}
+
+export interface CompleteOnboardingResponse {
+  success: boolean
+  message: string
+}
+
 // Backend response types
 export interface BackendSuccessResponse<T = any> {
   success: true
@@ -121,9 +132,18 @@ export interface BackendErrorResponse {
   success: false
   error_type: string
   error_message: string
+  error_id?: string
 }
 
 export type BackendResponse<T = any> = BackendSuccessResponse<T> | BackendErrorResponse
+
+// Error object structure for throw new Error
+export interface AuthErrorObject {
+  error_type: string
+  error_message: string
+  error_id?: string
+  status?: number
+}
 
 // API error types (legacy - keeping for backward compatibility)
 export interface ValidationError {

@@ -10,6 +10,9 @@ export { Spinner, ButtonLoader } from './loaders'
 // Slider components
 export { Slider } from './slider'
 
+// Dropdown components
+export { Dropdown, DropdownItem } from './dropdown'
+
 // Toast components
 export { Toast, ToastContainer, showSuccessToast, showErrorToast, showWarningToast, showInfoToast } from './toast'
 

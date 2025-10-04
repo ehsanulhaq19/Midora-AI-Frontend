@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { WelcomeStep, FullNameStep, ProfessionStep, PasswordStep, OTPVerificationStep, SuccessStep } from './'
 import { LogoOnly } from '@/icons/logo-only';
-import { authApi } from '@/api/auth/api'
 import { useToast } from '@/hooks/useToast'
+import { useAuth } from '@/hooks/use-auth'
 import { handleApiError } from '@/lib/error-handler'
 import { useAppDispatch } from '@/store/hooks'
 import { loginSuccess } from '@/store/slices/authSlice'
@@ -11,8 +11,10 @@ import { tokenManager } from '@/lib/token-manager'
 interface MultiStepContainerProps {
   onComplete: (data: { email: string; fullName: string; profession: string }) => void
   initialEmail?: string
+  initialPassword?: string
   initialFullName?: string
   isSSOOnboarding?: boolean
+  initialStep?: Step
   className?: string
 }
 
@@ -21,20 +23,26 @@ type Step = 'email' | 'welcome' | 'fullName' | 'profession' | 'password' | 'otp'
 export const MultiStepContainer: React.FC<MultiStepContainerProps> = ({ 
   onComplete, 
   initialEmail = '',
+  initialPassword = '',
   initialFullName = '',
   isSSOOnboarding = false,
+  initialStep,
   className 
 }) => {
   const dispatch = useAppDispatch()
-  const [currentStep, setCurrentStep] = useState<Step>(isSSOOnboarding ? 'welcome' : 'welcome')
+  const { verifyOTP, register, regenerateOTP, updateProfile, completeOnboarding, getCurrentUser } = useAuth()
+  const [currentStep, setCurrentStep] = useState<Step>(
+    initialStep || (isSSOOnboarding ? 'welcome' : 'welcome')
+  )
   const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('right')
   const [formData, setFormData] = useState({
     email: initialEmail,
     fullName: initialFullName,
     profession: '',
-    password: ''
+    password: initialPassword
   })
   const { success: showSuccessToast, error: showErrorToast } = useToast()
+  const isOtpEmailSend = useRef(false)
 
   const handleEmailSubmit = (email: string) => {
     setFormData(prev => ({ ...prev, email }))
@@ -81,13 +89,11 @@ export const MultiStepContainer: React.FC<MultiStepContainerProps> = ({
     setFormData(prev => ({ ...prev, password }))
     
     try {
-      // Split full name into first and last name
       const nameParts = formData.fullName.trim().split(' ')
       const firstName = nameParts[0] || ''
       const lastName = nameParts.slice(1).join(' ') || ''
 
-      // Call register API
-      const response = await authApi.register({
+      await register({
         email: formData.email,
         first_name: firstName,
         last_name: lastName,
@@ -97,13 +103,9 @@ export const MultiStepContainer: React.FC<MultiStepContainerProps> = ({
         }
       })
 
-      if (response.success) {
-        showSuccessToast('Registration Successful', 'Please check your email for OTP verification')
-        setSlideDirection('right')
-        setCurrentStep('otp')
-      } else {
-        throw new Error(response.error || 'Registration failed')
-      }
+      showSuccessToast('Registration Successful', 'Please check your email for OTP verification')
+      setSlideDirection('right')
+      setCurrentStep('otp')
     } catch (err: any) {
       console.error('Registration error:', err)
       showErrorToast('Registration Failed', handleApiError(err))
@@ -117,22 +119,18 @@ export const MultiStepContainer: React.FC<MultiStepContainerProps> = ({
 
   const handleOTPNext = async (otpCode: string) => {
     try {
-      const response = await authApi.verifyOTP({
+      await verifyOTP({
         email: formData.email,
         otp_code: otpCode
       })
 
-      if (response.success) {
-        showSuccessToast('Email Verified', 'Welcome to Midora!')
-        setSlideDirection('right')
-        setCurrentStep('success')
-      } else {
-        throw new Error(response.error || 'OTP verification failed')
-      }
+      showSuccessToast('Email Verified', 'Welcome to Midora!')
+      setSlideDirection('right')
+      setCurrentStep('success')
     } catch (err: any) {
       console.error('OTP verification error:', err)
       showErrorToast('OTP Verification Failed', handleApiError(err))
-      throw err // Re-throw to let OTP component handle the error
+      throw err
     }
   }
 
@@ -143,13 +141,8 @@ export const MultiStepContainer: React.FC<MultiStepContainerProps> = ({
 
   const handleOTPRegenerate = async () => {
     try {
-      const response = await authApi.regenerateOTP(formData.email)
-      
-      if (response.success) {
-        showSuccessToast('OTP Sent', 'A new OTP has been sent to your email')
-      } else {
-        throw new Error(response.error || 'Failed to regenerate OTP')
-      }
+      await regenerateOTP(formData.email)
+      showSuccessToast('OTP Sent', 'A new OTP has been sent to your email')
     } catch (err: any) {
       console.error('OTP regeneration error:', err)
       showErrorToast('Failed to Resend OTP', handleApiError(err))
@@ -164,38 +157,28 @@ export const MultiStepContainer: React.FC<MultiStepContainerProps> = ({
         const [firstName, ...lastNameParts] = formData.fullName.split(' ')
         const lastName = lastNameParts.join(' ')
         
-        const response = await authApi.updateProfile({
+        // Complete onboarding with profile data
+        await completeOnboarding({
           first_name: firstName,
           last_name: lastName,
-          profession: formData.profession
+          profession: [formData.profession]
         })
-
-        if (response.success) {
-          // Complete onboarding
-          const completeResponse = await authApi.completeOnboarding()
-          
-          if (completeResponse.success) {
-            // Get updated user data and store in Redux
-            const userResponse = await authApi.getCurrentUser()
-            if (userResponse.data) {
-              const tokens = tokenManager.getTokens()
-              dispatch(loginSuccess({
-                user: userResponse.data,
-                accessToken: tokens.accessToken!,
-                refreshToken: tokens.refreshToken!,
-                authMethod: (tokens.authMethod as 'email' | 'google' | 'microsoft' | 'github') || 'email'
-              }))
-            }
-            
-            showSuccessToast('Profile Complete', 'Welcome to Midora!')
-            // Redirect to chat
-            window.location.href = '/chat'
-          } else {
-            throw new Error(completeResponse.error || 'Failed to complete onboarding')
-          }
-        } else {
-          throw new Error(response.error || 'Failed to update profile')
+        
+        // Get updated user data and store in Redux
+        const userData = await getCurrentUser()
+        if (userData) {
+          const tokens = tokenManager.getTokens()
+          dispatch(loginSuccess({
+            user: userData,
+            accessToken: tokens.accessToken!,
+            refreshToken: tokens.refreshToken!,
+            authMethod: (tokens.authMethod as 'email' | 'google' | 'microsoft' | 'github') || 'email'
+          }))
         }
+        
+        showSuccessToast('Profile Complete', 'Welcome to Midora!')
+        // Redirect to chat
+        window.location.href = '/chat'
       } catch (err: any) {
         console.error('SSO onboarding completion error:', err)
         showErrorToast('Onboarding Failed', handleApiError(err))
@@ -276,6 +259,13 @@ export const MultiStepContainer: React.FC<MultiStepContainerProps> = ({
         return null
     }
   }
+
+  useEffect(() => {
+    if (initialStep == "otp" && formData.email && !isOtpEmailSend.current) {
+      isOtpEmailSend.current = true
+      regenerateOTP(formData.email)
+    }
+  }, [initialStep, formData.email])
 
   useEffect(() => {
     const timer = setTimeout(() => {

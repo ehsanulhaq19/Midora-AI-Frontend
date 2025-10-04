@@ -179,6 +179,24 @@ export const errors = {
   LOG_FORMAT_INVALID: 'Logging system error',
   LOG_LEVEL_INVALID: 'Logging system error',
 
+  // New error types for structured error handling
+  TOKEN_REFRESH_FAILED: 'Session refresh failed. Please sign in again',
+  USER_DATA_FETCH_FAILED: 'Failed to load user information. Please try again',
+  SSO_AUTH_URL_FAILED: 'Failed to get authorization URL. Please try again',
+  INVALID_STATE_PARAMETER: 'Invalid request parameter. Please try again',
+  UNSUPPORTED_SSO_PROVIDER: 'Unsupported authentication provider',
+  INVALID_SSO_RESPONSE: 'Invalid response from authentication provider',
+  OTP_VERIFICATION_FAILED: 'Verification code is invalid or expired',
+  LOGIN_FAILED: 'Login failed. Please check your credentials',
+  CONVERSATIONS_LOAD_FAILED: 'Failed to load conversations. Please try again',
+  CONVERSATION_CREATION_FAILED: 'Failed to create conversation. Please try again',
+  AI_MODELS_LOAD_FAILED: 'Failed to load AI models. Please try again',
+  MESSAGES_LOAD_FAILED: 'Failed to load messages. Please try again',
+  OTP_REGENERATION_FAILED: 'Failed to resend verification code. Please try again',
+  ONBOARDING_COMPLETION_FAILED: 'Failed to complete setup. Please try again',
+  PROFILE_UPDATE_FAILED: 'Failed to update profile. Please try again',
+  MISSING_CREDENTIALS: 'Email and password are required',
+
   // Generic fallback errors
   NETWORK_ERROR: 'Network error. Please check your connection',
   UNKNOWN_ERROR: 'An unexpected error occurred. Please try again',

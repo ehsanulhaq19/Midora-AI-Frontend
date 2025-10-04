@@ -1,0 +1,68 @@
+'use client'
+
+import React from 'react'
+import { cn } from '@/lib/utils'
+import { LogoOnly } from '@/icons/logo-only'
+
+interface ScreenLoaderProps {
+  message?: string
+  className?: string
+  size?: 'sm' | 'md' | 'lg'
+  fullScreen?: boolean
+}
+
+/**
+ * Elegant screen loader component with purple theme
+ * Clean design with smooth animations and no shadows
+ */
+export const ScreenLoader: React.FC<ScreenLoaderProps> = ({
+  message = 'Loading...',
+  className,
+  size = 'lg',
+  fullScreen = true
+}) => {
+  const sizeClasses = {
+    sm: 'h-8 w-8',
+    md: 'h-10 w-10',
+    lg: 'h-12 w-12'
+  }
+
+  const borderClasses = {
+    sm: 'border-2',
+    md: 'border-2',
+    lg: 'border-3'
+  }
+
+  const content = (
+    <div className={cn(
+      'flex flex-col items-center justify-center gap-6',
+      className
+    )}>
+      {/* Logo with circular animation */}
+      <div className="relative">
+        <div className="w-16 h-16 animate-spin" style={{ animation: 'spin 3s linear infinite' }}>
+          <LogoOnly className="w-full h-full" />
+        </div>
+      </div>
+      
+      {/* Loading message with elegant typography */}
+      <p className="text-sm font-medium text-gray-600 text-center max-w-xs leading-relaxed">
+        {message}
+      </p>
+    </div>
+  )
+
+  if (fullScreen) {
+    return (
+      <div className="fixed inset-0 bg-white z-50 flex items-center justify-center">
+        <div className="bg-white rounded-xl p-8">
+          {content}
+        </div>
+      </div>
+    )
+  }
+
+  return content
+}
+
+export default ScreenLoader

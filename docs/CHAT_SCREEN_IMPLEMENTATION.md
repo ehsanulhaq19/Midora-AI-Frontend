@@ -46,6 +46,7 @@ New icons have been added to `src/icons/`:
 - **Model Selection**: Dropdown to select AI model (Manual/Claude)
 - **Welcome Section**: Personalized greeting with user name
 - **Message Input**: Rich text input with attachment and voice input options
+- **Streaming Protection**: Input is disabled during AI response streaming to prevent interruption
 
 ### Navigation Sidebar
 
@@ -112,6 +113,49 @@ const handleSendMessage = (message: string) => {
   // TODO: Implement message sending logic here
 }
 ```
+
+## Streaming Response Management
+
+The chat interface implements streaming response protection to ensure a smooth user experience:
+
+### Message Submission Control
+
+When an AI response is being streamed (`isStreaming = true`), the following controls are disabled:
+
+- **Text Input**: The message textarea is disabled to prevent new input
+- **Submit Button**: The send button is disabled and shows "Waiting for AI response..."
+- **Attachment Buttons**: Add attachment and voice input buttons are disabled
+- **Model Selection**: The model dropdown is disabled to prevent changes during streaming
+- **Keyboard Submission**: Enter key submission is blocked during streaming
+
+### Implementation Details
+
+```typescript
+// MessageInput component receives isStreaming prop
+interface MessageInputProps {
+  onSend: (message: string, modelUuid?: string) => void
+  isStreaming?: boolean
+}
+
+// Streaming state flows from Redux store through component hierarchy
+ChatScreen -> ChatInterface -> MessageInput
+```
+
+### User Experience
+
+- **Visual Feedback**: Placeholder text changes to "Waiting for AI response..." during streaming
+- **Disabled State**: All interactive elements show disabled styling
+- **Accessibility**: Proper ARIA labels indicate the waiting state
+- **Prevention**: Users cannot interrupt ongoing AI responses by submitting new messages
+
+### State Management
+
+The streaming state is managed in the Redux store (`conversationSlice`):
+
+- `isStreaming: boolean` - Indicates if AI response is being streamed
+- `startStreaming()` - Action to begin streaming state
+- `completeStreaming()` - Action to end streaming state
+- `stopStreaming()` - Action to stop streaming (error case)
 
 ## File Structure
 

@@ -1,12 +1,14 @@
 import { configureStore } from '@reduxjs/toolkit'
 import authReducer from './slices/authSlice'
 import conversationReducer from './slices/conversationSlice'
+import aiModelsReducer from './slices/aiModelsSlice'
 import toastReducer from './slices/toastSlice'
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
     conversation: conversationReducer,
+    aiModels: aiModelsReducer,
     toast: toastReducer,
   },
   middleware: (getDefaultMiddleware) =>
