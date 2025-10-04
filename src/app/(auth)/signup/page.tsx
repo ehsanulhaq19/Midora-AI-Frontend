@@ -34,112 +34,50 @@ function SignupPageContent() {
   const [isProcessingSSO, setIsProcessingSSO] = useState(false)
   const [initialOnboardingStep, setInitialOnboardingStep] = useState<string | undefined>(undefined)
 
-  // Handle SSO callback with tokens in query parameters
+  // Handle SSO onboarding from stored tokens (new flow)
   useEffect(() => {
-    const processSSOCallback = async () => {
-      const accessToken = searchParams.get('access_token')
-      const refreshToken = searchParams.get('refresh_token')
-      const authMethod = searchParams.get('auth_method')
-      const error = searchParams.get('error')
-      const errorMessage = searchParams.get('message')
-
-      // Handle SSO error
-      if (error) {
-        console.error('SSO Error:', errorMessage)
-        const errorMsg = errorMessage || 'SSO authentication failed'
-        showErrorToast('SSO Error', errorMsg)
-        
-        // Remove error query params
-        const newUrl = new URL(window.location.href)
-        newUrl.searchParams.delete('error')
-        newUrl.searchParams.delete('message')
-        window.history.replaceState({}, '', newUrl.toString())
-        return
-      }
-
-      // Process SSO success with tokens
-      if (accessToken && refreshToken && authMethod) {
-        setIsProcessingSSO(true)
-        dispatch(setLoading(true))
-        dispatch(setError(null))
-
+    const checkSSOOnboarding = async () => {
+      // Check if we have valid tokens and user is not authenticated
+      const tokens = tokenManager.getTokens()
+      if (tokens.accessToken && tokens.refreshToken && !isProcessingSSO) {
         try {
-          // Store tokens using token manager
-          tokenManager.storeTokens(accessToken, refreshToken, authMethod)
-          
-          // Also store in cookies for middleware access
-          setTokens(accessToken, refreshToken)
-
           // Get user details from backend
           const userData = await getCurrentUser()
-          
-          if (userData) {
-            // Store auth data in Redux
+          if (userData && !userData.is_onboarded) { 
+            // Store user data for SSO onboarding
+            updateData({ 
+              email: userData.email,
+              fullName: `${userData.first_name} ${userData.last_name}`.trim()
+            })
+            // Show SSO onboarding flow
+            setIsSSOOnboarding(true)
+            setShowOnboarding(true)
+          } else if (userData && userData.is_onboarded) {
+            // User is already onboarded, redirect to chat
             dispatch(loginSuccess({
               user: userData,
-              accessToken,
-              refreshToken,
-              authMethod: authMethod as 'google' | 'microsoft' | 'github'
+              accessToken: tokens.accessToken,
+              refreshToken: tokens.refreshToken,
+              authMethod: (tokens.authMethod as 'google' | 'microsoft' | 'github') || 'email'
             }))
-
-            // Remove query params
-            const newUrl = new URL(window.location.href)
-            newUrl.searchParams.delete('access_token')
-            newUrl.searchParams.delete('refresh_token')
-            newUrl.searchParams.delete('auth_method')
-            window.history.replaceState({}, '', newUrl.toString())
-
-            // Check if user needs onboarding
-            if (!userData.is_onboarded) {
-              // Store user data for SSO onboarding
-              updateData({ 
-                email: userData.email,
-                fullName: `${userData.first_name} ${userData.last_name}`.trim()
-              })
-              
-              // Show SSO onboarding flow in same page
-              setIsSSOOnboarding(true)
-              setShowOnboarding(true)
-            } else {
-              // Redirect to chat page
-              router.push('/chat')
-            }
-          } else {
-            throw new Error('Failed to get user information')
+            router.push('/chat')
           }
         } catch (err: any) {
-          console.error('SSO callback processing error:', err)
-          
-          // Clear tokens on error
+          console.error('SSO onboarding check error:', err)
+          // Clear invalid tokens
           tokenManager.clearTokens()
-          
-          // Remove query params
-          const newUrl = new URL(window.location.href)
-          newUrl.searchParams.delete('access_token')
-          newUrl.searchParams.delete('refresh_token')
-          newUrl.searchParams.delete('auth_method')
-          window.history.replaceState({}, '', newUrl.toString())
-          
-          // Show error
-          const errorMessage = handleApiError(err)
-          showErrorToast('Authentication Error', errorMessage)
-          dispatch(setError(errorMessage))
         } finally {
-          setIsProcessingSSO(false)
           dispatch(setLoading(false))
         }
       }
     }
 
-    // Only run if there are relevant search params
-    if (searchParams.has('access_token') || searchParams.has('error')) {
-      processSSOCallback().catch((error) => {
-        console.error('SSO callback error:', error)
-        dispatch(setError('SSO authentication failed'))
-        dispatch(setLoading(false))
-      })
+    // Only check if we're not already processing SSO and no query params
+    if (!isProcessingSSO && searchParams.has('access_token') && searchParams.has('refresh_token')) {
+      tokenManager.storeTokens(searchParams.get('access_token')!, searchParams.get('refresh_token')!, searchParams.get('auth_method')!)
+      checkSSOOnboarding()
     }
-  }, [searchParams, dispatch, router, showErrorToast])
+  }, [dispatch, router, isProcessingSSO, searchParams])
 
   const handleOnboardingComplete = async (onboardingData: { email: string; fullName: string; profession: string }) => {
     try {
@@ -154,7 +92,6 @@ function SignupPageContent() {
           last_name: lastName,
           profession: [onboardingData.profession]
         })
-        
         // Redirect to chat
         router.push('/chat')
       } else {
@@ -174,7 +111,6 @@ function SignupPageContent() {
     }
     setShowOnboarding(true)
   }
-
   // Show onboarding flow in full screen blank layout if needed
   if (showOnboarding) {
     return (

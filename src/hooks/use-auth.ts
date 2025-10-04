@@ -84,7 +84,6 @@ export const useAuth = (): UseAuthReturn => {
       }
 
       if (response.data) {
-        console.log('Login successful, storing tokens...', response.data)
         const { access_token, refresh_token } = response.data
         
         setTokens(access_token, refresh_token)
@@ -115,7 +114,6 @@ export const useAuth = (): UseAuthReturn => {
           const returnUrl = urlParams.get('returnUrl') || '/chat'
           router.push(returnUrl)
         } catch (redirectError) {
-          console.error('Redirect error:', redirectError)
           router.push('/chat')
         }
       }
@@ -542,14 +540,6 @@ export const useAuth = (): UseAuthReturn => {
       }
 
       if (response.data) {
-        // Store auth data in Redux
-        dispatch(loginSuccess({
-          user: response.data.user,
-          accessToken: response.data.access_token,
-          refreshToken: response.data.refresh_token,
-          authMethod: provider
-        }))
-
         // Store tokens using token manager
         tokenManager.storeTokens(
           response.data.access_token,
@@ -563,8 +553,23 @@ export const useAuth = (): UseAuthReturn => {
         // Clear the state from sessionStorage
         sessionStorage.removeItem('sso_state')
 
-        // Redirect to chat page
-        router.push('/chat')
+        // Check if user needs onboarding
+        if (!response.data.user.is_onboarded) {
+          // Redirect to signup page with SSO onboarding flow
+          // The signup page will handle the onboarding process
+          router.push('/signup')
+        } else {
+          // Store auth data in Redux and redirect to chat
+          dispatch(loginSuccess({
+            user: response.data.user,
+            accessToken: response.data.access_token,
+            refreshToken: response.data.refresh_token,
+            authMethod: provider
+          }))
+          
+          // Redirect to chat page
+          router.push('/chat')
+        }
       } else {
         const errorObject = {
           error_type: 'INVALID_SSO_RESPONSE',
@@ -637,7 +642,6 @@ export const useAuth = (): UseAuthReturn => {
           )
           
           setTokens(loginResponse.data.access_token, loginResponse.data.refresh_token)
-          
           router.push('/chat')
         } else {
           const errorObject = {

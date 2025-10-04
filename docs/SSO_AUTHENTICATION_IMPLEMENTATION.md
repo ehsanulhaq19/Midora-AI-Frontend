@@ -48,13 +48,22 @@ This document describes the implementation of Single Sign-On (SSO) authenticatio
    - Callback page extracts code and state from URL parameters
    - State is verified against stored value for CSRF protection
    - Authorization code is exchanged for access token via backend API
-   - User data is retrieved and stored in Redux
-   - User is redirected to chat page
+   - User data is retrieved and onboarding status is checked
+   - If user is not onboarded, redirect to signup page for onboarding flow
+   - If user is onboarded, store data in Redux and redirect to chat page
 
 3. **Token Management**
    - Access and refresh tokens are stored in localStorage
    - Authentication method is tracked in Redux store
    - Tokens are automatically included in API requests via interceptors
+
+4. **SSO Onboarding Flow**
+   - For new SSO users, a streamlined onboarding process is triggered
+   - User sees: Welcome → Full Name (pre-filled) → Profession → Success
+   - Full name is automatically populated from SSO provider data
+   - No password or email verification steps required
+   - Onboarding completion calls `completeOnboarding` API with profile data
+   - User is redirected to chat page after successful onboarding
 
 ### Email/Password Authentication Flow
 
@@ -69,6 +78,32 @@ This document describes the implementation of Single Sign-On (SSO) authenticatio
    - System checks if email exists
    - If exists, user is prompted for password (login flow)
    - If new, user proceeds through multi-step registration
+
+## Onboarding Flows
+
+The application supports two distinct onboarding flows depending on how the user authenticates:
+
+### 1. Email Signup Onboarding Flow
+For users who sign up with email and password:
+1. **Welcome Screen** - Introduction to the platform
+2. **Full Name Screen** - User enters their full name
+3. **Profession Screen** - User selects their profession
+4. **Password Screen** - User sets their password
+5. **Email Verification Screen** - User verifies email with OTP
+6. **Success Screen** - Account setup complete, redirect to chat
+
+### 2. SSO Onboarding Flow
+For users who authenticate via SSO providers (Google, Microsoft, GitHub):
+1. **Welcome Screen** - Introduction to the platform
+2. **Full Name Screen** - Pre-filled with SSO provider data, user can edit
+3. **Profession Screen** - User selects their profession
+4. **Success Screen** - Profile complete, redirect to chat
+
+**Key Differences:**
+- SSO users skip password and email verification steps
+- Full name is automatically populated from SSO provider
+- Streamlined 4-step process vs 6-step email signup process
+- Both flows end with the same success screen and chat redirect
 
 ## API Endpoints
 
@@ -147,12 +182,19 @@ src/
 │   └── auth/
 │       ├── AuthGuard.tsx       # Route protection component
 │       ├── AuthInitializer.tsx # Auth state initialization
-│       └── signup-form-section.tsx # Signup form with SSO buttons
+│       ├── signup-form-section.tsx # Signup form with SSO buttons
+│       └── signup-steps/       # Onboarding flow components
+│           ├── multi-step-container.tsx # Main onboarding container
+│           ├── welcome-step.tsx         # Welcome screen
+│           ├── full-name-step.tsx       # Full name input
+│           ├── profession-step.tsx      # Profession selection
+│           ├── password-step.tsx        # Password setup
+│           ├── otp-verification-step.tsx # Email verification
+│           └── success-step.tsx         # Completion screen
 ├── hooks/
-│   ├── useSSO.ts              # SSO authentication hook
-│   ├── useLogin.ts            # Email/password login hook
-│   ├── useLogout.ts           # Logout functionality hook
-│   └── useAuthInit.ts         # Auth state initialization hook
+│   ├── use-auth.ts            # Main authentication hook with SSO support
+│   ├── useAuthInit.ts         # Auth state initialization hook
+│   └── useAuthRedux.ts        # Redux authentication hook
 ├── store/
 │   └── slices/
 │       └── authSlice.ts       # Redux authentication slice
@@ -175,9 +217,9 @@ src/
 ### Using SSO Authentication
 
 ```typescript
-import { useSSO } from '@/hooks/useSSO'
+import { useAuth } from '@/hooks/use-auth'
 
-const { signInWithGoogle, signInWithMicrosoft, signInWithGitHub } = useSSO()
+const { signInWithGoogle, signInWithMicrosoft, signInWithGitHub } = useAuth()
 
 // Initiate Google SSO
 const handleGoogleSignIn = () => {
@@ -202,12 +244,12 @@ export default function ProtectedPage() {
 ### Using Logout
 
 ```typescript
-import { useLogout } from '@/hooks/useLogout'
+import { useAuth } from '@/hooks/use-auth'
 
-const { logoutUser } = useLogout()
+const { logout } = useAuth()
 
 const handleLogout = () => {
-  logoutUser()
+  logout()
 }
 ```
 
@@ -312,6 +354,13 @@ Configure OAuth providers with correct redirect URIs:
    - Check Redux store initialization
    - Verify token validation logic
    - Check for race conditions in auth initialization
+
+4. **SSO Onboarding Issues**
+   - Verify user data is properly fetched from `getCurrentUser` API
+   - Check if `is_onboarded` flag is correctly set in user data
+   - Ensure full name is properly populated from SSO provider data
+   - Verify `completeOnboarding` API call includes correct profile data
+   - Check for proper token storage before onboarding flow starts
 
 ### Debug Tools
 

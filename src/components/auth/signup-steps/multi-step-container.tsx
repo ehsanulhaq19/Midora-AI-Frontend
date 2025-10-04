@@ -7,6 +7,7 @@ import { handleApiError } from '@/lib/error-handler'
 import { useAppDispatch } from '@/store/hooks'
 import { loginSuccess } from '@/store/slices/authSlice'
 import { tokenManager } from '@/lib/token-manager'
+import { useRouter } from 'next/navigation'
 
 interface MultiStepContainerProps {
   onComplete: (data: { email: string; fullName: string; profession: string }) => void
@@ -31,6 +32,7 @@ export const MultiStepContainer: React.FC<MultiStepContainerProps> = ({
 }) => {
   const dispatch = useAppDispatch()
   const { verifyOTP, register, regenerateOTP, updateProfile, completeOnboarding, getCurrentUser } = useAuth()
+  const router = useRouter()
   const [currentStep, setCurrentStep] = useState<Step>(
     initialStep || (isSSOOnboarding ? 'welcome' : 'welcome')
   )
@@ -161,7 +163,7 @@ export const MultiStepContainer: React.FC<MultiStepContainerProps> = ({
         await completeOnboarding({
           first_name: firstName,
           last_name: lastName,
-          profession: [formData.profession]
+          profession: formData.profession
         })
         
         // Get updated user data and store in Redux
@@ -176,9 +178,7 @@ export const MultiStepContainer: React.FC<MultiStepContainerProps> = ({
           }))
         }
         
-        showSuccessToast('Profile Complete', 'Welcome to Midora!')
-        // Redirect to chat
-        window.location.href = '/chat'
+        router.push('/chat')
       } catch (err: any) {
         console.error('SSO onboarding completion error:', err)
         showErrorToast('Onboarding Failed', handleApiError(err))
@@ -212,6 +212,7 @@ export const MultiStepContainer: React.FC<MultiStepContainerProps> = ({
             <FullNameStep 
               onNext={handleFullNameNext} 
               onBack={handleFullNameBack}
+              initialName={formData.fullName}
             />
           </div>
         )

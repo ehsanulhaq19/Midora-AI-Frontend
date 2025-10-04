@@ -15,15 +15,19 @@ export const AuthRedirect: React.FC<AuthRedirectProps> = ({
   redirectTo = '/chat' 
 }) => {
   const router = useRouter()
-  const { isAuthenticated, isLoading } = useAppSelector((state) => state.auth)
+  const { isAuthenticated, isLoading, user } = useAppSelector((state) => state.auth)
 
   useEffect(() => {
     if (!isLoading) {
       const hasValidTokens = tokenManager.hasValidTokens()
-      
+
+      if (!user?.is_onboarded) {
+        return 
+      } 
       if (isAuthenticated || hasValidTokens) {
         router.push(redirectTo)
       }
+      
     }
   }, [isAuthenticated, isLoading, router, redirectTo])
 
@@ -31,7 +35,7 @@ export const AuthRedirect: React.FC<AuthRedirectProps> = ({
     return null
   }
 
-  if (isAuthenticated || tokenManager.hasValidTokens()) {
+  if ((isAuthenticated || tokenManager.hasValidTokens()) && user?.is_onboarded) {
     return null
   }
 
