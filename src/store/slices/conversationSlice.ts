@@ -11,6 +11,7 @@ const initialState: ConversationState = {
   error: null,
   isStreaming: false,
   streamingContent: '',
+  streamingMetadata: null,
   aiModels: [],
   selectedModel: null,
   pagination: {},
@@ -113,10 +114,13 @@ const conversationSlice = createSlice({
     // Add a message to a conversation
     addMessage: (state, action: PayloadAction<{ conversationUuid: string; message: Message }>) => {
       const { conversationUuid, message } = action.payload
-      if (!state.messages[conversationUuid]) {
-        state.messages[conversationUuid] = []
+      // Only add message if it's not null or undefined
+      if (message) {
+        if (!state.messages[conversationUuid]) {
+          state.messages[conversationUuid] = []
+        }
+        state.messages[conversationUuid].push(message)
       }
-      state.messages[conversationUuid].push(message)
     },
 
     // Update a message
@@ -150,6 +154,7 @@ const conversationSlice = createSlice({
     startStreaming: (state) => {
       state.isStreaming = true
       state.streamingContent = ''
+      state.streamingMetadata = null
     },
 
     // Update streaming content
@@ -162,25 +167,48 @@ const conversationSlice = createSlice({
       state.streamingContent = action.payload
     },
 
+    // Set streaming metadata (for metadata stream responses)
+    setStreamingMetadata: (state, action: PayloadAction<{ 
+      message_type?: string
+      selected_model?: string
+      selected_provider?: string
+      query_category?: string
+      rank?: number
+    } | null>) => {
+      state.streamingMetadata = action.payload
+    },
+
     // Complete streaming
     completeStreaming: (state, action: PayloadAction<{ conversationUuid: string; content: string; metadata: any }>) => {
       state.isStreaming = false
       state.streamingContent = ''
       
-      // Add the complete AI message to the conversation
+      // Add the complete AI message to the conversation only if message exists (not null)
       const { conversationUuid, content, metadata } = action.payload
-      const aiMessage: Message = metadata.message
       
-      if (!state.messages[conversationUuid]) {
-        state.messages[conversationUuid] = []
+      if (metadata.message) {
+        const aiMessage: Message = metadata.message
+        
+        // Add model_name from streamingMetadata if available
+        if (state.streamingMetadata?.selected_model) {
+          aiMessage.model_name = state.streamingMetadata.selected_model
+        }
+        
+        if (!state.messages[conversationUuid]) {
+          state.messages[conversationUuid] = []
+        }
+        state.messages[conversationUuid].push(aiMessage)
       }
-      state.messages[conversationUuid].push(aiMessage)
+      
+      // Clear streaming metadata after completion
+      state.streamingMetadata = null
     },
 
     // Stop streaming
     stopStreaming: (state) => {
       state.isStreaming = false
       state.streamingContent = ''
+      state.streamingMetadata = null
     },
 
     // Clear all conversation data
@@ -190,6 +218,7 @@ const conversationSlice = createSlice({
       state.messages = {}
       state.isStreaming = false
       state.streamingContent = ''
+      state.streamingMetadata = null
       state.conversationPagination = null
     },
 
@@ -227,6 +256,7 @@ export const {
   startStreaming,
   updateStreamingContent,
   setStreamingContent,
+  setStreamingMetadata,
   completeStreaming,
   stopStreaming,
   clearConversations,

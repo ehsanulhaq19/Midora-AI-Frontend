@@ -73,17 +73,19 @@ export interface GenerateContentResponse {
 
 // Streaming response types
 export interface StreamingResponse {
-  type: 'metadata' | 'content' | 'completion' | 'error' | 'unethical'
+  type: 'metadata' | 'meta_data' | 'model_selection' | 'content' | 'completion' | 'error' | 'unethical' | 'initial_metadata'
   conversation_uuid?: string
   message_id?: string
   chunk?: string
+  message_type?: string
   model_used?: string
   query_category?: string
   selected_provider?: string
   selected_model?: string
+  rank?: number
   ai_message_id?: string
   error?: string
-  message?: string
+  message?: string | null
 }
 
 // Streaming callback types

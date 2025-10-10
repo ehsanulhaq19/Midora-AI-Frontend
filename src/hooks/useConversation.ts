@@ -21,6 +21,7 @@ import {
   removeMessage,
   startStreaming,
   setStreamingContent,
+  setStreamingMetadata,
   completeStreaming,
   stopStreaming,
 } from '@/store/slices/conversationSlice'
@@ -40,6 +41,7 @@ export const useConversation = () => {
     error,
     isStreaming,
     streamingContent,
+    streamingMetadata,
     pagination,
     isLoadingMore,
     conversationPagination,
@@ -203,21 +205,40 @@ export const useConversation = () => {
       // Generate AI response with streaming
       await aiApi.generateContentStream(
         { query: content, conversation_uuid: targetConversationUuid, stream: true, ai_model_uuid: modelUuid },
-        (chunk: string) => {
-          accumulatedContent += chunk
-          streamingBuffer += chunk
-          
-          // Throttle UI updates for smoother performance
-          const now = Date.now()
-          if (now - lastUpdateTime >= UPDATE_THROTTLE) {
-            dispatch(setStreamingContent(streamingBuffer))
-            lastUpdateTime = now
+        (chunk: string, type: string, metadata?: any) => {
+          if (type === 'metadata') {
+            // Handle metadata stream responses - update metadata state only
+            if (metadata?.message_type) {
+              dispatch(setStreamingMetadata({ message_type: metadata.message_type }))
+            }
+          } else if (type === 'model_selection') {
+            // Handle model selection stream responses
+            dispatch(setStreamingMetadata({
+              selected_model: metadata?.selected_model,
+              selected_provider: metadata?.selected_provider,
+              query_category: metadata?.query_category,
+              rank: metadata?.rank
+            }))
+          } else {
+            // Handle regular content chunks
+            accumulatedContent += chunk
+            streamingBuffer += chunk
+            
+            // Throttle UI updates for smoother performance
+            const now = Date.now()
+            if (now - lastUpdateTime >= UPDATE_THROTTLE) {
+              dispatch(setStreamingContent(streamingBuffer))
+              lastUpdateTime = now
+            }
           }
         },
         (metadata: any) => {
           if (metadata.type == "initial_metadata") {
             dispatch(removeMessage({ conversationUuid: targetConversationUuid!, messageUuid: messageUuid }))
-            dispatch(addMessage({ conversationUuid: targetConversationUuid!, message: metadata.message }))
+            // Only add message if it exists (not null)
+            if (metadata.message) {
+              dispatch(addMessage({ conversationUuid: targetConversationUuid!, message: metadata.message }))
+            }
           } else {
             // Ensure final content is displayed
             dispatch(setStreamingContent(streamingBuffer))
@@ -336,6 +357,7 @@ export const useConversation = () => {
     error,
     isStreaming,
     streamingContent,
+    streamingMetadata,
     pagination: currentConversation ? pagination[currentConversation.uuid] : null,
     isLoadingMore,
     conversationPagination,

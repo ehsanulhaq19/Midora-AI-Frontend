@@ -25,10 +25,8 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   
   if (isCompact) {
     return (
-      <div className="p-4">
-        <div className="max-w-[698px] mx-auto">
-          <MessageInput onSend={onSendMessage} isStreaming={isStreaming} />
-        </div>
+      <div className="w-full max-w-[808px] max-h-[106px] mx-auto p-4">
+        <MessageInput onSend={onSendMessage} isStreaming={isStreaming} className="max-w-[808px]" textAreaClassName="!text-[length:var(--text-medium-font-size)]"/>
       </div>
     )
   }
@@ -58,7 +56,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       </div>
 
       {/* Welcome Section */}
-      <div className="flex flex-col w-full max-w-[698px] items-center gap-6 relative flex-[0_0_auto]">
+      <div className="flex flex-col w-full max-w-[808px] items-center gap-6 relative flex-[0_0_auto] mx-auto">
         <div className="inline-flex items-center gap-[15px] relative flex-[0_0_auto]">
           <div className="flex flex-col w-[37px] h-9 items-start gap-2.5 relative aspect-[1.02]">
             <LogoOnly className="relative self-stretch w-full mb-[-0.45px] aspect-[1.02]" />

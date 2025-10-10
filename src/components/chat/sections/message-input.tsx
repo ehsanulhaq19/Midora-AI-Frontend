@@ -11,9 +11,11 @@ import { t } from '@/i18n'
 interface MessageInputProps {
   onSend: (message: string, modelUuid?: string) => void
   isStreaming?: boolean
+  className?: string
+  textAreaClassName?: string
 }
 
-export const MessageInput: React.FC<MessageInputProps> = ({ onSend, isStreaming = false }) => {
+export const MessageInput: React.FC<MessageInputProps> = ({ onSend, isStreaming = false, className = '', textAreaClassName = '' }) => {
   const [message, setMessage] = useState('')
   // Using t function from i18n
   const {
@@ -52,7 +54,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({ onSend, isStreaming 
   }
 
   return (
-    <div className="relative w-full bg-[color:var(--tokens-color-surface-surface-neutral)] rounded-[var(--premitives-corner-radius-corner-radius-3)] min-h-[120px]">
+    <div className={`relative w-full max-w-[698px] max-h-[152px] mx-auto bg-[color:var(--tokens-color-surface-surface-neutral)] rounded-[var(--premitives-corner-radius-corner-radius-3)] min-h-[120px] ${className}`}>
       <form onSubmit={handleSubmit} className="relative w-full h-full">
         {/* Textarea covering the whole component */}
         <TextareaInput
@@ -60,7 +62,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({ onSend, isStreaming 
           onChange={(e) => setMessage(e.target.value)}
           onKeyPress={handleKeyPress}
           placeholder={isStreaming ? t('chat.waitingForResponse') : t('chat.howCanIHelp')}
-          className="w-full border-none h-full px-4 pt-4 pb-16 text-lg lg:text-xl font-text-large font-[number:var(--text-large-font-weight)] text-[color:var(--tokens-color-text-text-primary)] placeholder-[color:var(--tokens-color-text-text-brand)] [font-style:var(--text-large-font-style)] min-h-[120px] max-h-[200px] resize-none"
+          className={`w-full border-none h-full px-4 pt-4 pb-16 text-lg lg:text-xl font-text-large font-[number:var(--text-large-font-weight)] text-[color:var(--tokens-color-text-text-primary)] placeholder-[color:var(--tokens-color-text-text-brand)] [font-style:var(--text-large-font-style)] min-h-[120px] max-h-[200px] resize-none ${textAreaClassName}`}
           variant="outline"
           disabled={isStreaming}
         />

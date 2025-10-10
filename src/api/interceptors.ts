@@ -6,6 +6,7 @@
 import { appConfig } from '@/config/app'
 import { handleApiError } from '@/lib/error-handler'
 import { tokenManager } from '@/lib/token-manager'
+import { handle401WithReload, resetReloadCount } from '@/lib/reload-counter'
 
 /**
  * Get access token using token manager
@@ -91,6 +92,18 @@ export async function enhancedResponseInterceptor(response: Response): Promise<R
   // This interceptor is mainly for logging and monitoring
   if (!response.ok) {
     console.warn(`API Error Response: ${response.status} ${response.statusText}`)
+    
+    // Handle 401 Unauthorized errors with reload logic
+    if (response.status === 401) {
+      console.error('401 Unauthorized error detected')
+      // Trigger reload with retry limit
+      handle401WithReload()
+    }
+  } else {
+    // Reset reload counter on successful request
+    if (response.status >= 200 && response.status < 300) {
+      resetReloadCount()
+    }
   }
   
   return response

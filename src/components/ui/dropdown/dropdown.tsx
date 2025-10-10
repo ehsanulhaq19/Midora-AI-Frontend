@@ -61,8 +61,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
   const getButtonClasses = () => {
     if (variant === 'model-selector') {
       return `
-        inline-flex items-center justify-between w-full px-3 py-2 
-        bg-[color:var(--tokens-color-surface-surface-primary)] 
+        inline-flex items-center justify-between w-full py-2 
         border border-[color:var(--tokens-color-border-border-subtle)] 
         rounded-[var(--premitives-corner-radius-corner-radius-2)]
         text-left cursor-pointer transition-colors duration-200
@@ -71,8 +70,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
     }
     
     return `
-      inline-flex items-center justify-between w-full px-3 py-2 
-      bg-[color:var(--tokens-color-surface-surface-button-pressed)] 
+      inline-flex items-center justify-between w-full py-2 
       border border-transparent rounded-[var(--premitives-corner-radius-corner-radius-2)]
       text-left cursor-pointer transition-colors duration-200 h-[25px]
       ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-opacity-80'}
@@ -92,8 +90,25 @@ export const Dropdown: React.FC<DropdownProps> = ({
   const getButtonContent = () => {
     if (variant === 'model-selector') {
       return (
-        <div className="flex items-center gap-2 mr-[10px]">
-          <span className="font-text-small font-[number:var(--text-small-font-weight)] text-[color:var(--tokens-color-text-text-brand)] text-[length:var(--text-small-font-size)] tracking-[var(--text-small-letter-spacing)] leading-[var(--text-small-line-height)] whitespace-nowrap [font-style:var(--text-small-font-style)]">
+        <div className="flex items-center gap-2">
+          {modeText && (
+            <span className="font-text-medium font-[number:var(--text-medium-font-weight)] text-tokens-color-text-text-neutral text-[length:var(--text-medium-font-size)] tracking-[var(--text-medium-letter-spacing)] leading-[var(--text-medium-line-height)] whitespace-nowrap [font-style:var(--text-medium-font-style)]">
+              {modeText}
+            </span>
+          )}
+          {selectedOption?.icon && (
+            <div className="flex-shrink-0">
+              {selectedOption.icon}
+            </div>
+          )}
+          {selectedOption?.image && (
+            <img
+              src={selectedOption.image}
+              alt={selectedOption.label}
+              className="w-4 h-4 rounded flex-shrink-0"
+            />
+          )}
+          <span className="font-text-medium font-[number:var(--text-medium-font-weight)] text-[color:var(--tokens-color-text-text-brand)] text-[length:var(--text-medium-font-size)] tracking-[var(--text-medium-letter-spacing)] leading-[var(--text-medium-line-height)] whitespace-nowrap [font-style:var(--text-medium-font-style)]">
             {selectedOption?.label || placeholder}
           </span>
         </div>
@@ -101,9 +116,9 @@ export const Dropdown: React.FC<DropdownProps> = ({
     }
 
     return (
-      <div className="flex items-center gap-2 mr-[10px]">
+      <div className="flex items-center gap-2">
         {modeText && (
-          <span className="font-text-small font-[number:var(--text-small-font-weight)] text-tokens-color-text-text-neutral text-[length:var(--text-small-font-size)] tracking-[var(--text-small-letter-spacing)] leading-[var(--text-small-line-height)] whitespace-nowrap [font-style:var(--text-small-font-style)]">
+          <span className="font-text-medium font-[number:var(--text-medium-font-weight)] text-tokens-color-text-text-neutral text-[length:var(--text-medium-font-size)] tracking-[var(--text-medium-letter-spacing)] leading-[var(--text-medium-line-height)] whitespace-nowrap [font-style:var(--text-medium-font-style)]">
             {modeText}
           </span>
         )}
@@ -112,6 +127,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
             {selectedOption.icon}
           </div>
         )}
+
         {selectedOption?.image && (
           <img
             src={selectedOption.image}
@@ -119,7 +135,13 @@ export const Dropdown: React.FC<DropdownProps> = ({
             className="w-4 h-4 rounded flex-shrink-0"
           />
         )}
-        <span className="font-text-small font-[number:var(--text-small-font-weight)] text-tokens-color-text-text-neutral text-[length:var(--text-small-font-size)] tracking-[var(--text-small-letter-spacing)] leading-[var(--text-small-line-height)] whitespace-nowrap [font-style:var(--text-small-font-style)]">
+
+        <ArrowDownSm 
+          color={variant === 'model-selector' ? "rgba(31, 23, 64, 0.9)" : "#FFFFFF"} 
+          className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+        />
+
+        <span className="font-text-medium font-[number:var(--text-medium-font-weight)] text-tokens-color-text-text-neutral text-[length:var(--text-medium-font-size)] tracking-[var(--text-medium-letter-spacing)] leading-[var(--text-medium-line-height)] whitespace-nowrap [font-style:var(--text-medium-font-style)]">
           {selectedOption?.label || placeholder}
         </span>
       </div>
@@ -135,10 +157,6 @@ export const Dropdown: React.FC<DropdownProps> = ({
         disabled={disabled}
       >
         {getButtonContent()}
-        <ArrowDownSm 
-          color={variant === 'model-selector' ? "#6B4392" : "#FFFFFF"} 
-          className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
-        />
       </button>
 
       {isOpen && (

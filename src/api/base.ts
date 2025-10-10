@@ -6,6 +6,7 @@
 import { appConfig } from '@/config/app'
 import { requestInterceptor } from './interceptors'
 import { handleApiError } from '@/lib/error-handler'
+import { handle401WithReload, resetReloadCount } from '@/lib/reload-counter'
 
 export interface ApiResponse<T = any> {
   data?: T
@@ -103,6 +104,12 @@ class BaseApiClient {
       clearTimeout(timeoutId)
 
       if (!response.ok) {
+        // Handle 401 Unauthorized errors with reload logic
+        if (response.status === 401) {
+          console.error('401 Unauthorized error detected in GET request')
+          handle401WithReload()
+        }
+        
         // Try to parse error response from backend
         let errorData: any = null
         try {
@@ -128,6 +135,9 @@ class BaseApiClient {
         }
       }
 
+      // Reset reload counter on successful request
+      resetReloadCount()
+      
       const responseData = await response.json()
       return this.processResponseData<T>(responseData, response)
     } catch (error) {
@@ -185,6 +195,12 @@ class BaseApiClient {
 
       console.log('--------Response:', response)
       if (!response.ok) {
+        // Handle 401 Unauthorized errors with reload logic
+        if (response.status === 401) {
+          console.error('401 Unauthorized error detected in POST request')
+          handle401WithReload()
+        }
+        
         // Try to parse error response from backend
         let errorData: any = null
         try {
@@ -211,6 +227,9 @@ class BaseApiClient {
         }
       }
 
+      // Reset reload counter on successful request
+      resetReloadCount()
+      
       const responseData = await response.json()
       return this.processResponseData<T>(responseData, response)
     } catch (error) {
@@ -267,6 +286,12 @@ class BaseApiClient {
       clearTimeout(timeoutId)
 
       if (!response.ok) {
+        // Handle 401 Unauthorized errors with reload logic
+        if (response.status === 401) {
+          console.error('401 Unauthorized error detected in PUT request')
+          handle401WithReload()
+        }
+        
         // Try to parse error response from backend
         let errorData: any = null
         try {
@@ -292,6 +317,9 @@ class BaseApiClient {
         }
       }
 
+      // Reset reload counter on successful request
+      resetReloadCount()
+      
       const responseData = await response.json()
       return { data: responseData, status: response.status }
     } catch (error) {
@@ -347,6 +375,12 @@ class BaseApiClient {
       clearTimeout(timeoutId)
 
       if (!response.ok) {
+        // Handle 401 Unauthorized errors with reload logic
+        if (response.status === 401) {
+          console.error('401 Unauthorized error detected in DELETE request')
+          handle401WithReload()
+        }
+        
         // Try to parse error response from backend
         let errorData: any = null
         try {
@@ -372,6 +406,9 @@ class BaseApiClient {
         }
       }
 
+      // Reset reload counter on successful request
+      resetReloadCount()
+      
       const responseData = await response.json()
       return this.processResponseData<T>(responseData, response)
     } catch (error) {

@@ -57,7 +57,7 @@ export const ChatScreen: React.FC = () => {
             <ChatHeader onMenuClick={handleMenuClick} />
             <ConversationContainer 
               conversationUuid={currentConversation.uuid}
-              className="flex-1"
+              className="flex-1 max-h-[calc(100vh-270px)]"
             />
             <div className="">
               <ChatInterface 

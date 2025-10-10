@@ -44,7 +44,9 @@ import {
   Copy,
   LogoOnly,
   Logout,
-  Filters
+  Filters,
+  PersonFace,
+  AI
 } from '@/icons'
 
 export default function AppDocumentsPage() {
@@ -93,6 +95,8 @@ export default function AppDocumentsPage() {
     { name: 'LogoOnly', component: LogoOnly },
     { name: 'Logout', component: Logout },
     { name: 'Filters', component: Filters },
+    { name: 'PersonFace', component: PersonFace },
+    { name: 'AI', component: AI },
   ]
 
   return (

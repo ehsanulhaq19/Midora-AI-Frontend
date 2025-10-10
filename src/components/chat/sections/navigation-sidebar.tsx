@@ -8,8 +8,8 @@ import {
   Search02,
   Plus01_5, 
   ChevronDown,
-  Collapse,
-  Close,
+  AI,
+  PersonFace,
   MoreOptions,
   LogoOnly,
   MinusSquare,
@@ -37,10 +37,10 @@ const ChatListItem: React.FC<ChatListItemProps> = ({ text, isSelected, onClick }
     className={`w-full flex items-center gap-2.5 px-3 py-2 text-left rounded-[var(--premitives-corner-radius-corner-radius)] transition-colors ${
       isSelected 
         ? "bg-[color:var(--tokens-color-surface-surface-tertiary)] text-[color:var(--tokens-color-text-text-brand)]" 
-        : "text-[color:var(--tokens-color-text-text-inactive-2)] hover:bg-[color:var(--tokens-color-surface-surface-secondary)]"
+        : "text-[color:var(--tokens-color-text-text-conversation)] hover:bg-[color:var(--tokens-color-surface-surface-secondary)]"
     }`}
   >
-    <div className="font-text-small flex-1 mt-[-1.00px] tracking-[var(--text-small-letter-spacing)] text-[length:var(--text-small-font-size)] [font-style:var(--text-small-font-style)] font-[number:var(--text-small-font-weight)] leading-[var(--text-small-line-height)] truncate">
+    <div className="font-text-small flex-1 mt-[-1.00px] tracking-[var(--text-small-letter-spacing)] text-[14px] [font-style:var(--text-small-font-style)] font-[number:var(--text-small-font-weight)] leading-[var(--text-small-line-height)] truncate">
       {text}
     </div>
     {isSelected && <MoreOptions className="w-4 h-4" />}
@@ -245,7 +245,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
               onMouseEnter={() => setSearchHovered(true)}
               onMouseLeave={() => setSearchHovered(false)}
             >
-              <Search02 className="w-5 h-5" />
+              <Search02 className="w-6 h-6" />
               <div className="font-text w-fit flex tracking-[var(--text-letter-spacing)] text-[length:var(--text-font-size)] items-center text-[color:var(--tokens-color-text-text-seconary)] font-[number:var(--text-font-weight)] leading-[var(--text-line-height)] whitespace-nowrap justify-center relative [font-style:var(--text-font-style)]">
                 {t('chat.searchChat')}
               </div>
@@ -267,14 +267,14 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                 </button>
 
                 <button className="flex items-center gap-3 px-3 py-2 relative w-full">
-                  <MidorasIcon className="w-6 h-6" color="#1F1740" />
+                  <PersonFace className="w-6 h-6" />
                   <div className="relative flex items-center justify-center w-fit font-text font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] whitespace-nowrap [font-style:var(--text-font-style)]">
                     AI Detection
                   </div>
                 </button>
 
                 <button className="flex items-center gap-3 px-3 py-2 relative w-full">
-                  <MidorasIcon className="w-6 h-6" color="#1F1740" />
+                  <AI className="w-6 h-6" />
                   <div className="relative flex items-center justify-center w-fit font-text font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] whitespace-nowrap [font-style:var(--text-font-style)]">
                     AI Humanizer
                   </div>
@@ -300,7 +300,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                         isExpanded={expandedProjects[index]}
                         onToggle={() => toggleProject(index)}
                       />
-                      <span className="font-text font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] whitespace-nowrap [font-style:var(--text-font-style)]">
+                      <span className="font-text font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-[14px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] whitespace-nowrap [font-style:var(--text-font-style)]">
                         {project.title}
                       </span>
                     </button>

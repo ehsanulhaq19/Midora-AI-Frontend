@@ -10,6 +10,13 @@ export interface ConversationState {
   error: string | null
   isStreaming: boolean
   streamingContent: string
+  streamingMetadata: { 
+    message_type?: string
+    selected_model?: string
+    selected_provider?: string
+    query_category?: string
+    rank?: number
+  } | null
   aiModels: AIModel[]
   selectedModel: AIModel | null
   pagination: { [conversationUuid: string]: { page: number, per_page: number, total: number, total_pages: number } }

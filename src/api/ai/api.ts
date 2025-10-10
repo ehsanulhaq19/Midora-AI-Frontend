@@ -91,6 +91,15 @@ class AIApiClient {
                 case 'initial_metadata':
                   onComplete(eventData)
                   break
+                case 'metadata':
+                case 'meta_data':
+                  // Handle metadata stream responses (don't add to content)
+                  onChunk('', 'metadata', eventData)
+                  break
+                case 'model_selection':
+                  // Handle model selection stream responses
+                  onChunk('', 'model_selection', eventData)
+                  break
                 case 'content':
                   onChunk(eventData.chunk || '', 'content', eventData)
                   break

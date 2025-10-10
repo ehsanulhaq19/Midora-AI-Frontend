@@ -11,6 +11,7 @@ export interface Message {
   conversation_uuid: string
   created_at: string
   updated_at: string
+  model_name?: string
   sender?: {
     uuid: string
     email: string

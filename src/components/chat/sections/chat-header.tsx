@@ -11,7 +11,7 @@ interface ChatHeaderProps {
 
 export const ChatHeader: React.FC<ChatHeaderProps> = ({ onMenuClick }) => {
   return (
-    <div className="flex items-start justify-between relative w-full px-[28px] py-4 border-b border-[color:var(--tokens-color-border-border-subtle)]">
+    <div className="flex items-start justify-between relative w-full px-[28px] py-4">
       <div className="flex items-center gap-4">
         <button 
           onClick={onMenuClick}

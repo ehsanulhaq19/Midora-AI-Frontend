@@ -16,6 +16,10 @@ Welcome to the comprehensive documentation for the Midora AI Frontend applicatio
 - [API Documentation](./api.md) - API endpoints and integration
 - [State Management](./state-management.md) - Data flow and state handling
 - [Styling Guide](./styling.md) - CSS and design system
+- [Error Handling](./ERROR_HANDLING_IMPLEMENTATION.md) - Error handling strategies
+- [401 Error Handling](./401_ERROR_HANDLING.md) - Automatic reload on authentication errors
+- [AI Stream Metadata](./AI_STREAM_METADATA_IMPLEMENTATION.md) - Real-time AI status messages during streaming
+- [Model Selection Display](./MODEL_SELECTION_DISPLAY_IMPLEMENTATION.md) - Display AI model names in chat messages
 
 ### 🧪 Testing & Quality
 - [Testing Guide](./testing.md) - Unit and integration testing
