@@ -46,7 +46,8 @@ import {
   Logout,
   Filters,
   PersonFace,
-  AI
+  AI,
+  LogoText
 } from '@/icons'
 
 export default function AppDocumentsPage() {
@@ -97,6 +98,7 @@ export default function AppDocumentsPage() {
     { name: 'Filters', component: Filters },
     { name: 'PersonFace', component: PersonFace },
     { name: 'AI', component: AI },
+    { name: 'LogoText', component: LogoText },
   ]
 
   return (

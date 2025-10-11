@@ -11,7 +11,7 @@ import {
   AI,
   PersonFace,
   MoreOptions,
-  LogoOnly,
+  LogoText,
   MinusSquare,
   MidorasIcon,
   FoldersIcon,
@@ -34,7 +34,7 @@ interface ChatListItemProps {
 const ChatListItem: React.FC<ChatListItemProps> = ({ text, isSelected, onClick }) => (
   <button
     onClick={onClick}
-    className={`w-full flex items-center gap-2.5 px-3 py-2 text-left rounded-[var(--premitives-corner-radius-corner-radius)] transition-colors ${
+    className={`w-full flex items-center gap-2.5 px-3 py-2 text-left rounded-[var(--premitives-corner-radius-corner-radius)] transition-colors hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] ${
       isSelected 
         ? "bg-[color:var(--tokens-color-surface-surface-tertiary)] text-[color:var(--tokens-color-text-text-brand)]" 
         : "text-[color:var(--tokens-color-text-text-conversation)] hover:bg-[color:var(--tokens-color-surface-surface-secondary)]"
@@ -63,10 +63,10 @@ const ProjectFolderItem: React.FC<ProjectFolderItemProps> = ({
   <div className="flex flex-col items-start relative w-full">
     <button
       onClick={onToggle}
-      className={`flex items-center gap-2 px-3 py-2 relative w-full transition-colors ${
+      className={`flex items-center gap-2 px-3 py-2 relative w-full transition-colors rounded-[var(--premitives-corner-radius-corner-radius)] ${
         isExpanded 
-          ? "bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded-[var(--premitives-corner-radius-corner-radius)]" 
-          : "hover:bg-[color:var(--tokens-color-surface-surface-secondary)]"
+          ? "bg-[color:var(--tokens-color-surface-surface-tertiary)]" 
+          : "hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]"
       }`}
     >
       <FolderOpen className="w-5 h-5" />
@@ -216,19 +216,19 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
         {/* Header */}
         <div className="flex flex-col items-start gap-3 flex-shrink-0">
           <div className="flex h-[68px] items-center justify-between px-5 py-0 relative w-full">
-            <LogoOnly
-              className="relative w-9 h-9 aspect-[1]"
+            <LogoText
+              className="relative aspect-[1]"
             />
 
-            <button className="p-1 hover:bg-gray-200 rounded transition-colors">
+            <button className="p-1 hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded transition-colors">
               <MinusSquare className="w-5 h-5" />
             </button>
           </div>
 
-          <div className="flex flex-col h-[93px] items-start gap-2 relative w-full px-5 pb-2">
+          <div className="flex flex-col h-[93px] items-start gap-1 relative w-full px-5 pb-2">
             <button 
               onClick={handleNewChat}
-              className="flex items-center gap-2 py-2 relative w-full hover:bg-[color:var(--tokens-color-surface-surface-secondary)] rounded transition-colors"
+              className="flex items-center gap-2 py-2 relative w-full hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded transition-colors"
             >
               <div className="w-9 h-9 flex items-center justify-center gap-2.5 p-2.5 rounded-[var(--premitives-corner-radius-corner-radius)] bg-[color:var(--tokens-color-icon-surface-icon-inactive-brand)] text-white">
                 <Plus01_5 className="w-5 h-5" color="#ffffff" />
@@ -239,8 +239,8 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
             </button>
 
             <button
-              className={`w-full flex items-center gap-3 p-2 rounded-[var(--premitives-corner-radius-corner-radius)] transition-colors ${
-                searchHovered ? "bg-[color:var(--tokens-color-surface-surface-secondary)]" : ""
+              className={`w-full flex items-center gap-3 p-2 rounded-[var(--premitives-corner-radius-corner-radius)] transition-colors pl-0 ${
+                searchHovered ? "bg-[color:var(--tokens-color-surface-surface-tertiary)]" : ""
               }`}
               onMouseEnter={() => setSearchHovered(true)}
               onMouseLeave={() => setSearchHovered(false)}
@@ -255,25 +255,25 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
 
         {/* Scrollable Content */}
         <div className="flex-1 overflow-hidden">
-          <div className="h-full overflow-y-auto scrollbar-hide px-3 py-6">
-            <div className="flex flex-col items-start gap-6">
+          <div className="h-full px-3 py-5">
+            <div className="flex flex-col items-start gap-5">
               {/* Tools Section */}
               <div className="flex flex-col items-start relative w-full">
-                <button className="flex items-center gap-3 px-3 py-2 relative w-full">
+                <button className="flex items-center gap-3 px-3 py-2 relative w-full hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded transition-colors">
                   <MidorasIcon className="w-6 h-6" color="#1F1740" />
                   <div className="relative flex items-center justify-center w-fit font-text font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] whitespace-nowrap [font-style:var(--text-font-style)]">
                     Midoras
                   </div>
                 </button>
 
-                <button className="flex items-center gap-3 px-3 py-2 relative w-full">
+                <button className="flex items-center gap-3 px-3 py-2 relative w-full hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded transition-colors">
                   <PersonFace className="w-6 h-6" />
                   <div className="relative flex items-center justify-center w-fit font-text font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] whitespace-nowrap [font-style:var(--text-font-style)]">
                     AI Detection
                   </div>
                 </button>
 
-                <button className="flex items-center gap-3 px-3 py-2 relative w-full">
+                <button className="flex items-center gap-3 px-3 py-2 relative w-full hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded transition-colors">
                   <AI className="w-6 h-6" />
                   <div className="relative flex items-center justify-center w-fit font-text font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] whitespace-nowrap [font-style:var(--text-font-style)]">
                     AI Humanizer
@@ -283,7 +283,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
 
               {/* Projects Section */}
               <div className="flex flex-col items-start relative w-full">
-                <button className="flex items-center gap-3 px-3 py-2 relative w-full hover:bg-[color:var(--tokens-color-surface-surface-secondary)] rounded transition-colors">
+                <button className="flex items-center gap-3 px-3 py-2 relative w-full hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded transition-colors">
                   <FoldersIcon />
                   <div className="relative flex items-center justify-center w-fit font-text font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] whitespace-nowrap [font-style:var(--text-font-style)]">
                     {t('chat.newFolder')}
@@ -379,7 +379,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
             <div className="absolute bottom-full left-2.5 right-2.5 mb-2 bg-[color:var(--tokens-color-surface-surface-primary)] border border-[color:var(--tokens-color-border-border-primary)] rounded-[var(--premitives-corner-radius-corner-radius)] shadow-lg z-50">
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-3 w-full px-3 py-2.5 text-left hover:bg-[color:var(--tokens-color-surface-surface-secondary)] transition-colors first:rounded-t-[var(--premitives-corner-radius-corner-radius)] last:rounded-b-[var(--premitives-corner-radius-corner-radius)]"
+                className="flex items-center gap-3 w-full px-3 py-2.5 text-left hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] transition-colors first:rounded-t-[var(--premitives-corner-radius-corner-radius)] last:rounded-b-[var(--premitives-corner-radius-corner-radius)]"
               >
                 <Logout className="w-4 h-4 text-[color:var(--tokens-color-text-text-inactive-2)]" />
                 <span className="font-text font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">

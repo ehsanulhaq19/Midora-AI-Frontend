@@ -62,7 +62,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
     if (variant === 'model-selector') {
       return `
         inline-flex items-center justify-between w-full py-2 
-        border border-[color:var(--tokens-color-border-border-subtle)] 
+        border-0
         rounded-[var(--premitives-corner-radius-corner-radius-2)]
         text-left cursor-pointer transition-colors duration-200
         ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[color:var(--tokens-color-surface-surface-secondary)]'}
@@ -78,7 +78,8 @@ export const Dropdown: React.FC<DropdownProps> = ({
   }
 
   const getDropdownClasses = () => {
-    const baseClasses = "absolute left-0 right-0 mt-1 bg-[color:var(--tokens-color-surface-surface-button-pressed)] border border-[color:var(--tokens-color-border-border-subtle)] rounded-[var(--premitives-corner-radius-corner-radius-2)] shadow-lg z-50 max-h-60 overflow-y-auto"
+    const bgColor = variant === 'model-selector' ? 'bg-white' : 'bg-[color:var(--tokens-color-surface-surface-button-pressed)]'
+    const baseClasses = `absolute left-0 right-0 mt-1 ${bgColor} border border-[color:var(--tokens-color-border-border-subtle)] rounded-[var(--premitives-corner-radius-corner-radius-2)] shadow-lg z-50 max-h-60 overflow-y-auto`
     
     if (openUpward) {
       return `${baseClasses} bottom-full mb-1`
@@ -90,27 +91,35 @@ export const Dropdown: React.FC<DropdownProps> = ({
   const getButtonContent = () => {
     if (variant === 'model-selector') {
       return (
-        <div className="flex items-center gap-2">
-          {modeText && (
-            <span className="font-text-medium font-[number:var(--text-medium-font-weight)] text-tokens-color-text-text-neutral text-[length:var(--text-medium-font-size)] tracking-[var(--text-medium-letter-spacing)] leading-[var(--text-medium-line-height)] whitespace-nowrap [font-style:var(--text-medium-font-style)]">
-              {modeText}
+        <div className="flex items-center gap-2 w-full justify-between">
+          <div className="flex items-center gap-2">
+            {modeText && (
+              <span className="font-text-medium font-[number:var(--text-medium-font-weight)] text-tokens-color-text-text-neutral text-[length:var(--text-medium-font-size)] tracking-[var(--text-medium-letter-spacing)] leading-[var(--text-medium-line-height)] whitespace-nowrap [font-style:var(--text-medium-font-style)]">
+                {modeText}
+              </span>
+            )}
+            {selectedOption?.icon && (
+              <div className="flex-shrink-0">
+                {selectedOption.icon}
+              </div>
+            )}
+            {selectedOption?.image && (
+              <img
+                src={selectedOption.image}
+                alt={selectedOption.label}
+                className="w-4 h-4 rounded flex-shrink-0"
+              />
+            )}
+            <span className="font-text-medium font-[number:var(--text-medium-font-weight)] text-[color:var(--tokens-color-text-text-brand)] text-[length:var(--text-medium-font-size)] tracking-[var(--text-medium-letter-spacing)] leading-[var(--text-medium-line-height)] whitespace-nowrap [font-style:var(--text-medium-font-style)]">
+              {selectedOption?.label || placeholder}
             </span>
-          )}
-          {selectedOption?.icon && (
-            <div className="flex-shrink-0">
-              {selectedOption.icon}
-            </div>
-          )}
-          {selectedOption?.image && (
-            <img
-              src={selectedOption.image}
-              alt={selectedOption.label}
-              className="w-4 h-4 rounded flex-shrink-0"
+          </div>
+          {!isOpen && (
+            <ArrowDownSm 
+              color="rgba(31, 23, 64, 0.9)" 
+              className="transition-transform duration-200 flex-shrink-0"
             />
           )}
-          <span className="font-text-medium font-[number:var(--text-medium-font-weight)] text-[color:var(--tokens-color-text-text-brand)] text-[length:var(--text-medium-font-size)] tracking-[var(--text-medium-letter-spacing)] leading-[var(--text-medium-line-height)] whitespace-nowrap [font-style:var(--text-medium-font-style)]">
-            {selectedOption?.label || placeholder}
-          </span>
         </div>
       )
     }
@@ -185,7 +194,9 @@ export const Dropdown: React.FC<DropdownProps> = ({
                   className="w-4 h-4 rounded flex-shrink-0"
                 />
               )}
-              <span className="font-text-small font-[number:var(--text-small-font-weight)] text-[color:var(--tokens-color-text-text-neutral)] text-[length:var(--text-small-font-size)] tracking-[var(--text-small-letter-spacing)] leading-[var(--text-small-line-height)] [font-style:var(--text-small-font-style)]">
+              <span className={`font-text-small font-[number:var(--text-small-font-weight)] text-[length:var(--text-small-font-size)] tracking-[var(--text-small-letter-spacing)] leading-[var(--text-small-line-height)] [font-style:var(--text-small-font-style)] ${
+                variant === 'model-selector' ? 'text-[color:var(--tokens-color-text-text-brand)]' : 'text-[color:var(--tokens-color-text-text-neutral)]'
+              }`}>
                 {option.label}
               </span>
             </button>

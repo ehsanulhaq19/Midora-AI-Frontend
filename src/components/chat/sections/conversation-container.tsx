@@ -148,6 +148,9 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const isLoadingMoreRef = useRef(false)
+  const shouldAutoScrollRef = useRef(true)
+  const userScrolledRef = useRef(false)
+  const scrollRafRef = useRef<number | null>(null)
 
   useEffect(() => {
     if (conversationUuid) {
@@ -155,16 +158,28 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
     }
   }, [conversationUuid, selectConversation])
   
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }
+  const scrollToBottom = useCallback((instant: boolean = false) => {
+    if (messagesContainerRef.current) {
+      if (instant) {
+        messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight
+      } else {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+      }
+    }
+  }, [])
 
-  // Handle scroll to load more messages
+  const isAtBottom = useCallback(() => {
+    if (!messagesContainerRef.current) return false
+    const container = messagesContainerRef.current
+    const threshold = 50
+    const scrollBottom = container.scrollHeight - container.scrollTop - container.clientHeight
+    return scrollBottom <= threshold
+  }, [])
+
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     const container = e.currentTarget
     const scrollTop = container.scrollTop
     
-    // Check if scrolled to top and not already loading
     if (scrollTop === 0 && !isLoadingMoreRef.current && conversationUuid && pagination) {
       const { page, total_pages } = pagination
       if (page < total_pages) {
@@ -174,31 +189,49 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
         })
       }
     }
-  }, [conversationUuid, pagination, loadMoreMessages])
 
-  // Scroll to bottom when messages change
+    if (isStreaming) {
+      const atBottom = isAtBottom()
+      shouldAutoScrollRef.current = atBottom
+      
+      if (!atBottom && !userScrolledRef.current) {
+        userScrolledRef.current = true
+      } else if (atBottom && userScrolledRef.current) {
+        userScrolledRef.current = false
+      }
+    }
+  }, [conversationUuid, pagination, loadMoreMessages, isStreaming, isAtBottom])
+
   useEffect(() => {
-    scrollToBottom()
-  }, [messages])
+    scrollToBottom(false)
+  }, [messages, scrollToBottom])
 
-  // Scroll to bottom when streaming starts
   useEffect(() => {
     if (isStreaming) {
-      scrollToBottom()
+      shouldAutoScrollRef.current = true
+      userScrolledRef.current = false
     }
   }, [isStreaming])
 
-  // Throttled scroll for streaming content updates
   useEffect(() => {
-    if (isStreaming && streamingContent) {
-      // Use requestAnimationFrame for smoother scrolling
-      const rafId = requestAnimationFrame(() => {
-        scrollToBottom()
+    if (isStreaming && streamingContent && shouldAutoScrollRef.current) {
+      if (scrollRafRef.current) {
+        cancelAnimationFrame(scrollRafRef.current)
+      }
+      
+      scrollRafRef.current = requestAnimationFrame(() => {
+        scrollToBottom(true)
+        scrollRafRef.current = null
       })
 
-      return () => cancelAnimationFrame(rafId)
+      return () => {
+        if (scrollRafRef.current) {
+          cancelAnimationFrame(scrollRafRef.current)
+          scrollRafRef.current = null
+        }
+      }
     }
-  }, [streamingContent, isStreaming])
+  }, [streamingContent, isStreaming, scrollToBottom])
 
   // Sort messages by created_at date (oldest first, newest last)
   // Filter out null/undefined messages before sorting
