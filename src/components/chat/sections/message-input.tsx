@@ -77,7 +77,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({ onSend, isStreaming 
               size="lg"
               icon={<Plus01_5 className="w-5 h-5" color="#6B4392" />}
               aria-label="Add attachment"
-              className="border-[color:var(--tokens-color-border-border-subtle)]"
+              className="border-[color:var(--tokens-color-border-border-subtle)] bg-[#F4F5F5]"
               disabled={isStreaming}
             />
 
@@ -87,7 +87,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({ onSend, isStreaming 
               size="lg"
               icon={<Filters className="w-7 h-7" color="#6B4392" />}
               aria-label="Voice input"
-              className="border-[color:var(--tokens-color-border-border-subtle)]"
+              className="border-[color:var(--tokens-color-border-border-subtle)] bg-[#F4F5F5]"
               disabled={isStreaming}
             />
           </div>

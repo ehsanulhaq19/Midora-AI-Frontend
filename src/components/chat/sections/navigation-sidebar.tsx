@@ -292,7 +292,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
 
                 <div className="flex flex-col items-start relative w-full max-h-48 overflow-y-auto scrollbar-hide ml-3">
                   {projects.map((project, index) => (
-                    <button key={index} className="w-full mb-2 flex items-center gap-4">
+                    <button key={index} className="w-full mb-3 flex items-center gap-4 items-center">
                       <FolderOpen01
                         key={index}
                         title={project.title}
