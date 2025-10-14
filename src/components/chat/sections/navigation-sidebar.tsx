@@ -261,21 +261,21 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
               Midoras
             </div>
             <button className="flex items-center gap-3 px-5 py-2 relative w-full hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded transition-colors">
-              <MidorasIcon className="w-6 h-6" color="#1F1740" />
+              <MidorasIcon className="w-5 h-5" color="#1F1740" />
               <div className="relative flex items-center justify-center w-fit font-text font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-[14px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] whitespace-nowrap [font-style:var(--text-font-style)]">
                 Midoras
               </div>
             </button>
 
             <button className="flex items-center gap-3 px-5 py-2 relative w-full hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded transition-colors">
-              <PersonFace className="w-6 h-6" />
+              <PersonFace className="w-5 h-5" />
               <div className="relative flex items-center justify-center w-fit font-text font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-[14px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] whitespace-nowrap [font-style:var(--text-font-style)]">
                 AI Detection
               </div>
             </button>
 
             <button className="flex items-center gap-3 px-5 py-2 relative w-full hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded transition-colors">
-              <AI className="w-6 h-6" />
+              <AI className="w-5 h-5" />
               <div className="relative flex items-center justify-center w-fit font-text font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-[14px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] whitespace-nowrap [font-style:var(--text-font-style)]">
                 AI Humanizer
               </div>
