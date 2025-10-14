@@ -6,7 +6,7 @@ interface FoldersIconProps {
 }
 
 export const FoldersIcon: React.FC<FoldersIconProps> = ({ 
-  className = "w-6 h-6", 
+  className = "w-5 h-5", 
   color = "#1F1740" 
 }) => (
   <svg 

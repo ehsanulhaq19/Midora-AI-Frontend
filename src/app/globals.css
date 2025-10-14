@@ -52,7 +52,7 @@
   --premitives-color-light-purple-200: rgba(94, 77, 116, 0.2);
   --premitives-color-light-purple-400: rgba(94, 77, 116, 0.4);
   --premitives-color-brand-purple-1000: #6B4392;
-  --premitives-color-neutral-surface: rgba(41, 50, 65, 0.05);
+  --premitives-color-neutral-surface: #F4F5F5;
   --premitives-color-dropdown-icon: rgba(31, 23, 64, 0.9);
   --premitives-corner-radius-corner-radius: 8px;
   --premitives-corner-radius-corner-radius-2: 12px;
@@ -97,6 +97,8 @@
   --tokens-color-border-border-inactive: var(--premitives-color-light-gray-300);
   --tokens-color-border-border-active: var(--premitives-color-light-purple-1000);
   --tokens-color-border-border-subtle: rgba(41, 50, 65, 0.10);
+  --tokens-color-text-text-section-header: rgba(41, 50, 65, 0.5);
+  --sidebar-conversations-max-height: calc(100vh - 450px);
   
   /* Surface colors for Tailwind config */
   --surface-primary: var(--premitives-color-light-gray-2000);
@@ -151,6 +153,8 @@
   --tokens-color-border-border-inactive: #4b5563;
   --tokens-color-border-border-active: #5E4D74;
   --tokens-color-border-border-subtle: rgba(41, 50, 65, 0.10);
+  --tokens-color-text-text-section-header: rgba(255, 255, 255, 0.5);
+  --sidebar-conversations-max-height: calc(100vh - 450px);
   
   /* Dark mode surface colors */
   --surface-primary: #1F1740;

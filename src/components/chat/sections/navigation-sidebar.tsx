@@ -34,7 +34,7 @@ interface ChatListItemProps {
 const ChatListItem: React.FC<ChatListItemProps> = ({ text, isSelected, onClick }) => (
   <button
     onClick={onClick}
-    className={`w-full flex items-center gap-2.5 px-3 py-2 text-left rounded-[var(--premitives-corner-radius-corner-radius)] transition-colors hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] ${
+    className={`w-full flex items-center gap-2.5 px-5 py-2 text-left transition-colors hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] ${
       isSelected 
         ? "bg-[color:var(--tokens-color-surface-surface-tertiary)] text-[color:var(--tokens-color-text-text-brand)]" 
         : "text-[color:var(--tokens-color-text-text-conversation)] hover:bg-[color:var(--tokens-color-surface-surface-secondary)]"
@@ -63,14 +63,14 @@ const ProjectFolderItem: React.FC<ProjectFolderItemProps> = ({
   <div className="flex flex-col items-start relative w-full">
     <button
       onClick={onToggle}
-      className={`flex items-center gap-2 px-3 py-2 relative w-full transition-colors rounded-[var(--premitives-corner-radius-corner-radius)] ${
+      className={`flex items-center gap-2 px-5 py-2 relative w-full transition-colors rounded-[var(--premitives-corner-radius-corner-radius)] ${
         isExpanded 
           ? "bg-[color:var(--tokens-color-surface-surface-tertiary)]" 
           : "hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]"
       }`}
     >
       <FolderOpen className="w-5 h-5" />
-      <div className={`relative flex items-center justify-center flex-1 mt-[-1.00px] font-text-small font-[number:var(--text-small-font-weight)] text-[length:var(--text-small-font-size)] tracking-[var(--text-small-letter-spacing)] leading-[var(--text-small-line-height)] [font-style:var(--text-small-font-style)] text-left ${
+      <div className={`relative flex items-center justify-center flex-1 mt-[-1.00px] font-text-small font-[number:var(--text-small-font-weight)] text-[14px] tracking-[var(--text-small-letter-spacing)] leading-[var(--text-small-line-height)] [font-style:var(--text-small-font-style)] text-left ${
         isExpanded ? "text-[color:var(--tokens-color-text-text-brand)]" : "text-[color:var(--tokens-color-text-text-seconary)]"
       }`}>
         {title}
@@ -202,20 +202,20 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
       {/* Mobile overlay */}
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          className="fixed inset-0 z-50 lg:hidden "
           onClick={onClose}
         />
       )}
       
       {/* Sidebar */}
       <div className={`
-        fixed lg:relative top-0 left-0 w-[282px] bg-[color:var(--tokens-color-surface-surface-neutral)] z-50 transform transition-transform duration-300 ease-in-out
+        fixed lg:relative top-0 left-0 w-[258px] bg-[color:var(--tokens-color-surface-surface-neutral)] z-50 transform transition-transform duration-300 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         flex flex-col h-[100vh]
       `}>
         {/* Header */}
-        <div className="flex flex-col items-start gap-3 flex-shrink-0">
-          <div className="flex h-[68px] items-center justify-between px-5 py-0 relative w-full">
+        <div className="flex flex-col items-start gap-3 flex-shrink-0 pb-6">
+          <div className="flex h-[68px] items-center justify-between py-0 px-5 relative w-full">
             <LogoText
               className="relative aspect-[1]"
             />
@@ -225,28 +225,28 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
             </button>
           </div>
 
-          <div className="flex flex-col h-[93px] items-start gap-1 relative w-full px-5 pb-2">
+          <div className="flex flex-col items-start gap-1 relative w-full">
             <button 
               onClick={handleNewChat}
-              className="flex items-center gap-2 py-2 relative w-full hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded transition-colors"
+              className="flex items-center gap-2 py-2 relative px-5 w-full hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded transition-colors"
             >
-              <div className="w-9 h-9 flex items-center justify-center gap-2.5 p-2.5 rounded-[var(--premitives-corner-radius-corner-radius)] bg-[color:var(--tokens-color-icon-surface-icon-inactive-brand)] text-white">
+              <div className="w-7 h-7 flex items-center justify-center gap-2.5 rounded-[var(--premitives-corner-radius-corner-radius)] bg-[color:var(--tokens-color-icon-surface-icon-inactive-brand)] text-white">
                 <Plus01_5 className="w-5 h-5" color="#ffffff" />
               </div>
-              <div className="relative flex items-center justify-center w-fit font-h05-heading05 font-[number:var(--h05-heading05-font-weight)] text-[color:var(--tokens-color-text-text-brand)] text-[length:var(--h05-heading05-font-size)] tracking-[var(--h05-heading05-letter-spacing)] leading-[var(--h05-heading05-line-height)] whitespace-nowrap [font-style:var(--h05-heading05-font-style)]">
+              <div className="relative flex items-center justify-center w-fit font-h05-heading05 font-[number:var(--h05-heading05-font-weight)] text-[color:var(--tokens-color-text-text-brand)] text-[14px] tracking-[var(--h05-heading05-letter-spacing)] leading-[var(--h05-heading05-line-height)] whitespace-nowrap [font-style:var(--h05-heading05-font-style)]">
                 {t('chat.newChat')}
               </div>
             </button>
 
             <button
-              className={`w-full flex items-center gap-3 p-2 rounded-[var(--premitives-corner-radius-corner-radius)] transition-colors pl-0 ${
+              className={`w-full flex items-center gap-3 p-2 px-5 rounded-[var(--premitives-corner-radius-corner-radius)] transition-colors ${
                 searchHovered ? "bg-[color:var(--tokens-color-surface-surface-tertiary)]" : ""
               }`}
               onMouseEnter={() => setSearchHovered(true)}
               onMouseLeave={() => setSearchHovered(false)}
             >
-              <Search02 className="w-6 h-6" />
-              <div className="font-text w-fit flex tracking-[var(--text-letter-spacing)] text-[length:var(--text-font-size)] items-center text-[color:var(--tokens-color-text-text-seconary)] font-[number:var(--text-font-weight)] leading-[var(--text-line-height)] whitespace-nowrap justify-center relative [font-style:var(--text-font-style)]">
+              <Search02 className="w-5 h-5" />
+              <div className="font-text w-fit flex tracking-[var(--text-letter-spacing)] text-[14px] items-center text-[color:var(--tokens-color-text-text-seconary)] font-[number:var(--text-font-weight)] leading-[var(--text-line-height)] whitespace-nowrap justify-center relative [font-style:var(--text-font-style)]">
                 {t('chat.searchChat')}
               </div>
             </button>
@@ -254,102 +254,108 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
         </div>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-hidden">
-          <div className="h-full px-3 py-5">
-            <div className="flex flex-col items-start gap-5">
-              {/* Tools Section */}
-              <div className="flex flex-col items-start relative w-full">
-                <button className="flex items-center gap-3 px-3 py-2 relative w-full hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded transition-colors">
-                  <MidorasIcon className="w-6 h-6" color="#1F1740" />
-                  <div className="relative flex items-center justify-center w-fit font-text font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] whitespace-nowrap [font-style:var(--text-font-style)]">
-                    Midoras
-                  </div>
-                </button>
-
-                <button className="flex items-center gap-3 px-3 py-2 relative w-full hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded transition-colors">
-                  <PersonFace className="w-6 h-6" />
-                  <div className="relative flex items-center justify-center w-fit font-text font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] whitespace-nowrap [font-style:var(--text-font-style)]">
-                    AI Detection
-                  </div>
-                </button>
-
-                <button className="flex items-center gap-3 px-3 py-2 relative w-full hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded transition-colors">
-                  <AI className="w-6 h-6" />
-                  <div className="relative flex items-center justify-center w-fit font-text font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] whitespace-nowrap [font-style:var(--text-font-style)]">
-                    AI Humanizer
-                  </div>
-                </button>
+        <div className="flex-1 overflow-hidden overflow-y-auto flex flex-col">
+          {/* Tools Section */}
+          <div className="flex flex-col items-start relative w-full flex-shrink-0">
+            <div className="relative flex items-center justify-center w-fit mb-[8px] mt-[-1.00px] font-text-small font-[number:var(--text-small-font-weight)] text-[color:var(--tokens-color-text-text-section-header)] text-[14px] tracking-[var(--text-small-letter-spacing)] leading-[var(--text-small-line-height)] whitespace-nowrap [font-style:var(--text-small-font-style)] px-5">
+              Midoras
+            </div>
+            <button className="flex items-center gap-3 px-5 py-2 relative w-full hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded transition-colors">
+              <MidorasIcon className="w-6 h-6" color="#1F1740" />
+              <div className="relative flex items-center justify-center w-fit font-text font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-[14px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] whitespace-nowrap [font-style:var(--text-font-style)]">
+                Midoras
               </div>
+            </button>
 
-              {/* Projects Section */}
-              <div className="flex flex-col items-start relative w-full">
-                <button className="flex items-center gap-3 px-3 py-2 relative w-full hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded transition-colors">
-                  <FoldersIcon />
-                  <div className="relative flex items-center justify-center w-fit font-text font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] whitespace-nowrap [font-style:var(--text-font-style)]">
-                    {t('chat.newFolder')}
-                  </div>
+            <button className="flex items-center gap-3 px-5 py-2 relative w-full hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded transition-colors">
+              <PersonFace className="w-6 h-6" />
+              <div className="relative flex items-center justify-center w-fit font-text font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-[14px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] whitespace-nowrap [font-style:var(--text-font-style)]">
+                AI Detection
+              </div>
+            </button>
+
+            <button className="flex items-center gap-3 px-5 py-2 relative w-full hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded transition-colors">
+              <AI className="w-6 h-6" />
+              <div className="relative flex items-center justify-center w-fit font-text font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-[14px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] whitespace-nowrap [font-style:var(--text-font-style)]">
+                AI Humanizer
+              </div>
+            </button>
+          </div>
+
+          {/* Projects Section */}
+          <div className="flex flex-col items-start relative w-full flex-shrink-0 mt-6">
+            <div className="relative flex items-center justify-center w-fit mt-[-1.00px] mb-[8px] font-text-small font-[number:var(--text-small-font-weight)] text-[color:var(--tokens-color-text-text-section-header)] text-[14px] tracking-[var(--text-small-letter-spacing)] leading-[var(--text-small-line-height)] whitespace-nowrap [font-style:var(--text-small-font-style)] px-5">
+              Projects
+            </div>
+            <button className="flex items-center gap-[8px] px-5 py-2 relative w-full hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded transition-colors">
+              <FoldersIcon />
+              <div className="relative flex items-center justify-center w-fit font-text font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-[14px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] whitespace-nowrap [font-style:var(--text-font-style)]">
+                {t('chat.newFolder')}
+              </div>
+            </button>
+
+            <div className="flex flex-col items-start relative w-full max-h-48 overflow-y-auto scrollbar-hide scroll-smooth ml-3">
+              {projects.map((project, index) => (
+                <button key={index} className="w-full pt-[5px] pb-[8px] px-2 gap-[8px] flex items-center items-center hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]">
+                  <FolderOpen01
+                    key={index}
+                    title={project.title}
+                    chats={project.chats}
+                    isExpanded={expandedProjects[index]}
+                    onToggle={() => toggleProject(index)}
+                  />
+                  <span className="font-text mt-[3px] font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-[14px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] whitespace-nowrap [font-style:var(--text-font-style)]">
+                    {project.title}
+                  </span>
                 </button>
+              ))}
+            </div>
+          </div>
 
-                <div className="flex flex-col items-start relative w-full max-h-48 overflow-y-auto scrollbar-hide ml-3">
-                  {projects.map((project, index) => (
-                    <button key={index} className="w-full mb-3 flex items-center gap-4 items-center">
-                      <FolderOpen01
-                        key={index}
-                        title={project.title}
-                        chats={project.chats}
-                        isExpanded={expandedProjects[index]}
-                        onToggle={() => toggleProject(index)}
-                      />
-                      <span className="font-text font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-[14px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] whitespace-nowrap [font-style:var(--text-font-style)]">
-                        {project.title}
-                      </span>
-                    </button>
+          {/* Recents Section - Takes remaining space */}
+          <div className="flex flex-col items-start relative w-full flex-1 mt-6 min-h-0">
+            <div className="flex items-center gap-2.5 px-5 py-0 relative w-full">
+              <div className="relative flex items-center justify-center w-fit mt-[-1.00px] mb-[8px] font-text-small font-[number:var(--text-small-font-weight)] text-[color:var(--tokens-color-text-text-section-header)] text-[14px] tracking-[var(--text-small-letter-spacing)] leading-[var(--text-small-line-height)] whitespace-nowrap [font-style:var(--text-small-font-style)]">
+                {t('chat.recents')}
+              </div>
+            </div>
+
+            <div 
+              ref={conversationsContainerRef}
+              className="flex flex-col items-start relative w-full overflow-y-auto scroll-smooth"
+              style={{ 
+                maxHeight: 'var(--sidebar-conversations-max-height)',
+                minHeight: '200px'
+              }}
+              onScroll={handleConversationsScroll}
+            >
+              {conversations.length > 0 ? (
+                <>
+                  {conversations
+                    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+                    .map((conversation, index) => (
+                    <ChatListItem
+                      key={conversation.uuid}
+                      text={conversation.name}
+                      isSelected={currentConversation?.uuid === conversation.uuid}
+                      onClick={() => handleSelectChat(conversation.uuid)}
+                    />
                   ))}
-                </div>
-              </div>
-
-              {/* Recents Section */}
-              <div className="flex flex-col items-start gap-2 relative w-full">
-                <div className="flex items-center gap-2.5 px-3 py-0 relative w-full">
-                  <div className="relative flex items-center justify-center w-fit mt-[-1.00px] font-text-small font-[number:var(--text-small-font-weight)] text-[color:var(--tokens-color-text-text-primary)] text-[length:var(--text-small-font-size)] tracking-[var(--text-small-letter-spacing)] leading-[var(--text-small-line-height)] whitespace-nowrap [font-style:var(--text-small-font-style)]">
-                    {t('chat.recents')}
-                  </div>
-                </div>
-
-                <div 
-                  ref={conversationsContainerRef}
-                  className="flex flex-col items-start relative w-full overflow-y-auto scrollbar-hide max-h-[330px]"
-                  onScroll={handleConversationsScroll}
-                >
-                  {conversations.length > 0 ? (
-                    <>
-                      {conversations
-                        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-                        .map((conversation, index) => (
-                        <ChatListItem
-                          key={conversation.uuid}
-                          text={conversation.name}
-                          isSelected={currentConversation?.uuid === conversation.uuid}
-                          onClick={() => handleSelectChat(conversation.uuid)}
-                        />
-                      ))}
-                      {/* Loading indicator for more conversations */}
-                      {isLoadingMoreConversations && (
-                        <div className="w-full p-3 text-center text-[color:var(--tokens-color-text-text-inactive-2)]">
-                          <div className="flex items-center justify-center gap-2">
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[color:var(--tokens-color-text-text-inactive-2)]"></div>
-                            <span className="text-sm">{t('chat.loadingMoreConversations')}</span>
-                          </div>
-                        </div>
-                      )}
-                    </>
-                  ) : (
+                  {/* Loading indicator for more conversations */}
+                  {isLoadingMoreConversations && (
                     <div className="w-full p-3 text-center text-[color:var(--tokens-color-text-text-inactive-2)]">
-                      {t('chat.noConversations')}
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[color:var(--tokens-color-text-text-inactive-2)]"></div>
+                        <span className="text-[14px]">{t('chat.loadingMoreConversations')}</span>
+                      </div>
                     </div>
                   )}
+                </>
+              ) : (
+                <div className="w-full p-3 text-center text-[color:var(--tokens-color-text-text-inactive-2)]">
+                  {t('chat.noConversations')}
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
@@ -364,10 +370,10 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
               {userName?.charAt(0).toUpperCase() || 'U'}
             </div>
             <div className="flex flex-col items-start grow gap-1 flex-1 relative">
-              <div className="font-h05-heading05 w-fit mt-[-1.00px] tracking-[var(--h05-heading05-letter-spacing)] text-[length:var(--h05-heading05-font-size)] [font-style:var(--h05-heading05-font-style)] text-[color:var(--tokens-color-text-text-brand)] font-[number:var(--h05-heading05-font-weight)] text-center whitespace-nowrap leading-[var(--h05-heading05-line-height)] relative">
+              <div className="font-h05-heading05 w-fit mt-[-1.00px] tracking-[var(--h05-heading05-letter-spacing)] text-[14px] [font-style:var(--h05-heading05-font-style)] text-[color:var(--tokens-color-text-text-brand)] font-[number:var(--h05-heading05-font-weight)] text-center whitespace-nowrap leading-[var(--h05-heading05-line-height)] relative">
                 {userName || 'User'}
               </div>
-              <div className="font-text-small w-fit mt-[-1.00px] tracking-[var(--text-small-letter-spacing)] text-[length:var(--text-small-font-size)] [font-style:var(--text-small-font-style)] text-[color:var(--tokens-color-text-text-inactive-2)] font-[number:var(--text-small-font-weight)] text-center whitespace-nowrap leading-[var(--text-small-line-height)] relative">
+              <div className="font-text-small w-fit mt-[-1.00px] tracking-[var(--text-small-letter-spacing)] text-[14px] [font-style:var(--text-small-font-style)] text-[color:var(--tokens-color-text-text-inactive-2)] font-[number:var(--text-small-font-weight)] text-center whitespace-nowrap leading-[var(--text-small-line-height)] relative">
                 Plus Member
               </div>
             </div>
@@ -379,10 +385,10 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
             <div className="absolute bottom-full left-2.5 right-2.5 mb-2 bg-[color:var(--tokens-color-surface-surface-primary)] border border-[color:var(--tokens-color-border-border-primary)] rounded-[var(--premitives-corner-radius-corner-radius)] shadow-lg z-50">
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-3 w-full px-3 py-2.5 text-left hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] transition-colors first:rounded-t-[var(--premitives-corner-radius-corner-radius)] last:rounded-b-[var(--premitives-corner-radius-corner-radius)]"
+                className="flex items-center gap-3 w-full px-5 py-2.5 text-left hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] transition-colors first:rounded-t-[var(--premitives-corner-radius-corner-radius)] last:rounded-b-[var(--premitives-corner-radius-corner-radius)]"
               >
                 <Logout className="w-4 h-4 text-[color:var(--tokens-color-text-text-inactive-2)]" />
-                <span className="font-text font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
+                <span className="font-text font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-[14px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
                   Logout
                 </span>
               </button>
