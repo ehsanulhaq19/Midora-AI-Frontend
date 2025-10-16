@@ -21,8 +21,8 @@ import {
 import { IconButton } from '@/components/ui/buttons'
 import Image from 'next/image'
 import { t } from '@/i18n'
-import { useAuthRedux } from '@/hooks/useAuthRedux'
-import { useConversation } from '@/hooks/useConversation'
+import { useAuthRedux } from '@/hooks/use-auth-redux'
+import { useConversation } from '@/hooks/use-conversation'
 import { useAuth } from '@/contexts/AuthContext'
 
 interface ChatListItemProps {

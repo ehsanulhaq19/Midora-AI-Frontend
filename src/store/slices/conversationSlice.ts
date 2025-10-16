@@ -175,7 +175,7 @@ const conversationSlice = createSlice({
       query_category?: string
       rank?: number
     } | null>) => {
-      state.streamingMetadata = action.payload
+      state.streamingMetadata = { ...state.streamingMetadata, ...action.payload }
     },
 
     // Complete streaming
@@ -209,6 +209,52 @@ const conversationSlice = createSlice({
       state.isStreaming = false
       state.streamingContent = ''
       state.streamingMetadata = null
+    },
+
+    // Update message content (for regeneration)
+    updateMessageContent: (state, action: PayloadAction<{ conversationUuid: string; messageUuid: string; content: string }>) => {
+      const { conversationUuid, messageUuid, content } = action.payload
+      const messages = state.messages[conversationUuid]
+      if (messages) {
+        const index = messages.findIndex(msg => msg.uuid === messageUuid)
+        if (index !== -1) {
+          messages[index].content = content
+        }
+      }
+    },
+
+    // Add message version (for regeneration)
+    addMessageVersion: (state, action: PayloadAction<{ conversationUuid: string; originalMessageUuid: string; newMessage: Message }>) => {
+      const { conversationUuid, originalMessageUuid, newMessage } = action.payload
+      const messages = state.messages[conversationUuid]
+      if (messages) {
+        const index = messages.findIndex(msg => msg.uuid === originalMessageUuid)
+        if (index !== -1) {
+          // Initialize message versions if not exists
+          if (!messages[index].versions) {
+            messages[index].versions = [messages[index]]
+          }
+          // Add new version
+          messages[index].versions.push(newMessage)
+          // Update current version index
+          messages[index].currentVersionIndex = messages[index].versions.length - 1
+          // Update content to show new version
+          messages[index].content = newMessage.content
+        }
+      }
+    },
+
+    // Set current message version
+    setCurrentMessageVersion: (state, action: PayloadAction<{ conversationUuid: string; messageUuid: string; versionIndex: number }>) => {
+      const { conversationUuid, messageUuid, versionIndex } = action.payload
+      const messages = state.messages[conversationUuid]
+      if (messages) {
+        const index = messages.findIndex(msg => msg.uuid === messageUuid)
+        if (index !== -1 && messages[index].versions && messages[index].versions[versionIndex]) {
+          messages[index].currentVersionIndex = versionIndex
+          messages[index].content = messages[index].versions[versionIndex].content
+        }
+      }
     },
 
     // Clear all conversation data
@@ -251,6 +297,9 @@ export const {
   addMessage,
   removeMessage,
   updateMessage,
+  updateMessageContent,
+  addMessageVersion,
+  setCurrentMessageVersion,
   setAIModels,
   setSelectedModel,
   startStreaming,

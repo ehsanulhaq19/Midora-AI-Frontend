@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '@/store'
 import { conversationApi } from '@/api/conversation/api'
 import { aiApi } from '@/api/ai/api'
-import { useAuthRedux } from '@/hooks/useAuthRedux'
+import { useAuthRedux } from '@/hooks/use-auth-redux'
 import { setAutoMode } from '@/store/slices/aiModelsSlice'
 import {
   setLoading,
@@ -26,7 +26,7 @@ import {
   stopStreaming,
 } from '@/store/slices/conversationSlice'
 import { Conversation, Message } from '@/api/conversation/types'
-import { useToast } from './useToast'
+import { useToast } from './use-toast'
 import { handleApiError } from '@/lib/error-handler'
 
 export const useConversation = () => {
@@ -159,7 +159,7 @@ export const useConversation = () => {
       
       // Create conversation if none exists
       if (!targetConversationUuid) {
-        const response = await conversationApi.createConversation({ name: `Chat - ${content.substring(0, 50)}...` })
+        const response = await conversationApi.createConversation({ name: `${content.substring(0, 50)}...` })
         if (response.error) {
           const errorObject = response.processedError || {
             error_type: 'CONVERSATION_CREATION_FAILED',
@@ -212,6 +212,7 @@ export const useConversation = () => {
               dispatch(setStreamingMetadata({ message_type: metadata.message_type }))
             }
           } else if (type === 'model_selection') {
+            console.log("metadata = ", metadata)
             // Handle model selection stream responses
             dispatch(setStreamingMetadata({
               selected_model: metadata?.selected_model,

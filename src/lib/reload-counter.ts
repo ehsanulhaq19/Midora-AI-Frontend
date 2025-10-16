@@ -26,7 +26,6 @@ export function getReloadCount(): number {
     
     return count ? parseInt(count, 10) : 0
   } catch (error) {
-    console.error('Error getting reload count:', error)
     return 0
   }
 }
@@ -49,10 +48,8 @@ export function incrementReloadCount(): number {
       localStorage.setItem(RELOAD_COUNTER_EXPIRY_KEY, expiryTime.toString())
     }
     
-    console.log(`401 reload attempt count: ${newCount}/${MAX_RELOAD_ATTEMPTS}`)
     return newCount
   } catch (error) {
-    console.error('Error incrementing reload count:', error)
     return 0
   }
 }
@@ -66,9 +63,8 @@ export function resetReloadCount(): void {
   try {
     localStorage.removeItem(RELOAD_COUNTER_KEY)
     localStorage.removeItem(RELOAD_COUNTER_EXPIRY_KEY)
-    console.log('Reload counter reset')
   } catch (error) {
-    console.error('Error resetting reload count:', error)
+    // Error resetting reload count
   }
 }
 
@@ -96,7 +92,6 @@ export function handle401WithReload(): boolean {
   
   if (canReload()) {
     const newCount = incrementReloadCount()
-    console.warn(`401 Unauthorized detected. Reloading page (attempt ${newCount}/${MAX_RELOAD_ATTEMPTS})`)
     
     // Use setTimeout to allow any cleanup code to run
     setTimeout(() => {
@@ -105,7 +100,6 @@ export function handle401WithReload(): boolean {
     
     return true
   } else {
-    console.error(`Maximum reload attempts (${MAX_RELOAD_ATTEMPTS}) reached for 401 errors. Redirecting to login.`)
     // Reset counter after max attempts and redirect to login
     resetReloadCount()
     

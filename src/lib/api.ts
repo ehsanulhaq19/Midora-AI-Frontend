@@ -117,7 +117,7 @@ async function makeRequest<T = any>(
         try {
           apiResponseSchema.parse(data)
         } catch (validationError) {
-          console.warn('API response validation failed:', validationError)
+          // API response validation failed
         }
       }
       

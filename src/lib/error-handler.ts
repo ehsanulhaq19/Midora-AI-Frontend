@@ -107,7 +107,6 @@ export const getErrorMessage = (error: ApiError | Error | string | object): stri
       try {
         return t(i18nKey)
       } catch (translationError) {
-        console.warn(`Translation not found for error type: ${apiError.error_type}`)
         return apiError.error_message || 'An unexpected error occurred'
       }
     }
@@ -124,7 +123,6 @@ export const getErrorMessage = (error: ApiError | Error | string | object): stri
  * Handles API errors and returns user-friendly messages
  */
 export const handleApiError = (error: any): string => {
-  console.error('API Error:', error)
   
   // Handle Error objects with JSON stringified error objects
   if (error instanceof Error) {

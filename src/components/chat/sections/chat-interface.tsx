@@ -6,7 +6,7 @@ import { ModelSelection } from './model-selection'
 import { MessageInput } from './message-input'
 import { LogoOnly } from '@/icons'
 import { t, tWithParams } from '@/i18n'
-import { useAuthRedux } from '@/hooks/useAuthRedux'
+import { useAuthRedux } from '@/hooks/use-auth-redux'
 
 interface ChatInterfaceProps {
   onMenuClick: () => void

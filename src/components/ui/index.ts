@@ -16,6 +16,9 @@ export { Dropdown, DropdownItem } from './dropdown'
 // Toast components
 export { Toast, ToastContainer, showSuccessToast, showErrorToast, showWarningToast, showInfoToast } from './toast'
 
+// Tooltip components
+export { Tooltip } from './tooltip'
+
 // Other components
 export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from './card'
 export { ErrorDisplay } from './error-display'

@@ -5,7 +5,7 @@ import { NavigationSidebar } from './sections/navigation-sidebar'
 import { ChatInterface } from './sections/chat-interface'
 import { ConversationContainer } from './sections/conversation-container'
 import { ChatHeader } from './sections/chat-header'
-import { useConversation } from '@/hooks/useConversation'
+import { useConversation } from '@/hooks/use-conversation'
 import { useAIModels } from '@/hooks'
 
 export const ChatScreen: React.FC = () => {

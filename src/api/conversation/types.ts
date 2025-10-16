@@ -18,6 +18,9 @@ export interface Message {
     first_name: string
     last_name: string
   }
+  // Versioning support for regeneration
+  versions?: Message[]
+  currentVersionIndex?: number
 }
 
 // Conversation types

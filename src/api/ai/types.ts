@@ -59,6 +59,12 @@ export interface GenerateContentRequest {
   temperature?: number
 }
 
+// Regenerate Content types
+export interface RegenerateContentRequest {
+  message_uuid: string
+  ai_model_uuid: string
+}
+
 export interface GenerateContentResponse {
   content: string
   model_used: string
