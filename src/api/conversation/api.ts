@@ -7,6 +7,7 @@ import { baseApiClient, ApiResponse } from '../base'
 import {
   Conversation,
   Message,
+  MessageGroup,
   CreateConversationRequest,
   CreateConversationResponse,
   GetConversationsResponse,
@@ -21,6 +22,68 @@ class ConversationApiClient {
   private baseClient = baseApiClient
 
   /**
+   * Transform message groups into individual messages with versioning support
+   */
+  private transformMessageGroups(messageGroups: MessageGroup[]): Message[] {
+    const transformedMessages: Message[] = []
+    
+    messageGroups.forEach(group => {
+      if (group.type === 'single_message') {
+        // Single message - add as is
+        transformedMessages.push(...group.messages)
+      } else if (group.type === 'multi_message') {
+        // Multi message - group messages by parent_message_uuid for versioning
+        const parentMessageId = group.parent_message_uuid
+        
+        if (parentMessageId) {
+          // Find if we already have a message with this parent ID
+          const existingMessageIndex = transformedMessages.findIndex(
+            msg => msg.uuid === parentMessageId
+          )
+          
+          if (existingMessageIndex !== -1) {
+            // Add versions to existing message
+            const existingMessage = transformedMessages[existingMessageIndex]
+            if (!existingMessage.versions) {
+              // Create versions array with the original message as first version
+              existingMessage.versions = [{ ...existingMessage }]
+              existingMessage.currentVersionIndex = 0
+            }
+            // Add new versions
+            existingMessage.versions.push(...group.messages)
+            existingMessage.currentVersionIndex = existingMessage.versions.length - 1
+            // Update content to show the latest version
+            if (group.messages.length > 0) {
+              const latestMessage = group.messages[group.messages.length - 1]
+              existingMessage.content = latestMessage.content
+              existingMessage.model_name = latestMessage.model_name
+            }
+          } else {
+            // Parent message not found, add the first message as the main message with versions
+            if (group.messages.length > 0) {
+              const mainMessage = { ...group.messages[0] }
+              mainMessage.versions = [...group.messages]
+              mainMessage.currentVersionIndex = group.messages.length - 1
+              // Show the latest version content
+              const latestMessage = group.messages[group.messages.length - 1]
+              mainMessage.content = latestMessage.content
+              mainMessage.model_name = latestMessage.model_name
+              // Use the parent message ID as the main message UUID
+              mainMessage.uuid = parentMessageId
+              transformedMessages.push(mainMessage)
+            }
+          }
+        } else {
+          // No parent message ID, add all messages as individual messages
+          transformedMessages.push(...group.messages)
+        }
+      }
+    })
+    
+    return transformedMessages
+  }
+
+  /**
    * Get all conversations
    */
   async getConversations(page: number = 1, perPage: number = 20, orderBy: string = "-created_at"): Promise<ApiResponse<{ conversations: Conversation[], pagination: { page: number, per_page: number, total: number, total_pages: number } }>> {
@@ -30,12 +93,12 @@ class ConversationApiClient {
     }
     
     // Extract conversations and pagination from the response data
-    const conversations = response?.data.items || []
+    const conversations = response?.data?.items || []
     const pagination = {
-      page: response?.data.page || page,
-      per_page: response?.data.per_page || perPage,
-      total: response?.data.total || 0,
-      total_pages: response?.data.total_pages || 0
+      page: response?.data?.page || page,
+      per_page: response?.data?.per_page || perPage,
+      total: response?.data?.total || 0,
+      total_pages: response?.data?.total_pages || 0
     }
     
     return { data: { conversations, pagination }, status: response.status }
@@ -90,13 +153,15 @@ class ConversationApiClient {
       return { error: response.error, status: response.status }
     }
     
-    // Extract messages and pagination from the response data
-    const messages = response.data?.items || []
+    // Transform message groups into individual messages with versioning support
+    const messageGroups = response?.data?.items || []
+    const messages = this.transformMessageGroups(messageGroups)
+    
     const pagination = {
-      page: response.data?.page || page,
-      per_page: response.data?.per_page || perPage,
-      total: response.data?.total || 0,
-      total_pages: response.data?.total_pages || 0
+      page: response?.data?.page || page,
+      per_page: response?.data?.per_page || perPage,
+      total: response?.data?.total || 0,
+      total_pages: response?.data?.total_pages || 0
     }
     
     return { data: { messages, pagination }, status: response.status }

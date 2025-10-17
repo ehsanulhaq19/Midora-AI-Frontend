@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '@/store'
 import { aiApi } from '@/api/ai/api'
@@ -12,7 +12,10 @@ import {
   setError,
   updateMessageContent,
   addMessageVersion,
-  setCurrentMessageVersion
+  addMessageVersions,
+  setCurrentMessageVersion,
+  clearMessageContent,
+  startRegeneration
 } from '@/store/slices/conversationSlice'
 import { useToast } from './use-toast'
 import { handleApiError } from '@/lib/error-handler'
@@ -22,6 +25,7 @@ export const useRegenerate = () => {
   const { user } = useAuthRedux()
   const { error: showErrorToast } = useToast()
   const { isStreaming } = useSelector((state: RootState) => state.conversation)
+  const [isRegenerating, setIsRegenerating] = useState(false)
 
   const regenerateMessage = useCallback(async (
     messageUuid: string,
@@ -29,7 +33,11 @@ export const useRegenerate = () => {
     conversationUuid: string
   ) => {
     try {
+      setIsRegenerating(true)
       dispatch(setError(null))
+      
+      // Start regeneration - clear content and prepare for streaming
+      dispatch(startRegeneration({ conversationUuid, messageUuid }))
       
       // Start streaming
       dispatch(startStreaming())
@@ -63,6 +71,13 @@ export const useRegenerate = () => {
             accumulatedContent += chunk
             streamingBuffer += chunk
             
+            // Update the message content in real-time
+            dispatch(updateMessageContent({ 
+              conversationUuid, 
+              messageUuid, 
+              content: streamingBuffer 
+            }))
+            
             // Throttle UI updates for smoother performance
             const now = Date.now()
             if (now - lastUpdateTime >= UPDATE_THROTTLE) {
@@ -73,34 +88,43 @@ export const useRegenerate = () => {
         },
         (metadata: any) => {
           if (metadata.type === "initial_metadata") {
-            // Handle initial metadata - this contains the new message
+            // Handle initial metadata - just store the message info for later use
+            // Don't add version yet, wait for completion
+          } else if (metadata.type === "completion") {
+            // Handle completion - create final version with complete content
             if (metadata.message) {
-              // Add the new regenerated message as a version
+              // Update the message with final content and model info
+              const finalMessage = {
+                ...metadata.message,
+                content: accumulatedContent,
+                model_name: metadata.selected_model || metadata.model_used
+              }
+              
+              // Add as new version using the new pattern
               dispatch(addMessageVersion({
                 conversationUuid,
                 originalMessageUuid: messageUuid,
-                newMessage: metadata.message
+                newMessage: finalMessage
               }))
             }
-          } else {
-            // Ensure final content is displayed
+            
+            // Stop streaming
             dispatch(setStreamingContent(streamingBuffer))
-            dispatch(completeStreaming({
-              conversationUuid,
-              content: accumulatedContent,
-              metadata
-            }))
+            dispatch(stopStreaming())
+            setIsRegenerating(false)
           }
         },
         (error: string) => {
           dispatch(stopStreaming())
           dispatch(setError(error))
+          setIsRegenerating(false)
           showErrorToast('Regenerate Error', error)
         }
       )
       
     } catch (err) {
       dispatch(stopStreaming())
+      setIsRegenerating(false)
       const errorMessage = handleApiError(err)
       dispatch(setError(errorMessage))
       showErrorToast('Failed to Regenerate Message', errorMessage)
@@ -122,6 +146,6 @@ export const useRegenerate = () => {
   return {
     regenerateMessage,
     switchMessageVersion,
-    isRegenerating: isStreaming
+    isRegenerating
   }
 }

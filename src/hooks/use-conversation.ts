@@ -179,16 +179,33 @@ export const useConversation = () => {
       const userMessage: Message = {
         uuid: messageUuid,
         content,
-        sender_id: user?.id || 0,
-        conversation_uuid: targetConversationUuid,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
+        model_name: null,
         sender: user ? {
-          uuid: user.uuid,
           email: user.email,
           first_name: user.first_name,
-          last_name: user.last_name
-        } : undefined
+          last_name: user.last_name,
+          uuid: user.uuid,
+          username: user.username || '',
+          is_active: true,
+          is_verified: true,
+          is_onboarded: true,
+          meta_data: {
+            sso_created: true,
+            created_via: 'sso'
+          }
+        } : {
+          email: '',
+          first_name: '',
+          last_name: '',
+          uuid: '',
+          username: '',
+          is_active: false,
+          is_verified: false,
+          is_onboarded: false,
+          meta_data: null
+        }
       }
       
       dispatch(addMessage({ conversationUuid: targetConversationUuid, message: userMessage }))

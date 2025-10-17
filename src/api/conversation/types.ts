@@ -3,24 +3,40 @@
  * Type definitions for all conversation-related API requests and responses
  */
 
+// Sender types
+export interface Sender {
+  email: string
+  first_name: string
+  last_name: string
+  uuid: string
+  username: string
+  is_active: boolean
+  is_verified: boolean
+  is_onboarded: boolean
+  meta_data: {
+    sso_created?: boolean
+    created_via?: string
+  } | null
+}
+
 // Message types
 export interface Message {
-  uuid: string
   content: string
-  sender_id: number
-  conversation_uuid: string
+  uuid: string
+  sender: Sender
+  model_name: string | null
   created_at: string
-  updated_at: string
-  model_name?: string
-  sender?: {
-    uuid: string
-    email: string
-    first_name: string
-    last_name: string
-  }
+  updated_at: string | null
   // Versioning support for regeneration
   versions?: Message[]
   currentVersionIndex?: number
+}
+
+// Message group types for new response structure
+export interface MessageGroup {
+  type: 'single_message' | 'multi_message'
+  messages: Message[]
+  parent_message_uuid: string | null
 }
 
 // Conversation types
@@ -44,43 +60,28 @@ export interface CreateMessageRequest {
   content: string
 }
 
-// Response types
-export interface CreateConversationResponse {
-  success: boolean
-  data: Conversation
-}
+// Response types (after baseApiClient processing)
+export interface CreateConversationResponse extends Conversation {}
 
 export interface GetConversationsResponse {
-  success: boolean
-  data: {
-    items: Conversation[]
-    total: number
-    page: number
-    per_page: number
-    total_pages: number
-  }
+  items: Conversation[]
+  total: number
+  page: number
+  per_page: number
+  total_pages: number
 }
 
-export interface GetConversationResponse {
-  success: boolean
-  data: Conversation
-}
+export interface GetConversationResponse extends Conversation {}
 
 export interface GetMessagesResponse {
-  success: boolean
-  data: {
-    items: Message[]
-    total: number
-    page: number
-    per_page: number
-    total_pages: number
-  }
+  items: MessageGroup[]
+  total: number
+  page: number
+  per_page: number
+  total_pages: number
 }
 
-export interface CreateMessageResponse {
-  success: boolean
-  data: Message
-}
+export interface CreateMessageResponse extends Message {}
 
 export interface DeleteConversationResponse {
   success: boolean
