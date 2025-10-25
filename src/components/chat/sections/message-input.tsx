@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { ArrowUpSm, Plus01_5, Microphone, Filters } from '@/icons'
 import { IconButton } from '@/components/ui/buttons'
 import { TextareaInput } from '@/components/ui/inputs'
@@ -10,13 +10,14 @@ import { useAIModels, useFileUpload, useToast } from '@/hooks'
 import { t } from '@/i18n'
 
 interface MessageInputProps {
-  onSend: (message: string, modelUuid?: string, fileUuids?: string[]) => void
+  onSend: (message: string, modelUuid?: string, fileUuids?: string[], uploadedFiles?: any[]) => void
   isStreaming?: boolean
   className?: string
   textAreaClassName?: string
+  onFilesChange?: (hasFiles: boolean) => void
 }
 
-export const MessageInput: React.FC<MessageInputProps> = ({ onSend, isStreaming = false, className = '', textAreaClassName = '' }) => {
+export const MessageInput: React.FC<MessageInputProps> = ({ onSend, isStreaming = false, className = '', textAreaClassName = '', onFilesChange }) => {
   const [message, setMessage] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { error: showErrorToast } = useToast()
@@ -38,12 +39,19 @@ export const MessageInput: React.FC<MessageInputProps> = ({ onSend, isStreaming 
     validateFile
   } = useFileUpload()
 
+  // Notify parent when files change
+  useEffect(() => {
+    if (onFilesChange) {
+      onFilesChange(files.length > 0)
+    }
+  }, [files.length, onFilesChange])
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if ((message.trim() || files.length > 0) && !isStreaming && !isUploading) {
       const modelUuid = isAutoMode ? undefined : selectedModel?.uuid
       const fileUuids = files.map(f => f.uuid)
-      onSend(message, modelUuid, fileUuids)
+      onSend(message, modelUuid, fileUuids, files)
       setMessage('')
       clearFiles() // Clear files after sending message
     }

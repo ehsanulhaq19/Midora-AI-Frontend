@@ -24,11 +24,11 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({ onMenuClick }) => {
       </div>
 
       <div className="flex items-center gap-2">
-        <button className="hidden sm:inline-flex items-center justify-center gap-2 p-3 bg-[color:var(--premitives-color-brand-purple-1000)] rounded-[var(--premitives-corner-radius-corner-radius-2)] hover:bg-[color:var(--tokens-color-surface-surface-button-pressed)] transition-colors">
+        {/* <button className="hidden sm:inline-flex items-center justify-center gap-2 p-3 bg-[color:var(--premitives-color-brand-purple-1000)] rounded-[var(--premitives-corner-radius-corner-radius-2)] hover:bg-[color:var(--tokens-color-surface-surface-button-pressed)] transition-colors">
           <div className="relative w-fit mt-[-1.00px] font-h05-heading05 font-[number:var(--h05-heading05-font-weight)] text-tokens-color-text-text-neutral text-[length:var(--h05-heading05-font-size)] tracking-[var(--h05-heading05-letter-spacing)] leading-[var(--h05-heading05-line-height)] whitespace-nowrap [font-style:var(--h05-heading05-font-style)]">
             {t('chat.upgradeToPro')}
           </div>
-        </button>
+        </button> */}
       </div>
     </div>
   )

@@ -10,6 +10,7 @@ import { useAIModels } from '@/hooks'
 
 export const ChatScreen: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [hasFiles, setHasFiles] = useState(false)
   const {
     currentConversation,
     loadConversations,
@@ -36,8 +37,8 @@ export const ChatScreen: React.FC = () => {
     setSidebarOpen(false)
   }
 
-  const handleSendMessage = async (message: string, modelUuid?: string, fileUuids?: string[]) => {
-    await sendMessage(message, modelUuid, undefined, fileUuids)
+  const handleSendMessage = async (message: string, modelUuid?: string, fileUuids?: string[], uploadedFiles?: any[]) => {
+    await sendMessage(message, modelUuid, undefined, fileUuids, uploadedFiles)
   }
 
   return (
@@ -57,7 +58,7 @@ export const ChatScreen: React.FC = () => {
             <ChatHeader onMenuClick={handleMenuClick} />
             <ConversationContainer 
               conversationUuid={currentConversation.uuid}
-              className="flex-1 max-h-[calc(100vh-270px)]"
+              className={`flex-1 ${hasFiles ? 'max-h-[calc(100vh-380px)]' : 'max-h-[calc(100vh-270px)]'}`}
             />
             <div className="">
               <ChatInterface 
@@ -65,6 +66,7 @@ export const ChatScreen: React.FC = () => {
                 onSendMessage={handleSendMessage}
                 isCompact={true}
                 isStreaming={isStreaming}
+                onFilesChange={setHasFiles}
               />
             </div>
           </>

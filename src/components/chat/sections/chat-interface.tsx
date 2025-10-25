@@ -12,16 +12,18 @@ import { useFileUpload, useToast } from '@/hooks'
 
 interface ChatInterfaceProps {
   onMenuClick: () => void
-  onSendMessage: (message: string, modelUuid?: string, fileUuids?: string[]) => void
+  onSendMessage: (message: string, modelUuid?: string, fileUuids?: string[], uploadedFiles?: any[]) => void
   isCompact?: boolean
   isStreaming?: boolean
+  onFilesChange?: (hasFiles: boolean) => void
 }
 
 export const ChatInterface: React.FC<ChatInterfaceProps> = ({ 
   onMenuClick, 
   onSendMessage,
   isCompact = false,
-  isStreaming = false
+  isStreaming = false,
+  onFilesChange
 }) => {
   const { userName } = useAuthRedux()
   const [isDragOver, setIsDragOver] = useState(false)
@@ -68,11 +70,11 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       }
     }
   }, [validateFile, uploadFile, showErrorToast])
-  
+
   if (isCompact) {
     return (
       <div className="w-full max-w-[808px] max-h-[106px] mx-auto p-4">
-        <MessageInput onSend={onSendMessage} isStreaming={isStreaming} className="max-w-[808px]" textAreaClassName="!app-text-lg"/>
+        <MessageInput onSend={onSendMessage} isStreaming={isStreaming} className="max-w-[808px]" textAreaClassName="!app-text-lg" onFilesChange={onFilesChange}/>
       </div>
     )
   }
@@ -119,7 +121,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
           </p>
         </div>
 
-        <MessageInput onSend={onSendMessage} isStreaming={isStreaming} />
+        <MessageInput onSend={onSendMessage} isStreaming={isStreaming} onFilesChange={onFilesChange} />
       </div>
     </div>
   )
