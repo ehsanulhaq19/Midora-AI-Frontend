@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { ArrowUpSm, Plus01_5, Microphone, Filters } from '@/icons'
 import { IconButton } from '@/components/ui/buttons'
 import { TextareaInput } from '@/components/ui/inputs'
@@ -14,9 +14,10 @@ interface MessageInputProps {
   isStreaming?: boolean
   className?: string
   textAreaClassName?: string
+  onFilesChange?: (hasFiles: boolean) => void
 }
 
-export const MessageInput: React.FC<MessageInputProps> = ({ onSend, isStreaming = false, className = '', textAreaClassName = '' }) => {
+export const MessageInput: React.FC<MessageInputProps> = ({ onSend, isStreaming = false, className = '', textAreaClassName = '', onFilesChange }) => {
   const [message, setMessage] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { error: showErrorToast } = useToast()
@@ -37,6 +38,13 @@ export const MessageInput: React.FC<MessageInputProps> = ({ onSend, isStreaming 
     clearFiles,
     validateFile
   } = useFileUpload()
+
+  // Notify parent when files change
+  useEffect(() => {
+    if (onFilesChange) {
+      onFilesChange(files.length > 0)
+    }
+  }, [files.length, onFilesChange])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()

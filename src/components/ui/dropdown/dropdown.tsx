@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useRef, useEffect } from 'react'
-import { ArrowDownSm } from '@/icons'
+import { ArrowDownSm, ArrowUpSm } from '@/icons'
 
 interface DropdownOption {
   value: string
@@ -79,7 +79,8 @@ export const Dropdown: React.FC<DropdownProps> = ({
 
   const getDropdownClasses = () => {
     const bgColor = variant === 'model-selector' ? 'bg-white' : 'bg-[color:var(--tokens-color-surface-surface-button-pressed)]'
-    const baseClasses = `absolute left-0 right-0 mt-1 ${bgColor} border border-[color:var(--tokens-color-border-border-subtle)] rounded-[var(--premitives-corner-radius-corner-radius-2)] shadow-lg z-50 max-h-60 overflow-y-auto`
+    const widthClass = variant === 'model-selector' ? 'w-full' : 'left-0 right-0'
+    const baseClasses = `absolute ${widthClass} mt-1 ${bgColor} border border-[color:var(--tokens-color-border-border-subtle)] rounded-[var(--premitives-corner-radius-corner-radius-2)] shadow-lg z-50 max-h-60 overflow-y-auto`
     
     if (openUpward) {
       return `${baseClasses} bottom-full mb-1`
@@ -91,7 +92,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
   const getButtonContent = () => {
     if (variant === 'model-selector') {
       return (
-        <div className="flex items-center gap-2 w-full justify-between">
+        <div className="flex items-center gap-[10px] w-full">
           <div className="flex items-center gap-2">
             {modeText && (
               <span className="font-text-medium font-[number:var(--text-medium-font-weight)] text-tokens-color-text-text-neutral text-sm tracking-[var(--text-medium-letter-spacing)] leading-[var(--text-medium-line-height)] whitespace-nowrap [font-style:var(--text-medium-font-style)]">
@@ -114,10 +115,15 @@ export const Dropdown: React.FC<DropdownProps> = ({
               {selectedOption?.label || placeholder}
             </span>
           </div>
-          {!isOpen && (
+          {isOpen ? (
+            <ArrowUpSm 
+              color="rgba(31, 23, 64, 0.9)" 
+              className="transition-transform duration-200 flex-shrink-0 w-5 h-6"
+            />
+          ) : (
             <ArrowDownSm 
               color="rgba(31, 23, 64, 0.9)" 
-              className="transition-transform duration-200 flex-shrink-0"
+              className="transition-transform duration-200 flex-shrink-0 w-3 h-3"
             />
           )}
         </div>
