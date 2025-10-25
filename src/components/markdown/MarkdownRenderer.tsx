@@ -22,56 +22,56 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
         components={{
           // Headings with theme-aware styling
           h1: ({ children }) => (
-            <h1 className="text-2xl font-bold text-[color:var(--tokens-color-text-text-primary)] mb-4 mt-6 first:mt-0">
+            <h1 className="app-text-3xl font-bold app-text-primary mb-4 mt-6 first:mt-0">
               {children}
             </h1>
           ),
           h2: ({ children }) => (
-            <h2 className="text-xl font-semibold text-[color:var(--tokens-color-text-text-primary)] mb-3 mt-5 first:mt-0">
+            <h2 className="app-text-2xl font-semibold app-text-primary mb-3 mt-5 first:mt-0">
               {children}
             </h2>
           ),
           h3: ({ children }) => (
-            <h3 className="text-lg font-medium text-[color:var(--tokens-color-text-text-primary)] mb-2 mt-4 first:mt-0">
+            <h3 className="app-text-xl font-medium app-text-primary mb-2 mt-4 first:mt-0">
               {children}
             </h3>
           ),
           h4: ({ children }) => (
-            <h4 className="text-base font-medium text-[color:var(--tokens-color-text-text-primary)] mb-2 mt-3 first:mt-0">
+            <h4 className="app-text-lg font-medium app-text-primary mb-2 mt-3 first:mt-0">
               {children}
             </h4>
           ),
           h5: ({ children }) => (
-            <h5 className="text-sm font-medium text-[color:var(--tokens-color-text-text-primary)] mb-2 mt-3 first:mt-0">
+            <h5 className="app-text-md font-medium app-text-primary mb-2 mt-3 first:mt-0">
               {children}
             </h5>
           ),
           h6: ({ children }) => (
-            <h6 className="text-xs font-medium text-[color:var(--tokens-color-text-text-primary)] mb-2 mt-3 first:mt-0">
+            <h6 className="app-text-sm font-medium app-text-primary mb-2 mt-3 first:mt-0">
               {children}
             </h6>
           ),
 
           // Paragraphs
           p: ({ children }) => (
-            <p className="text-[color:var(--tokens-color-text-text-primary)] mb-3 leading-relaxed">
+            <p className="app-text-md app-text-primary mb-3 leading-relaxed">
               {children}
             </p>
           ),
 
           // Lists with theme styling
           ul: ({ children }) => (
-            <ul className="list-disc list-inside mb-4 space-y-1 text-[color:var(--tokens-color-text-text-primary)]">
+            <ul className="list-disc list-inside mb-4 space-y-1 app-text-primary">
               {children}
             </ul>
           ),
           ol: ({ children }) => (
-            <ol className="list-decimal list-inside mb-4 space-y-1 text-[color:var(--tokens-color-text-text-primary)]">
+            <ol className="list-decimal list-inside mb-4 space-y-1 app-text-primary">
               {children}
             </ol>
           ),
           li: ({ children }) => (
-            <li className="text-[color:var(--tokens-color-text-text-primary)]">
+            <li className="app-text-primary">
               {children}
             </li>
           ),

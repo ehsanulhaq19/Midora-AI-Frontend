@@ -48,6 +48,9 @@ export const chat = {
   // Conversation related translations
   selectConversation: 'Select a conversation to start chatting',
   copyMessage: 'Copy message',
+  copied: 'Copied!',
+  regenerateMessage: 'Regenerate message',
+  regenerating: 'Regenerating...',
   typing: 'AI is typing...',
   loading: 'Loading...',
   loadingMoreMessages: 'Loading more messages...',
@@ -57,6 +60,13 @@ export const chat = {
   loadConversationsError: 'Failed to load conversations',
   createConversationError: 'Failed to create conversation',
   loadMoreMessagesError: 'Failed to load more messages',
+  regenerateMessageError: 'Failed to regenerate message',
+  
+  // Message versioning
+  messageVersions: 'Message versions',
+  previousVersion: 'Previous version',
+  nextVersion: 'Next version',
+  currentVersion: 'Current version',
   
   // AI Stream Status Messages
   aiStatus: {

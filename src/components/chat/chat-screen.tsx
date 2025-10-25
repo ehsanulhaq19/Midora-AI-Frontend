@@ -5,7 +5,7 @@ import { NavigationSidebar } from './sections/navigation-sidebar'
 import { ChatInterface } from './sections/chat-interface'
 import { ConversationContainer } from './sections/conversation-container'
 import { ChatHeader } from './sections/chat-header'
-import { useConversation } from '@/hooks/useConversation'
+import { useConversation } from '@/hooks/use-conversation'
 import { useAIModels } from '@/hooks'
 
 export const ChatScreen: React.FC = () => {
@@ -36,8 +36,8 @@ export const ChatScreen: React.FC = () => {
     setSidebarOpen(false)
   }
 
-  const handleSendMessage = async (message: string, modelUuid?: string) => {
-    await sendMessage(message, modelUuid)
+  const handleSendMessage = async (message: string, modelUuid?: string, fileUuids?: string[]) => {
+    await sendMessage(message, modelUuid, undefined, fileUuids)
   }
 
   return (

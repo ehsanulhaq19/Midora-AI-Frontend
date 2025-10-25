@@ -16,6 +16,7 @@ export interface AppConfig {
   // Authentication settings
   auth: {
     accessTokenExpiry: number
+    refreshTokenExpiry: number
   }
   
   // Feature flags
@@ -50,6 +51,7 @@ function getAppConfig(): AppConfig {
     // Authentication settings
     auth: {
       accessTokenExpiry: parseInt(process.env.NEXT_PUBLIC_ACCESS_TOKEN_EXPIRY || '900'), // 15 minutes
+      refreshTokenExpiry: parseInt(process.env.NEXT_PUBLIC_REFRESH_TOKEN_EXPIRY || '604800'), // 7 days
     },
     
     // Feature flags

@@ -20,9 +20,3 @@ export const useAuthRedux = () => {
     userFullName: authState.user ? `${authState.user.first_name} ${authState.user.last_name}`.trim() : 'User',
   }
 }
-
-
-
-
-
-

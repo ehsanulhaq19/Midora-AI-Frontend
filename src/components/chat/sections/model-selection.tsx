@@ -53,7 +53,7 @@ export const ModelSelection: React.FC<ModelSelectionProps> = ({
       {
         value: 'auto',
         label: 'Midroa AI',
-        icon: <LogoOnly color="#FFFFFF" className="w-4 h-4" />
+        icon: <LogoOnly color="#D1ADF9" className="w-4 h-4" />
       }
     ]
 
@@ -75,7 +75,7 @@ export const ModelSelection: React.FC<ModelSelectionProps> = ({
         className={`inline-flex items-center justify-center gap-1 p-2 relative rounded-[var(--premitives-corner-radius-corner-radius-2)] ${className}`}
         style={{ background: 'linear-gradient(109deg, #1F1740 3.33%, #503CA6 127.07%)' }}
       >
-        <div className="text-tokens-color-text-text-neutral font-text-medium text-[length:var(--text-medium-font-size)]">Loading...</div>
+        <div className="text-tokens-color-text-text-neutral font-text-medium text-sm">Loading...</div>
       </div>
     )
   }

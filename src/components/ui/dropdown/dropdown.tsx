@@ -94,7 +94,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
         <div className="flex items-center gap-2 w-full justify-between">
           <div className="flex items-center gap-2">
             {modeText && (
-              <span className="font-text-medium font-[number:var(--text-medium-font-weight)] text-tokens-color-text-text-neutral text-[length:var(--text-medium-font-size)] tracking-[var(--text-medium-letter-spacing)] leading-[var(--text-medium-line-height)] whitespace-nowrap [font-style:var(--text-medium-font-style)]">
+              <span className="font-text-medium font-[number:var(--text-medium-font-weight)] text-tokens-color-text-text-neutral text-sm tracking-[var(--text-medium-letter-spacing)] leading-[var(--text-medium-line-height)] whitespace-nowrap [font-style:var(--text-medium-font-style)]">
                 {modeText}
               </span>
             )}
@@ -110,7 +110,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
                 className="w-4 h-4 rounded flex-shrink-0"
               />
             )}
-            <span className="font-text-medium font-[number:var(--text-medium-font-weight)] text-[color:var(--tokens-color-text-text-brand)] text-[length:var(--text-medium-font-size)] tracking-[var(--text-medium-letter-spacing)] leading-[var(--text-medium-line-height)] whitespace-nowrap [font-style:var(--text-medium-font-style)]">
+            <span className="font-text-medium font-[number:var(--text-medium-font-weight)] text-[color:var(--tokens-color-text-text-brand)] text-sm tracking-[var(--text-medium-letter-spacing)] leading-[var(--text-medium-line-height)] whitespace-nowrap [font-style:var(--text-medium-font-style)]">
               {selectedOption?.label || placeholder}
             </span>
           </div>
@@ -127,7 +127,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
     return (
       <div className="flex items-center gap-2">
         {modeText && (
-          <span className="font-text-medium font-[number:var(--text-medium-font-weight)] text-tokens-color-text-text-neutral text-[length:var(--text-medium-font-size)] tracking-[var(--text-medium-letter-spacing)] leading-[var(--text-medium-line-height)] whitespace-nowrap [font-style:var(--text-medium-font-style)]">
+          <span className="font-text-medium font-[number:var(--text-medium-font-weight)] text-tokens-color-text-text-neutral text-sm tracking-[var(--text-medium-letter-spacing)] leading-[var(--text-medium-line-height)] whitespace-nowrap [font-style:var(--text-medium-font-style)]">
             {modeText}
           </span>
         )}
@@ -150,7 +150,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
           className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
         />
 
-        <span className="font-text-medium font-[number:var(--text-medium-font-weight)] text-tokens-color-text-text-neutral text-[length:var(--text-medium-font-size)] tracking-[var(--text-medium-letter-spacing)] leading-[var(--text-medium-line-height)] whitespace-nowrap [font-style:var(--text-medium-font-style)]">
+        <span className="font-text-medium font-[number:var(--text-medium-font-weight)] text-tokens-color-text-text-neutral text-sm tracking-[var(--text-medium-letter-spacing)] leading-[var(--text-medium-line-height)] whitespace-nowrap [font-style:var(--text-medium-font-style)]">
           {selectedOption?.label || placeholder}
         </span>
       </div>
@@ -194,7 +194,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
                   className="w-4 h-4 rounded flex-shrink-0"
                 />
               )}
-              <span className={`font-text-small font-[number:var(--text-small-font-weight)] text-[length:var(--text-small-font-size)] tracking-[var(--text-small-letter-spacing)] leading-[var(--text-small-line-height)] [font-style:var(--text-small-font-style)] ${
+              <span className={`font-text-small font-[number:var(--text-small-font-weight)] text-sm tracking-[var(--text-small-letter-spacing)] leading-[var(--text-small-line-height)] [font-style:var(--text-small-font-style)] ${
                 variant === 'model-selector' ? 'text-[color:var(--tokens-color-text-text-brand)]' : 'text-[color:var(--tokens-color-text-text-neutral)]'
               }`}>
                 {option.label}

@@ -47,7 +47,8 @@ import {
   Filters,
   PersonFace,
   AI,
-  LogoText
+  LogoText,
+  Regenerate
 } from '@/icons'
 
 export default function AppDocumentsPage() {
@@ -99,6 +100,7 @@ export default function AppDocumentsPage() {
     { name: 'PersonFace', component: PersonFace },
     { name: 'AI', component: AI },
     { name: 'LogoText', component: LogoText },
+    { name: 'Regenerate', component: Regenerate },
   ]
 
   return (

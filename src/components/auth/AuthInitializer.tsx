@@ -1,6 +1,6 @@
 'use client'
 
-import { useAuthInit } from '@/hooks/useAuthInit'
+import { useAuthInit } from '@/hooks/use-auth-init'
 
 /**
  * Component to initialize authentication state on app startup

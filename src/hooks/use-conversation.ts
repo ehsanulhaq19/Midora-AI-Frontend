@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '@/store'
 import { conversationApi } from '@/api/conversation/api'
 import { aiApi } from '@/api/ai/api'
-import { useAuthRedux } from '@/hooks/useAuthRedux'
+import { useAuthRedux } from '@/hooks/use-auth-redux'
 import { setAutoMode } from '@/store/slices/aiModelsSlice'
 import {
   setLoading,
@@ -26,7 +26,7 @@ import {
   stopStreaming,
 } from '@/store/slices/conversationSlice'
 import { Conversation, Message } from '@/api/conversation/types'
-import { useToast } from './useToast'
+import { useToast } from './use-toast'
 import { handleApiError } from '@/lib/error-handler'
 
 export const useConversation = () => {
@@ -151,7 +151,7 @@ export const useConversation = () => {
   }, [dispatch, conversations, messages])
 
   // Send a message
-  const sendMessage = useCallback(async (content: string, modelUuid?: string, conversationUuid?: string) => {
+  const sendMessage = useCallback(async (content: string, modelUuid?: string, conversationUuid?: string, fileUuids?: string[]) => {
     try {
       dispatch(clearError())
       
@@ -159,7 +159,7 @@ export const useConversation = () => {
       
       // Create conversation if none exists
       if (!targetConversationUuid) {
-        const response = await conversationApi.createConversation({ name: `Chat - ${content.substring(0, 50)}...` })
+        const response = await conversationApi.createConversation({ name: `${content.substring(0, 50)}...` })
         if (response.error) {
           const errorObject = response.processedError || {
             error_type: 'CONVERSATION_CREATION_FAILED',
@@ -179,16 +179,33 @@ export const useConversation = () => {
       const userMessage: Message = {
         uuid: messageUuid,
         content,
-        sender_id: user?.id || 0,
-        conversation_uuid: targetConversationUuid,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
+        model_name: null,
         sender: user ? {
-          uuid: user.uuid,
           email: user.email,
           first_name: user.first_name,
-          last_name: user.last_name
-        } : undefined
+          last_name: user.last_name,
+          uuid: user.uuid,
+          username: user.username || '',
+          is_active: true,
+          is_verified: true,
+          is_onboarded: true,
+          meta_data: {
+            sso_created: true,
+            created_via: 'sso'
+          }
+        } : {
+          email: '',
+          first_name: '',
+          last_name: '',
+          uuid: '',
+          username: '',
+          is_active: false,
+          is_verified: false,
+          is_onboarded: false,
+          meta_data: null
+        }
       }
       
       dispatch(addMessage({ conversationUuid: targetConversationUuid, message: userMessage }))
@@ -204,7 +221,7 @@ export const useConversation = () => {
       
       // Generate AI response with streaming
       await aiApi.generateContentStream(
-        { query: content, conversation_uuid: targetConversationUuid, stream: true, ai_model_uuid: modelUuid },
+        { query: content, conversation_uuid: targetConversationUuid, stream: true, ai_model_uuid: modelUuid, file_uuids: fileUuids },
         (chunk: string, type: string, metadata?: any) => {
           if (type === 'metadata') {
             // Handle metadata stream responses - update metadata state only
@@ -212,6 +229,7 @@ export const useConversation = () => {
               dispatch(setStreamingMetadata({ message_type: metadata.message_type }))
             }
           } else if (type === 'model_selection') {
+            console.log("metadata = ", metadata)
             // Handle model selection stream responses
             dispatch(setStreamingMetadata({
               selected_model: metadata?.selected_model,

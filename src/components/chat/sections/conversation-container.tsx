@@ -1,15 +1,21 @@
 'use client'
 
-import React, { useEffect, useRef, useCallback } from 'react'
-import { useConversation } from '@/hooks/useConversation'
-import { Message } from '@/api/conversation/types'
-import { Copy, LogoOnly } from '@/icons'
+import React, { useEffect, useRef, useCallback, useState } from 'react'
+import { useConversation } from '@/hooks/use-conversation'
+import { Message, LinkedFile } from '@/api/conversation/types'
+import { Copy, LogoOnly, CheckBroken, Regenerate } from '@/icons'
 import { IconButton } from '@/components/ui/buttons'
 import { Spinner } from '@/components/ui/loaders'
+import { Tooltip } from '@/components/ui/tooltip'
 import { t } from '@/i18n'
 import { MarkdownRenderer } from '@/components/markdown'
+import { markdownToTextSync } from '@/lib/markdown-utils'
+import { useRegenerate } from '@/hooks/use-regenerate'
 import './style.css'
-import { useAuthRedux } from '@/hooks/useAuthRedux'
+import { useAuthRedux } from '@/hooks/use-auth-redux'
+import { useAIModels } from '@/hooks/use-ai-models'
+import { MessageVersionNavigation } from './message-version-navigation'
+import { LinkedFilesPreview } from './linked-files-preview'
 
 interface ConversationContainerProps {
   conversationUuid: string | null
@@ -20,17 +26,89 @@ interface MessageBubbleProps {
   message: Message
   isUser: boolean,
   textClassName?: string
+  isLastMessage?: boolean
+  conversationUuid?: string
+  onRegenerate?: (messageUuid: string) => void
+  isRegenerating?: boolean
+  isStreaming?: boolean
+  streamingContent?: string
+  streamingMetadata?: {
+    selected_model?: string;
+    selected_provider?: string;
+    query_category?: string;
+    rank?: number;
+    message_type?: string;
+    linked_files?: Array<{
+      uuid: string;
+      filename: string;
+      file_extension: string;
+      file_type: string;
+      file_size: number;
+      storage_type: string;
+    }>;
+  }
+  isThisMessageRegenerating?: boolean
 }
 
-const MessageBubble: React.FC<MessageBubbleProps> = ({ message, isUser, textClassName = "" }) => {
+const MessageBubble: React.FC<MessageBubbleProps> = ({ 
+  message, 
+  isUser, 
+  textClassName = "",
+  isLastMessage = false,
+  conversationUuid,
+  onRegenerate,
+  isRegenerating = false,
+  isStreaming = false,
+  streamingContent = '',
+  streamingMetadata = null,
+  isThisMessageRegenerating = false
+}) => {
+  const [isCopied, setIsCopied] = useState(false)
+  const { switchMessageVersion } = useRegenerate()
+
   const handleCopy = async () => {
+    if (isCopied) return // Prevent multiple copies while showing feedback
+    
     try {
-      await navigator.clipboard.writeText(message.content)
-      // You could add a toast notification here
+      // Convert markdown to plain text for copying
+      const plainText = isUser ? message.content : markdownToTextSync(message.content)
+      await navigator.clipboard.writeText(plainText)
+      
+      // Show feedback
+      setIsCopied(true)
+      
+      // Reset after 2 seconds
+      setTimeout(() => {
+        setIsCopied(false)
+      }, 2000)
     } catch (err) {
       console.error('Failed to copy text: ', err)
     }
   }
+
+  const handleRegenerate = () => {
+    if (onRegenerate && conversationUuid) {
+      onRegenerate(message.uuid)
+    }
+  }
+
+  const handleVersionNavigation = (direction: 'prev' | 'next') => {
+    if (!message.versions || !conversationUuid) return
+    
+    const currentIndex = message.currentVersionIndex || 0
+    const newIndex = direction === 'prev' ? currentIndex - 1 : currentIndex + 1
+    
+    
+    if (newIndex >= 0 && newIndex < message.versions.length) {
+      switchMessageVersion(conversationUuid, message.uuid, newIndex)
+    }
+  }
+
+  // Check if message has multiple versions
+  const hasMultipleVersions = message.versions && message.versions.length > 1
+  const currentVersionIndex = message.currentVersionIndex || 0
+  const canGoPrevious = currentVersionIndex > 0
+  const canGoNext = currentVersionIndex < (message.versions?.length || 1) - 1
 
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-6 px-4 message-blub`}>
@@ -43,31 +121,103 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, isUser, textClas
           }`}
         >
           {isUser ? (
-            <p className="whitespace-pre-wrap">{message.content}</p>
+            <p className="whitespace-pre-wrap text-sm">{message.content}</p>
           ) : (
-            <MarkdownRenderer content={message.content} />
+            <div className="text-sm">
+              {isThisMessageRegenerating && isStreaming ? (
+                <>
+                  {!streamingContent && !message.content ? (
+                    // Show loading animation before content arrives
+                    <div className="flex items-center gap-3">
+                      <div className="animate-spin" style={{ animation: 'spin 2s linear infinite' }}>
+                        <LogoOnly className="w-6 h-6" />
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <MarkdownRenderer content={streamingContent || message.content} />
+                      <StreamingCursor />
+                    </>
+                  )}
+                </>
+              ) : (
+                <MarkdownRenderer content={message.content || ''} />
+              )}
+            </div>
           )}
         </div>
 
+        {/* Linked Files Preview */}
+        {message.linked_files && message.linked_files.length > 0 && (
+          <LinkedFilesPreview linkedFiles={message.linked_files} isUser={isUser} />
+        )}
+
         <div className="ml-2">
           {/* Display AI model name with copy button for AI messages */}
-          {!isUser && message.model_name && (
+          {!isUser && message.model_name && !isThisMessageRegenerating && (
             <div className="flex items-center gap-1 pl-[3px]">
-              <span className="!text-sm text-[color:var(--tokens-color-text-text-inactive-2)]">
+              <span className="text-sm text-[color:var(--tokens-color-text-text-inactive-2)]">
                 {message.model_name}
               </span>
             </div>
           )}
           
+          {/* Display status messages during regeneration */}
+          {!isUser && isThisMessageRegenerating && isStreaming && streamingMetadata?.message_type && (
+            <div className="flex items-center gap-1 mt-1 pl-[3px]">
+              <div className="w-2 h-2 bg-[color:var(--tokens-color-text-text-brand)] rounded-full animate-pulse"></div>
+              <span className="text-sm text-[color:var(--tokens-color-text-text-inactive-2)]">
+                {streamingMetadata.message_type === 'thinking_through_query' && t('chat.thinking')}
+                {streamingMetadata.message_type === 'evaluating_ai_options' && t('chat.evaluating')}
+                {streamingMetadata.message_type === 'generating_response' && t('chat.generating')}
+                {!['thinking_through_query', 'evaluating_ai_options', 'generating_response'].includes(streamingMetadata.message_type) && t('chat.typing')}
+              </span>
+            </div>
+          )}
+          
           <div className={`flex items-center gap-2 mt-2 ${isUser ? 'justify-end' : 'justify-start'}`}>
-            <IconButton
-              variant="outline"
-              size="sm"
-              icon={<Copy />}
-              onClick={handleCopy}
-              aria-label={t('chat.copyMessage')}
-              className={!isUser ? '' : 'opacity-0 group-hover:opacity-100 transition-opacity'}
-            />
+            {/* Version Navigation for AI messages with multiple versions */}
+            {!isUser && (
+              <MessageVersionNavigation
+                hasMultipleVersions={hasMultipleVersions}
+                currentVersionIndex={currentVersionIndex}
+                totalVersions={message.versions?.length || 1}
+                canGoPrevious={canGoPrevious}
+                canGoNext={canGoNext}
+                onPrevious={() => handleVersionNavigation('prev')}
+                onNext={() => handleVersionNavigation('next')}
+              />
+            )}
+
+            <div>
+              {/* Copy Button */}
+              <Tooltip content={isCopied ? t('chat.copied') : t('chat.copyMessage')}>
+                <IconButton
+                  variant="outline"
+                  size="sm"
+                  icon={isCopied ? <CheckBroken className="w-4 h-4" /> : <Copy className="w-4 h-5" />}
+                  onClick={handleCopy}
+                  disabled={isCopied}
+                  aria-label={isCopied ? t('chat.copied') : t('chat.copyMessage')}
+                  className={!isUser ? '' : 'opacity-0 group-hover:opacity-100 transition-opacity'}
+                />
+              </Tooltip>
+
+              {/* Regenerate Button - only for AI messages that are the last message */}
+              {!isUser && isLastMessage && onRegenerate && (
+                <Tooltip content={t('chat.regenerateMessage')}>
+                  <IconButton
+                    variant="outline"
+                    size="sm"
+                    icon={<Regenerate className="w-4 h-5" />}
+                    onClick={handleRegenerate}
+                    disabled={isRegenerating}
+                    aria-label={t('chat.regenerateMessage')}
+                    className=""
+                  />
+                </Tooltip>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -86,22 +236,49 @@ const StreamingCursor: React.FC = () => {
   )
 }
 
-const StreamingMessage: React.FC<{ content: string; messageType?: string }> = ({ content, messageType }) => {
+interface StreamingMessageProps {
+  content: string
+  messageType?: string
+  selectedModel?: string
+  linkedFiles?: LinkedFile[]
+}
+
+const StreamingMessage: React.FC<StreamingMessageProps> = ({ content, messageType, selectedModel, linkedFiles }) => {
+  const [isCopied, setIsCopied] = useState(false)
   const hasContent = content.length > 0
   
   // Get status message from i18n based on message_type
   const getStatusMessage = () => {
-    console.log("---------messageType-----------", messageType)
     if (messageType && t(`chat.aiStatus.${messageType}` as any)) {
       return t(`chat.aiStatus.${messageType}` as any)
     }
     return t('chat.typing')
   }
+
+  const handleCopy = async () => {
+    if (isCopied) return // Prevent multiple copies while showing feedback
+    
+    try {
+      // Convert markdown to plain text for copying
+      const plainText = markdownToTextSync(content)
+      await navigator.clipboard.writeText(plainText)
+      
+      // Show feedback
+      setIsCopied(true)
+      
+      // Reset after 2 seconds
+      setTimeout(() => {
+        setIsCopied(false)
+      }, 2000)
+    } catch (err) {
+      console.error('Failed to copy text: ', err)
+    }
+  }
   
   return (
     <div className="flex justify-start mb-6 px-4">
       <div className="max-w-[75%]">
-        <div className="px-4 py-3 rounded-lg rounded-bl-sm bg-[color:var(--tokens-color-surface-surface-secondary)] text-[color:var(--tokens-color-text-text-primary)]">
+        <div className="px-4 py-3 rounded-lg rounded-bl-sm bg-[color:var(--tokens-color-surface-surface-secondary)] text-[color:var(--tokens-color-text-text-primary)] text-sm">
           {!hasContent ? (
             // Show loading animation before content arrives
             <div className="flex items-center gap-3">
@@ -112,17 +289,48 @@ const StreamingMessage: React.FC<{ content: string; messageType?: string }> = ({
           ) : (
             // Show content with cursor when content is available
             <>
-              <MarkdownRenderer content={content} />
-              <StreamingCursor />
+              <div className="text-sm">
+                <MarkdownRenderer content={content} />
+              </div>
+              {/* <StreamingCursor /> */}
             </>
           )}
+          
+          {/* Display selected model name if available */}
+          {selectedModel && (
+            <div className="flex items-center gap-1 pl-[3px] mt-1">
+              <span className="text-sm text-[color:var(--tokens-color-text-text-inactive-2)]">
+                {selectedModel}
+              </span>
+            </div>
+          )}
+          
           <div className="flex items-center gap-1 mt-2">
             <div className="w-2 h-2 bg-[color:var(--tokens-color-text-text-brand)] rounded-full animate-pulse"></div>
-            <span className="text-xs text-[color:var(--tokens-color-text-text-inactive-2)]">
+            <span className="text-sm text-[color:var(--tokens-color-text-text-inactive-2)]">
               {getStatusMessage()}
             </span>
           </div>
         </div>
+
+        {/* Linked Files Preview for streaming message */}
+        {linkedFiles && linkedFiles.length > 0 && (
+          <LinkedFilesPreview linkedFiles={linkedFiles} isUser={false} />
+        )}
+
+        {/* Copy button for streaming content */}
+        {hasContent && (
+          <div className="flex items-center gap-2 mt-2">
+            <IconButton
+              variant="outline"
+              size="sm"
+              icon={isCopied ? <CheckBroken className="w-4 h-4" /> : <Copy className="w-4 h-5" />}
+              onClick={handleCopy}
+              disabled={isCopied}
+              aria-label={isCopied ? t('chat.copied') : t('chat.copyMessage')}
+            />
+          </div>
+        )}
       </div>
     </div>
   )
@@ -144,6 +352,10 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
     isLoadingMore 
   } = useConversation()
   const { user } = useAuthRedux()
+  const { regenerateMessage, isRegenerating } = useRegenerate()
+  
+  // Track which message is being regenerated
+  const [regeneratingMessageUuid, setRegeneratingMessageUuid] = useState<string | null>(null)
   
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
@@ -152,11 +364,23 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
   const userScrolledRef = useRef(false)
   const scrollRafRef = useRef<number | null>(null)
 
+  const {
+    isAutoMode,
+    selectedModel
+  } = useAIModels()
+
   useEffect(() => {
     if (conversationUuid) {
       selectConversation(conversationUuid)
     }
   }, [conversationUuid, selectConversation])
+
+  // Clear regenerating message UUID when regeneration is complete
+  useEffect(() => {
+    if (!isRegenerating && regeneratingMessageUuid) {
+      setRegeneratingMessageUuid(null)
+    }
+  }, [isRegenerating, regeneratingMessageUuid])
   
   const scrollToBottom = useCallback((instant: boolean = false) => {
     if (messagesContainerRef.current) {
@@ -243,11 +467,20 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
       return dateA - dateB
     })
 
+
+  const handleRegenerate = (messageUuid: string) => {
+    if (conversationUuid) {
+      setRegeneratingMessageUuid(messageUuid)
+      const aiModelUuid = isAutoMode ? '' : selectedModel?.uuid
+      regenerateMessage(messageUuid, aiModelUuid, conversationUuid)
+    }
+  }
+
   if (!conversationUuid) {
     return (
       <div className={`flex-1 flex items-center justify-center ${className}`}>
         <div className="text-center">
-          <p className="text-[color:var(--tokens-color-text-text-inactive-2)] text-lg">
+          <p className="text-[color:var(--tokens-color-text-text-inactive-2)] text-sm">
             {t('chat.selectConversation')}
           </p>
         </div>
@@ -273,20 +506,30 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
             </div>
           )}
           
-          {sortedMessages.map((message) => (
+          {sortedMessages.map((message, index) => (
             <div key={message.uuid} className="group">
               <MessageBubble
                 message={message}
-                isUser={message?.sender?.uuid == user?.uuid}
-                textClassName={message?.sender?.uuid == user?.uuid ? '' : 'pb-0'}
+                isUser={message?.sender?.uuid === user?.uuid}
+                textClassName={message?.sender?.uuid === user?.uuid ? '' : 'pb-0'}
+                isLastMessage={index === sortedMessages.length - 1}
+                conversationUuid={conversationUuid}
+                onRegenerate={handleRegenerate}
+                isRegenerating={isRegenerating}
+                isStreaming={isStreaming}
+                streamingContent={streamingContent}
+                streamingMetadata={streamingMetadata}
+                isThisMessageRegenerating={regeneratingMessageUuid === message.uuid}
               />
             </div>
           ))}
           
-          {isStreaming && (
+          {isStreaming && !isRegenerating && (
             <StreamingMessage 
               content={streamingContent} 
-              messageType={streamingMetadata?.message_type} 
+              messageType={streamingMetadata?.message_type}
+              selectedModel={streamingMetadata?.selected_model}
+              linkedFiles={streamingMetadata?.linked_files}
             />
           )}
           

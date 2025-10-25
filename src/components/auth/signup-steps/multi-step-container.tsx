@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { WelcomeStep, FullNameStep, ProfessionStep, PasswordStep, OTPVerificationStep, SuccessStep } from './'
 import { LogoOnly } from '@/icons/logo-only';
-import { useToast } from '@/hooks/useToast'
+import { useToast } from '@/hooks/use-toast'
 import { useAuth } from '@/hooks/use-auth'
 import { handleApiError } from '@/lib/error-handler'
 import { useAppDispatch } from '@/store/hooks'

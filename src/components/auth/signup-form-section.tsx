@@ -16,7 +16,7 @@ import { useAuth } from '@/hooks/use-auth'
 import { loginSuccess, setLoading, setError } from '@/store/slices/authSlice'
 import { tokenManager } from '@/lib/token-manager'
 import { setTokens } from '@/lib/auth'
-import { useToast } from '@/hooks/useToast'
+import { useToast } from '@/hooks/use-toast'
 
 interface SignupFormSectionProps {
   className?: string

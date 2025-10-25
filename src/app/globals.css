@@ -193,11 +193,14 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    font-size: 14px; /* Set 14px as default font size */
   }
   
   body {
     @apply text-text-primary bg-surface-primary font-sans;
     font-feature-settings: 'rlig' 1, 'calt' 1;
+    font-size: 14px; /* Ensure body uses 14px as base */
+    line-height: 1.4; /* Consistent line height with app text classes */
   }
   
   h1, h2, h3, h4, h5, h6 {
@@ -258,9 +261,195 @@
   [data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
     background: #6b7280;
   }
+
+  /* File preview scrollbar - ensure visibility */
+  .file-preview-scroll::-webkit-scrollbar {
+    height: 8px;
+  }
+  
+  .file-preview-scroll::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+    margin: 0 4px;
+  }
+  
+  .file-preview-scroll::-webkit-scrollbar-thumb {
+    background: #9ca3af;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  .file-preview-scroll::-webkit-scrollbar-thumb:hover {
+    background: #6b7280;
+  }
+
+  /* Dark mode file preview scrollbar */
+  [data-theme="dark"] .file-preview-scroll::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.15);
+    margin: 0 4px;
+  }
+  
+  [data-theme="dark"] .file-preview-scroll::-webkit-scrollbar-thumb {
+    background: #4b5563;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+  }
+  
+  [data-theme="dark"] .file-preview-scroll::-webkit-scrollbar-thumb:hover {
+    background: #6b7280;
+  }
 }
 
 @layer components {
+  /* ===== APP FONT SIZE CLASSES ===== */
+  .app-text-xs {
+    font-size: 10px;
+    line-height: 1.4;
+  }
+  
+  /* Default text class - 14px (same as body default) */
+  .app-text {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+  
+  .app-text-sm {
+    font-size: 12px;
+    line-height: 1.4;
+  }
+  
+  .app-text-md {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+  
+  .app-text-lg {
+    font-size: 16px;
+    line-height: 1.4;
+  }
+  
+  .app-text-xl {
+    font-size: 18px;
+    line-height: 1.4;
+  }
+  
+  .app-text-2xl {
+    font-size: 20px;
+    line-height: 1.4;
+  }
+  
+  .app-text-3xl {
+    font-size: 24px;
+    line-height: 1.4;
+  }
+  
+  .app-text-4xl {
+    font-size: 28px;
+    line-height: 1.4;
+  }
+  
+  .app-text-5xl {
+    font-size: 32px;
+    line-height: 1.4;
+  }
+  
+  /* ===== DARK AND LIGHT MODE COLOR CLASSES ===== */
+  .app-bg-primary {
+    @apply bg-surface-primary;
+  }
+  
+  .app-bg-secondary {
+    @apply bg-surface-secondary;
+  }
+  
+  .app-bg-tertiary {
+    @apply bg-surface-tertiary;
+  }
+  
+  .app-bg-card {
+    @apply bg-surface-card;
+  }
+  
+  .app-bg-button {
+    @apply bg-surface-button;
+  }
+  
+  .app-bg-button-hover {
+    @apply bg-surface-button-hover;
+  }
+  
+  .app-bg-button-active {
+    @apply bg-surface-button-active;
+  }
+  
+  .app-bg-button-inactive {
+    @apply bg-surface-button-inactive;
+  }
+  
+  .app-bg-button-disabled {
+    @apply bg-surface-button-disabled;
+  }
+  
+  .app-text-primary {
+    @apply text-text-primary;
+  }
+  
+  .app-text-secondary {
+    @apply text-text-secondary;
+  }
+  
+  .app-text-tertiary {
+    @apply text-text-tertiary;
+  }
+  
+  .app-text-muted {
+    @apply text-text-muted;
+  }
+  
+  .app-text-brand {
+    @apply text-text-brand;
+  }
+  
+  .app-text-accent {
+    @apply text-text-accent;
+  }
+  
+  .app-text-success {
+    @apply text-text-success;
+  }
+  
+  .app-text-warning {
+    @apply text-text-warning;
+  }
+  
+  .app-text-error {
+    @apply text-text-error;
+  }
+  
+  .app-text-info {
+    @apply text-text-info;
+  }
+  
+  .app-border-primary {
+    @apply border-border-primary;
+  }
+  
+  .app-border-secondary {
+    @apply border-border-secondary;
+  }
+  
+  .app-border-focus {
+    @apply border-border-focus;
+  }
+  
+  .app-border-error {
+    @apply border-border-error;
+  }
+  
+  .app-border-success {
+    @apply border-border-success;
+  }
+  
+  /* ===== BUTTON COMPONENTS ===== */
   .btn {
     @apply inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none;
   }

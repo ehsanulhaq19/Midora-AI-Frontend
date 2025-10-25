@@ -175,7 +175,7 @@ const conversationSlice = createSlice({
       query_category?: string
       rank?: number
     } | null>) => {
-      state.streamingMetadata = action.payload
+      state.streamingMetadata = { ...state.streamingMetadata, ...action.payload }
     },
 
     // Complete streaming
@@ -209,6 +209,133 @@ const conversationSlice = createSlice({
       state.isStreaming = false
       state.streamingContent = ''
       state.streamingMetadata = null
+    },
+
+    // Update message content (for regeneration)
+    updateMessageContent: (state, action: PayloadAction<{ conversationUuid: string; messageUuid: string; content: string }>) => {
+      const { conversationUuid, messageUuid, content } = action.payload
+      const messages = state.messages[conversationUuid]
+      if (messages) {
+        const index = messages.findIndex(msg => msg.uuid === messageUuid)
+        if (index !== -1) {
+          messages[index].content = content
+        }
+      }
+    },
+
+    // Clear message content (for regeneration)
+    clearMessageContent: (state, action: PayloadAction<{ conversationUuid: string; messageUuid: string }>) => {
+      const { conversationUuid, messageUuid } = action.payload
+      const messages = state.messages[conversationUuid]
+      if (messages) {
+        const index = messages.findIndex(msg => msg.uuid === messageUuid)
+        if (index !== -1) {
+          messages[index].content = ''
+        }
+      }
+    },
+
+    // Start regeneration (clear content and prepare for streaming)
+    startRegeneration: (state, action: PayloadAction<{ conversationUuid: string; messageUuid: string }>) => {
+      const { conversationUuid, messageUuid } = action.payload
+      const messages = state.messages[conversationUuid]
+      if (messages) {
+        const index = messages.findIndex(msg => msg.uuid === messageUuid)
+        if (index !== -1) {
+          // Initialize message versions if not exists
+          if (!messages[index].versions) {
+            // Create a deep copy of the current message to avoid circular reference
+            const currentMessageCopy = { 
+              ...messages[index],
+              // Ensure we preserve the original content and model name
+              content: messages[index].content,
+              model_name: messages[index].model_name
+            }
+            messages[index].versions = [currentMessageCopy]
+            // Set current version index to 0 for the first version
+            messages[index].currentVersionIndex = 0
+          }
+          // Clear the content to show streaming, but keep the versions intact
+          messages[index].content = ''
+        }
+      }
+    },
+
+    // Add message version (for regeneration)
+    addMessageVersion: (state, action: PayloadAction<{ conversationUuid: string; originalMessageUuid: string; newMessage: Message }>) => {
+      const { conversationUuid, originalMessageUuid, newMessage } = action.payload
+      const messages = state.messages[conversationUuid]
+      if (messages) {
+        const index = messages.findIndex(msg => msg.uuid === originalMessageUuid)
+        if (index !== -1) {
+          // Initialize message versions if not exists
+          if (!messages[index].versions) {
+            // Create a deep copy of the current message to avoid circular reference
+            const currentMessageCopy = { 
+              ...messages[index],
+              // Ensure we preserve the original content and model name
+              content: messages[index].content,
+              model_name: messages[index].model_name
+            }
+            messages[index].versions = [currentMessageCopy]
+            // Set current version index to 0 for the first version
+            messages[index].currentVersionIndex = 0
+          }
+          // Add new version
+          messages[index].versions.push(newMessage)
+          // Update current version index to show the new version
+          messages[index].currentVersionIndex = messages[index].versions.length - 1
+          // Update content to show new version
+          messages[index].content = newMessage.content
+          // Update model name if available
+          if (newMessage.model_name) {
+            messages[index].model_name = newMessage.model_name
+          }
+        }
+      }
+    },
+
+    // Add multiple message versions (for new response structure)
+    addMessageVersions: (state, action: PayloadAction<{ conversationUuid: string; parentMessageUuid: string; versions: Message[] }>) => {
+      const { conversationUuid, parentMessageUuid, versions } = action.payload
+      const messages = state.messages[conversationUuid]
+      if (messages && versions.length > 0) {
+        const index = messages.findIndex(msg => msg.uuid === parentMessageUuid)
+        if (index !== -1) {
+          // Set up versions array
+          messages[index].versions = [...versions]
+          messages[index].currentVersionIndex = versions.length - 1
+          // Update content to show the latest version
+          const latestVersion = versions[versions.length - 1]
+          messages[index].content = latestVersion.content
+          messages[index].model_name = latestVersion.model_name
+        } else {
+          // Parent message not found, add the first message as the main message with versions
+          const mainMessage = versions[0]
+          mainMessage.versions = [...versions]
+          mainMessage.currentVersionIndex = versions.length - 1
+          mainMessage.content = versions[versions.length - 1].content
+          mainMessage.model_name = versions[versions.length - 1].model_name
+          messages.push(mainMessage)
+        }
+      }
+    },
+
+    // Set current message version
+    setCurrentMessageVersion: (state, action: PayloadAction<{ conversationUuid: string; messageUuid: string; versionIndex: number }>) => {
+      const { conversationUuid, messageUuid, versionIndex } = action.payload
+      const messages = state.messages[conversationUuid]
+      if (messages) {
+        const index = messages.findIndex(msg => msg.uuid === messageUuid)
+        if (index !== -1 && messages[index].versions && messages[index].versions[versionIndex]) {
+          messages[index].currentVersionIndex = versionIndex
+          messages[index].content = messages[index].versions[versionIndex].content
+          // Also update model name if available in the version
+          if (messages[index].versions[versionIndex].model_name) {
+            messages[index].model_name = messages[index].versions[versionIndex].model_name
+          }
+        }
+      }
     },
 
     // Clear all conversation data
@@ -251,6 +378,12 @@ export const {
   addMessage,
   removeMessage,
   updateMessage,
+  updateMessageContent,
+  clearMessageContent,
+  startRegeneration,
+  addMessageVersion,
+  addMessageVersions,
+  setCurrentMessageVersion,
   setAIModels,
   setSelectedModel,
   startStreaming,

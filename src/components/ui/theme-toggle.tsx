@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { useTheme } from '@/components/theme-provider'
+import { useTheme } from '@/hooks/use-theme'
 import { IconButton } from '@/components/ui/buttons'
 import { Lightbulb, MinusSquare } from '@/icons'
 

@@ -34,7 +34,7 @@ export const EmailInput: React.FC<EmailInputProps> = ({
         onKeyDown={onKeyDown}
         placeholder={placeholder}
         disabled={disabled}
-        className="relative w-full font-body-primary font-normal text-black text-base tracking-[-0.48px] leading-[normal] bg-transparent border-none outline-none placeholder:text-[#a0a0a0] px-6 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="relative w-full font-body-primary font-normal text-black app-text tracking-[-0.48px] leading-[normal] bg-transparent border-none outline-none placeholder:text-[#a0a0a0] px-6 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
         aria-label="Email address"
         required
       />

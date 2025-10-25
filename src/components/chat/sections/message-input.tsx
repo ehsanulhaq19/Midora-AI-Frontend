@@ -1,15 +1,16 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { ArrowUpSm, Plus01_5, Microphone, Filters } from '@/icons'
 import { IconButton } from '@/components/ui/buttons'
 import { TextareaInput } from '@/components/ui/inputs'
 import { Dropdown } from '@/components/ui'
-import { useAIModels } from '@/hooks'
+import { FilePreview } from '@/components/ui/file-preview'
+import { useAIModels, useFileUpload, useToast } from '@/hooks'
 import { t } from '@/i18n'
 
 interface MessageInputProps {
-  onSend: (message: string, modelUuid?: string) => void
+  onSend: (message: string, modelUuid?: string, fileUuids?: string[]) => void
   isStreaming?: boolean
   className?: string
   textAreaClassName?: string
@@ -17,6 +18,9 @@ interface MessageInputProps {
 
 export const MessageInput: React.FC<MessageInputProps> = ({ onSend, isStreaming = false, className = '', textAreaClassName = '' }) => {
   const [message, setMessage] = useState('')
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const { error: showErrorToast } = useToast()
+  
   // Using t function from i18n
   const {
     selectedProviderModels,
@@ -25,17 +29,28 @@ export const MessageInput: React.FC<MessageInputProps> = ({ onSend, isStreaming 
     selectModel
   } = useAIModels()
 
+  const {
+    files,
+    isUploading,
+    uploadFile,
+    removeFile,
+    clearFiles,
+    validateFile
+  } = useFileUpload()
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (message.trim() && !isStreaming) {
+    if ((message.trim() || files.length > 0) && !isStreaming && !isUploading) {
       const modelUuid = isAutoMode ? undefined : selectedModel?.uuid
-      onSend(message, modelUuid)
+      const fileUuids = files.map(f => f.uuid)
+      onSend(message, modelUuid, fileUuids)
       setMessage('')
+      clearFiles() // Clear files after sending message
     }
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey && !isStreaming) {
+    if (e.key === 'Enter' && !e.shiftKey && !isStreaming && !isUploading) {
       e.preventDefault()
       handleSubmit(e)
     }
@@ -53,71 +68,124 @@ export const MessageInput: React.FC<MessageInputProps> = ({ onSend, isStreaming 
     }))
   }
 
+  const handleFileSelect = async (selectedFiles: FileList | null) => {
+    if (!selectedFiles) return
+
+    for (const file of Array.from(selectedFiles)) {
+      try {
+        await uploadFile(file)
+      } catch (error) {
+        showErrorToast(
+          'Upload Failed',
+          error instanceof Error ? error.message : t('common.fileUpload.uploadFailed')
+        )
+      }
+    }
+  }
+
+  const handleAddAttachment = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleFileSelect(e.target.files)
+    // Reset input value to allow selecting the same file again
+    e.target.value = ''
+  }
+
   return (
-    <div className={`relative w-full max-w-[698px] max-h-[152px] mx-auto bg-[color:var(--tokens-color-surface-surface-neutral)] rounded-[var(--premitives-corner-radius-corner-radius-3)] min-h-[120px] ${className}`}>
-      <form onSubmit={handleSubmit} className="relative w-full h-full">
-        {/* Textarea covering the whole component */}
-        <TextareaInput
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          onKeyPress={handleKeyPress}
-          placeholder={isStreaming ? t('chat.waitingForResponse') : t('chat.howCanIHelp')}
-          className={`w-full border-none h-full px-4 pt-4 pb-16 text-lg lg:text-xl font-text-large font-[number:var(--text-large-font-weight)] text-[color:var(--tokens-color-text-text-primary)] placeholder-[color:var(--tokens-color-text-text-brand)] [font-style:var(--text-large-font-style)] min-h-[120px] max-h-[200px] resize-none ${textAreaClassName}`}
-          variant="outline"
-          disabled={isStreaming}
-        />
-        
-        {/* Bottom buttons container */}
-        <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between">
-          {/* Left side buttons */}
-          <div className="flex items-center gap-[13px]">
-            <IconButton
-              type="button"
-              variant="outline"
-              size="lg"
-              icon={<Plus01_5 className="w-5 h-5" color="#6B4392" />}
-              aria-label="Add attachment"
-              className="border-[color:var(--tokens-color-border-border-subtle)] bg-[#F4F5F5]"
-              disabled={isStreaming}
-            />
-
-            <IconButton
-              type="button"
-              variant="outline"
-              size="lg"
-              icon={<Filters className="w-7 h-7" color="#6B4392" />}
-              aria-label="Voice input"
-              className="border-[color:var(--tokens-color-border-border-subtle)] bg-[#F4F5F5]"
-              disabled={isStreaming}
-            />
-          </div>
-
-          {/* Right side buttons */}
-          <div className="flex items-center gap-[13px]">
-            {/* Models dropdown - only show when not in auto mode and provider is selected */}
-            {!isAutoMode && selectedProviderModels.length > 0 && (
-              <Dropdown
-                options={getModelOptions()}
-                value={selectedModel?.uuid || ''}
-                onChange={handleModelChange}
-                placeholder={t('chat.selectModel')}
-                className="min-w-[80px]"
-                openUpward={true}
-                variant="model-selector"
-                disabled={isStreaming}
+    <div className={`relative w-full max-w-[698px] mx-auto bg-[color:var(--tokens-color-surface-surface-neutral)] rounded-[var(--premitives-corner-radius-corner-radius-3)] min-h-[120px] max-h-[400px] ${className}`}>
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        multiple
+        accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.zip,.rar,.7z"
+        onChange={handleFileInputChange}
+        className="hidden"
+      />
+      
+      <form onSubmit={handleSubmit} className="relative w-full h-full flex flex-col">
+        {/* Textarea covering the main area */}
+        <div className="relative flex-1">
+          <TextareaInput
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder={isStreaming ? t('chat.waitingForResponse') : t('chat.howCanIHelp')}
+            className={`w-full border-none h-full px-4 pt-4 pb-16 text-lg lg:text-xl font-text-large font-[number:var(--text-large-font-weight)] text-[color:var(--tokens-color-text-text-primary)] placeholder-[color:var(--tokens-color-text-text-brand)] [font-style:var(--text-large-font-style)] min-h-[120px] max-h-[200px] resize-none ${textAreaClassName}`}
+            variant="outline"
+            disabled={isStreaming || isUploading}
+          />
+          
+          {/* Bottom buttons container - positioned relative to textarea */}
+          <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between z-10">
+            {/* Left side buttons */}
+            <div className="flex items-center gap-[13px]">
+              <IconButton
+                type="button"
+                variant="outline"
+                size="lg"
+                icon={<Plus01_5 className="w-5 h-5" color="#6B4392" />}
+                aria-label="Add attachment"
+                className="border-[color:var(--tokens-color-border-border-subtle)] bg-[#F4F5F5]"
+                disabled={isStreaming || isUploading}
+                onClick={handleAddAttachment}
               />
-            )}
-            
-            <IconButton
-              type="submit"
-              disabled={!message.trim() || isStreaming}
-              variant="primary"
-              size="lg"
-              icon={<ArrowUpSm className="w-6 h-6" color="white" />}
-              aria-label={isStreaming ? t('chat.waitingForResponse') : t('chat.sendMessage')}
-            />
+
+              <IconButton
+                type="button"
+                variant="outline"
+                size="lg"
+                icon={<Filters className="w-7 h-7" color="#6B4392" />}
+                aria-label="Voice input"
+                className="border-[color:var(--tokens-color-border-border-subtle)] bg-[#F4F5F5]"
+                disabled={isStreaming || isUploading}
+              />
+            </div>
+
+            {/* Right side buttons */}
+            <div className="flex items-center gap-[13px]">
+              {/* Models dropdown - only show when not in auto mode and provider is selected */}
+              {!isAutoMode && selectedProviderModels.length > 0 && (
+                <Dropdown
+                  options={getModelOptions()}
+                  value={selectedModel?.uuid || ''}
+                  onChange={handleModelChange}
+                  placeholder={t('chat.selectModel')}
+                  className="min-w-[80px]"
+                  openUpward={true}
+                  variant="model-selector"
+                  disabled={isStreaming || isUploading}
+                />
+              )}
+              
+              <IconButton
+                type="submit"
+                disabled={(!message.trim() && files.length === 0) || isStreaming || isUploading}
+                variant="primary"
+                size="lg"
+                icon={<ArrowUpSm className="w-6 h-6" color="white" />}
+                aria-label={isStreaming ? t('chat.waitingForResponse') : t('chat.sendMessage')}
+              />
+            </div>
           </div>
         </div>
+        
+        {/* File previews section - bottom scrollable area */}
+        {files.length > 0 && (
+          <div className="border-t border-[color:var(--tokens-color-border-border-subtle)] p-3 max-h-[200px] overflow-y-auto">
+            <div className="flex gap-3 overflow-x-auto overflow-y-hidden pb-2 file-preview-scroll">
+              {files.map((file) => (
+                <FilePreview
+                  key={file.uuid}
+                  file={file}
+                  onRemove={removeFile}
+                />
+              ))}
+            </div>
+          </div>
+        )}
       </form>
     </div>
   )

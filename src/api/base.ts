@@ -7,6 +7,7 @@ import { appConfig } from '@/config/app'
 import { requestInterceptor } from './interceptors'
 import { handleApiError } from '@/lib/error-handler'
 import { handle401WithReload, resetReloadCount } from '@/lib/reload-counter'
+import { tokenManager } from '@/lib/token-manager'
 
 export interface ApiResponse<T = any> {
   data?: T
@@ -39,6 +40,16 @@ class BaseApiClient {
   constructor() {
     this.baseUrl = appConfig.backendUrl
     this.timeout = appConfig.apiTimeout
+  }
+
+  /**
+   * Send credentials only when we have tokens to avoid CORS issues
+   */
+  private shouldSendCredentials(): boolean {
+    // Only send credentials if we have tokens to avoid CORS issues with backend
+    const hasTokens = tokenManager.hasValidTokens()
+    console.log('Should send credentials:', hasTokens)
+    return hasTokens
   }
 
   /**
@@ -88,7 +99,8 @@ class BaseApiClient {
 
       const url = `${this.baseUrl}${endpoint}`
       console.log('Making GET request to:', url)
-      const interceptedOptions = requestInterceptor(url, {
+      
+      const requestOptions: RequestInit = {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -96,7 +108,17 @@ class BaseApiClient {
         },
         signal: controller.signal,
         ...options,
-      })
+      }
+
+      // Send credentials conditionally to avoid CORS issues
+      if (this.shouldSendCredentials()) {
+        requestOptions.credentials = 'include'
+        console.log('Sending credentials with GET request to include refresh token cookie')
+      } else {
+        console.log('Skipping credentials for GET request (no tokens)')
+      }
+
+      const interceptedOptions = requestInterceptor(url, requestOptions)
 
       const response = await fetch(url, interceptedOptions)
       console.log('GET response status:', response.status)
@@ -178,7 +200,8 @@ class BaseApiClient {
       const timeoutId = setTimeout(() => controller.abort(), this.timeout)
 
       const url = `${this.baseUrl}${endpoint}`
-      const interceptedOptions = requestInterceptor(url, {
+      
+      const requestOptions: RequestInit = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -187,7 +210,17 @@ class BaseApiClient {
         body: JSON.stringify(data),
         signal: controller.signal,
         ...options,
-      })
+      }
+
+      // Send credentials conditionally to avoid CORS issues
+      if (this.shouldSendCredentials()) {
+        requestOptions.credentials = 'include'
+        console.log('Sending credentials with POST request to include refresh token cookie')
+      } else {
+        console.log('Skipping credentials for POST request (no tokens)')
+      }
+
+      const interceptedOptions = requestInterceptor(url, requestOptions)
 
       const response = await fetch(url, interceptedOptions)
 
@@ -270,7 +303,8 @@ class BaseApiClient {
       const timeoutId = setTimeout(() => controller.abort(), this.timeout)
 
       const url = `${this.baseUrl}${endpoint}`
-      const interceptedOptions = requestInterceptor(url, {
+      
+      const requestOptions: RequestInit = {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -279,7 +313,17 @@ class BaseApiClient {
         body: JSON.stringify(data),
         signal: controller.signal,
         ...options,
-      })
+      }
+
+      // Send credentials conditionally to avoid CORS issues
+      if (this.shouldSendCredentials()) {
+        requestOptions.credentials = 'include'
+        console.log('Sending credentials with PUT request to include refresh token cookie')
+      } else {
+        console.log('Skipping credentials for PUT request (no tokens)')
+      }
+
+      const interceptedOptions = requestInterceptor(url, requestOptions)
 
       const response = await fetch(url, interceptedOptions)
 
@@ -360,7 +404,8 @@ class BaseApiClient {
       const timeoutId = setTimeout(() => controller.abort(), this.timeout)
 
       const url = `${this.baseUrl}${endpoint}`
-      const interceptedOptions = requestInterceptor(url, {
+      
+      const requestOptions: RequestInit = {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -368,7 +413,17 @@ class BaseApiClient {
         },
         signal: controller.signal,
         ...options,
-      })
+      }
+
+      // Send credentials conditionally to avoid CORS issues
+      if (this.shouldSendCredentials()) {
+        requestOptions.credentials = 'include'
+        console.log('Sending credentials with DELETE request to include refresh token cookie')
+      } else {
+        console.log('Skipping credentials for DELETE request (no tokens)')
+      }
+
+      const interceptedOptions = requestInterceptor(url, requestOptions)
 
       const response = await fetch(url, interceptedOptions)
 

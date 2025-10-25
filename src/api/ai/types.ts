@@ -57,6 +57,13 @@ export interface GenerateContentRequest {
   ai_model_uuid?: string
   max_tokens?: number
   temperature?: number
+  file_uuids?: string[]
+}
+
+// Regenerate Content types
+export interface RegenerateContentRequest {
+  message_uuid: string
+  ai_model_uuid: string
 }
 
 export interface GenerateContentResponse {
@@ -86,6 +93,14 @@ export interface StreamingResponse {
   ai_message_id?: string
   error?: string
   message?: string | null
+  linked_files?: Array<{
+    uuid: string
+    filename: string
+    file_extension: string
+    file_type: string
+    file_size: number
+    storage_type: string
+  }>
 }
 
 // Streaming callback types

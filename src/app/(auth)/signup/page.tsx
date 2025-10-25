@@ -14,7 +14,7 @@ import { MultiStepContainer } from '@/components/auth/signup-steps/multi-step-co
 import { useSignupData, SignupDataProvider } from '@/contexts/SignupDataContext'
 import { LoadingWrapper } from '@/components/ui/loaders'
 import { handleApiError } from '@/lib/error-handler'
-import { useToast } from '@/hooks/useToast'
+import { useToast } from '@/hooks/use-toast'
 import { useAuth } from '@/hooks/use-auth'
 import { useAppDispatch } from '@/store/hooks'
 import { loginSuccess, setLoading, setError } from '@/store/slices/authSlice'
@@ -38,6 +38,7 @@ function SignupPageContent() {
   useEffect(() => {
     const checkSSOOnboarding = async () => {
       // Check if we have valid tokens and user is not authenticated
+      tokenManager.debugTokenState()
       const tokens = tokenManager.getTokens()
       if (tokens.accessToken && tokens.refreshToken && !isProcessingSSO) {
         try {
@@ -75,6 +76,7 @@ function SignupPageContent() {
     // Only check if we're not already processing SSO and no query params
     if (!isProcessingSSO && searchParams.has('access_token') && searchParams.has('refresh_token')) {
       tokenManager.storeTokens(searchParams.get('access_token')!, searchParams.get('refresh_token')!, searchParams.get('auth_method')!)
+      console.log('Stored tokens from query params')
       checkSSOOnboarding()
     }
   }, [dispatch, router, isProcessingSSO, searchParams])
