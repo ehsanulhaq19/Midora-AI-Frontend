@@ -10,7 +10,7 @@ import { useAIModels, useFileUpload, useToast } from '@/hooks'
 import { t } from '@/i18n'
 
 interface MessageInputProps {
-  onSend: (message: string, modelUuid?: string, fileUuids?: string[]) => void
+  onSend: (message: string, modelUuid?: string, fileUuids?: string[], uploadedFiles?: any[]) => void
   isStreaming?: boolean
   className?: string
   textAreaClassName?: string
@@ -51,7 +51,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({ onSend, isStreaming 
     if ((message.trim() || files.length > 0) && !isStreaming && !isUploading) {
       const modelUuid = isAutoMode ? undefined : selectedModel?.uuid
       const fileUuids = files.map(f => f.uuid)
-      onSend(message, modelUuid, fileUuids)
+      onSend(message, modelUuid, fileUuids, files)
       setMessage('')
       clearFiles() // Clear files after sending message
     }

@@ -151,7 +151,7 @@ export const useConversation = () => {
   }, [dispatch, conversations, messages])
 
   // Send a message
-  const sendMessage = useCallback(async (content: string, modelUuid?: string, conversationUuid?: string, fileUuids?: string[]) => {
+  const sendMessage = useCallback(async (content: string, modelUuid?: string, conversationUuid?: string, fileUuids?: string[], uploadedFiles?: any[]) => {
     try {
       dispatch(clearError())
       
@@ -174,6 +174,16 @@ export const useConversation = () => {
         targetConversationUuid = newConversation.uuid
       }
       
+      // Convert uploaded files to LinkedFile format
+      const linkedFiles = uploadedFiles?.map(file => ({
+        uuid: file.uuid,
+        filename: file.filename,
+        file_extension: file.file_extension,
+        file_type: file.file_type,
+        file_size: file.file_size,
+        storage_type: 'offline' // Default storage type
+      })) || []
+
       // Add user message to store immediately
       const messageUuid = `user-${Date.now()}`
       const userMessage: Message = {
@@ -182,6 +192,7 @@ export const useConversation = () => {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         model_name: null,
+        linked_files: linkedFiles.length > 0 ? linkedFiles : undefined,
         sender: user ? {
           email: user.email,
           first_name: user.first_name,

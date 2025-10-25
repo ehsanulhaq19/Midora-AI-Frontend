@@ -37,8 +37,8 @@ export const ChatScreen: React.FC = () => {
     setSidebarOpen(false)
   }
 
-  const handleSendMessage = async (message: string, modelUuid?: string, fileUuids?: string[]) => {
-    await sendMessage(message, modelUuid, undefined, fileUuids)
+  const handleSendMessage = async (message: string, modelUuid?: string, fileUuids?: string[], uploadedFiles?: any[]) => {
+    await sendMessage(message, modelUuid, undefined, fileUuids, uploadedFiles)
   }
 
   return (

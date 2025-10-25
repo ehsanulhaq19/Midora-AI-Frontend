@@ -12,7 +12,7 @@ import { useFileUpload, useToast } from '@/hooks'
 
 interface ChatInterfaceProps {
   onMenuClick: () => void
-  onSendMessage: (message: string, modelUuid?: string, fileUuids?: string[]) => void
+  onSendMessage: (message: string, modelUuid?: string, fileUuids?: string[], uploadedFiles?: any[]) => void
   isCompact?: boolean
   isStreaming?: boolean
   onFilesChange?: (hasFiles: boolean) => void
