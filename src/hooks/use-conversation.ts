@@ -151,7 +151,7 @@ export const useConversation = () => {
   }, [dispatch, conversations, messages])
 
   // Send a message
-  const sendMessage = useCallback(async (content: string, modelUuid?: string, conversationUuid?: string) => {
+  const sendMessage = useCallback(async (content: string, modelUuid?: string, conversationUuid?: string, fileUuids?: string[]) => {
     try {
       dispatch(clearError())
       
@@ -221,7 +221,7 @@ export const useConversation = () => {
       
       // Generate AI response with streaming
       await aiApi.generateContentStream(
-        { query: content, conversation_uuid: targetConversationUuid, stream: true, ai_model_uuid: modelUuid },
+        { query: content, conversation_uuid: targetConversationUuid, stream: true, ai_model_uuid: modelUuid, file_uuids: fileUuids },
         (chunk: string, type: string, metadata?: any) => {
           if (type === 'metadata') {
             // Handle metadata stream responses - update metadata state only

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useCallback, useState } from 'react'
 import { useConversation } from '@/hooks/use-conversation'
-import { Message } from '@/api/conversation/types'
+import { Message, LinkedFile } from '@/api/conversation/types'
 import { Copy, LogoOnly, CheckBroken, Regenerate } from '@/icons'
 import { IconButton } from '@/components/ui/buttons'
 import { Spinner } from '@/components/ui/loaders'
@@ -15,6 +15,7 @@ import './style.css'
 import { useAuthRedux } from '@/hooks/use-auth-redux'
 import { useAIModels } from '@/hooks/use-ai-models'
 import { MessageVersionNavigation } from './message-version-navigation'
+import { LinkedFilesPreview } from './linked-files-preview'
 
 interface ConversationContainerProps {
   conversationUuid: string | null
@@ -37,6 +38,14 @@ interface MessageBubbleProps {
     query_category?: string;
     rank?: number;
     message_type?: string;
+    linked_files?: Array<{
+      uuid: string;
+      filename: string;
+      file_extension: string;
+      file_type: string;
+      file_size: number;
+      storage_type: string;
+    }>;
   }
   isThisMessageRegenerating?: boolean
 }
@@ -138,6 +147,11 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
           )}
         </div>
 
+        {/* Linked Files Preview */}
+        {message.linked_files && message.linked_files.length > 0 && (
+          <LinkedFilesPreview linkedFiles={message.linked_files} isUser={isUser} />
+        )}
+
         <div className="ml-2">
           {/* Display AI model name with copy button for AI messages */}
           {!isUser && message.model_name && !isThisMessageRegenerating && (
@@ -175,33 +189,35 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
               />
             )}
 
-            {/* Copy Button */}
-            <Tooltip content={isCopied ? t('chat.copied') : t('chat.copyMessage')}>
-              <IconButton
-                variant="outline"
-                size="sm"
-                icon={isCopied ? <CheckBroken className="w-4 h-4" /> : <Copy className="w-4 h-5" />}
-                onClick={handleCopy}
-                disabled={isCopied}
-                aria-label={isCopied ? t('chat.copied') : t('chat.copyMessage')}
-                className={!isUser ? '' : 'opacity-0 group-hover:opacity-100 transition-opacity'}
-              />
-            </Tooltip>
-
-            {/* Regenerate Button - only for AI messages that are the last message */}
-            {!isUser && isLastMessage && onRegenerate && (
-              <Tooltip content={t('chat.regenerateMessage')}>
+            <div>
+              {/* Copy Button */}
+              <Tooltip content={isCopied ? t('chat.copied') : t('chat.copyMessage')}>
                 <IconButton
                   variant="outline"
                   size="sm"
-                  icon={<Regenerate className="w-4 h-4" />}
-                  onClick={handleRegenerate}
-                  disabled={isRegenerating}
-                  aria-label={t('chat.regenerateMessage')}
-                  className=""
+                  icon={isCopied ? <CheckBroken className="w-4 h-4" /> : <Copy className="w-4 h-5" />}
+                  onClick={handleCopy}
+                  disabled={isCopied}
+                  aria-label={isCopied ? t('chat.copied') : t('chat.copyMessage')}
+                  className={!isUser ? '' : 'opacity-0 group-hover:opacity-100 transition-opacity'}
                 />
               </Tooltip>
-            )}
+
+              {/* Regenerate Button - only for AI messages that are the last message */}
+              {!isUser && isLastMessage && onRegenerate && (
+                <Tooltip content={t('chat.regenerateMessage')}>
+                  <IconButton
+                    variant="outline"
+                    size="sm"
+                    icon={<Regenerate className="w-4 h-5" />}
+                    onClick={handleRegenerate}
+                    disabled={isRegenerating}
+                    aria-label={t('chat.regenerateMessage')}
+                    className=""
+                  />
+                </Tooltip>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -224,9 +240,10 @@ interface StreamingMessageProps {
   content: string
   messageType?: string
   selectedModel?: string
+  linkedFiles?: LinkedFile[]
 }
 
-const StreamingMessage: React.FC<StreamingMessageProps> = ({ content, messageType, selectedModel }) => {
+const StreamingMessage: React.FC<StreamingMessageProps> = ({ content, messageType, selectedModel, linkedFiles }) => {
   const [isCopied, setIsCopied] = useState(false)
   const hasContent = content.length > 0
   
@@ -275,7 +292,7 @@ const StreamingMessage: React.FC<StreamingMessageProps> = ({ content, messageTyp
               <div className="text-sm">
                 <MarkdownRenderer content={content} />
               </div>
-              <StreamingCursor />
+              {/* <StreamingCursor /> */}
             </>
           )}
           
@@ -295,6 +312,11 @@ const StreamingMessage: React.FC<StreamingMessageProps> = ({ content, messageTyp
             </span>
           </div>
         </div>
+
+        {/* Linked Files Preview for streaming message */}
+        {linkedFiles && linkedFiles.length > 0 && (
+          <LinkedFilesPreview linkedFiles={linkedFiles} isUser={false} />
+        )}
 
         {/* Copy button for streaming content */}
         {hasContent && (
@@ -507,6 +529,7 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
               content={streamingContent} 
               messageType={streamingMetadata?.message_type}
               selectedModel={streamingMetadata?.selected_model}
+              linkedFiles={streamingMetadata?.linked_files}
             />
           )}
           

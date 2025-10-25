@@ -7,7 +7,7 @@ import { AuthInitializer } from '@/components/auth/AuthInitializer'
 import { initializeI18n } from '@/i18n'
 import { initializeInterceptors } from '@/api/interceptors'
 import { ThemeInitializer } from '@/components/ui/theme-initializer'
-import { ThemeProvider } from '@/components/theme-provider'
+import { ThemeProvider } from '@/hooks/use-theme'
 import { ToastContainer } from '@/components/ui/toast'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -61,7 +61,7 @@ export default function RootLayout({
           <ReduxProvider>
             <AuthInitializer />
             <AuthProvider>
-              <div className="min-h-screen bg-surface-primary">
+              <div className="min-h-screen app-bg-primary">
                 {children}
                 <ToastContainer />
               </div>

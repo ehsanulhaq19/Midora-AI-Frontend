@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { initializeTheme } from '@/lib/theme';
+import { initializeTheme } from '@/hooks/use-theme';
 
 export function ThemeInitializer() {
   useEffect(() => {

@@ -19,12 +19,23 @@ export interface Sender {
   } | null
 }
 
+// Linked file types
+export interface LinkedFile {
+  uuid: string
+  filename: string
+  file_extension: string
+  file_type: string
+  file_size: number
+  storage_type: string
+}
+
 // Message types
 export interface Message {
   content: string
   uuid: string
   sender: Sender
   model_name: string | null
+  linked_files?: LinkedFile[]
   created_at: string
   updated_at: string | null
   // Versioning support for regeneration

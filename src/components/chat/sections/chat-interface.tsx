@@ -1,16 +1,18 @@
 'use client'
 
-import React from 'react'
+import React, { useState, useCallback } from 'react'
 import { Menu } from '@/icons'
 import { ModelSelection } from './model-selection'
 import { MessageInput } from './message-input'
+import { DragDropOverlay } from '@/components/ui/drag-drop-overlay'
 import { LogoOnly } from '@/icons'
 import { t, tWithParams } from '@/i18n'
 import { useAuthRedux } from '@/hooks/use-auth-redux'
+import { useFileUpload, useToast } from '@/hooks'
 
 interface ChatInterfaceProps {
   onMenuClick: () => void
-  onSendMessage: (message: string, modelUuid?: string) => void
+  onSendMessage: (message: string, modelUuid?: string, fileUuids?: string[]) => void
   isCompact?: boolean
   isStreaming?: boolean
 }
@@ -22,17 +24,68 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   isStreaming = false
 }) => {
   const { userName } = useAuthRedux()
+  const [isDragOver, setIsDragOver] = useState(false)
+  const { error: showErrorToast } = useToast()
+  const { uploadFile, validateFile } = useFileUpload()
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragOver(true)
+  }, [])
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragOver(false)
+  }, [])
+
+  const handleDrop = useCallback(async (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragOver(false)
+
+    const files = Array.from(e.dataTransfer.files)
+    if (files.length === 0) return
+
+    for (const file of files) {
+      const validation = validateFile(file)
+      if (!validation.isValid) {
+        showErrorToast(
+          'Upload Failed',
+          validation.error || t('common.fileUpload.uploadFailed')
+        )
+        continue
+      }
+
+      try {
+        await uploadFile(file)
+      } catch (error) {
+        showErrorToast(
+          'Upload Failed',
+          error instanceof Error ? error.message : t('common.fileUpload.uploadFailed')
+        )
+      }
+    }
+  }, [validateFile, uploadFile, showErrorToast])
   
   if (isCompact) {
     return (
       <div className="w-full max-w-[808px] max-h-[106px] mx-auto p-4">
-        <MessageInput onSend={onSendMessage} isStreaming={isStreaming} className="max-w-[808px]" textAreaClassName="!text-[length:var(--text-medium-font-size)]"/>
+        <MessageInput onSend={onSendMessage} isStreaming={isStreaming} className="max-w-[808px]" textAreaClassName="!app-text-lg"/>
       </div>
     )
   }
 
   return (
-    <div className="flex flex-col items-center gap-[246px] px-4 lg:px-0 py-6 relative flex-1 grow min-h-screen">
+    <div 
+      className="flex flex-col items-center gap-[246px] px-4 lg:px-0 py-6 relative flex-1 grow min-h-screen"
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
+      <DragDropOverlay isVisible={isDragOver} />
+      
       {/* Header */}
       <div className="flex items-start justify-between relative w-full px-[28px]">
         <div className="flex items-center gap-4">
@@ -47,11 +100,11 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         </div>
 
         <div className="flex items-center gap-2">
-          <button className="hidden sm:inline-flex items-center justify-center gap-2 p-3 bg-[color:var(--premitives-color-brand-purple-1000)] rounded-[var(--premitives-corner-radius-corner-radius-2)] hover:bg-[color:var(--tokens-color-surface-surface-button-pressed)] transition-colors">
-            <div className="relative w-fit mt-[-1.00px] font-h05-heading05 font-[number:var(--h05-heading05-font-weight)] text-tokens-color-text-text-neutral text-[length:var(--h05-heading05-font-size)] tracking-[var(--h05-heading05-letter-spacing)] leading-[var(--h05-heading05-line-height)] whitespace-nowrap [font-style:var(--h05-heading05-font-style)]">
+          {/* <button className="hidden sm:inline-flex items-center justify-center gap-2 p-3 bg-[color:var(--premitives-color-brand-purple-1000)] rounded-[var(--premitives-corner-radius-corner-radius-2)] hover:bg-[color:var(--tokens-color-surface-surface-button-pressed)] transition-colors">
+            <div className="relative w-fit mt-[-1.00px] font-h05-heading05 app-text-sm app-text-primary tracking-[var(--h05-heading05-letter-spacing)] leading-[var(--h05-heading05-line-height)] whitespace-nowrap [font-style:var(--h05-heading05-font-style)]">
               {t('chat.upgradeToPro')}
             </div>
-          </button>
+          </button> */}
         </div>
       </div>
 

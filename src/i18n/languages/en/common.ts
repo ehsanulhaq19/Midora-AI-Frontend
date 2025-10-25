@@ -23,4 +23,13 @@ export const common = {
   refresh: 'Refresh',
   retry: 'Retry',
   theme: 'Theme',
+  fileUpload: {
+    fileTooLarge: 'File size must be less than {maxSize}',
+    videoNotAllowed: 'Video files are not allowed',
+    unsupportedFileType: 'This file type is not supported',
+    uploadFailed: 'File upload failed',
+    dragDropText: 'Drop files here',
+    selectFile: 'Select file',
+    removeFile: 'Remove file',
+  },
 }

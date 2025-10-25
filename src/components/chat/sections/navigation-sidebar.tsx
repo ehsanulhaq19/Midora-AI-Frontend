@@ -294,9 +294,9 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
               </div>
             </button>
 
-            <div className="flex flex-col items-start relative w-full max-h-48 overflow-y-auto scrollbar-hide scroll-smooth ml-3">
+            <div className="flex flex-col items-start relative w-full max-h-48 overflow-y-auto scrollbar-hide scroll-smooth">
               {projects.map((project, index) => (
-                <button key={index} className="w-full pt-[5px] pb-[8px] px-2 gap-[8px] flex items-center items-center hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]">
+                <button key={index} className="w-full pt-[5px] pb-[8px] px-2 gap-[8px] flex items-center items-center pl-5 hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]">
                   <FolderOpen01
                     key={index}
                     title={project.title}
