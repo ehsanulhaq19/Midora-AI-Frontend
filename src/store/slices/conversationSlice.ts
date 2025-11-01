@@ -11,6 +11,7 @@ const initialState: ConversationState = {
   error: null,
   isStreaming: false,
   streamingContent: '',
+  initialContent: '',
   streamingMetadata: null,
   aiModels: [],
   selectedModel: null,
@@ -154,6 +155,7 @@ const conversationSlice = createSlice({
     startStreaming: (state) => {
       state.isStreaming = true
       state.streamingContent = ''
+      state.initialContent = ''
       state.streamingMetadata = null
     },
 
@@ -165,6 +167,15 @@ const conversationSlice = createSlice({
     // Set streaming content (for batch updates)
     setStreamingContent: (state, action: PayloadAction<string>) => {
       state.streamingContent = action.payload
+      // Clear initial content when real content starts
+      if (action.payload && state.initialContent) {
+        state.initialContent = ''
+      }
+    },
+
+    // Set initial content (from local model)
+    setInitialContent: (state, action: PayloadAction<string>) => {
+      state.initialContent = action.payload
     },
 
     // Set streaming metadata (for metadata stream responses)
@@ -182,6 +193,7 @@ const conversationSlice = createSlice({
     completeStreaming: (state, action: PayloadAction<{ conversationUuid: string; content: string; metadata: any }>) => {
       state.isStreaming = false
       state.streamingContent = ''
+      state.initialContent = ''
       
       // Add the complete AI message to the conversation only if message exists (not null)
       const { conversationUuid, content, metadata } = action.payload
@@ -208,6 +220,7 @@ const conversationSlice = createSlice({
     stopStreaming: (state) => {
       state.isStreaming = false
       state.streamingContent = ''
+      state.initialContent = ''
       state.streamingMetadata = null
     },
 
@@ -345,6 +358,7 @@ const conversationSlice = createSlice({
       state.messages = {}
       state.isStreaming = false
       state.streamingContent = ''
+      state.initialContent = ''
       state.streamingMetadata = null
       state.conversationPagination = null
     },
@@ -389,6 +403,7 @@ export const {
   startStreaming,
   updateStreamingContent,
   setStreamingContent,
+  setInitialContent,
   setStreamingMetadata,
   completeStreaming,
   stopStreaming,

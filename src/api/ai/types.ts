@@ -80,7 +80,7 @@ export interface GenerateContentResponse {
 
 // Streaming response types
 export interface StreamingResponse {
-  type: 'metadata' | 'meta_data' | 'model_selection' | 'content' | 'completion' | 'error' | 'unethical' | 'initial_metadata'
+  type: 'metadata' | 'meta_data' | 'model_selection' | 'content' | 'initial_content' | 'completion' | 'error' | 'unethical' | 'initial_metadata'
   conversation_uuid?: string
   message_id?: string
   chunk?: string

@@ -21,6 +21,7 @@ import {
   removeMessage,
   startStreaming,
   setStreamingContent,
+  setInitialContent,
   setStreamingMetadata,
   completeStreaming,
   stopStreaming,
@@ -41,6 +42,7 @@ export const useConversation = () => {
     error,
     isStreaming,
     streamingContent,
+    initialContent,
     streamingMetadata,
     pagination,
     isLoadingMore,
@@ -227,8 +229,14 @@ export const useConversation = () => {
       // Track accumulated content for completion
       let accumulatedContent = ''
       let streamingBuffer = ''
+      let initialContentBuffer = ''
       let lastUpdateTime = 0
+      let lastInitialUpdateTime = 0
       const UPDATE_THROTTLE = 50 // Update UI every 50ms max
+      let hasRealContentStarted = false
+      let initialContentRafPending = false
+      let streamingContentRafPending = false
+      let isFirstInitialChunk = true
       
       // Generate AI response with streaming
       await aiApi.generateContentStream(
@@ -248,8 +256,33 @@ export const useConversation = () => {
               query_category: metadata?.query_category,
               rank: metadata?.rank
             }))
-          } else {
-            // Handle regular content chunks
+          } else if (type === 'initial_content') {
+            // Handle initial content from local model (only show if real content hasn't started)
+            if (!hasRealContentStarted) {
+              initialContentBuffer += chunk
+              
+              // Dispatch immediately on first chunk for instant feedback
+              if (isFirstInitialChunk) {
+                isFirstInitialChunk = false
+                dispatch(setInitialContent(initialContentBuffer))
+                lastInitialUpdateTime = Date.now()
+              } else if (!initialContentRafPending) {
+                // Schedule RAF update for subsequent chunks (smoother than throttling)
+                initialContentRafPending = true
+                requestAnimationFrame(() => {
+                  dispatch(setInitialContent(initialContentBuffer))
+                  initialContentRafPending = false
+                  lastInitialUpdateTime = Date.now()
+                })
+              }
+            }
+          } else if (type === 'content') {
+            // Real content has started - clear initial content and switch to real content
+            if (!hasRealContentStarted) {
+              hasRealContentStarted = true
+              dispatch(setInitialContent('')) // Clear initial content
+            }
+            
             accumulatedContent += chunk
             streamingBuffer += chunk
             
@@ -258,6 +291,14 @@ export const useConversation = () => {
             if (now - lastUpdateTime >= UPDATE_THROTTLE) {
               dispatch(setStreamingContent(streamingBuffer))
               lastUpdateTime = now
+            } else if (!streamingContentRafPending) {
+              // Use RAF as fallback for smooth updates
+              streamingContentRafPending = true
+              requestAnimationFrame(() => {
+                dispatch(setStreamingContent(streamingBuffer))
+                streamingContentRafPending = false
+                lastUpdateTime = Date.now()
+              })
             }
           }
         },
@@ -386,6 +427,7 @@ export const useConversation = () => {
     error,
     isStreaming,
     streamingContent,
+    initialContent,
     streamingMetadata,
     pagination: currentConversation ? pagination[currentConversation.uuid] : null,
     isLoadingMore,

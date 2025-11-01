@@ -238,14 +238,28 @@ const StreamingCursor: React.FC = () => {
 
 interface StreamingMessageProps {
   content: string
+  initialContent?: string
   messageType?: string
   selectedModel?: string
   linkedFiles?: LinkedFile[]
 }
 
-const StreamingMessage: React.FC<StreamingMessageProps> = ({ content, messageType, selectedModel, linkedFiles }) => {
+const StreamingMessage: React.FC<StreamingMessageProps> = ({ content, initialContent = '', messageType, selectedModel, linkedFiles }) => {
   const [isCopied, setIsCopied] = useState(false)
+  const [initialContentOpacity, setInitialContentOpacity] = useState(1)
   const hasContent = content.length > 0
+  const hasInitialContent = initialContent.length > 0
+  
+  // Hide initial content smoothly when real content starts appearing
+  useEffect(() => {
+    if (hasContent && hasInitialContent) {
+      // Start fade out immediately
+      setInitialContentOpacity(0)
+    } else if (!hasContent && hasInitialContent) {
+      // Reset opacity when only initial content is present
+      setInitialContentOpacity(1)
+    }
+  }, [hasContent, hasInitialContent])
   
   // Get status message from i18n based on message_type
   const getStatusMessage = () => {
@@ -278,8 +292,8 @@ const StreamingMessage: React.FC<StreamingMessageProps> = ({ content, messageTyp
   return (
     <div className="flex justify-start mb-6 px-4">
       <div className="max-w-[75%]">
-        <div className="px-4 py-3 rounded-lg rounded-bl-sm bg-[color:var(--tokens-color-surface-surface-secondary)] text-[color:var(--tokens-color-text-text-primary)] text-sm">
-          {!hasContent ? (
+        <div className="px-4 py-3 rounded-lg rounded-bl-sm bg-[color:var(--tokens-color-surface-surface-secondary)] text-[color:var(--tokens-color-text-text-primary)] text-sm relative">
+          {!hasContent && !hasInitialContent ? (
             // Show loading animation before content arrives
             <div className="flex items-center gap-3">
               <div className="animate-spin" style={{ animation: 'spin 2s linear infinite' }}>
@@ -287,13 +301,24 @@ const StreamingMessage: React.FC<StreamingMessageProps> = ({ content, messageTyp
               </div>
             </div>
           ) : (
-            // Show content with cursor when content is available
-            <>
-              <div className="text-sm">
-                <MarkdownRenderer content={content} />
-              </div>
-              {/* <StreamingCursor /> */}
-            </>
+            <div className="relative">
+              {/* Initial content (from local model) - shown in light color */}
+              {hasInitialContent && (
+                <div 
+                  className="text-sm app-text-tertiary transition-opacity duration-300"
+                  style={{ opacity: initialContentOpacity }}
+                >
+                  <MarkdownRenderer content={initialContent} />
+                </div>
+              )}
+              
+              {/* Real content (from actual AI model) - overlays initial content */}
+              {hasContent && (
+                <div className={`text-sm ${hasInitialContent ? 'absolute inset-0 px-4 py-3' : ''}`}>
+                  <MarkdownRenderer content={content} />
+                </div>
+              )}
+            </div>
           )}
           
           {/* Display selected model name if available */}
@@ -345,6 +370,7 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
     isLoading, 
     isStreaming, 
     streamingContent,
+    initialContent,
     streamingMetadata, 
     selectConversation, 
     loadMoreMessages, 
@@ -526,7 +552,8 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
           
           {isStreaming && !isRegenerating && (
             <StreamingMessage 
-              content={streamingContent} 
+              content={streamingContent}
+              initialContent={initialContent}
               messageType={streamingMetadata?.message_type}
               selectedModel={streamingMetadata?.selected_model}
               linkedFiles={streamingMetadata?.linked_files}
