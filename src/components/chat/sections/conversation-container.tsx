@@ -246,20 +246,20 @@ interface StreamingMessageProps {
 
 const StreamingMessage: React.FC<StreamingMessageProps> = ({ content, initialContent = '', messageType, selectedModel, linkedFiles }) => {
   const [isCopied, setIsCopied] = useState(false)
-  const [initialContentOpacity, setInitialContentOpacity] = useState(1)
+  const [isHidingInitialContent, setIsHidingInitialContent] = useState(false)
   const hasContent = content.length > 0
   const hasInitialContent = initialContent.length > 0
   
-  // Hide initial content smoothly when real content starts appearing
+  // Hide initial content with slide-up effect when real content starts appearing
   useEffect(() => {
-    if (hasContent && hasInitialContent) {
-      // Start fade out immediately
-      setInitialContentOpacity(0)
+    if (hasContent && hasInitialContent && !isHidingInitialContent) {
+      // Trigger slide-out animation
+      setIsHidingInitialContent(true)
     } else if (!hasContent && hasInitialContent) {
-      // Reset opacity when only initial content is present
-      setInitialContentOpacity(1)
+      // Reset when only initial content is present
+      setIsHidingInitialContent(false)
     }
-  }, [hasContent, hasInitialContent])
+  }, [hasContent, hasInitialContent, isHidingInitialContent])
   
   // Get status message from i18n based on message_type
   const getStatusMessage = () => {
@@ -301,20 +301,38 @@ const StreamingMessage: React.FC<StreamingMessageProps> = ({ content, initialCon
               </div>
             </div>
           ) : (
-            <div className="relative">
-              {/* Initial content (from local model) - shown in light color */}
+            <div className="relative overflow-hidden">
+              {/* Initial content (from local model) - shown with low opacity, slides up when hiding */}
               {hasInitialContent && (
                 <div 
-                  className="text-sm app-text-tertiary transition-opacity duration-300"
-                  style={{ opacity: initialContentOpacity }}
+                  className={`text-sm app-text-tertiary transition-all duration-500 ease-in-out ${
+                    isHidingInitialContent ? 'opacity-0' : 'opacity-30'
+                  }`}
+                  style={{ 
+                    transform: isHidingInitialContent ? 'translateY(-100%)' : 'translateY(0)',
+                    transition: 'opacity 500ms ease-in-out, transform 500ms ease-in-out',
+                  }}
                 >
                   <MarkdownRenderer content={initialContent} />
                 </div>
               )}
               
-              {/* Real content (from actual AI model) - overlays initial content */}
+              {/* Real content (from actual AI model) - fades in smoothly */}
               {hasContent && (
-                <div className={`text-sm ${hasInitialContent ? 'absolute inset-0 px-4 py-3' : ''}`}>
+                <div 
+                  className={`text-sm transition-opacity duration-300 ${
+                    isHidingInitialContent || !hasInitialContent ? 'opacity-100' : 'opacity-0'
+                  }`}
+                  style={{
+                    ...(hasInitialContent && !isHidingInitialContent ? { 
+                      position: 'absolute', 
+                      top: 0, 
+                      left: 0, 
+                      right: 0,
+                      padding: '12px 16px'
+                    } : {})
+                  }}
+                >
                   <MarkdownRenderer content={content} />
                 </div>
               )}
