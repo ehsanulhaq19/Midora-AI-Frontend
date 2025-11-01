@@ -105,6 +105,10 @@ class AIApiClient {
                 case 'initial_metadata':
                   onComplete(eventData)
                   break
+                case 'initial_content':
+                  // Handle initial content from local model (placeholder content)
+                  onChunk(eventData.chunk || '', 'initial_content', eventData)
+                  break
                 case 'metadata':
                 case 'meta_data':
                   // Handle metadata stream responses (don't add to content)
@@ -210,6 +214,10 @@ class AIApiClient {
               switch (eventData.type) {
                 case 'initial_metadata':
                   onComplete(eventData)
+                  break
+                case 'initial_content':
+                  // Handle initial content from local model (placeholder content)
+                  onChunk(eventData.chunk || '', 'initial_content', eventData)
                   break
                 case 'metadata':
                 case 'meta_data':

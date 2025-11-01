@@ -238,14 +238,28 @@ const StreamingCursor: React.FC = () => {
 
 interface StreamingMessageProps {
   content: string
+  initialContent?: string
   messageType?: string
   selectedModel?: string
   linkedFiles?: LinkedFile[]
 }
 
-const StreamingMessage: React.FC<StreamingMessageProps> = ({ content, messageType, selectedModel, linkedFiles }) => {
+const StreamingMessage: React.FC<StreamingMessageProps> = ({ content, initialContent = '', messageType, selectedModel, linkedFiles }) => {
   const [isCopied, setIsCopied] = useState(false)
+  const [isHidingInitialContent, setIsHidingInitialContent] = useState(false)
   const hasContent = content.length > 0
+  const hasInitialContent = initialContent.length > 0
+  
+  // Hide initial content with slide-up effect when real content starts appearing
+  useEffect(() => {
+    if (hasContent && hasInitialContent && !isHidingInitialContent) {
+      // Trigger slide-out animation
+      setIsHidingInitialContent(true)
+    } else if (!hasContent && hasInitialContent) {
+      // Reset when only initial content is present
+      setIsHidingInitialContent(false)
+    }
+  }, [hasContent, hasInitialContent, isHidingInitialContent])
   
   // Get status message from i18n based on message_type
   const getStatusMessage = () => {
@@ -278,8 +292,8 @@ const StreamingMessage: React.FC<StreamingMessageProps> = ({ content, messageTyp
   return (
     <div className="flex justify-start mb-6 px-4">
       <div className="max-w-[75%]">
-        <div className="px-4 py-3 rounded-lg rounded-bl-sm bg-[color:var(--tokens-color-surface-surface-secondary)] text-[color:var(--tokens-color-text-text-primary)] text-sm">
-          {!hasContent ? (
+        <div className="px-4 py-3 rounded-lg rounded-bl-sm bg-[color:var(--tokens-color-surface-surface-secondary)] text-[color:var(--tokens-color-text-text-primary)] text-sm relative">
+          {!hasContent && !hasInitialContent ? (
             // Show loading animation before content arrives
             <div className="flex items-center gap-3">
               <div className="animate-spin" style={{ animation: 'spin 2s linear infinite' }}>
@@ -287,13 +301,42 @@ const StreamingMessage: React.FC<StreamingMessageProps> = ({ content, messageTyp
               </div>
             </div>
           ) : (
-            // Show content with cursor when content is available
-            <>
-              <div className="text-sm">
-                <MarkdownRenderer content={content} />
-              </div>
-              {/* <StreamingCursor /> */}
-            </>
+            <div className="relative overflow-hidden">
+              {/* Initial content (from local model) - shown with low opacity, slides up when hiding */}
+              {hasInitialContent && (
+                <div 
+                  className={`text-sm app-text-tertiary transition-all duration-500 ease-in-out ${
+                    isHidingInitialContent ? 'opacity-0' : 'opacity-30'
+                  }`}
+                  style={{ 
+                    transform: isHidingInitialContent ? 'translateY(-100%)' : 'translateY(0)',
+                    transition: 'opacity 500ms ease-in-out, transform 500ms ease-in-out',
+                  }}
+                >
+                  <MarkdownRenderer content={initialContent} />
+                </div>
+              )}
+              
+              {/* Real content (from actual AI model) - fades in smoothly */}
+              {hasContent && (
+                <div 
+                  className={`text-sm transition-opacity duration-300 ${
+                    isHidingInitialContent || !hasInitialContent ? 'opacity-100' : 'opacity-0'
+                  }`}
+                  style={{
+                    ...(hasInitialContent && !isHidingInitialContent ? { 
+                      position: 'absolute', 
+                      top: 0, 
+                      left: 0, 
+                      right: 0,
+                      padding: '12px 16px'
+                    } : {})
+                  }}
+                >
+                  <MarkdownRenderer content={content} />
+                </div>
+              )}
+            </div>
           )}
           
           {/* Display selected model name if available */}
@@ -345,6 +388,7 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
     isLoading, 
     isStreaming, 
     streamingContent,
+    initialContent,
     streamingMetadata, 
     selectConversation, 
     loadMoreMessages, 
@@ -526,7 +570,8 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
           
           {isStreaming && !isRegenerating && (
             <StreamingMessage 
-              content={streamingContent} 
+              content={streamingContent}
+              initialContent={initialContent}
               messageType={streamingMetadata?.message_type}
               selectedModel={streamingMetadata?.selected_model}
               linkedFiles={streamingMetadata?.linked_files}
