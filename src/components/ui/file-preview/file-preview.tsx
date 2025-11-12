@@ -3,6 +3,8 @@
 import React from 'react'
 import { Close } from '@/icons'
 import { FilePreview as FilePreviewType, FileTypeInfo } from '@/api/files/types'
+import { Spinner } from '@/components/ui/loaders'
+import { t } from '@/i18n'
 
 interface FilePreviewProps {
   file: FilePreviewType
@@ -89,18 +91,30 @@ const formatFileSize = (bytes: number): string => {
 export const FilePreview: React.FC<FilePreviewProps> = ({ file, onRemove, className = '' }) => {
   const fileTypeInfo = getFileTypeInfo(file.file_type, file.file_extension)
   const isImage = fileTypeInfo.category === 'image'
+  const isUploading = file.uuid.startsWith('temp-')
   
   // Get file extension without dot
   const fileExtension = file.file_extension.replace('.', '').toUpperCase()
   
   return (
     <div className={`relative bg-[color:var(--tokens-color-surface-surface-secondary)] border border-[color:var(--tokens-color-border-border-subtle)] rounded-[var(--premitives-corner-radius-corner-radius-2)] p-3 w-[200px] h-[120px] flex flex-col shadow-sm hover:shadow-md transition-shadow flex-shrink-0 ${className}`}>
+      {/* Uploading overlay */}
+      {isUploading && (
+        <div className="absolute inset-0 bg-black/50 rounded-[var(--premitives-corner-radius-corner-radius-2)] flex items-center justify-center z-20">
+          <div className="flex flex-col items-center gap-2">
+            <Spinner size="md" color="white" />
+            <span className="app-text-xs app-text-primary text-white">{t('common.fileUpload.uploading')}</span>
+          </div>
+        </div>
+      )}
+      
       {/* Remove button */}
       <button
         type="button"
         onClick={() => onRemove(file.uuid)}
         aria-label="Remove file"
         className="absolute top-2 right-2 p-1 hover:bg-red-100 rounded-full transition-colors z-10"
+        disabled={isUploading}
       >
         <Close className="w-3 h-3 text-red-500 hover:text-red-700" />
       </button>

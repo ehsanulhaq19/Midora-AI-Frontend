@@ -5,15 +5,12 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { dark } from 'react-syntax-highlighter/dist/esm/styles/prism'
-
-interface MarkdownRendererProps {
-  content: string
-  className?: string
-}
+import type { MarkdownRendererProps } from './types'
 
 export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ 
   content, 
-  className = '' 
+  className = '',
+  onLinkClick
 }) => {
   return (
     <div className={`markdown-content ${className}`}>
@@ -126,6 +123,11 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
               className="text-[color:var(--tokens-color-text-text-brand)] hover:text-[color:var(--tokens-color-text-text-brand)] underline hover:no-underline transition-colors"
               target="_blank"
               rel="noopener noreferrer"
+              onClick={(event) => {
+                if (onLinkClick) {
+                  onLinkClick(event, href)
+                }
+              }}
             >
               {children}
             </a>

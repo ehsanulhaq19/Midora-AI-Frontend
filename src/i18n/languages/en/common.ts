@@ -29,6 +29,8 @@ export const common = {
     unsupportedFileType: 'This file type is not supported',
     uploadFailed: 'File upload failed',
     dragDropText: 'Drop files here',
+    dropHere: 'Drop here',
+    uploading: 'Uploading...',
     selectFile: 'Select file',
     removeFile: 'Remove file',
   },

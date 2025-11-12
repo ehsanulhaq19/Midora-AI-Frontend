@@ -1,14 +1,14 @@
 'use client'
 
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useRef } from 'react'
 import { Menu } from '@/icons'
 import { ModelSelection } from './model-selection'
-import { MessageInput } from './message-input'
+import { MessageInput, MessageInputHandle } from './message-input'
 import { DragDropOverlay } from '@/components/ui/drag-drop-overlay'
 import { LogoOnly } from '@/icons'
 import { t, tWithParams } from '@/i18n'
 import { useAuthRedux } from '@/hooks/use-auth-redux'
-import { useFileUpload, useToast } from '@/hooks'
+import { useToast } from '@/hooks'
 
 interface ChatInterfaceProps {
   onMenuClick: () => void
@@ -28,7 +28,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const { userName } = useAuthRedux()
   const [isDragOver, setIsDragOver] = useState(false)
   const { error: showErrorToast } = useToast()
-  const { uploadFile, validateFile } = useFileUpload()
+  const messageInputRef = useRef<MessageInputHandle>(null)
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault()
@@ -50,8 +50,16 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     const files = Array.from(e.dataTransfer.files)
     if (files.length === 0) return
 
+    if (!messageInputRef.current) {
+      showErrorToast(
+        'Upload Failed',
+        t('common.fileUpload.uploadFailed')
+      )
+      return
+    }
+
     for (const file of files) {
-      const validation = validateFile(file)
+      const validation = messageInputRef.current.validateFile(file)
       if (!validation.isValid) {
         showErrorToast(
           'Upload Failed',
@@ -61,7 +69,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       }
 
       try {
-        await uploadFile(file)
+        await messageInputRef.current.uploadFile(file)
       } catch (error) {
         showErrorToast(
           'Upload Failed',
@@ -69,12 +77,18 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         )
       }
     }
-  }, [validateFile, uploadFile, showErrorToast])
+  }, [showErrorToast])
 
   if (isCompact) {
     return (
-      <div className="w-full max-w-[808px] max-h-[106px] mx-auto p-4">
-        <MessageInput onSend={onSendMessage} isStreaming={isStreaming} className="max-w-[808px]" textAreaClassName="!app-text-lg" onFilesChange={onFilesChange}/>
+      <div 
+        className="w-full max-w-[808px] max-h-[106px] mx-auto p-4 relative"
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+      >
+        <DragDropOverlay isVisible={isDragOver} />
+        <MessageInput ref={messageInputRef} onSend={onSendMessage} isStreaming={isStreaming} className="max-w-[808px]" textAreaClassName="!app-text-lg" onFilesChange={onFilesChange}/>
       </div>
     )
   }
@@ -121,7 +135,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
           </p>
         </div>
 
-        <MessageInput onSend={onSendMessage} isStreaming={isStreaming} onFilesChange={onFilesChange} />
+        <MessageInput ref={messageInputRef} onSend={onSendMessage} isStreaming={isStreaming} onFilesChange={onFilesChange} />
       </div>
     </div>
   )

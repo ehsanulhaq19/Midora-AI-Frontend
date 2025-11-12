@@ -16,6 +16,8 @@ import { useAuthRedux } from '@/hooks/use-auth-redux'
 import { useAIModels } from '@/hooks/use-ai-models'
 import { MessageVersionNavigation } from './message-version-navigation'
 import { LinkedFilesPreview } from './linked-files-preview'
+import { appConfig } from '@/config/app'
+import { baseApiClient } from '@/api/base'
 
 interface ConversationContainerProps {
   conversationUuid: string | null
@@ -48,6 +50,7 @@ interface MessageBubbleProps {
     }>;
   }
   isThisMessageRegenerating?: boolean
+  onMarkdownLinkClick?: (event: React.MouseEvent<HTMLAnchorElement>, href?: string) => void
 }
 
 const MessageBubble: React.FC<MessageBubbleProps> = ({ 
@@ -61,7 +64,8 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
   isStreaming = false,
   streamingContent = '',
   streamingMetadata = null,
-  isThisMessageRegenerating = false
+  isThisMessageRegenerating = false,
+  onMarkdownLinkClick
 }) => {
   const [isCopied, setIsCopied] = useState(false)
   const { switchMessageVersion } = useRegenerate()
@@ -135,13 +139,19 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
                     </div>
                   ) : (
                     <>
-                      <MarkdownRenderer content={streamingContent || message.content} />
+                      <MarkdownRenderer 
+                        content={streamingContent || message.content} 
+                        onLinkClick={onMarkdownLinkClick}
+                      />
                       <StreamingCursor />
                     </>
                   )}
                 </>
               ) : (
-                <MarkdownRenderer content={message.content || ''} />
+                <MarkdownRenderer 
+                  content={message.content || ''} 
+                  onLinkClick={onMarkdownLinkClick}
+                />
               )}
             </div>
           )}
@@ -242,9 +252,10 @@ interface StreamingMessageProps {
   messageType?: string
   selectedModel?: string
   linkedFiles?: LinkedFile[]
+  onLinkClick?: (event: React.MouseEvent<HTMLAnchorElement>, href?: string) => void
 }
 
-const StreamingMessage: React.FC<StreamingMessageProps> = ({ content, initialContent = '', messageType, selectedModel, linkedFiles }) => {
+const StreamingMessage: React.FC<StreamingMessageProps> = ({ content, initialContent = '', messageType, selectedModel, linkedFiles, onLinkClick }) => {
   const [isCopied, setIsCopied] = useState(false)
   const [isHidingInitialContent, setIsHidingInitialContent] = useState(false)
   const hasContent = content.length > 0
@@ -313,7 +324,10 @@ const StreamingMessage: React.FC<StreamingMessageProps> = ({ content, initialCon
                     transition: 'opacity 500ms ease-in-out, transform 500ms ease-in-out',
                   }}
                 >
-                  <MarkdownRenderer content={initialContent} />
+                  <MarkdownRenderer 
+                    content={initialContent} 
+                    onLinkClick={onLinkClick}
+                  />
                 </div>
               )}
               
@@ -333,7 +347,10 @@ const StreamingMessage: React.FC<StreamingMessageProps> = ({ content, initialCon
                     } : {})
                   }}
                 >
-                  <MarkdownRenderer content={content} />
+                  <MarkdownRenderer 
+                    content={content} 
+                    onLinkClick={onLinkClick}
+                  />
                 </div>
               )}
             </div>
@@ -511,6 +528,40 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
       return dateA - dateB
     })
 
+  const handleMarkdownLinkClick = async (event: React.MouseEvent<HTMLAnchorElement>, href?: string) => {
+    if (!href) {
+      return
+    }
+
+    const backendUrl = appConfig.backendUrl.replace(/\/$/, '')
+
+    if (href.startsWith(backendUrl) && href.includes('/api/v1/files/download')) {
+      event.preventDefault()
+      event.stopPropagation()
+
+      try {
+        const downloadUrl = new URL(href)
+        const endpoint = `${downloadUrl.pathname}${downloadUrl.search}`
+        const downloadResponse = await baseApiClient.downloadFile(endpoint)
+        const blobUrl = window.URL.createObjectURL(downloadResponse.data)
+
+        const pathSegments = downloadUrl.pathname.split('/')
+        const fallbackFilename = decodeURIComponent(pathSegments[pathSegments.length - 1] || 'download')
+        const filename = downloadResponse.filename || fallbackFilename || 'download'
+
+        const link = document.createElement('a')
+        link.href = blobUrl
+        link.download = filename
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        window.URL.revokeObjectURL(blobUrl)
+      } catch (error) {
+        console.error('Failed to download file from conversation link:', error)
+      }
+    }
+  }
+
 
   const handleRegenerate = (messageUuid: string) => {
     if (conversationUuid) {
@@ -564,6 +615,7 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
                 streamingContent={streamingContent}
                 streamingMetadata={streamingMetadata}
                 isThisMessageRegenerating={regeneratingMessageUuid === message.uuid}
+                onMarkdownLinkClick={handleMarkdownLinkClick}
               />
             </div>
           ))}
@@ -575,6 +627,7 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
               messageType={streamingMetadata?.message_type}
               selectedModel={streamingMetadata?.selected_model}
               linkedFiles={streamingMetadata?.linked_files}
+              onLinkClick={handleMarkdownLinkClick}
             />
           )}
           

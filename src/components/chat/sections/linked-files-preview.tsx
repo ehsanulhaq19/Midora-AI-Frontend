@@ -3,6 +3,8 @@
 import React from 'react'
 import { LinkedFile } from '@/api/conversation/types'
 import { FileTypeInfo } from '@/api/files/types'
+import { Spinner } from '@/components/ui/loaders'
+import { t } from '@/i18n'
 
 interface LinkedFilesPreviewProps {
   linkedFiles: LinkedFile[]
@@ -91,6 +93,7 @@ const LinkedFilePreview: React.FC<{ linkedFile: LinkedFile; isUser: boolean }> =
   const fileTypeInfo = getFileTypeInfo(linkedFile.file_type, linkedFile.file_extension)
   const isImage = fileTypeInfo.category === 'image'
   const fileExtension = linkedFile.file_extension.replace('.', '').toUpperCase()
+  const isUploading = linkedFile.uuid?.startsWith('temp-') || false
   
   // Determine background color based on message type
   const backgroundColor = isUser 
@@ -99,6 +102,16 @@ const LinkedFilePreview: React.FC<{ linkedFile: LinkedFile; isUser: boolean }> =
 
   return (
     <div className={`relative ${backgroundColor} border rounded-[var(--premitives-corner-radius-corner-radius-2)] p-3 w-[200px] h-[120px] flex flex-col shadow-sm hover:shadow-md transition-shadow flex-shrink-0`}>
+      {/* Uploading overlay */}
+      {isUploading && (
+        <div className="absolute inset-0 bg-black/50 rounded-[var(--premitives-corner-radius-corner-radius-2)] flex items-center justify-center z-20">
+          <div className="flex flex-col items-center gap-2">
+            <Spinner size="md" color="white" />
+            <span className="app-text-xs app-text-primary text-white">{t('common.fileUpload.uploading')}</span>
+          </div>
+        </div>
+      )}
+      
       {/* File preview section - fixed height */}
       <div className="flex items-center justify-center h-16 mb-2">
         {isImage ? (
