@@ -13,11 +13,11 @@ export const DragDropOverlay: React.FC<DragDropOverlayProps> = ({ isVisible, cla
   if (!isVisible) return null
 
   return (
-    <div className={`fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center ${className}`}>
-      <div className="bg-[color:var(--tokens-color-surface-surface-primary)] rounded-[var(--premitives-corner-radius-corner-radius-3)] p-8 flex flex-col items-center gap-4 border-2 border-dashed border-[color:var(--tokens-color-border-border-brand)]">
+    <div className={`fixed inset-0 z-50 bg-black/40 flex items-center justify-center ${className}`}>
+      <div className="bg-[color:var(--tokens-color-surface-surface-primary)] rounded-[var(--premitives-corner-radius-corner-radius-3)] p-8 flex flex-col items-center gap-4 border-2 border-dashed border-[color:var(--tokens-color-border-border-brand)] shadow-lg">
         <FileUpload className="w-16 h-16 text-[color:var(--tokens-color-text-text-brand)]" />
         <p className="app-text-lg app-text-primary font-medium">
-          {t('common.fileUpload.dragDropText')}
+          {t('common.fileUpload.dropHere')}
         </p>
       </div>
     </div>

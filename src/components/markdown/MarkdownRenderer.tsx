@@ -4,16 +4,13 @@ import React from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
-import { dark } from 'react-syntax-highlighter/dist/esm/styles/prism'
-
-interface MarkdownRendererProps {
-  content: string
-  className?: string
-}
+import { oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism'
+import type { MarkdownRendererProps } from './types'
 
 export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ 
   content, 
-  className = '' 
+  className = '',
+  onLinkClick
 }) => {
   return (
     <div className={`markdown-content ${className}`}>
@@ -54,7 +51,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
 
           // Paragraphs
           p: ({ children }) => (
-            <p className="app-text-md app-text-primary mb-3 leading-relaxed">
+            <p className="app-text-md app-text-primary mb-3 leading-relaxed break-words">
               {children}
             </p>
           ),
@@ -126,29 +123,40 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
               className="text-[color:var(--tokens-color-text-text-brand)] hover:text-[color:var(--tokens-color-text-text-brand)] underline hover:no-underline transition-colors"
               target="_blank"
               rel="noopener noreferrer"
+              onClick={(event) => {
+                if (onLinkClick) {
+                  onLinkClick(event, href)
+                }
+              }}
             >
               {children}
             </a>
           ),
 
-          // Code blocks with syntax highlighting
+          // Code blocks with syntax highlighting - white background
           code: ({ node, inline, className, children, ...props }) => {
             const match = /language-(\w+)/.exec(className || '')
             
             if (!inline && match) {
               return (
-                <div className="my-4 rounded-lg overflow-hidden">
+                <div className="my-4 rounded-lg overflow-hidden border border-[color:var(--tokens-color-border-border-inactive)]">
                   <SyntaxHighlighter
-                    style={dark}
+                    style={oneLight}
                     language={match[1]}
                     PreTag="div"
-                    className="!bg-black !text-gray-100"
+                    className="!bg-white !text-gray-800"
                     customStyle={{
-                      backgroundColor: '#000000',
+                      backgroundColor: '#ffffff',
                       margin: 0,
                       borderRadius: '0.5rem',
                       fontSize: '0.875rem',
                       lineHeight: '1.5',
+                      padding: '1rem',
+                    }}
+                    codeTagProps={{
+                      style: {
+                        color: '#1f2937',
+                      }
                     }}
                     {...props}
                   >

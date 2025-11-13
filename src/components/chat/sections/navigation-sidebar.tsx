@@ -13,7 +13,7 @@ import {
   MoreOptions,
   LogoText,
   MinusSquare,
-  MidorasIcon,
+  LogoOnly,
   FoldersIcon,
   FolderOpen01,
   Logout
@@ -92,21 +92,36 @@ interface NavigationSidebarProps {
   isOpen: boolean
   onClose: () => void
   onNewChat?: () => void
+  showFullSidebar?: boolean
 }
 
 export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({ 
   isOpen, 
   onClose,
-  onNewChat
+  onNewChat,
+  showFullSidebar = true
 }) => {
   const [selectedChat, setSelectedChat] = useState<number | null>(null)
   const [expandedProjects, setExpandedProjects] = useState<Record<number, boolean>>({})
   const [searchHovered, setSearchHovered] = useState(false)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [isManuallyShrunk, setIsManuallyShrunk] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const conversationsContainerRef = useRef<HTMLDivElement>(null)
   const { userName } = useAuthRedux()
   const { logout } = useAuth()
+  
+  // Determine if sidebar should be shrunk
+  // Sidebar is shrunk if: canvas is open (!showFullSidebar) OR manually shrunk by user
+  const isShrunk = !showFullSidebar || isManuallyShrunk
+  
+  // When canvas closes (showFullSidebar becomes true), don't reset manual shrink
+  // User's manual preference is preserved
+  // When canvas opens (showFullSidebar becomes false), sidebar will shrink regardless of manual state
+  
+  const handleToggleSidebar = () => {
+    setIsManuallyShrunk(!isManuallyShrunk)
+  }
   const { 
     conversations, 
     currentConversation, 
@@ -209,46 +224,76 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
       
       {/* Sidebar */}
       <div className={`
-        fixed lg:relative top-0 left-0 w-[258px] bg-[color:var(--tokens-color-surface-surface-neutral)] z-50 transform transition-transform duration-300 ease-in-out
+        fixed lg:relative top-0 left-0 z-50 transform transition-all duration-300 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-        flex flex-col h-[100vh]
+        ${isShrunk ? 'w-[70px] lg:w-[70px]' : 'w-[258px]'}
+        ${isShrunk ? 'bg-[color:var(--tokens-color-surface-surface-sidebar-shrunk)]' : 'bg-[color:var(--tokens-color-surface-surface-neutral)]'}
+        flex flex-col h-[100vh] relative
       `}>
         {/* Header */}
-        <div className="flex flex-col items-start gap-3 flex-shrink-0 pb-6">
-          <div className="flex h-[68px] items-center justify-between py-0 px-5 relative w-full">
-            <LogoText
-              className="relative aspect-[1]"
-            />
-
-            <button className="p-1 hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded transition-colors">
-              <MinusSquare className="w-5 h-5" />
-            </button>
+        <div className={`flex flex-col items-start flex-shrink-0 pb-6 ${isShrunk ? 'gap-6' : 'gap-3'}`}>
+          <div className={`flex h-[68px] items-center justify-center py-0 relative w-full transition-all duration-300 ${
+            isShrunk ? 'px-3 flex-col gap-2' : 'px-5 justify-between'
+          }`}>
+            {isShrunk ? (
+              <div className="mt-[34px] flex flex-col items-center justify-center gap-3">
+                <LogoOnly className="w-8 h-8" />
+                <button 
+                  onClick={handleToggleSidebar}
+                  className="p-1 hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded transition-colors"
+                  aria-label="Expand sidebar"
+                  title="Expand sidebar"
+                >
+                  <MinusSquare className="w-5 h-5" />
+                </button>
+              </div>
+            ) : (
+              <>
+                <LogoText className="relative aspect-[1]" />
+                <button 
+                  onClick={handleToggleSidebar}
+                  className="p-1 hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded transition-colors"
+                  aria-label="Shrink sidebar"
+                  title="Shrink sidebar"
+                >
+                  <MinusSquare className="w-5 h-5" />
+                </button>
+              </>
+            )}
           </div>
 
-          <div className="flex flex-col items-start gap-1 relative w-full">
+          <div className={`flex flex-col items-start gap-1 relative w-full ${isShrunk ? 'px-2' : ''}`}>
             <button 
               onClick={handleNewChat}
-              className="flex items-center gap-2 py-2 relative px-5 w-full hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded transition-colors"
+              className={`flex items-center gap-2 py-2 relative w-full hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded transition-colors ${
+                isShrunk ? 'px-2 justify-center' : 'px-5'
+              }`}
+              title={isShrunk ? t('chat.newChat') : ''}
             >
               <div className="w-7 h-7 flex items-center justify-center gap-2.5 rounded-[var(--premitives-corner-radius-corner-radius)] bg-[color:var(--tokens-color-icon-surface-icon-inactive-brand)] text-white">
                 <Plus01_5 className="w-5 h-5" color="#ffffff" />
               </div>
-              <div className="relative flex items-center justify-center w-fit font-h05-heading05 font-[number:var(--h05-heading05-font-weight)] text-[color:var(--tokens-color-text-text-brand)] text-[14px] tracking-[var(--h05-heading05-letter-spacing)] leading-[var(--h05-heading05-line-height)] whitespace-nowrap [font-style:var(--h05-heading05-font-style)]">
-                {t('chat.newChat')}
-              </div>
+              {!isShrunk && (
+                <div className="relative flex items-center justify-center w-fit font-h05-heading05 font-[number:var(--h05-heading05-font-weight)] text-[color:var(--tokens-color-text-text-brand)] text-[14px] tracking-[var(--h05-heading05-letter-spacing)] leading-[var(--h05-heading05-line-height)] whitespace-nowrap [font-style:var(--h05-heading05-font-style)]">
+                  {t('chat.newChat')}
+                </div>
+              )}
             </button>
 
             <button
-              className={`w-full flex items-center gap-3 p-2 px-5 rounded-[var(--premitives-corner-radius-corner-radius)] transition-colors ${
+              className={`w-full flex items-center rounded-[var(--premitives-corner-radius-corner-radius)] transition-colors ${
                 searchHovered ? "bg-[color:var(--tokens-color-surface-surface-tertiary)]" : ""
-              }`}
+              } ${isShrunk ? 'px-2 py-2 justify-center' : 'px-5 py-2 gap-3'}`}
               onMouseEnter={() => setSearchHovered(true)}
               onMouseLeave={() => setSearchHovered(false)}
+              title={isShrunk ? t('chat.searchChat') : ''}
             >
               <Search02 className="w-5 h-5" />
-              <div className="font-text w-fit flex tracking-[var(--text-letter-spacing)] text-[14px] items-center text-[color:var(--tokens-color-text-text-seconary)] font-[number:var(--text-font-weight)] leading-[var(--text-line-height)] whitespace-nowrap justify-center relative [font-style:var(--text-font-style)]">
-                {t('chat.searchChat')}
-              </div>
+              {!isShrunk && (
+                <div className="font-text w-fit flex tracking-[var(--text-letter-spacing)] text-[14px] items-center text-[color:var(--tokens-color-text-text-seconary)] font-[number:var(--text-font-weight)] leading-[var(--text-line-height)] whitespace-nowrap justify-center relative [font-style:var(--text-font-style)]">
+                  {t('chat.searchChat')}
+                </div>
+              )}
             </button>
           </div>
         </div>
@@ -257,140 +302,230 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
         <div className="flex-1 overflow-hidden overflow-y-auto flex flex-col">
           {/* Tools Section */}
           <div className="flex flex-col items-start relative w-full flex-shrink-0">
-            <div className="relative flex items-center justify-center w-fit mb-[8px] mt-[-1.00px] font-text-small font-[number:var(--text-small-font-weight)] text-[color:var(--tokens-color-text-text-section-header)] text-[14px] tracking-[var(--text-small-letter-spacing)] leading-[var(--text-small-line-height)] whitespace-nowrap [font-style:var(--text-small-font-style)] px-5">
-              Midoras
-            </div>
-            <button className="flex items-center gap-3 px-5 py-2 relative w-full hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded transition-colors">
-              <MidorasIcon className="w-5 h-5" color="#1F1740" />
-              <div className="relative flex items-center justify-center w-fit font-text font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-[14px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] whitespace-nowrap [font-style:var(--text-font-style)]">
+            {!isShrunk && (
+              <div className="relative flex items-center justify-center w-fit mb-[8px] mt-[-1.00px] font-text-small font-[number:var(--text-small-font-weight)] text-[color:var(--tokens-color-text-text-section-header)] text-[14px] tracking-[var(--text-small-letter-spacing)] leading-[var(--text-small-line-height)] whitespace-nowrap [font-style:var(--text-small-font-style)] px-5">
                 Midoras
               </div>
+            )}
+            <button 
+              className={`flex items-center relative w-full hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded transition-colors ${
+                isShrunk ? 'px-2 py-2 justify-center' : 'px-5 py-2 gap-3'
+              }`}
+              title={isShrunk ? 'Midoras' : ''}
+            >
+              <LogoOnly className="w-5 h-5" />
+              {!isShrunk && (
+                <div className="relative flex items-center justify-center w-fit font-text font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-[14px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] whitespace-nowrap [font-style:var(--text-font-style)]">
+                  Midoras
+                </div>
+              )}
             </button>
 
-            <button className="flex items-center gap-3 px-5 py-2 relative w-full hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded transition-colors">
+            <button 
+              className={`flex items-center relative w-full hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded transition-colors ${
+                isShrunk ? 'px-2 py-2 justify-center' : 'px-5 py-2 gap-3'
+              }`}
+              title={isShrunk ? 'AI Detection' : ''}
+            >
               <PersonFace className="w-5 h-5" />
-              <div className="relative flex items-center justify-center w-fit font-text font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-[14px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] whitespace-nowrap [font-style:var(--text-font-style)]">
-                AI Detection
-              </div>
+              {!isShrunk && (
+                <div className="relative flex items-center justify-center w-fit font-text font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-[14px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] whitespace-nowrap [font-style:var(--text-font-style)]">
+                  AI Detection
+                </div>
+              )}
             </button>
 
-            <button className="flex items-center gap-3 px-5 py-2 relative w-full hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded transition-colors">
+            <button 
+              className={`flex items-center relative w-full hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded transition-colors ${
+                isShrunk ? 'px-2 py-2 justify-center' : 'px-5 py-2 gap-3'
+              }`}
+              title={isShrunk ? 'AI Humanizer' : ''}
+            >
               <AI className="w-5 h-5" />
-              <div className="relative flex items-center justify-center w-fit font-text font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-[14px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] whitespace-nowrap [font-style:var(--text-font-style)]">
-                AI Humanizer
-              </div>
+              {!isShrunk && (
+                <div className="relative flex items-center justify-center w-fit font-text font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-[14px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] whitespace-nowrap [font-style:var(--text-font-style)]">
+                  AI Humanizer
+                </div>
+              )}
             </button>
           </div>
 
           {/* Projects Section */}
           <div className="flex flex-col items-start relative w-full flex-shrink-0 mt-6">
-            <div className="relative flex items-center justify-center w-fit mt-[-1.00px] mb-[8px] font-text-small font-[number:var(--text-small-font-weight)] text-[color:var(--tokens-color-text-text-section-header)] text-[14px] tracking-[var(--text-small-letter-spacing)] leading-[var(--text-small-line-height)] whitespace-nowrap [font-style:var(--text-small-font-style)] px-5">
-              Projects
-            </div>
-            <button className="flex items-center gap-[8px] px-5 py-2 relative w-full hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded transition-colors">
-              <FoldersIcon />
-              <div className="relative flex items-center justify-center w-fit font-text font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-[14px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] whitespace-nowrap [font-style:var(--text-font-style)]">
-                {t('chat.newFolder')}
+            {!isShrunk && (
+              <div className="relative flex items-center justify-center w-fit mt-[-1.00px] mb-[8px] font-text-small font-[number:var(--text-small-font-weight)] text-[color:var(--tokens-color-text-text-section-header)] text-[14px] tracking-[var(--text-small-letter-spacing)] leading-[var(--text-small-line-height)] whitespace-nowrap [font-style:var(--text-small-font-style)] px-5">
+                Projects
               </div>
+            )}
+            <button 
+              className={`flex items-center relative w-full hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded transition-colors ${
+                isShrunk ? 'px-2 py-2 justify-center' : 'px-5 py-2 gap-[8px]'
+              }`}
+              title={isShrunk ? t('chat.newFolder') : ''}
+            >
+              <FoldersIcon />
+              {!isShrunk && (
+                <div className="relative flex items-center justify-center w-fit font-text font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-[14px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] whitespace-nowrap [font-style:var(--text-font-style)]">
+                  {t('chat.newFolder')}
+                </div>
+              )}
             </button>
 
-            <div className="flex flex-col items-start relative w-full max-h-48 overflow-y-auto scrollbar-hide scroll-smooth">
-              {projects.map((project, index) => (
-                <button key={index} className="w-full pt-[5px] pb-[8px] px-2 gap-[8px] flex items-center items-center pl-5 hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]">
-                  <FolderOpen01
-                    key={index}
-                    title={project.title}
-                    chats={project.chats}
-                    isExpanded={expandedProjects[index]}
-                    onToggle={() => toggleProject(index)}
-                  />
-                  <span className="font-text mt-[3px] font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-[14px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] whitespace-nowrap [font-style:var(--text-font-style)]">
-                    {project.title}
-                  </span>
-                </button>
-              ))}
-            </div>
+            {!isShrunk && (
+              <div className="flex flex-col items-start relative w-full max-h-48 overflow-y-auto scrollbar-hide scroll-smooth">
+                {projects.map((project, index) => (
+                  <button key={index} className="w-full pt-[5px] pb-[8px] px-2 gap-[8px] flex items-center items-center pl-5 hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]">
+                    <FolderOpen01
+                      key={index}
+                      title={project.title}
+                      chats={project.chats}
+                      isExpanded={expandedProjects[index]}
+                      onToggle={() => toggleProject(index)}
+                    />
+                    <span className="font-text mt-[3px] font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-[14px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] whitespace-nowrap [font-style:var(--text-font-style)]">
+                      {project.title}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Recents Section - Takes remaining space */}
           <div className="flex flex-col items-start relative w-full flex-1 mt-6 min-h-0">
-            <div className="flex items-center gap-2.5 px-5 py-0 relative w-full">
-              <div className="relative flex items-center justify-center w-fit mt-[-1.00px] mb-[8px] font-text-small font-[number:var(--text-small-font-weight)] text-[color:var(--tokens-color-text-text-section-header)] text-[14px] tracking-[var(--text-small-letter-spacing)] leading-[var(--text-small-line-height)] whitespace-nowrap [font-style:var(--text-small-font-style)]">
-                {t('chat.recents')}
-              </div>
-            </div>
-
-            <div 
-              ref={conversationsContainerRef}
-              className="flex flex-col items-start relative w-full overflow-y-auto scroll-smooth"
-              style={{ 
-                maxHeight: 'var(--sidebar-conversations-max-height)',
-                minHeight: '200px'
-              }}
-              onScroll={handleConversationsScroll}
-            >
-              {conversations.length > 0 ? (
-                <>
-                  {conversations
-                    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-                    .map((conversation, index) => (
-                    <ChatListItem
-                      key={conversation.uuid}
-                      text={conversation.name}
-                      isSelected={currentConversation?.uuid === conversation.uuid}
-                      onClick={() => handleSelectChat(conversation.uuid)}
-                    />
-                  ))}
-                  {/* Loading indicator for more conversations */}
-                  {isLoadingMoreConversations && (
-                    <div className="w-full p-3 text-center text-[color:var(--tokens-color-text-text-inactive-2)]">
-                      <div className="flex items-center justify-center gap-2">
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[color:var(--tokens-color-text-text-inactive-2)]"></div>
-                        <span className="text-[14px]">{t('chat.loadingMoreConversations')}</span>
-                      </div>
-                    </div>
-                  )}
-                </>
-              ) : (
-                <div className="w-full p-3 text-center text-[color:var(--tokens-color-text-text-inactive-2)]">
-                  {t('chat.noConversations')}
+            {!isShrunk && (
+              <div className="flex items-center gap-2.5 px-5 py-0 relative w-full">
+                <div className="relative flex items-center justify-center w-fit mt-[-1.00px] mb-[8px] font-text-small font-[number:var(--text-small-font-weight)] text-[color:var(--tokens-color-text-text-section-header)] text-[14px] tracking-[var(--text-small-letter-spacing)] leading-[var(--text-small-line-height)] whitespace-nowrap [font-style:var(--text-small-font-style)]">
+                  {t('chat.recents')}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
+
+            {isShrunk ? (
+              // Icon-only view for conversations
+              <div 
+                ref={conversationsContainerRef}
+                className="flex flex-col items-center relative w-full overflow-y-auto scroll-smooth px-2"
+                style={{ 
+                  maxHeight: 'var(--sidebar-conversations-max-height)',
+                  minHeight: '200px'
+                }}
+                onScroll={handleConversationsScroll}
+              >
+                {conversations.length > 0 ? (
+                  <>
+                    {conversations
+                      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+                      .slice(0, 10)
+                      .map((conversation) => (
+                      <button
+                        key={conversation.uuid}
+                        onClick={() => handleSelectChat(conversation.uuid)}
+                        className={`w-10 h-10 rounded-lg mb-2 flex items-center justify-center transition-colors ${
+                          currentConversation?.uuid === conversation.uuid
+                            ? 'bg-[color:var(--tokens-color-surface-surface-tertiary)] text-[color:var(--tokens-color-text-text-brand)]'
+                            : 'hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] text-[color:var(--tokens-color-text-text-conversation)]'
+                        }`}
+                        title={conversation.name}
+                      >
+                        <div className="w-6 h-6 rounded bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white text-xs font-semibold">
+                          {conversation.name.charAt(0).toUpperCase()}
+                        </div>
+                      </button>
+                    ))}
+                  </>
+                ) : (
+                  <div className="w-full p-3 text-center text-[color:var(--tokens-color-text-text-inactive-2)]">
+                    <div className="w-8 h-8 rounded bg-gray-200 mx-auto"></div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div 
+                ref={conversationsContainerRef}
+                className="flex flex-col items-start relative w-full overflow-y-auto scroll-smooth"
+                style={{ 
+                  maxHeight: 'var(--sidebar-conversations-max-height)',
+                  minHeight: '200px'
+                }}
+                onScroll={handleConversationsScroll}
+              >
+                {conversations.length > 0 ? (
+                  <>
+                    {conversations
+                      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+                      .map((conversation, index) => (
+                      <ChatListItem
+                        key={conversation.uuid}
+                        text={conversation.name}
+                        isSelected={currentConversation?.uuid === conversation.uuid}
+                        onClick={() => handleSelectChat(conversation.uuid)}
+                      />
+                    ))}
+                    {/* Loading indicator for more conversations */}
+                    {isLoadingMoreConversations && (
+                      <div className="w-full p-3 text-center text-[color:var(--tokens-color-text-text-inactive-2)]">
+                        <div className="flex items-center justify-center gap-2">
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[color:var(--tokens-color-text-text-inactive-2)]"></div>
+                          <span className="text-[14px]">{t('chat.loadingMoreConversations')}</span>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="w-full p-3 text-center text-[color:var(--tokens-color-text-text-inactive-2)]">
+                    {t('chat.noConversations')}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
         {/* Profile Section */}
-        <div className="flex flex-col w-full h-[84px] items-start gap-2.5 p-2.5 flex-shrink-0 relative" ref={dropdownRef}>
+        <div className={`flex flex-col w-full items-start gap-2.5 flex-shrink-0 relative ${isShrunk ? 'p-2' : 'p-2.5'}`} ref={dropdownRef}>
           <button 
             onClick={toggleDropdown}
-            className="flex items-center gap-2 p-2 rounded-[var(--premitives-corner-radius-corner-radius-5)] relative w-full bg-[color:var(--tokens-color-surface-surface-primary)] hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] transition-colors"
+            className={`flex items-center gap-2 p-2 rounded-[var(--premitives-corner-radius-corner-radius-5)] relative w-full bg-[color:var(--tokens-color-surface-surface-primary)] hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] transition-colors ${
+              isShrunk ? 'justify-center' : ''
+            }`}
+            title={isShrunk ? userName || 'User' : ''}
           >
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white font-semibold">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white font-semibold flex-shrink-0">
               {userName?.charAt(0).toUpperCase() || 'U'}
             </div>
-            <div className="flex flex-col items-start grow gap-1 flex-1 relative">
-              <div className="font-h05-heading05 w-fit mt-[-1.00px] tracking-[var(--h05-heading05-letter-spacing)] text-[14px] [font-style:var(--h05-heading05-font-style)] text-[color:var(--tokens-color-text-text-brand)] font-[number:var(--h05-heading05-font-weight)] text-center whitespace-nowrap leading-[var(--h05-heading05-line-height)] relative">
-                {userName || 'User'}
-              </div>
-              <div className="font-text-small w-fit mt-[-1.00px] tracking-[var(--text-small-letter-spacing)] text-[14px] [font-style:var(--text-small-font-style)] text-[color:var(--tokens-color-text-text-inactive-2)] font-[number:var(--text-small-font-weight)] text-center whitespace-nowrap leading-[var(--text-small-line-height)] relative">
-                Plus Member
-              </div>
-            </div>
-            <ChevronDown className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+            {!isShrunk && (
+              <>
+                <div className="flex flex-col items-start grow gap-1 flex-1 relative">
+                  <div className="font-h05-heading05 w-fit mt-[-1.00px] tracking-[var(--h05-heading05-letter-spacing)] text-[14px] [font-style:var(--h05-heading05-font-style)] text-[color:var(--tokens-color-text-text-brand)] font-[number:var(--h05-heading05-font-weight)] text-center whitespace-nowrap leading-[var(--h05-heading05-line-height)] relative">
+                    {userName || 'User'}
+                  </div>
+                  <div className="font-text-small w-fit mt-[-1.00px] tracking-[var(--text-small-letter-spacing)] text-[14px] [font-style:var(--text-small-font-style)] text-[color:var(--tokens-color-text-text-inactive-2)] font-[number:var(--text-small-font-weight)] text-center whitespace-nowrap leading-[var(--text-small-line-height)] relative">
+                    Plus Member
+                  </div>
+                </div>
+                <ChevronDown className={`w-4 h-4 transition-transform flex-shrink-0 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+              </>
+            )}
           </button>
 
           {/* Dropdown Menu */}
           {isDropdownOpen && (
-            <div className="absolute bottom-full left-2.5 right-2.5 mb-2 bg-[color:var(--tokens-color-surface-surface-primary)] border border-[color:var(--tokens-color-border-border-primary)] rounded-[var(--premitives-corner-radius-corner-radius)] shadow-lg z-50">
+            <div className={`absolute bottom-full mb-2 bg-[color:var(--tokens-color-surface-surface-primary)] border border-[color:var(--tokens-color-border-border-primary)] rounded-[var(--premitives-corner-radius-corner-radius)] shadow-lg z-50 ${
+              isShrunk ? 'left-2 right-2' : 'left-2.5 right-2.5'
+            }`}>
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-3 w-full px-5 py-2.5 text-left hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] transition-colors first:rounded-t-[var(--premitives-corner-radius-corner-radius)] last:rounded-b-[var(--premitives-corner-radius-corner-radius)]"
+                className={`flex items-center gap-3 w-full text-left hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] transition-colors first:rounded-t-[var(--premitives-corner-radius-corner-radius)] last:rounded-b-[var(--premitives-corner-radius-corner-radius)] ${
+                  isShrunk ? 'px-3 py-2 justify-center' : 'px-5 py-2.5'
+                }`}
               >
-                <Logout className="w-4 h-4 text-[color:var(--tokens-color-text-text-inactive-2)]" />
-                <span className="font-text font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-[14px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
-                  Logout
-                </span>
+                <Logout className="w-4 h-4 text-[color:var(--tokens-color-text-text-inactive-2)] flex-shrink-0" />
+                {!isShrunk && (
+                  <span className="font-text font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-[14px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
+                    Logout
+                  </span>
+                )}
               </button>
             </div>
           )}
