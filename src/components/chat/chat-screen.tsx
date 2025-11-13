@@ -11,6 +11,7 @@ import { useAIModels } from '@/hooks'
 export const ChatScreen: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [hasFiles, setHasFiles] = useState(false)
+  const [isCanvasOpen, setIsCanvasOpen] = useState(false)
   const {
     currentConversation,
     loadConversations,
@@ -22,6 +23,10 @@ export const ChatScreen: React.FC = () => {
   } = useConversation()
 
   const { fetchServiceProviders } = useAIModels()
+  
+  const handleCanvasStateChange = (isOpen: boolean) => {
+    setIsCanvasOpen(isOpen)
+  }
 
   useEffect(() => {
     // Load initial data
@@ -50,25 +55,33 @@ export const ChatScreen: React.FC = () => {
           startNewChat()
           setSidebarOpen(false)
         }}
+        showFullSidebar={!isCanvasOpen}
       />
       
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col h-screen overflow-hidden">
         {currentConversation ? (
           <>
-            <ChatHeader onMenuClick={handleMenuClick} />
+            {!isCanvasOpen && <ChatHeader onMenuClick={handleMenuClick} />}
             <ConversationContainer 
               conversationUuid={currentConversation.uuid}
-              className={`flex-1 ${hasFiles ? 'max-h-[calc(100vh-380px)]' : 'max-h-[calc(100vh-270px)]'}`}
+              className={`flex-1 ${isCanvasOpen ? 'h-screen' : hasFiles ? 'max-h-[calc(100vh-380px)]' : 'max-h-[calc(100vh-270px)]'}`}
+              onCanvasStateChange={handleCanvasStateChange}
+              onSendMessage={isCanvasOpen ? handleSendMessage : undefined}
+              isStreaming={isStreaming}
+              onFilesChange={isCanvasOpen ? setHasFiles : undefined}
+              hasFiles={hasFiles}
             />
-            <div className="">
-              <ChatInterface 
-                onMenuClick={handleMenuClick} 
-                onSendMessage={handleSendMessage}
-                isCompact={true}
-                isStreaming={isStreaming}
-                onFilesChange={setHasFiles}
-              />
-            </div>
+            {!isCanvasOpen && (
+              <div className="">
+                <ChatInterface 
+                  onMenuClick={handleMenuClick} 
+                  onSendMessage={handleSendMessage}
+                  isCompact={true}
+                  isStreaming={isStreaming}
+                  onFilesChange={setHasFiles}
+                />
+              </div>
+            )}
           </>
         ) : (
           <ChatInterface 

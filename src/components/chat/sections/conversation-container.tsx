@@ -18,10 +18,19 @@ import { MessageVersionNavigation } from './message-version-navigation'
 import { LinkedFilesPreview } from './linked-files-preview'
 import { appConfig } from '@/config/app'
 import { baseApiClient } from '@/api/base'
+import { Canvas } from './canvas'
+import { CanvasToggleButton } from './canvas-toggle-button'
+import { countWords, exceedsWordThreshold, truncateMarkdown, getFirstLine } from '@/lib/content-utils'
+import { MessageInput, MessageInputHandle } from './message-input'
 
 interface ConversationContainerProps {
   conversationUuid: string | null
   className?: string
+  onCanvasStateChange?: (isOpen: boolean) => void
+  onSendMessage?: (message: string, modelUuid?: string, fileUuids?: string[], uploadedFiles?: any[]) => void
+  isStreaming?: boolean
+  onFilesChange?: (hasFiles: boolean) => void
+  hasFiles?: boolean
 }
 
 interface MessageBubbleProps {
@@ -51,6 +60,10 @@ interface MessageBubbleProps {
   }
   isThisMessageRegenerating?: boolean
   onMarkdownLinkClick?: (event: React.MouseEvent<HTMLAnchorElement>, href?: string) => void
+  isCanvasOpen?: boolean
+  activeCanvasMessageUuid?: string | null
+  onCanvasToggle?: (messageUuid: string) => void
+  showInChat?: boolean
 }
 
 const MessageBubble: React.FC<MessageBubbleProps> = ({ 
@@ -65,10 +78,38 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
   streamingContent = '',
   streamingMetadata = null,
   isThisMessageRegenerating = false,
-  onMarkdownLinkClick
+  onMarkdownLinkClick,
+  isCanvasOpen = false,
+  activeCanvasMessageUuid = null,
+  onCanvasToggle,
+  showInChat = true
 }) => {
   const [isCopied, setIsCopied] = useState(false)
   const { switchMessageVersion } = useRegenerate()
+  
+  // Determine content to display
+  const displayContent = isThisMessageRegenerating && isStreaming 
+    ? (streamingContent || message.content)
+    : message.content
+  
+  // Check if message should show canvas button (threshold: 100 words)
+  const wordCount = countWords(displayContent)
+  const shouldShowCanvas = !isUser && exceedsWordThreshold(displayContent, 100)
+  
+  // Get truncated content for chat display
+  const { truncated: truncatedContent, wasTruncated } = shouldShowCanvas && showInChat
+    ? truncateMarkdown(displayContent, 50)
+    : { truncated: displayContent, wasTruncated: false }
+  
+  // Check if this message is active in canvas
+  const isActiveInCanvas = isCanvasOpen && activeCanvasMessageUuid === message.uuid
+  
+  // Handle canvas toggle
+  const handleCanvasToggle = () => {
+    if (onCanvasToggle) {
+      onCanvasToggle(message.uuid)
+    }
+  }
 
   const handleCopy = async () => {
     if (isCopied) return // Prevent multiple copies while showing feedback
@@ -149,7 +190,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
                 </>
               ) : (
                 <MarkdownRenderer 
-                  content={message.content || ''} 
+                  content={truncatedContent || ''} 
                   onLinkClick={onMarkdownLinkClick}
                 />
               )}
@@ -182,6 +223,19 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
                 {streamingMetadata.message_type === 'generating_response' && t('chat.generating')}
                 {!['thinking_through_query', 'evaluating_ai_options', 'generating_response'].includes(streamingMetadata.message_type) && t('chat.typing')}
               </span>
+            </div>
+          )}
+          
+          {/* Canvas Toggle Button - shown for messages over 100 words - full width */}
+          {shouldShowCanvas && onCanvasToggle && (
+            <div className="mt-3 mb-2 -mx-4 px-4">
+              <CanvasToggleButton
+                isCanvasOpen={isCanvasOpen}
+                isActive={isActiveInCanvas}
+                onClick={handleCanvasToggle}
+                disabled={false}
+                content={displayContent}
+              />
             </div>
           )}
           
@@ -253,13 +307,45 @@ interface StreamingMessageProps {
   selectedModel?: string
   linkedFiles?: LinkedFile[]
   onLinkClick?: (event: React.MouseEvent<HTMLAnchorElement>, href?: string) => void
+  isCanvasOpen?: boolean
+  activeCanvasMessageUuid?: string | null
+  onCanvasToggle?: (messageUuid: string) => void
+  messageUuid?: string
 }
 
-const StreamingMessage: React.FC<StreamingMessageProps> = ({ content, initialContent = '', messageType, selectedModel, linkedFiles, onLinkClick }) => {
+const StreamingMessage: React.FC<StreamingMessageProps> = ({ 
+  content, 
+  initialContent = '', 
+  messageType, 
+  selectedModel, 
+  linkedFiles, 
+  onLinkClick,
+  isCanvasOpen = false,
+  activeCanvasMessageUuid = null,
+  onCanvasToggle,
+  messageUuid
+}) => {
   const [isCopied, setIsCopied] = useState(false)
   const [isHidingInitialContent, setIsHidingInitialContent] = useState(false)
   const hasContent = content.length > 0
   const hasInitialContent = initialContent.length > 0
+  
+  // Check if content should show canvas (threshold: 100 words)
+  const displayContent = content || initialContent
+  const shouldShowCanvas = exceedsWordThreshold(displayContent, 100)
+  const { truncated: truncatedContent, wasTruncated } = shouldShowCanvas
+    ? truncateMarkdown(displayContent, 50)
+    : { truncated: displayContent, wasTruncated: false }
+  
+  // Check if this message is active in canvas
+  const isActiveInCanvas = isCanvasOpen && activeCanvasMessageUuid === messageUuid
+  
+  // Handle canvas toggle
+  const handleCanvasToggle = () => {
+    if (onCanvasToggle && messageUuid) {
+      onCanvasToggle(messageUuid)
+    }
+  }
   
   // Hide initial content with slide-up effect when real content starts appearing
   useEffect(() => {
@@ -348,7 +434,7 @@ const StreamingMessage: React.FC<StreamingMessageProps> = ({ content, initialCon
                   }}
                 >
                   <MarkdownRenderer 
-                    content={content} 
+                    content={truncatedContent} 
                     onLinkClick={onLinkClick}
                   />
                 </div>
@@ -362,6 +448,19 @@ const StreamingMessage: React.FC<StreamingMessageProps> = ({ content, initialCon
               <span className="text-sm text-[color:var(--tokens-color-text-text-inactive-2)]">
                 {selectedModel}
               </span>
+            </div>
+          )}
+          
+          {/* Canvas Toggle Button - shown for streaming messages over 100 words - full width */}
+          {shouldShowCanvas && onCanvasToggle && messageUuid && (
+            <div className="mt-3 mb-2 -mx-4 px-4">
+              <CanvasToggleButton
+                isCanvasOpen={isCanvasOpen}
+                isActive={isActiveInCanvas}
+                onClick={handleCanvasToggle}
+                disabled={false}
+                content={displayContent}
+              />
             </div>
           )}
           
@@ -398,12 +497,17 @@ const StreamingMessage: React.FC<StreamingMessageProps> = ({ content, initialCon
 
 export const ConversationContainer: React.FC<ConversationContainerProps> = ({
   conversationUuid,
-  className = ''
+  className = '',
+  onCanvasStateChange,
+  onSendMessage,
+  isStreaming: externalIsStreaming,
+  onFilesChange,
+  hasFiles
 }) => {
   const { 
     messages, 
     isLoading, 
-    isStreaming, 
+    isStreaming: internalIsStreaming, 
     streamingContent,
     initialContent,
     streamingMetadata, 
@@ -412,11 +516,24 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
     pagination, 
     isLoadingMore 
   } = useConversation()
+  
+  // Use external isStreaming if provided, otherwise use internal
+  const isStreaming = externalIsStreaming !== undefined ? externalIsStreaming : internalIsStreaming
+  
+  const messageInputRef = useRef<MessageInputHandle>(null)
   const { user } = useAuthRedux()
   const { regenerateMessage, isRegenerating } = useRegenerate()
   
   // Track which message is being regenerated
   const [regeneratingMessageUuid, setRegeneratingMessageUuid] = useState<string | null>(null)
+  
+  // Canvas state management
+  const [isCanvasOpen, setIsCanvasOpen] = useState(false)
+  const [activeCanvasMessageUuid, setActiveCanvasMessageUuid] = useState<string | null>(null)
+  const [streamingMessageUuid, setStreamingMessageUuid] = useState<string | null>(null)
+  const [hasAutoOpenedCanvas, setHasAutoOpenedCanvas] = useState(false)
+  // Store last streaming content to use as fallback after streaming completes
+  const [lastStreamingContent, setLastStreamingContent] = useState<string>('')
   
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
@@ -429,6 +546,227 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
     isAutoMode,
     selectedModel
   } = useAIModels()
+  
+  // Store last streaming content when streaming is active
+  useEffect(() => {
+    if (isStreaming && streamingContent) {
+      setLastStreamingContent(streamingContent)
+    }
+  }, [isStreaming, streamingContent])
+  
+  // Track streaming message UUID when streaming starts
+  useEffect(() => {
+    if (isStreaming && !isRegenerating && streamingContent) {
+      // Find the last AI message (non-user message) - this should be the streaming message
+      const lastAIMessage = [...messages].reverse().find((m: Message) => m.sender?.uuid !== user?.uuid)
+      
+      if (lastAIMessage) {
+        // Use the actual message UUID if found
+        if (!streamingMessageUuid || streamingMessageUuid !== lastAIMessage.uuid) {
+          setStreamingMessageUuid(lastAIMessage.uuid)
+        }
+      } else if (!streamingMessageUuid) {
+        // Create temporary UUID only if no message found and no UUID set yet
+        const tempUuid = `streaming-${Date.now()}`
+        setStreamingMessageUuid(tempUuid)
+      }
+    } else if (!isStreaming) {
+      // When streaming stops, try to find the message in the array
+      if (streamingMessageUuid) {
+        const message = messages.find((m: Message) => m.uuid === streamingMessageUuid)
+        if (message) {
+          // Message found, keep using its UUID
+          // Keep activeCanvasMessageUuid pointing to this message if canvas is open
+          if (isCanvasOpen && activeCanvasMessageUuid === streamingMessageUuid) {
+            // Canvas is open with this message - keep it active
+            // The message content will be updated automatically from messages array
+            // Do nothing, activeCanvasMessageUuid is already correct
+          }
+        } else if (streamingMessageUuid.startsWith('streaming-')) {
+          // Temporary UUID was used, try to find the last AI message
+          const lastAIMessage = [...messages].reverse().find((m: Message) => m.sender?.uuid !== user?.uuid)
+          if (lastAIMessage) {
+            // Update to use the actual message UUID
+            setStreamingMessageUuid(lastAIMessage.uuid)
+            // Update active canvas message UUID if canvas is open with temporary UUID
+            if (isCanvasOpen && activeCanvasMessageUuid && activeCanvasMessageUuid.startsWith('streaming-')) {
+              setActiveCanvasMessageUuid(lastAIMessage.uuid)
+            }
+          }
+        } else {
+          // Streaming UUID is not temporary and message not found yet
+          // Wait for message to appear in array - this can happen if streaming just completed
+          // Keep activeCanvasMessageUuid as is to avoid switching to wrong message
+        }
+      }
+      // Reset auto-open flag when streaming stops
+      setHasAutoOpenedCanvas(false)
+    }
+  }, [isStreaming, streamingContent, isRegenerating, messages, user, isCanvasOpen, activeCanvasMessageUuid, streamingMessageUuid])
+  
+  // Auto-open or switch canvas to streaming content when it exceeds 100 words
+  // This ensures canvas shows new streaming content when user types a new query
+  useEffect(() => {
+    if (isStreaming && streamingContent && streamingMessageUuid) {
+      const wordCount = countWords(streamingContent)
+      if (wordCount > 100) {
+        // If canvas is not open, open it
+        if (!isCanvasOpen) {
+          setIsCanvasOpen(true)
+          setActiveCanvasMessageUuid(streamingMessageUuid)
+          setHasAutoOpenedCanvas(true)
+        } else if (activeCanvasMessageUuid !== streamingMessageUuid) {
+          // If canvas is open but showing a different message, switch to streaming message
+          // This handles the case where user types new query while canvas shows previous message
+          setActiveCanvasMessageUuid(streamingMessageUuid)
+          setHasAutoOpenedCanvas(true)
+        } else {
+          // Canvas is already open and showing streaming message - ensure it stays active
+          setHasAutoOpenedCanvas(true)
+        }
+      }
+    }
+  }, [isStreaming, streamingContent, streamingMessageUuid, hasAutoOpenedCanvas, isCanvasOpen, activeCanvasMessageUuid])
+  
+  // Ensure canvas stays on streamed message after streaming completes
+  useEffect(() => {
+    // When streaming stops, if canvas is open and showing the streaming message,
+    // make sure we keep it showing the same message by finding it in messages array
+    if (!isStreaming && streamingMessageUuid && isCanvasOpen && activeCanvasMessageUuid === streamingMessageUuid) {
+      // Try to find the message in messages array by UUID
+      let message = messages.find((m: Message) => m.uuid === streamingMessageUuid)
+      
+      if (message) {
+        // Message found by UUID - activeCanvasMessageUuid is already correct
+        // Canvas will show the message content from messages array
+        // Do nothing, keep activeCanvasMessageUuid as is
+      } else if (streamingMessageUuid.startsWith('streaming-')) {
+        // Temporary UUID was used, find the last AI message
+        const lastAIMessage = [...messages].reverse().find((m: Message) => m.sender?.uuid !== user?.uuid)
+        if (lastAIMessage) {
+          // Update to use actual message UUID
+          setStreamingMessageUuid(lastAIMessage.uuid)
+          setActiveCanvasMessageUuid(lastAIMessage.uuid)
+        }
+      } else {
+        // Message UUID is not temporary but message not found yet
+        // This can happen if streaming just completed and message is still being saved
+        // Keep activeCanvasMessageUuid as is - getCanvasContent will use lastStreamingContent
+        // Also check if a new message was added that might be our streamed message
+        const lastAIMessage = [...messages].reverse().find((m: Message) => m.sender?.uuid !== user?.uuid)
+        if (lastAIMessage && lastAIMessage.content && lastStreamingContent) {
+          // Compare content to see if this is our streamed message
+          // If the last AI message content matches our last streaming content (approximately),
+          // update to use this message's UUID
+          const messageContentStart = lastAIMessage.content.substring(0, 100).trim()
+          const streamingContentStart = lastStreamingContent.substring(0, 100).trim()
+          if (messageContentStart === streamingContentStart || 
+              (messageContentStart.length > 50 && streamingContentStart.length > 50 &&
+               messageContentStart.substring(0, 50) === streamingContentStart.substring(0, 50))) {
+            // This is likely our streamed message - update UUIDs
+            setStreamingMessageUuid(lastAIMessage.uuid)
+            setActiveCanvasMessageUuid(lastAIMessage.uuid)
+          }
+        }
+      }
+    }
+  }, [isStreaming, streamingMessageUuid, isCanvasOpen, activeCanvasMessageUuid, messages, user, lastStreamingContent])
+  
+  // Watch for new messages when streaming completes to update canvas
+  useEffect(() => {
+    // When streaming stops and canvas is open, watch for the message to appear in messages array
+    if (!isStreaming && streamingMessageUuid && isCanvasOpen && activeCanvasMessageUuid === streamingMessageUuid) {
+      // Check if message is now in messages array
+      const message = messages.find((m: Message) => m.uuid === streamingMessageUuid)
+      if (message && message.content) {
+        // Message found - activeCanvasMessageUuid is correct, canvas will show message content
+        // Clear lastStreamingContent once message is found and saved
+        if (message.content === lastStreamingContent || 
+            (message.content.length > lastStreamingContent.length && 
+             message.content.startsWith(lastStreamingContent.substring(0, Math.min(100, lastStreamingContent.length))))) {
+          // Message content matches - we can clear lastStreamingContent (optional)
+          // Keep it as fallback for now
+        }
+      }
+    }
+  }, [messages, isStreaming, streamingMessageUuid, isCanvasOpen, activeCanvasMessageUuid, lastStreamingContent])
+  
+  // Notify parent of canvas state changes
+  useEffect(() => {
+    if (onCanvasStateChange) {
+      onCanvasStateChange(isCanvasOpen)
+    }
+  }, [isCanvasOpen, onCanvasStateChange])
+  
+  // Handle canvas toggle
+  const handleCanvasToggle = useCallback((messageUuid: string) => {
+    if (isCanvasOpen && activeCanvasMessageUuid === messageUuid) {
+      // Close canvas if it's already open with this message
+      setIsCanvasOpen(false)
+      setActiveCanvasMessageUuid(null)
+    } else {
+      // Open canvas or switch to this message
+      setIsCanvasOpen(true)
+      setActiveCanvasMessageUuid(messageUuid)
+    }
+  }, [isCanvasOpen, activeCanvasMessageUuid])
+  
+  // Handle canvas close
+  const handleCanvasClose = useCallback(() => {
+    setIsCanvasOpen(false)
+    setActiveCanvasMessageUuid(null)
+  }, [])
+  
+  // Get canvas content
+  const getCanvasContent = useCallback(() => {
+    if (!activeCanvasMessageUuid) return ''
+    
+    // Priority 1: If canvas is showing the streaming message
+    if (activeCanvasMessageUuid === streamingMessageUuid) {
+      // If currently streaming, always use streaming content
+      if (isStreaming && streamingContent) {
+        return streamingContent
+      }
+      
+      // If streaming completed, first try to find the message in messages array
+      const message = messages.find((m: Message) => m.uuid === activeCanvasMessageUuid)
+      if (message && message.content) {
+        // Message found with content - use it (this is the completed streamed content)
+        return message.content
+      }
+      
+      // Message not found yet or has no content - use last known streaming content
+      // This prevents canvas from showing empty or wrong message while message is being saved
+      if (lastStreamingContent) {
+        return lastStreamingContent
+      }
+      if (streamingContent) {
+        return streamingContent
+      }
+    }
+    
+    // Priority 2: Find message by UUID in messages array (for non-streaming messages)
+    const message = messages.find((m: Message) => m.uuid === activeCanvasMessageUuid)
+    if (message) {
+      // Check if this message is being regenerated
+      if (regeneratingMessageUuid === message.uuid && isStreaming && streamingContent) {
+        return streamingContent || message.content || ''
+      }
+      
+      // Return the message content
+      return message.content || ''
+    }
+    
+    // Priority 3: Fallback - if we have last streaming content and UUID matches, use it
+    if (lastStreamingContent && activeCanvasMessageUuid === streamingMessageUuid) {
+      return lastStreamingContent
+    }
+    if (streamingContent && activeCanvasMessageUuid === streamingMessageUuid) {
+      return streamingContent
+    }
+    
+    return ''
+  }, [activeCanvasMessageUuid, messages, isStreaming, streamingContent, isRegenerating, regeneratingMessageUuid, streamingMessageUuid, lastStreamingContent])
 
   useEffect(() => {
     if (conversationUuid) {
@@ -584,13 +922,24 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
   }
 
   return (
-    <div className={`${className}`}>
+    <div className={`flex flex-row relative ${className}`} style={{ height: '100%' }}>
+      {/* Chat Container */}
       <div 
-        ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto p-6 space-y-2 max-h-[calc(100vh-270px)]"
-        onScroll={handleScroll}
+        className={`flex-1 transition-all duration-300 ease-in-out overflow-hidden flex flex-col relative ${
+          isCanvasOpen ? 'w-1/2' : 'w-full'
+        } ${isCanvasOpen ? 'bg-[color:var(--tokens-color-surface-surface-conversation-canvas)]' : ''}`}
+        style={{ height: '100%' }}
       >
-        <div className=" max-w-[808px] mx-auto w-full">
+        {/* Chat messages container with darker background when canvas is open */}
+        <div 
+          ref={messagesContainerRef}
+          className={`flex-1 overflow-y-auto p-6 space-y-2 relative z-0 transition-colors duration-300 ${
+            isCanvasOpen ? '' : 'bg-[color:var(--tokens-color-surface-surface-primary)]'
+          }`}
+          style={{ minHeight: 0 }}
+          onScroll={handleScroll}
+        >
+          <div className="max-w-[808px] mx-auto w-full">
           {/* Top loader for loading more messages */}
           {isLoadingMore && (
             <div className="flex justify-center py-4">
@@ -616,6 +965,10 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
                 streamingMetadata={streamingMetadata}
                 isThisMessageRegenerating={regeneratingMessageUuid === message.uuid}
                 onMarkdownLinkClick={handleMarkdownLinkClick}
+                  isCanvasOpen={isCanvasOpen}
+                  activeCanvasMessageUuid={activeCanvasMessageUuid}
+                  onCanvasToggle={handleCanvasToggle}
+                  showInChat={true}
               />
             </div>
           ))}
@@ -628,12 +981,47 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
               selectedModel={streamingMetadata?.selected_model}
               linkedFiles={streamingMetadata?.linked_files}
               onLinkClick={handleMarkdownLinkClick}
+                isCanvasOpen={isCanvasOpen}
+                activeCanvasMessageUuid={activeCanvasMessageUuid}
+                onCanvasToggle={handleCanvasToggle}
+                messageUuid={streamingMessageUuid || (sortedMessages.length > 0 ? sortedMessages[sortedMessages.length - 1]?.uuid : undefined)}
             />
           )}
           
           <div ref={messagesEndRef} />
           </div>
+        </div>
+        
+        {/* Message Input - shown inside conversation container when canvas is open */}
+        {isCanvasOpen && onSendMessage && (
+          <div className="flex-shrink-0 p-4 border-t border-[color:var(--tokens-color-border-border-inactive)]">
+            <div className="max-w-full px-2">
+              <MessageInput
+                ref={messageInputRef}
+                onSend={onSendMessage}
+                isStreaming={isStreaming}
+                onFilesChange={onFilesChange}
+                className={`w-full max-w-full ${isCanvasOpen ? '!bg-[color:var(--tokens-color-surface-surface-input-canvas)]' : ''}`}
+                textAreaClassName="!app-text-lg"
+              />
+            </div>
+          </div>
+        )}
       </div>
+      
+      {/* Canvas Sidebar */}
+      {isCanvasOpen && (
+        <div className="relative z-50 flex-shrink-0 w-1/2" style={{ height: '100%' }}>
+          <Canvas
+            isOpen={isCanvasOpen}
+            content={getCanvasContent()}
+            messageUuid={activeCanvasMessageUuid || undefined}
+            onClose={handleCanvasClose}
+            className="flex-shrink-0 h-full"
+            onLinkClick={handleMarkdownLinkClick}
+          />
+        </div>
+      )}
     </div>
   )
 }

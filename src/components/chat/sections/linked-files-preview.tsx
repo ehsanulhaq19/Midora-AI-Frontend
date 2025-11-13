@@ -1,10 +1,12 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import { LinkedFile } from '@/api/conversation/types'
 import { FileTypeInfo } from '@/api/files/types'
 import { Spinner } from '@/components/ui/loaders'
 import { t } from '@/i18n'
+import { appConfig } from '@/config/app'
+import { baseApiClient } from '@/api/base'
 
 interface LinkedFilesPreviewProps {
   linkedFiles: LinkedFile[]
@@ -94,20 +96,91 @@ const LinkedFilePreview: React.FC<{ linkedFile: LinkedFile; isUser: boolean }> =
   const isImage = fileTypeInfo.category === 'image'
   const fileExtension = linkedFile.file_extension.replace('.', '').toUpperCase()
   const isUploading = linkedFile.uuid?.startsWith('temp-') || false
+  const [isDownloading, setIsDownloading] = useState(false)
   
   // Determine background color based on message type
   const backgroundColor = isUser 
     ? 'bg-[#6B4392]/10 border-[#6B4392]/20' 
     : 'bg-[color:var(--tokens-color-surface-surface-secondary)] border-[color:var(--tokens-color-border-border-subtle)]'
 
+  // Handle file download for AI responses (not user messages)
+  const handleFileDownload = async (event: React.MouseEvent) => {
+    // Only allow download for AI responses, not user messages
+    if (isUser || isUploading || isDownloading) {
+      return
+    }
+
+    event.preventDefault()
+    event.stopPropagation()
+
+    if (!linkedFile.uuid) {
+      console.error('File UUID is missing')
+      return
+    }
+
+    setIsDownloading(true)
+
+    try {
+      // Construct download endpoint
+      const endpoint = `/api/v1/files/download/${linkedFile.uuid}`
+      const downloadResponse = await baseApiClient.downloadFile(endpoint)
+      const blobUrl = window.URL.createObjectURL(downloadResponse.data)
+
+      // Get filename from response or use the linked file filename
+      const filename = downloadResponse.filename || linkedFile.filename || 'download'
+
+      // Create temporary link and trigger download
+      const link = document.createElement('a')
+      link.href = blobUrl
+      link.download = filename
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(blobUrl)
+    } catch (error) {
+      console.error('Failed to download file:', error)
+    } finally {
+      setIsDownloading(false)
+    }
+  }
+
+  // Determine if file is clickable (only AI responses, not uploading)
+  const isClickable = !isUser && !isUploading
+
   return (
-    <div className={`relative ${backgroundColor} border rounded-[var(--premitives-corner-radius-corner-radius-2)] p-3 w-[200px] h-[120px] flex flex-col shadow-sm hover:shadow-md transition-shadow flex-shrink-0`}>
+    <div 
+      className={`relative ${backgroundColor} border rounded-[var(--premitives-corner-radius-corner-radius-2)] p-3 w-[200px] h-[120px] flex flex-col shadow-sm transition-shadow flex-shrink-0 ${
+        isClickable 
+          ? 'hover:shadow-md cursor-pointer hover:border-[color:var(--tokens-color-border-border-active)]' 
+          : ''
+      }`}
+      onClick={isClickable ? handleFileDownload : undefined}
+      role={isClickable ? 'button' : undefined}
+      tabIndex={isClickable ? 0 : undefined}
+      aria-label={isClickable ? `Download ${linkedFile.filename}` : undefined}
+      onKeyDown={isClickable ? (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          handleFileDownload(e as any)
+        }
+      } : undefined}
+    >
       {/* Uploading overlay */}
       {isUploading && (
         <div className="absolute inset-0 bg-black/50 rounded-[var(--premitives-corner-radius-corner-radius-2)] flex items-center justify-center z-20">
           <div className="flex flex-col items-center gap-2">
             <Spinner size="md" color="white" />
             <span className="app-text-xs app-text-primary text-white">{t('common.fileUpload.uploading')}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Downloading overlay */}
+      {isDownloading && (
+        <div className="absolute inset-0 bg-black/50 rounded-[var(--premitives-corner-radius-corner-radius-2)] flex items-center justify-center z-20">
+          <div className="flex flex-col items-center gap-2">
+            <Spinner size="md" color="white" />
+            <span className="app-text-xs app-text-primary text-white">Downloading...</span>
           </div>
         </div>
       )}

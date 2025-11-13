@@ -52,6 +52,9 @@ export const chat = {
   regenerateMessage: 'Regenerate message',
   regenerating: 'Regenerating...',
   typing: 'AI is typing...',
+  thinking: 'Thinking...',
+  evaluating: 'Evaluating...',
+  generating: 'Generating...',
   loading: 'Loading...',
   loadingMoreMessages: 'Loading more messages...',
   loadingMoreConversations: 'Loading more conversations...',
@@ -120,5 +123,14 @@ export const chat = {
     preparing_details: 'Preparing details...',
     stay_with_me: 'Stay with me...',
     on_it: 'On it...'
-  }
+  },
+  
+  // Canvas UI translations
+  canvasTitle: 'Canvas',
+  canvasView: 'Canvas view',
+  viewInCanvas: 'View in Canvas',
+  openInCanvas: 'Open in Canvas',
+  hideCanvas: 'Hide Canvas',
+  closeCanvas: 'Close Canvas',
+  canvasExpanded: 'Content expanded to canvas'
 }
