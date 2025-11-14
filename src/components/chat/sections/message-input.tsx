@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useImperativeHandle, forwardRef } from 'react'
 import { ArrowUpSm, Plus01_5, Microphone, Filters } from '@/icons'
 import { IconButton } from '@/components/ui/buttons'
 import { TextareaInput } from '@/components/ui/inputs'
@@ -17,7 +17,12 @@ interface MessageInputProps {
   onFilesChange?: (hasFiles: boolean) => void
 }
 
-export const MessageInput: React.FC<MessageInputProps> = ({ onSend, isStreaming = false, className = '', textAreaClassName = '', onFilesChange }) => {
+export interface MessageInputHandle {
+  uploadFile: (file: File) => Promise<void>
+  validateFile: (file: File) => { isValid: boolean; error?: string }
+}
+
+export const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>(({ onSend, isStreaming = false, className = '', textAreaClassName = '', onFilesChange }, ref) => {
   const [message, setMessage] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { error: showErrorToast } = useToast()
@@ -38,6 +43,12 @@ export const MessageInput: React.FC<MessageInputProps> = ({ onSend, isStreaming 
     clearFiles,
     validateFile
   } = useFileUpload()
+
+  // Expose upload functions to parent via ref
+  useImperativeHandle(ref, () => ({
+    uploadFile,
+    validateFile
+  }), [uploadFile, validateFile])
 
   // Notify parent when files change
   useEffect(() => {
@@ -197,4 +208,6 @@ export const MessageInput: React.FC<MessageInputProps> = ({ onSend, isStreaming 
       </form>
     </div>
   )
-}
+})
+
+MessageInput.displayName = 'MessageInput'

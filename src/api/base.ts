@@ -33,6 +33,13 @@ export interface ApiError {
   status?: number
 }
 
+export interface FileDownloadResponse {
+  data: Blob
+  status: number
+  filename?: string
+  contentType?: string | null
+}
+
 class BaseApiClient {
   private baseUrl: string
   private timeout: number
@@ -496,6 +503,106 @@ class BaseApiClient {
   }
 
   /**
+   * Download a file (binary response) from the backend
+   */
+  async downloadFile(endpoint: string, options?: RequestInit): Promise<FileDownloadResponse> {
+    try {
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), this.timeout)
+
+      const url = `${this.baseUrl}${endpoint}`
+      console.log('Initiating file download from:', url)
+
+      const requestOptions: RequestInit = {
+        method: 'GET',
+        headers: {
+          ...(options?.headers || {}),
+        },
+        signal: controller.signal,
+        ...options,
+      }
+
+      if (this.shouldSendCredentials()) {
+        requestOptions.credentials = 'include'
+        console.log('Sending credentials with file download request')
+      } else {
+        console.log('Skipping credentials for file download request (no tokens)')
+      }
+
+      const interceptedOptions = requestInterceptor(url, requestOptions)
+
+      const response = await fetch(url, interceptedOptions)
+      console.log('File download response status:', response.status)
+
+      clearTimeout(timeoutId)
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          console.error('401 Unauthorized error detected during file download')
+          handle401WithReload()
+        }
+
+        let errorData: any = null
+        try {
+          const contentType = response.headers.get('content-type')
+          if (contentType && contentType.includes('application/json')) {
+            const jsonResponse = await response.json()
+            errorData = jsonResponse?.detail || jsonResponse
+          }
+        } catch (parseError) {
+          console.warn('Failed to parse error response for file download:', parseError)
+        }
+
+        const errorMessage = handleApiError(errorData || response)
+        throw new Error(errorMessage)
+      }
+
+      resetReloadCount()
+
+      const contentType = response.headers.get('content-type')
+      const contentDisposition = response.headers.get('content-disposition') || response.headers.get('Content-Disposition')
+      let filename: string | undefined
+      console.log('--------contentDisposition-----------', contentDisposition, response.headers)
+      if (contentDisposition) {
+        const filenameStarMatch = contentDisposition.match(/filename\*\s*=\s*(?:UTF-8'')?([^;]+)/i)
+        if (filenameStarMatch && filenameStarMatch[1]) {
+          try {
+            filename = decodeURIComponent(filenameStarMatch[1].replace(/['"]/g, '').trim())
+          } catch (decodeError) {
+            console.warn('Failed to decode filename* from Content-Disposition header:', decodeError)
+          }
+        }
+        console.log('--------filename--0---------', filename)
+        if (!filename) {
+          const match = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/.exec(contentDisposition)
+          if (match && match[1]) {
+            filename = match[1].replace(/['"]/g, '').trim()
+          }
+        }
+
+        console.log('--------filename---1--------', filename)
+      }
+
+      const data = await response.blob()
+
+      return {
+        data,
+        status: response.status,
+        filename,
+        contentType,
+      }
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        const errorMessage = handleApiError(error)
+        throw new Error(errorMessage)
+      }
+
+      const errorMessage = handleApiError(error)
+      throw new Error(errorMessage)
+    }
+  }
+
+  /**
    * Check if the backend service is healthy
    */
   async healthCheck(): Promise<boolean> {
@@ -513,3 +620,4 @@ export const baseApiClient = new BaseApiClient()
 
 // Export the class for custom instances
 export { BaseApiClient }
+
