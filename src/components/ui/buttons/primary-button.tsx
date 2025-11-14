@@ -32,12 +32,12 @@ export const PrimaryButton: React.FC<PrimaryButtonProps> = ({
       {loading ? (
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-          <span className="relative w-fit mt-[-1.50px] font-body-primary font-normal text-[#fffdfd] text-base tracking-[-0.48px] leading-[normal] whitespace-nowrap">
+          <span className="relative w-fit font-SF-Pro font-normal text-[#FFFEFE] text-base tracking-[-0.48px] leading-[100%] whitespace-nowrap">
             Loading...
           </span>
         </div>
       ) : (
-        <span className={`relative w-fit mt-[-1.50px] font-body-primary font-normal text-[#fffdfd] text-base tracking-[-0.48px] leading-[normal] whitespace-nowrap ${divClassName}`}>
+        <span className={`relative w-fit font-SF-Pro font-normal text-[#FFFEFE] text-base tracking-[-0.48px] leading-[100%] whitespace-nowrap ${divClassName}`}>
           {text || "Continue with email"}
         </span>
       )}

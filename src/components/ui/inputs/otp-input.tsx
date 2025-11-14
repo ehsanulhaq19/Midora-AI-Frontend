@@ -85,7 +85,7 @@ export const OTPInput: React.FC<OTPInputProps> = ({
   }
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col">
       <div className={cn("flex gap-2 justify-center", className)}>
         {otp.map((digit, index) => (
           <input

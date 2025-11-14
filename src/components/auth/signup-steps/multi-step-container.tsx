@@ -281,7 +281,7 @@ export const MultiStepContainer: React.FC<MultiStepContainerProps> = ({
   }, [currentStep])
 
   return (
-    <div className={`relative overflow-hidden w-full h-full ${className}`}>
+    <div className={`relative overflow-hidden h-full ${className}`}>
       <div className="relative w-full h-full flex flex-col">
         <div className="flex-1 flex justify-center">
           {getStepComponent()}
