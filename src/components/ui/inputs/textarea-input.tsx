@@ -34,7 +34,7 @@ export const TextareaInput: React.FC<TextareaInputProps> = ({
       {helperText && (
         <p className={cn(
           'mt-1 text-sm',
-          error ? 'text-red-500' : 'text-tokens-color-text-text-inactive-2'
+          error ? 'text-red-500' : '[color:var(--tokens-color-text-text-inactive-2)]'
         )}>
           {helperText}
         </p>

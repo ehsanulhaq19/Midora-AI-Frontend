@@ -38,7 +38,7 @@ export const ErrorScreen: React.FC<ErrorScreenProps> = ({
               />
             </svg>
           </div>
-          <h1 className="text-2xl font-heading-primary font-semibold text-text-primary mb-4">
+          <h1 className="text-2xl font-h02-heading02 font-semibold text-text-primary mb-4">
             {title}
           </h1>
           <p className="text-text-secondary">

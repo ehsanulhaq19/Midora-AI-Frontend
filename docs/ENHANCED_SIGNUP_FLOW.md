@@ -162,7 +162,7 @@ export const LoginPasswordInput: React.FC<LoginPasswordInputProps> = ({
         type="button"
         onClick={() => setShowPassword(!showPassword)}
         disabled={disabled}
-        className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+        className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded disabled:opacity-50 disabled:cursor-not-allowed"
         aria-label={showPassword ? 'Hide password' : 'Show password'}
       >
         {/* Eye icon */}

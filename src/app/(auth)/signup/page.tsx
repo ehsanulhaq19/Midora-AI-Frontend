@@ -123,7 +123,7 @@ function SignupPageContent() {
       >
         <div className="fixed inset-0 w-full h-full bg-[color:var(--tokens-color-surface-surface-primary)] flex flex-col justify-between">
           {/* Main content area */}
-          <div className="flex-1 flex justify-center px-4 py-8">
+          <div className="flex-1 flex justify-center px-4 py-24">
             <div className="w-full">
               <MultiStepContainer 
                 onComplete={handleOnboardingComplete}
@@ -138,14 +138,17 @@ function SignupPageContent() {
           
           {/* Footer */}
           <div className="flex justify-center px-4 pb-8">
-            <p className="font-text font-[number:var(--text-font-weight)] text-tokens-color-text-text-inactive-2 text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-center max-w-full">
-              <span className="font-text font-[number:var(--text-font-weight)] text-[#29324180] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
+            <p className="font-h02-heading02 font-[number:var(--text-font-weight)] [color:var(--tokens-color-text-text-inactive-2)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-center  max-w-full">
+              <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[#29324180] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
                 All rights reserved@ 2025, midora.ai, You can view our{" "}
               </span>
-              <span className="underline font-text [font-style:var(--text-font-style)] font-[number:var(--text-font-weight)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] text-[length:var(--text-font-size)]">
-                Privacy Policy
-              </span>
-              <span className="font-text font-[number:var(--text-font-weight)] text-[#29324180] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
+              <button 
+            className="underline underline-offset-0 decoration-0 [text-decoration-skip-ink:auto] [color:var(--tokens-color-text-text-inactive-2)] hover:text-gray-700 transition-colors cursor-pointer"
+          >
+            Privacy Policy
+            </button>
+          
+              <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[#29324180] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
                 {" "}here
               </span>
             </p>
@@ -184,7 +187,7 @@ function SignupPageContent() {
         {/* Main Content */}
         <main className="w-full">
           {/* Top Section - Signup Form and Sales Chart */}
-          <section className="w-full pt-4 lg:pt-8 pb-8 lg:pb-16">
+          <section className="w-full pt-4 lg:pt-8 pb-6 lg:pb-12">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 xl:gap-16 min-h-[600px]">
               {/* Signup Form Section */}
               <div className="order-2 lg:order-1 flex justify-center lg:justify-center px-4 sm:px-6 lg:px-8 m-auto items-end w-full h-full">
@@ -199,33 +202,33 @@ function SignupPageContent() {
           </section>
 
           {/* Hero Section with Background Images */}
-          <section className="relative w-full py-16 lg:py-24">
+          <section className="relative w-full pt-16 pb-8 lg:pt-24 lg:pb-16">
             <div className="w-full px-4 sm:px-6 lg:px-8">
               {/* Background Images - Hidden on mobile, visible on larger screens */}
               <div className="hidden lg:block absolute inset-0 pointer-events-none">
                 <img
-                  className="absolute w-[80px] h-[80px] lg:w-[114px] lg:h-[114px] top-[20%] left-[25%] aspect-[1] object-cover opacity-60"
+                  className="absolute w-[80px] h-[80px] lg:w-[114px] lg:h-[114px] top-[43.5%] left-[31%] aspect-[1] object-cover opacity-90"
                   alt="Image"
                   src="/img/image-16.png"
                 />
 
-                <img
+                {/* <img
                   className="absolute w-4 h-4 lg:w-6 lg:h-6 top-[25%] left-[40%] aspect-[1] object-cover opacity-60"
                   alt="Image"
                   src="/img/image-19.png"
-                />
+                /> */}
 
                 <img
-                  className="absolute w-[120px] h-[120px] lg:w-[202px] lg:h-[202px] top-[35%] right-[15%] aspect-[1] object-cover opacity-60"
+                  className="absolute w-[120px] h-[120px] lg:w-[202px] lg:h-[202px] top-[67%] right-[31%] aspect-[1] object-cover opacity-60"
                   alt="Image"
                   src="/img/image-18.png"
                 />
 
-                <img
+                {/* <img
                   className="absolute w-[20px] h-[24px] lg:w-[30px] lg:h-8 top-[40%] left-[25%] aspect-[0.96] opacity-60"
                   alt="Image"
                   src="/img/image-17.png"
-                />
+                /> */}
               </div>
 
               <HeroSection />
@@ -233,14 +236,14 @@ function SignupPageContent() {
           </section>
 
           {/* Pricing Section */}
-          <section className="w-full py-16 lg:py-24">
+          <section className="w-full py-8 lg:py-16">
             <div className="w-full px-4 sm:px-6 lg:px-8">
               <PricingSection />
             </div>
           </section>
 
           {/* FAQ Section */}
-          <section className="w-full py-16 lg:py-24">
+          <section className="w-full pt-8 pb-32 lg:pb-32 ">
             <div className="w-full px-4 sm:px-6 lg:px-8">
               <FaqSection />
             </div>

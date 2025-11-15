@@ -14,6 +14,7 @@ interface InputWithButtonProps {
   error?: string
   disabled?: boolean
   buttonText?: string
+  variant?: 'light' | 'dark'
 }
 
 export const InputWithButton = ({
@@ -27,12 +28,14 @@ export const InputWithButton = ({
   maxLength,
   error,
   disabled = false,
-  buttonText = "Continue"
+  buttonText = "Continue",
+  variant = 'light'
 }: InputWithButtonProps) => {
   const [internalValue, setInternalValue] = useState("")
   
   const value = controlledValue !== undefined ? controlledValue : internalValue
   const setValue = onChange || setInternalValue
+  const isDark = variant === 'dark'
 
   const handleSubmit = () => {
     if (onSubmit && value.trim()) {
@@ -66,7 +69,10 @@ export const InputWithButton = ({
           inputMode={inputMode}
           maxLength={maxLength}
           disabled={disabled}
-          className="relative flex-1 bg-transparent outline-none font-text font-[number:var(--text-font-weight)] text-tokens-color-text-text-seconary text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] placeholder:text-tokens-color-text-text-inactive-2 disabled:opacity-50"
+          className={cn(
+            "relative flex-1 bg-transparent outline-none font-text font-[number:var(--text-font-weight)] text-tokens-color-text-text-seconary text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] placeholder:[color:var(--tokens-color-text-text-inactive-2)] disabled:opacity-50",
+            isDark && "text-white placeholder:text-white/70"
+          )}
         />
 
         <button

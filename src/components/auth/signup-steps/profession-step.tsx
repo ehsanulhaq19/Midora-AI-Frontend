@@ -46,19 +46,28 @@ export const ProfessionStep = ({
   const isFormValid = selectedTopics.length === 3
 
   return (
-    <div className={`relative w-full bg-tokens-color-surface-surface-primary ${className}`}>
+    <div className={`relative bg-tokens-color-surface-surface-primary ${className}`}>
       <div className="flex flex-col items-start gap-6">
-        <LogoOnly
-          className="!h-14 !aspect-[1.02] !w-[57px] mx-auto ml-0"
-        />    
+      <div className="flex justify-start md:justify-center">
+              <a 
+                href="/" 
+                className="flex flex-col w-[120px] sm:w-[140px] lg:w-[154px] items-start gap-2.5 cursor-pointer hover:opacity-80 transition-opacity duration-200"
+              >
+                <img
+                  className="relative self-stretch w-full aspect-[5.19] object-cover"
+                  alt="Midora AI Logo"
+                  src="/img/logo.png"
+                />
+              </a>
+            </div>    
         <div className="flex items-center gap-2.5 relative self-stretch w-full">
-          <h1 className="relative w-fit [font-family:'Poppins',Helvetica] font-normal text-[color:var(--tokens-color-text-text-seconary)] text-lg sm:text-xl md:text-2xl tracking-[-1.80px] leading-tight sm:leading-8 md:leading-9">
+          <h1 className="relative w-fit whitespace-nowrap [font-family:'Poppins',Helvetica] font-normal text-[color:var(--tokens-color-text-text-seconary)] text-lg sm:text-xl md:text-2xl tracking-[-1.80px] leading-tight sm:leading-8 md:leading-9">
             What are you into? Pick any three topics to explore
           </h1>
         </div>
         
         <div className="flex items-center gap-2.5 relative self-stretch w-full">
-          <p className="relative w-full font-text font-[number:var(--text-font-weight)] text-tokens-color-text-text-inactive-2 text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
+          <p className="relative w-full font-text font-[number:var(--text-font-weight)] [color:var(--tokens-color-text-text-inactive-2)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
             {t('auth.professionTitle')}
           </p>
         </div>
@@ -75,7 +84,7 @@ export const ProfessionStep = ({
           ))}
         </div>
 
-        <div className="text-sm text-tokens-color-text-text-inactive-2 mt-2">
+        <div className="text-sm [color:var(--tokens-color-text-text-inactive-2)] mt-2">
           {selectedTopics.length}/3 topics selected
         </div>
 

@@ -153,24 +153,24 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
   return (
     <div className={`flex flex-col w-full max-w-[408px] items-center gap-12 lg:gap-[197px] ${className}`}>
       <div className="flex flex-col items-center gap-9 relative self-stretch w-full flex-[0_0_auto]">
-        <p className="relative w-full max-w-[232px] mt-[-1.00px] font-heading-primary font-normal text-[color:var(--tokens-color-text-text-seconary)] text-3xl sm:text-4xl text-center tracking-[-1.80px] leading-9">
-          <span className="font-light tracking-[-0.65px]">
+        <p className="relative w-full max-w-[232px] mt-[-1.00px] font-h02-heading02 font-normal text-[color:var(--tokens-color-text-text-seconary)] text-3xl sm:text-4xl text-center tracking-[-1.80px] leading-9">
+          <span className="tracking-[var(--h03-heading03-light-letter-spacing)] [font-family:'Poppins',Helvetica] [font-style:var(--h03-heading-light-font-family)] font-[number:var(--h03-heading-light-font-weight)] leading-[var(--h03-heading-light-line-height)] text-[length:var(--h03-heading-light-font-size)]">
             All your AI. <br />
           </span>
 
-          <span className="tracking-[var(--h02-heading02-letter-spacing)] font-h02-heading02 [font-style:var(--h02-heading02-font-style)] font-[number:var(--h02-heading02-font-weight)] leading-[var(--h02-heading02-line-height)] text-[length:var(--h02-heading02-font-size)]">
+          <span className="tracking-[var(--h02-heading02-letter-spacing)] [font-family:'Poppins',Helvetica] [font-style:var(--h02-heading02-font-style)] font-[number:var(--h02-heading02-font-weight)] leading-[var(--h02-heading02-line-height)] text-[length:var(--h02-heading02-font-size)]">
             One gateway
           </span>
 
           <span className="tracking-[-0.65px]">.</span>
         </p>
 
-        <div className="flex flex-col items-center gap-4 p-6 relative self-stretch w-full flex-[0_0_auto] bg-[color:var(--tokens-color-surface-surface-primary)] rounded-3xl shadow-[-6px_4px_33.2px_#4d30711a]">
+        <div className="flex flex-col items-center gap-4 p-6 relative self-stretch w-full flex-[0_0_auto] bg-[color:var(--tokens-color-surface-surface-primary)] rounded-3xl shadow-purple-soft">
           <div className="inline-flex flex-col items-start gap-4 relative flex-[0_0_auto]">
-            <div className="flex items-center justify-center gap-3 relative self-stretch w-full flex-[0_0_auto]">
-              <button 
+            <div className="flex flex-wrap sm:flex-nowrap justify-start items-center  gap-3 relative self-stretch w-full flex-[0_0_auto]">
+             <button 
                 type="button"
-                className="inline-flex items-center gap-2 p-3 relative flex-[0_0_auto] rounded-xl border border-solid border-[#dbdbdb] hover:border-[#bbb] hover:bg-gray-50 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex  items-center gap-2 p-3 relative flex-[0_0_auto] rounded-xl border border-solid border-[#dbdbdb] hover:border-[#bbb] hover:bg-gray-50 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 onClick={signInWithGitHub}
                 disabled={isProcessingSSO}
                 aria-label="Sign up with Github"
@@ -181,7 +181,7 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
                   src="/img/github.png"
                 />
 
-                <span className="relative w-fit font-body-primary font-normal text-black text-base tracking-[-0.48px] leading-[normal] whitespace-nowrap">
+                <span className="relative font-SF-Pro w-fit font-normal text-black text-base tracking-[-0.48px] leading-[100%] whitespace-nowrap">
                   Github
                 </span>
               </button>
@@ -199,7 +199,7 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
                   src="/img/microsoft.png"
                 />
 
-                <span className="relative w-fit font-body-primary font-normal text-black text-base tracking-[-0.48px] leading-[normal] whitespace-nowrap">
+                <span className="relative font-SF-Pro w-fit font-normal text-black text-base tracking-[-0.48px] leading-[100%] whitespace-nowrap">
                   Microsoft
                 </span>
               </button>
@@ -217,7 +217,7 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
                   src="/img/image-6.png"
                 />
 
-                <span className="relative w-fit font-body-primary font-normal text-black text-base tracking-[-0.48px] leading-[normal] whitespace-nowrap">
+                <span className="relative font-SF-Pro w-fit font-normal text-black text-base tracking-[-0.48px] leading-[100%] whitespace-nowrap">
                   Google
                 </span>
               </button>
@@ -231,7 +231,7 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
               src="/img/line-2.svg"
             />
 
-            <div className="relative w-fit mt-[-1.00px] font-body-primary font-normal text-[#dbdbdb] text-base tracking-[0] leading-[normal] whitespace-nowrap">
+            <div className="relative w-fit font-SF-Pro font-normal text-[#dbdbdb] text-[16px] tracking-[0] leading-[100%] whitespace-nowrap">
               OR
             </div>
 
@@ -299,14 +299,14 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
           </div>
 
           <div className="inline-flex items-center justify-center gap-2.5 relative flex-[0_0_auto]">
-            <p className="relative w-fit mt-[-1.00px] font-body-primary font-normal text-transparent text-sm text-center tracking-[0] leading-[normal]">
-              <span className="text-[#a0a0a0]">
+            <p className="relative w-fit font-SF-Pro font-normal text-transparent text-sm text-center tracking-[0] leading-[100%]">
+              <span className="text-[#A1A1A1]">
                 By continuing, you acknowledge our{" "}
               </span>
 
               <a 
                 href="/privacy-policy" 
-                className="text-[#2c1d3d] underline hover:text-[#1a0f2e] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
+                className="text-[#2C1D3D] underline leading-[100%] tracking-[0] text-center hover:text-[#1a0f2e] transition-colors duration-200 underline-offset-0 decoration-[0px] focus:outline-none focus:ring-2 focus:ring-[#1a0f2e] focus:ring-offset-2 rounded"
                 aria-label="Read our Privacy Policy"
               >
                 Privacy Policy
@@ -318,11 +318,11 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
 
       <button
         type="button"
-        className="border-[unset] rounded-[var(--premitives-corner-radius-corner-radius-3)] flex-[0_0_auto] border-[unset] bg-tokens-color-surface-surface-button-inactive hover:bg-opacity-80 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 inline-flex items-center gap-2 px-3 py-1.5"
+        className="border-[unset] rounded-[var(--premitives-corner-radius-corner-radius-3)] flex-[0_0_auto] bg-tokens-color-surface-surface-button-inactive hover:bg-opacity-80 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 inline-flex items-center gap-1.5 px-3 py-1.5"
         onClick={() => {}}
         aria-label="Learn more about our features"
       >
-        <span className="text-[color:var(--tokens-color-text-text-brand)] tracking-[-0.60px] text-xs font-normal font-heading-primary leading-4">
+        <span className="text-[color:var(--tokens-color-text-text-brand)] tracking-[-0.70px] text-xs font-normal [font-family:'Poppins',Helvetica] ">
           Learn More
         </span>
         <CaretDown

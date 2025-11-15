@@ -40,7 +40,7 @@ export const LoginPasswordInput: React.FC<LoginPasswordInputProps> = ({
         onKeyDown={onKeyDown}
         placeholder={placeholder}
         disabled={disabled}
-        className="relative w-full font-body-primary font-normal text-black text-base tracking-[-0.48px] leading-[normal] bg-transparent border-none outline-none placeholder:text-[#a0a0a0] px-6 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="relative w-full font-body-primary font-normal text-black text-base tracking-[-0.48px] leading-[normal] bg-transparent border-none outline-none placeholder:[color:var(--tokens-color-text-text-inactive-2)]px-6 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
         aria-label="Password"
         required
       />
@@ -48,7 +48,7 @@ export const LoginPasswordInput: React.FC<LoginPasswordInputProps> = ({
         type="button"
         onClick={togglePasswordVisibility}
         disabled={disabled}
-        className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+        className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded disabled:opacity-50 disabled:cursor-not-allowed"
         aria-label={showPassword ? 'Hide password' : 'Show password'}
       >
         {showPassword ? (
