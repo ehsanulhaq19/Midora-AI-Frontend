@@ -54,6 +54,7 @@ export const ChatScreen: React.FC = () => {
         onNewChat={() => {
           startNewChat()
           setSidebarOpen(false)
+          setIsCanvasOpen(false)
         }}
         showFullSidebar={!isCanvasOpen}
       />

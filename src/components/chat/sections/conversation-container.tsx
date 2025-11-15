@@ -541,6 +541,7 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
   const shouldAutoScrollRef = useRef(true)
   const userScrolledRef = useRef(false)
   const scrollRafRef = useRef<number | null>(null)
+  const prevIsStreamingRef = useRef<boolean>(false)
 
   const {
     isAutoMode,
@@ -563,12 +564,24 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
       if (lastAIMessage) {
         // Use the actual message UUID if found
         if (!streamingMessageUuid || streamingMessageUuid !== lastAIMessage.uuid) {
+          // New streaming message detected - clear previous canvas selection
+          // This ensures new streaming content becomes the active canvas by default
+          if (streamingMessageUuid && streamingMessageUuid !== lastAIMessage.uuid && isCanvasOpen) {
+            // Previous streaming message exists and is different - clear its selection
+            // Switch canvas to new streaming message immediately (will be confirmed at 100 words)
+            // This ensures the new message's canvas button shows as active
+            setActiveCanvasMessageUuid(lastAIMessage.uuid)
+          }
           setStreamingMessageUuid(lastAIMessage.uuid)
         }
       } else if (!streamingMessageUuid) {
         // Create temporary UUID only if no message found and no UUID set yet
         const tempUuid = `streaming-${Date.now()}`
         setStreamingMessageUuid(tempUuid)
+        // If canvas is open, switch to new streaming message
+        if (isCanvasOpen) {
+          setActiveCanvasMessageUuid(tempUuid)
+        }
       }
     } else if (!isStreaming) {
       // When streaming stops, try to find the message in the array
@@ -581,16 +594,24 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
             // Canvas is open with this message - keep it active
             // The message content will be updated automatically from messages array
             // Do nothing, activeCanvasMessageUuid is already correct
+          } else if (isCanvasOpen && hasAutoOpenedCanvas) {
+            // Canvas was auto-opened for this streaming message - ensure it stays active
+            setActiveCanvasMessageUuid(streamingMessageUuid)
           }
         } else if (streamingMessageUuid.startsWith('streaming-')) {
           // Temporary UUID was used, try to find the last AI message
           const lastAIMessage = [...messages].reverse().find((m: Message) => m.sender?.uuid !== user?.uuid)
           if (lastAIMessage) {
             // Update to use the actual message UUID
-            setStreamingMessageUuid(lastAIMessage.uuid)
-            // Update active canvas message UUID if canvas is open with temporary UUID
-            if (isCanvasOpen && activeCanvasMessageUuid && activeCanvasMessageUuid.startsWith('streaming-')) {
-              setActiveCanvasMessageUuid(lastAIMessage.uuid)
+            const newUuid = lastAIMessage.uuid
+            setStreamingMessageUuid(newUuid)
+            // Update active canvas message UUID if canvas is open
+            // This ensures canvas stays on the newly generated message
+            if (isCanvasOpen) {
+              // If canvas was auto-opened for streaming, keep it on the new message
+              if (hasAutoOpenedCanvas || activeCanvasMessageUuid === streamingMessageUuid) {
+                setActiveCanvasMessageUuid(newUuid)
+              }
             }
           }
         } else {
@@ -602,15 +623,16 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
       // Reset auto-open flag when streaming stops
       setHasAutoOpenedCanvas(false)
     }
-  }, [isStreaming, streamingContent, isRegenerating, messages, user, isCanvasOpen, activeCanvasMessageUuid, streamingMessageUuid])
+  }, [isStreaming, streamingContent, isRegenerating, messages, user, isCanvasOpen, activeCanvasMessageUuid, streamingMessageUuid, hasAutoOpenedCanvas])
   
   // Auto-open or switch canvas to streaming content when it exceeds 100 words
   // This ensures canvas shows new streaming content when user types a new query
+  // When new streaming starts, clear previous selection and make new message active by default
   useEffect(() => {
     if (isStreaming && streamingContent && streamingMessageUuid) {
       const wordCount = countWords(streamingContent)
       if (wordCount > 100) {
-        // If canvas is not open, open it
+        // If canvas is not open, open it with the new streaming message
         if (!isCanvasOpen) {
           setIsCanvasOpen(true)
           setActiveCanvasMessageUuid(streamingMessageUuid)
@@ -618,6 +640,7 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
         } else if (activeCanvasMessageUuid !== streamingMessageUuid) {
           // If canvas is open but showing a different message, switch to streaming message
           // This handles the case where user types new query while canvas shows previous message
+          // Clear previous selection and make new streaming message active
           setActiveCanvasMessageUuid(streamingMessageUuid)
           setHasAutoOpenedCanvas(true)
         } else {
@@ -629,67 +652,85 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
   }, [isStreaming, streamingContent, streamingMessageUuid, hasAutoOpenedCanvas, isCanvasOpen, activeCanvasMessageUuid])
   
   // Ensure canvas stays on streamed message after streaming completes
+  // This prevents canvas from switching back to previously selected messages
   useEffect(() => {
     // When streaming stops, if canvas is open and showing the streaming message,
     // make sure we keep it showing the same message by finding it in messages array
-    if (!isStreaming && streamingMessageUuid && isCanvasOpen && activeCanvasMessageUuid === streamingMessageUuid) {
-      // Try to find the message in messages array by UUID
-      let message = messages.find((m: Message) => m.uuid === streamingMessageUuid)
-      
-      if (message) {
-        // Message found by UUID - activeCanvasMessageUuid is already correct
-        // Canvas will show the message content from messages array
-        // Do nothing, keep activeCanvasMessageUuid as is
-      } else if (streamingMessageUuid.startsWith('streaming-')) {
-        // Temporary UUID was used, find the last AI message
-        const lastAIMessage = [...messages].reverse().find((m: Message) => m.sender?.uuid !== user?.uuid)
-        if (lastAIMessage) {
-          // Update to use actual message UUID
-          setStreamingMessageUuid(lastAIMessage.uuid)
-          setActiveCanvasMessageUuid(lastAIMessage.uuid)
-        }
-      } else {
-        // Message UUID is not temporary but message not found yet
-        // This can happen if streaming just completed and message is still being saved
-        // Keep activeCanvasMessageUuid as is - getCanvasContent will use lastStreamingContent
-        // Also check if a new message was added that might be our streamed message
-        const lastAIMessage = [...messages].reverse().find((m: Message) => m.sender?.uuid !== user?.uuid)
-        if (lastAIMessage && lastAIMessage.content && lastStreamingContent) {
-          // Compare content to see if this is our streamed message
-          // If the last AI message content matches our last streaming content (approximately),
-          // update to use this message's UUID
-          const messageContentStart = lastAIMessage.content.substring(0, 100).trim()
-          const streamingContentStart = lastStreamingContent.substring(0, 100).trim()
-          if (messageContentStart === streamingContentStart || 
-              (messageContentStart.length > 50 && streamingContentStart.length > 50 &&
-               messageContentStart.substring(0, 50) === streamingContentStart.substring(0, 50))) {
-            // This is likely our streamed message - update UUIDs
+    if (!isStreaming && streamingMessageUuid && isCanvasOpen) {
+      // If canvas was auto-opened for streaming, ensure it stays on the new message
+      if (hasAutoOpenedCanvas || activeCanvasMessageUuid === streamingMessageUuid) {
+        // Try to find the message in messages array by UUID
+        let message = messages.find((m: Message) => m.uuid === streamingMessageUuid)
+        
+        if (message) {
+          // Message found by UUID - activeCanvasMessageUuid is already correct
+          // Canvas will show the message content from messages array
+          // Ensure it stays active (in case it was reset somehow)
+          if (activeCanvasMessageUuid !== streamingMessageUuid) {
+            setActiveCanvasMessageUuid(streamingMessageUuid)
+          }
+        } else if (streamingMessageUuid.startsWith('streaming-')) {
+          // Temporary UUID was used, find the last AI message
+          const lastAIMessage = [...messages].reverse().find((m: Message) => m.sender?.uuid !== user?.uuid)
+          if (lastAIMessage) {
+            // Update to use actual message UUID
             setStreamingMessageUuid(lastAIMessage.uuid)
             setActiveCanvasMessageUuid(lastAIMessage.uuid)
+          }
+        } else {
+          // Message UUID is not temporary but message not found yet
+          // This can happen if streaming just completed and message is still being saved
+          // Keep activeCanvasMessageUuid as is - getCanvasContent will use lastStreamingContent
+          // Also check if a new message was added that might be our streamed message
+          const lastAIMessage = [...messages].reverse().find((m: Message) => m.sender?.uuid !== user?.uuid)
+          if (lastAIMessage && lastAIMessage.content && lastStreamingContent) {
+            // Compare content to see if this is our streamed message
+            // If the last AI message content matches our last streaming content (approximately),
+            // update to use this message's UUID
+            const messageContentStart = lastAIMessage.content.substring(0, 100).trim()
+            const streamingContentStart = lastStreamingContent.substring(0, 100).trim()
+            if (messageContentStart === streamingContentStart || 
+                (messageContentStart.length > 50 && streamingContentStart.length > 50 &&
+                 messageContentStart.substring(0, 50) === streamingContentStart.substring(0, 50))) {
+              // This is likely our streamed message - update UUIDs
+              setStreamingMessageUuid(lastAIMessage.uuid)
+              setActiveCanvasMessageUuid(lastAIMessage.uuid)
+            }
           }
         }
       }
     }
-  }, [isStreaming, streamingMessageUuid, isCanvasOpen, activeCanvasMessageUuid, messages, user, lastStreamingContent])
+  }, [isStreaming, streamingMessageUuid, isCanvasOpen, activeCanvasMessageUuid, messages, user, lastStreamingContent, hasAutoOpenedCanvas])
   
   // Watch for new messages when streaming completes to update canvas
+  // This ensures the newly generated message's canvas button is selected by default
+  // Users can still manually select previous message canvases if they want
   useEffect(() => {
-    // When streaming stops and canvas is open, watch for the message to appear in messages array
-    if (!isStreaming && streamingMessageUuid && isCanvasOpen && activeCanvasMessageUuid === streamingMessageUuid) {
-      // Check if message is now in messages array
-      const message = messages.find((m: Message) => m.uuid === streamingMessageUuid)
-      if (message && message.content) {
-        // Message found - activeCanvasMessageUuid is correct, canvas will show message content
-        // Clear lastStreamingContent once message is found and saved
-        if (message.content === lastStreamingContent || 
-            (message.content.length > lastStreamingContent.length && 
-             message.content.startsWith(lastStreamingContent.substring(0, Math.min(100, lastStreamingContent.length))))) {
-          // Message content matches - we can clear lastStreamingContent (optional)
-          // Keep it as fallback for now
-        }
+    // Detect when streaming just completed (transitioned from true to false)
+    const wasStreaming = prevIsStreamingRef.current
+    const streamingJustCompleted = wasStreaming && !isStreaming && !isRegenerating
+    
+    // Update ref for next render
+    prevIsStreamingRef.current = isStreaming
+    
+    // When streaming completes, find the most recent AI message and select its canvas
+    // This only happens once when streaming completes - users can then manually select other messages
+    if (streamingJustCompleted && messages.length > 0) {
+      // Find the most recent AI message (last non-user message)
+      const lastAIMessage = [...messages].reverse().find((m: Message) => m.sender?.uuid !== user?.uuid)
+      
+      if (lastAIMessage && lastAIMessage.uuid) {
+        // Auto-select the most recent message when streaming completes
+        // This ensures the newest message's canvas button is active by default
+        // Setting activeCanvasMessageUuid will automatically unselect all other canvas buttons
+        // Users can still manually select previous message canvases afterward
+        setActiveCanvasMessageUuid(lastAIMessage.uuid)
+        
+        // Update streamingMessageUuid to match the most recent message
+        setStreamingMessageUuid(lastAIMessage.uuid)
       }
     }
-  }, [messages, isStreaming, streamingMessageUuid, isCanvasOpen, activeCanvasMessageUuid, lastStreamingContent])
+  }, [isStreaming, isRegenerating, messages, user])
   
   // Notify parent of canvas state changes
   useEffect(() => {
