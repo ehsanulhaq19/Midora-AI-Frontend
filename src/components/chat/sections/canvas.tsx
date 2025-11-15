@@ -10,7 +10,6 @@ import { markdownToTextSync } from '@/lib/markdown-utils'
 import { cn } from '@/lib/utils'
 import { appConfig } from '@/config/app'
 import { baseApiClient } from '@/api/base'
-import { ModelSelection } from './model-selection'
 
 interface CanvasProps {
   isOpen: boolean
@@ -152,8 +151,6 @@ export const Canvas: React.FC<CanvasProps> = ({
           >
             <Close className="w-5 h-5" />
           </button>
-          {/* Model Selection in canvas header */}
-          <ModelSelection />
         </div>
         <div className="flex items-center gap-2">
           <button
