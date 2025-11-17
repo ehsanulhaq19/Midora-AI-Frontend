@@ -133,6 +133,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
   } = useConversation()
 
   const handleNewChat = () => {
+    setIsManuallyShrunk(false)
     startNewChat()
     onNewChat?.()
   }
