@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils'
 
 interface TopicCardProps {
-  icon: React.ComponentType<{ className?: string }>
+  icon: React.ComponentType<{ className?: string; color?: string }>
   text: string
   isSelected: boolean
   onClick: () => void
@@ -31,6 +31,7 @@ export const TopicCard = ({
           "h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0",
           isSelected ? "text-white" : "text-tokens-color-text-text-brand"
         )}
+        color={isSelected ? '#FFFFFF' : undefined}
       />
       <div
         className={cn(

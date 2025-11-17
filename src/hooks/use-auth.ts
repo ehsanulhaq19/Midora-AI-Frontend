@@ -15,45 +15,15 @@ import {
 import { 
   UserLogin, 
   UserCreate, 
-  ForgotPasswordRequest,
   PasswordResetRequest,
-  OTPVerificationRequest
+  OTPVerificationRequest,
+  AuthContextType
 } from '@/api/auth/types'
 import { setTokens, clearAuthCookies } from '@/lib/auth'
 import { tokenManager } from '@/lib/token-manager'
 import { handleApiError } from '@/lib/error-handler'
 
-interface UseAuthReturn {
-  // State
-  user: any
-  isAuthenticated: boolean
-  isLoading: boolean
-  error: string | null
-  accessToken: string | null
-  refreshToken: string | null
-  
-  // Actions
-  login: (credentials: UserLogin) => Promise<void>
-  register: (userData: UserCreate) => Promise<void>
-  logout: () => Promise<void>
-  refreshAccessToken: () => Promise<string>
-  resetPassword: (data: PasswordResetRequest) => Promise<void>
-  verifyOTP: (data: OTPVerificationRequest) => Promise<void>
-  regenerateOTP: (email: string) => Promise<void>
-  updateProfile: (data: { first_name: string; last_name: string; profession: string }) => Promise<void>
-  completeOnboarding: (data?: { first_name?: string; last_name?: string; profession?: string[] }) => Promise<void>
-  getCurrentUser: () => Promise<any>
-  clearError: () => void
-  
-  // SSO Methods
-  signInWithGoogle: () => Promise<void>
-  signInWithMicrosoft: () => Promise<void>
-  signInWithGitHub: () => Promise<void>
-  handleSSOCallback: (provider: 'google' | 'microsoft' | 'github', code: string, state?: string) => Promise<void>
-  
-  // OTP Login
-  verifyOTPAndLogin: (email: string, password: string, otpCode: string) => Promise<void>
-}
+type UseAuthReturn = AuthContextType
 
 /**
  * Consolidated authentication hook that provides all authentication functionality

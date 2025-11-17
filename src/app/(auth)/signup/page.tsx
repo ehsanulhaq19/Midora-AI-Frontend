@@ -29,20 +29,31 @@ function SignupPageContent() {
   const { data, updateData } = useSignupData()
   const { error: showErrorToast, success: showSuccessToast } = useToast()
   const { getCurrentUser, updateProfile, completeOnboarding } = useAuth()
-  const [showOnboarding, setShowOnboarding] = useState(false)
+  
+  const stepParam = searchParams.get('step')
+  const isInOnboardingFlow = stepParam && ['welcome', 'fullName', 'profession', 'password', 'otp', 'success'].includes(stepParam)
+  
+  const [showOnboarding, setShowOnboarding] = useState(isInOnboardingFlow)
   const [isSSOOnboarding, setIsSSOOnboarding] = useState(false)
   const [isProcessingSSO, setIsProcessingSSO] = useState(false)
-  const [initialOnboardingStep, setInitialOnboardingStep] = useState<string | undefined>(undefined)
+  const [initialOnboardingStep, setInitialOnboardingStep] = useState<string | undefined>(stepParam || undefined)
+  
+  useEffect(() => {
+    if (isInOnboardingFlow) {
+      setShowOnboarding(true)
+      setInitialOnboardingStep(stepParam || undefined)
+    } else {
+      setShowOnboarding(false)
+      setInitialOnboardingStep(undefined)
+    }
+  }, [stepParam, isInOnboardingFlow])
 
-  // Handle SSO onboarding from stored tokens (new flow)
   useEffect(() => {
     const checkSSOOnboarding = async () => {
-      // Check if we have valid tokens and user is not authenticated
       tokenManager.debugTokenState()
       const tokens = tokenManager.getTokens()
       if (tokens.accessToken && tokens.refreshToken && !isProcessingSSO) {
         try {
-          // Get user details from backend
           const userData = await getCurrentUser()
           if (userData && !userData.is_onboarded) { 
             // Store user data for SSO onboarding
@@ -50,8 +61,11 @@ function SignupPageContent() {
               email: userData.email,
               fullName: `${userData.first_name} ${userData.last_name}`.trim()
             })
-            // Show SSO onboarding flow
+            // Show SSO onboarding flow with query parameter
             setIsSSOOnboarding(true)
+            const params = new URLSearchParams(searchParams.toString())
+            params.set('step', 'welcome')
+            router.push(`/signup?${params.toString()}`, { scroll: false })
             setShowOnboarding(true)
           } else if (userData && userData.is_onboarded) {
             // User is already onboarded, redirect to chat
@@ -108,9 +122,16 @@ function SignupPageContent() {
   }
 
   const handleOnShowOnboarding = (step?: string) => {
+    // Navigate to the appropriate step using query parameters
+    const params = new URLSearchParams(searchParams.toString())
     if (step) {
+      params.set('step', step)
       setInitialOnboardingStep(step)
+    } else {
+      params.set('step', 'welcome')
+      setInitialOnboardingStep('welcome')
     }
+    router.push(`/signup?${params.toString()}`, { scroll: false })
     setShowOnboarding(true)
   }
   // Show onboarding flow in full screen blank layout if needed
@@ -190,12 +211,12 @@ function SignupPageContent() {
           <section className="w-full pt-4 lg:pt-8 pb-6 lg:pb-12">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 xl:gap-16 min-h-[600px]">
               {/* Signup Form Section */}
-              <div className="order-2 lg:order-1 flex justify-center lg:justify-center px-4 sm:px-6 lg:px-8 m-auto items-end w-full h-full">
+              <div className="order-1 lg:order-1 flex justify-center lg:justify-center px-4 sm:px-6 lg:px-8 m-auto items-end w-full h-full">
                 <SignupFormSection onShowOnboarding={(step: string | undefined) => handleOnShowOnboarding(step)} />
               </div>
 
               {/* Group Wrapper - Sales Funnel Chart */}
-              <div className="order-1 lg:order-2 flex justify-center lg:justify-end px-4 sm:px-6 lg:px-8">
+              <div className="order-2 lg:order-2 flex justify-center lg:justify-end px-4 sm:px-6 lg:px-8">
                 <GroupWrapper />
               </div>
             </div>

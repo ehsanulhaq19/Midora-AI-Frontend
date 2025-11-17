@@ -7,7 +7,7 @@ import { handleApiError } from '@/lib/error-handler'
 import { useAppDispatch } from '@/store/hooks'
 import { loginSuccess } from '@/store/slices/authSlice'
 import { tokenManager } from '@/lib/token-manager'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 interface MultiStepContainerProps {
   onComplete: (data: { email: string; fullName: string; profession: string }) => void
@@ -21,6 +21,9 @@ interface MultiStepContainerProps {
 
 type Step = 'email' | 'welcome' | 'fullName' | 'profession' | 'password' | 'otp' | 'success'
 
+// Step order for determining navigation direction
+const STEP_ORDER: Step[] = ['welcome', 'fullName', 'profession', 'password', 'otp', 'success']
+
 export const MultiStepContainer: React.FC<MultiStepContainerProps> = ({ 
   onComplete, 
   initialEmail = '',
@@ -33,58 +36,105 @@ export const MultiStepContainer: React.FC<MultiStepContainerProps> = ({
   const dispatch = useAppDispatch()
   const { verifyOTP, register, regenerateOTP, updateProfile, completeOnboarding, getCurrentUser } = useAuth()
   const router = useRouter()
-  const [currentStep, setCurrentStep] = useState<Step>(
-    initialStep || (isSSOOnboarding ? 'welcome' : 'welcome')
-  )
+  const searchParams = useSearchParams()
+  
+  // Get current step from query parameters, fallback to initialStep or default
+  const getStepFromParams = (): Step => {
+    const stepParam = searchParams.get('step')
+    if (stepParam && ['welcome', 'fullName', 'profession', 'password', 'otp', 'success'].includes(stepParam)) {
+      return stepParam as Step
+    }
+    return initialStep || (isSSOOnboarding ? 'welcome' : 'welcome')
+  }
+  
+  // Make currentStep reactive to query parameter changes
+  const [currentStep, setCurrentStep] = useState<Step>(() => getStepFromParams())
+  const [previousStep, setPreviousStep] = useState<Step>(() => getStepFromParams())
   const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('right')
+  
+  // Update currentStep when query parameters change (browser back/forward)
+  useEffect(() => {
+    const stepParam = searchParams.get('step')
+    const newStep: Step = stepParam && ['welcome', 'fullName', 'profession', 'password', 'otp', 'success'].includes(stepParam)
+      ? (stepParam as Step)
+      : (initialStep || (isSSOOnboarding ? 'welcome' : 'welcome'))
+    
+    if (newStep !== currentStep) {
+      setPreviousStep(currentStep)
+      setCurrentStep(newStep)
+    }
+  }, [searchParams, initialStep, isSSOOnboarding, currentStep])
   const [formData, setFormData] = useState({
     email: initialEmail,
     fullName: initialFullName,
     profession: '',
-    password: initialPassword
+    password: initialPassword,
+    selectedTopics: [] as string[],
+    otherTopicsInput: ''
   })
   const { success: showSuccessToast, error: showErrorToast } = useToast()
   const isOtpEmailSend = useRef(false)
+  
+  // Helper function to navigate to a step using query parameters
+  const navigateToStep = (step: Step, direction: 'left' | 'right' = 'right') => {
+    setSlideDirection(direction)
+    setPreviousStep(currentStep)
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('step', step)
+    // Use replace: false to allow browser history
+    router.push(`/signup?${params.toString()}`, { scroll: false })
+  }
+  
+  // Determine slide direction based on step order
+  useEffect(() => {
+    const currentIndex = STEP_ORDER.indexOf(currentStep)
+    const prevIndex = STEP_ORDER.indexOf(previousStep)
+    
+    if (currentIndex > prevIndex && currentIndex !== -1 && prevIndex !== -1) {
+      setSlideDirection('right')
+    } else if (currentIndex < prevIndex && currentIndex !== -1 && prevIndex !== -1) {
+      setSlideDirection('left')
+    }
+  }, [currentStep, previousStep])
 
   const handleEmailSubmit = (email: string) => {
     setFormData(prev => ({ ...prev, email }))
-    setSlideDirection('right')
-    setCurrentStep('welcome')
+    navigateToStep('welcome', 'right')
   }
 
   const handleWelcomeNext = () => {
-    setSlideDirection('right')
-    setCurrentStep('fullName')
+    navigateToStep('fullName', 'right')
   }
 
   const handleFullNameNext = (fullName: string) => {
     setFormData(prev => ({ ...prev, fullName }))
-    setSlideDirection('right')
-    setCurrentStep('profession')
+    navigateToStep('profession', 'right')
   }
 
   const handleFullNameBack = () => {
-    setSlideDirection('left')
-    setCurrentStep('welcome')
+    navigateToStep('welcome', 'left')
   }
 
-  const handleProfessionNext = (profession: string) => {
-    setFormData(prev => ({ ...prev, profession }))
+  const handleProfessionNext = (topics: string[], rawSelectedTopics: string[], otherInput?: string) => {
+    const profession = topics.join(', ')
+    setFormData(prev => ({ 
+      ...prev, 
+      profession,
+      selectedTopics: rawSelectedTopics,
+      otherTopicsInput: otherInput || ''
+    }))
     
     if (isSSOOnboarding) {
       // For SSO onboarding, go directly to success screen
-      setSlideDirection('right')
-      setCurrentStep('success')
+      navigateToStep('success', 'right')
     } else {
       // For regular onboarding, go to password step
-      setSlideDirection('right')
-      setCurrentStep('password')
+      navigateToStep('password', 'right')
     }
   }
 
   const handleProfessionBack = () => {
-    setSlideDirection('left')
-    setCurrentStep('fullName')
+    navigateToStep('fullName', 'left')
   }
 
   const handlePasswordNext = async (password: string) => {
@@ -106,8 +156,7 @@ export const MultiStepContainer: React.FC<MultiStepContainerProps> = ({
       })
 
       showSuccessToast('Registration Successful', 'Please check your email for OTP verification')
-      setSlideDirection('right')
-      setCurrentStep('otp')
+      navigateToStep('otp', 'right')
     } catch (err: any) {
       console.error('Registration error:', err)
       showErrorToast('Registration Failed', handleApiError(err))
@@ -115,8 +164,7 @@ export const MultiStepContainer: React.FC<MultiStepContainerProps> = ({
   }
 
   const handlePasswordBack = () => {
-    setSlideDirection('left')
-    setCurrentStep('profession')
+    navigateToStep('profession', 'left')
   }
 
   const handleOTPNext = async (otpCode: string) => {
@@ -127,8 +175,7 @@ export const MultiStepContainer: React.FC<MultiStepContainerProps> = ({
       })
 
       showSuccessToast('Email Verified', 'Welcome to Midora!')
-      setSlideDirection('right')
-      setCurrentStep('success')
+      navigateToStep('success', 'right')
     } catch (err: any) {
       console.error('OTP verification error:', err)
       showErrorToast('OTP Verification Failed', handleApiError(err))
@@ -137,8 +184,7 @@ export const MultiStepContainer: React.FC<MultiStepContainerProps> = ({
   }
 
   const handleOTPBack = () => {
-    setSlideDirection('left')
-    setCurrentStep('password')
+    navigateToStep('password', 'left')
   }
 
   const handleOTPRegenerate = async () => {
@@ -163,7 +209,7 @@ export const MultiStepContainer: React.FC<MultiStepContainerProps> = ({
         await completeOnboarding({
           first_name: firstName,
           last_name: lastName,
-          profession: formData.profession
+          profession: [formData.profession]
         })
         
         // Get updated user data and store in Redux
@@ -222,6 +268,8 @@ export const MultiStepContainer: React.FC<MultiStepContainerProps> = ({
             <ProfessionStep 
               onNext={handleProfessionNext} 
               onBack={handleProfessionBack}
+              initialSelectedTopics={formData.selectedTopics}
+              initialOtherInput={formData.otherTopicsInput}
             />
           </div>
         )
@@ -262,11 +310,11 @@ export const MultiStepContainer: React.FC<MultiStepContainerProps> = ({
   }
 
   useEffect(() => {
-    if (initialStep == "otp" && formData.email && !isOtpEmailSend.current) {
+    if (currentStep === "otp" && formData.email && !isOtpEmailSend.current) {
       isOtpEmailSend.current = true
       regenerateOTP(formData.email)
     }
-  }, [initialStep, formData.email])
+  }, [currentStep, formData.email, regenerateOTP])
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -278,6 +326,13 @@ export const MultiStepContainer: React.FC<MultiStepContainerProps> = ({
     }, 50)
 
     return () => clearTimeout(timer)
+  }, [currentStep])
+  
+  // Update previous step when current step changes (for browser navigation)
+  useEffect(() => {
+    if (currentStep !== previousStep) {
+      setPreviousStep(currentStep)
+    }
   }, [currentStep])
 
   return (

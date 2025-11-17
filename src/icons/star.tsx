@@ -2,21 +2,23 @@ import React from 'react'
 
 interface StarProps {
   className?: string
+  color?: string
 }
 
-export const Star: React.FC<StarProps> = ({ className }) => {
+export const Star: React.FC<StarProps> = ({ className, color = '#6B4392' }) => {
   return (
     <svg
-      className={`w-6 h-6 text-gray-600 ${className}`}
-      viewBox="0 0 24 24"
+      className={className}
+      width="20"
+      height="20"
+      viewBox="0 0 20 20"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
-        stroke="currentColor"
+        d="M9.07583 2.64344C9.39329 1.78552 10.6067 1.78552 10.9242 2.64344L12.5043 6.91355C12.6041 7.18328 12.8167 7.39594 13.0864 7.49575L17.3566 9.07583C18.2145 9.39329 18.2145 10.6067 17.3566 10.9242L13.0864 12.5043C12.8167 12.6041 12.6041 12.8167 12.5043 13.0864L10.9242 17.3566C10.6067 18.2145 9.39329 18.2145 9.07583 17.3566L7.49575 13.0864C7.39594 12.8167 7.18328 12.6041 6.91355 12.5043L2.64344 10.9242C1.78552 10.6067 1.78552 9.39329 2.64344 9.07583L6.91355 7.49575C7.18328 7.39594 7.39594 7.18328 7.49575 6.91355L9.07583 2.64344Z"
+        stroke={color}
         strokeWidth="2"
-        strokeLinecap="round"
         strokeLinejoin="round"
       />
     </svg>

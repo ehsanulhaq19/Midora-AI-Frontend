@@ -140,7 +140,7 @@ export const OTPVerificationStep = ({
         <div className="flex flex-col gap-4 w-full">
           {/* Check your email instructions - moved above OTP field */}
           <div className="bg-tokens-color-surface-surface-secondary p-4 rounded-lg pt-0 pl-0">
-            <h3 className="text-sm font-medium text-tokens-color-text-text-secondary mb-2">
+            <h3 className="text-sm font-medium font-SF-Pro text-tokens-color-text-text-secondary mb-2">
               {t('auth.checkYourEmail')}
             </h3>
             <ul className="text-xs [color:var(--tokens-color-text-text-inactive-2)] space-y-1">

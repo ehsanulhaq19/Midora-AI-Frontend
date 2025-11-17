@@ -167,7 +167,7 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
 
         <div className="flex flex-col items-center gap-4 p-6 relative self-stretch w-full flex-[0_0_auto] bg-[color:var(--tokens-color-surface-surface-primary)] rounded-3xl shadow-purple-soft">
           <div className="inline-flex flex-col items-start gap-4 relative flex-[0_0_auto]">
-            <div className="flex flex-wrap sm:flex-nowrap justify-start items-center  gap-3 relative self-stretch w-full flex-[0_0_auto]">
+            <div className="flex flex-row flex-wrap  sm:flex-nowrap justify-start items-center  gap-3 relative self-stretch w-full flex-[0_0_auto]">
              <button 
                 type="button"
                 className="inline-flex  items-center gap-2 p-3 relative flex-[0_0_auto] rounded-xl border border-solid border-[#dbdbdb] hover:border-[#bbb] hover:bg-gray-50 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -181,7 +181,7 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
                   src="/img/github.png"
                 />
 
-                <span className="relative font-SF-Pro w-fit font-normal text-black text-base tracking-[-0.48px] leading-[100%] whitespace-nowrap">
+                <span className="relative hidden lg:block font-SF-Pro w-fit font-normal text-black text-base tracking-[-0.48px] leading-[100%] whitespace-nowrap">
                   Github
                 </span>
               </button>
@@ -199,7 +199,7 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
                   src="/img/microsoft.png"
                 />
 
-                <span className="relative font-SF-Pro w-fit font-normal text-black text-base tracking-[-0.48px] leading-[100%] whitespace-nowrap">
+                <span className="relative relative hidden lg:block font-SF-Pro w-fit font-normal text-black text-base tracking-[-0.48px] leading-[100%] whitespace-nowrap">
                   Microsoft
                 </span>
               </button>
@@ -217,7 +217,7 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
                   src="/img/image-6.png"
                 />
 
-                <span className="relative font-SF-Pro w-fit font-normal text-black text-base tracking-[-0.48px] leading-[100%] whitespace-nowrap">
+                <span className="relative  hidden lg:block font-SF-Pro w-fit font-normal text-black text-base tracking-[-0.48px] leading-[100%] whitespace-nowrap">
                   Google
                 </span>
               </button>

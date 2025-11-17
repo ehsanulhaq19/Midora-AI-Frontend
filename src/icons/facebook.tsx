@@ -1,22 +1,31 @@
 interface FacebookProps {
   color?: string
+  strokeOpacity?: number
   className?: string
 }
 
-export const Facebook = ({ 
-  color = "currentColor", 
-  className 
+export const Facebook = ({
+  color = '#F2F2F2',
+  strokeOpacity = 0.7,
+  className,
 }: FacebookProps) => {
   return (
     <svg
       className={className}
-      fill={color}
-      height="20"
+      width="24"
+      height="24"
       viewBox="0 0 24 24"
-      width="20"
+      fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+      <path
+        d="M18 2H15C13.6739 2 12.4021 2.52678 11.4645 3.46447C10.5268 4.40215 10 5.67392 10 7V10H7V14H10V22H14V14H17L18 10H14V7C14 6.73478 14.1054 6.48043 14.2929 6.29289C14.4804 6.10536 14.7348 6 15 6H18V2Z"
+        stroke={color}
+        strokeOpacity={strokeOpacity}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   )
 }

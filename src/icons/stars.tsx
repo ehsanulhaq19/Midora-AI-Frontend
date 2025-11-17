@@ -2,28 +2,29 @@ import React from 'react'
 
 interface StarsProps {
   className?: string
+  color?: string
 }
 
-export const Stars: React.FC<StarsProps> = ({ className }) => {
+export const Stars: React.FC<StarsProps> = ({ className, color = '#6B4392' }) => {
   return (
     <svg
-      className={`w-6 h-6 text-gray-600 ${className}`}
-      viewBox="0 0 24 24"
+      className={className}
+      width="22"
+      height="22"
+      viewBox="0 0 22 22"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M12 2L13.09 8.26L20 9.27L15 14.14L16.18 21.02L12 17.77L7.82 21.02L9 14.14L4 9.27L10.91 8.26L12 2Z"
-        stroke="currentColor"
+        d="M13.4235 1L15.2538 5.94621L20.2 7.77647L15.2538 9.60673L13.4235 14.5529L11.5933 9.60673L6.64706 7.77647L11.5933 5.94621L13.4235 1Z"
+        stroke={color}
         strokeWidth="2"
-        strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
-        d="M19 2L19.5 4.5L22 5L19.5 5.5L19 8L18.5 5.5L16 5L18.5 4.5L19 2Z"
-        stroke="currentColor"
+        d="M4.95294 12.2941L6.55177 14.6482L8.90588 16.2471L6.55177 17.8459L4.95294 20.2L3.35411 17.8459L1 16.2471L3.35411 14.6482L4.95294 12.2941Z"
+        stroke={color}
         strokeWidth="2"
-        strokeLinecap="round"
         strokeLinejoin="round"
       />
     </svg>
