@@ -9,7 +9,6 @@ import { useConversation } from '@/hooks/use-conversation'
 import { useAIModels } from '@/hooks'
 
 export const ChatScreen: React.FC = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
   const [hasFiles, setHasFiles] = useState(false)
   const [isCanvasOpen, setIsCanvasOpen] = useState(false)
   const {
@@ -34,14 +33,6 @@ export const ChatScreen: React.FC = () => {
     fetchServiceProviders()
   }, [loadConversations, fetchServiceProviders])
 
-  const handleMenuClick = () => {
-    setSidebarOpen(true)
-  }
-
-  const handleCloseSidebar = () => {
-    setSidebarOpen(false)
-  }
-
   const handleSendMessage = async (message: string, modelUuid?: string, fileUuids?: string[], uploadedFiles?: any[]) => {
     await sendMessage(message, modelUuid, undefined, fileUuids, uploadedFiles)
   }
@@ -49,11 +40,10 @@ export const ChatScreen: React.FC = () => {
   return (
     <div className="min-h-screen flex bg-[color:var(--tokens-color-surface-surface-primary)]">
       <NavigationSidebar 
-        isOpen={sidebarOpen} 
-        onClose={handleCloseSidebar}
+        isOpen={true} 
+        onClose={() => {}}
         onNewChat={() => {
           startNewChat()
-          setSidebarOpen(false)
           setIsCanvasOpen(false)
         }}
         showFullSidebar={!isCanvasOpen}
@@ -62,7 +52,7 @@ export const ChatScreen: React.FC = () => {
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
         {currentConversation ? (
           <>
-            {!isCanvasOpen && <ChatHeader onMenuClick={handleMenuClick} />}
+            {!isCanvasOpen && <ChatHeader />}
             <ConversationContainer 
               conversationUuid={currentConversation.uuid}
               className={`flex-1 ${isCanvasOpen ? 'h-screen' : hasFiles ? 'max-h-[calc(100vh-380px)]' : 'max-h-[calc(100vh-270px)]'}`}
@@ -75,7 +65,6 @@ export const ChatScreen: React.FC = () => {
             {!isCanvasOpen && (
               <div className="">
                 <ChatInterface 
-                  onMenuClick={handleMenuClick} 
                   onSendMessage={handleSendMessage}
                   isCompact={true}
                   isStreaming={isStreaming}
@@ -86,7 +75,6 @@ export const ChatScreen: React.FC = () => {
           </>
         ) : (
           <ChatInterface 
-            onMenuClick={handleMenuClick} 
             onSendMessage={handleSendMessage}
             isCompact={false}
             isStreaming={isStreaming}

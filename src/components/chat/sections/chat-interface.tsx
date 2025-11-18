@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useState, useCallback, useRef } from 'react'
-import { Menu } from '@/icons'
 import { ModelSelection } from './model-selection'
 import { MessageInput, MessageInputHandle } from './message-input'
 import { DragDropOverlay } from '@/components/ui/drag-drop-overlay'
@@ -11,7 +10,6 @@ import { useAuthRedux } from '@/hooks/use-auth-redux'
 import { useToast } from '@/hooks'
 
 interface ChatInterfaceProps {
-  onMenuClick: () => void
   onSendMessage: (message: string, modelUuid?: string, fileUuids?: string[], uploadedFiles?: any[]) => void
   isCompact?: boolean
   isStreaming?: boolean
@@ -19,7 +17,6 @@ interface ChatInterfaceProps {
 }
 
 export const ChatInterface: React.FC<ChatInterfaceProps> = ({ 
-  onMenuClick, 
   onSendMessage,
   isCompact = false,
   isStreaming = false,
@@ -103,24 +100,17 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       <DragDropOverlay isVisible={isDragOver} />
       
       {/* Header */}
-      <div className="flex items-start justify-between relative w-full px-[28px]">
+      <div className="flex items-start justify-between relative w-full px-[24px]">
         <div className="flex items-center gap-4">
-          <button 
-            onClick={onMenuClick}
-            className="lg:hidden p-2 hover:bg-[color:var(--tokens-color-surface-surface-secondary)] rounded transition-colors"
-          >
-            <Menu className="w-6 h-6" />
-          </button>
-          
           <ModelSelection />
         </div>
 
         <div className="flex items-center gap-2">
-          {/* <button className="hidden sm:inline-flex items-center justify-center gap-2 p-3 bg-[color:var(--premitives-color-brand-purple-1000)] rounded-[var(--premitives-corner-radius-corner-radius-2)] hover:bg-[color:var(--tokens-color-surface-surface-button-pressed)] transition-colors">
-            <div className="relative w-fit mt-[-1.00px] font-h05-heading05 app-text-sm app-text-primary tracking-[var(--h05-heading05-letter-spacing)] leading-[var(--h05-heading05-line-height)] whitespace-nowrap [font-style:var(--h05-heading05-font-style)]">
+          <button className="hidden sm:inline-flex items-center justify-center gap-2 h-[40px] p-2 bg-[color:var(--premitives-color-brand-purple-1000)] rounded-[var(--premitives-corner-radius-corner-radius-2)] hover:bg-[color:var(--tokens-color-surface-surface-button-pressed)]  transition-colors">
+            <div className="relative w-fit  font-h02-heading02 text-[14px]  text-white tracking-[var(--h05-heading05-letter-spacing)] leading-[var(--h05-heading05-line-height)] whitespace-nowrap [font-style:var(--h05-heading05-font-style)]">
               {t('chat.upgradeToPro')}
             </div>
-          </button> */}
+          </button>
         </div>
       </div>
 
@@ -130,8 +120,8 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
           <div className="flex flex-col w-[37px] h-9 items-start gap-2.5 relative aspect-[1.02]">
             <LogoOnly className="relative self-stretch w-full mb-[-0.45px] aspect-[1.02]" />
           </div>
-          <p className="relative flex items-center justify-center w-fit mt-[-1.00px] font-h02-heading02 font-[number:var(--h02-heading02-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-[length:var(--h02-heading02-font-size)] tracking-[var(--h02-heading02-letter-spacing)] leading-[var(--h02-heading02-line-height)] text-center [font-style:var(--h02-heading02-font-style)]">
-            {tWithParams('chat.welcomeBack', { name: userName })}
+          <p className="relative flex items-center justify-center w-fit app-text-28 text-[color:var(--tokens-color-text-text-seconary)] font-h02-heading02 font-[number:var(--h02-heading02-font-weight)] text-center">
+            {tWithParams('chat.welcomeBack',{name:userName })}
           </p>
         </div>
 

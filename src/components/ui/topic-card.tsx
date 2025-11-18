@@ -35,7 +35,7 @@ export const TopicCard = ({
       />
       <div
         className={cn(
-          "relative w-fit mt-[-1.00px] font-text-small font-[number:var(--text-small-font-weight)] text-[length:var(--text-small-font-size)] tracking-[var(--text-small-letter-spacing)] leading-[var(--text-small-line-height)] [font-style:var(--text-small-font-style)] truncate",
+          "relative w-fit mt-[-1.00px] font-h02-heading02 font-[number:var(--text-small-font-weight)] text-[length:var(--text-small-font-size)] tracking-[var(--text-small-letter-spacing)] leading-[var(--text-small-line-height)] [font-style:var(--text-small-font-style)] truncate",
           isSelected ? "text-white" : "text-tokens-color-text-text-brand"
         )}
       >

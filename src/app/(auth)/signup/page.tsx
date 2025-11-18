@@ -160,7 +160,7 @@ function SignupPageContent() {
           {/* Footer */}
           <div className="flex justify-center px-4 pb-8">
             <p className="font-h02-heading02 font-[number:var(--text-font-weight)] [color:var(--tokens-color-text-text-inactive-2)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-center  max-w-full">
-              <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[#29324180] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
+              <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[color:var(--light-mode-colors-dark-gray-900)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
                 All rights reserved@ 2025, midora.ai, You can view our{" "}
               </span>
               <button 
@@ -169,7 +169,7 @@ function SignupPageContent() {
             Privacy Policy
             </button>
           
-              <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[#29324180] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
+              <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[color:var(--light-mode-colors-dark-gray-900)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
                 {" "}here
               </span>
             </p>
@@ -188,9 +188,9 @@ function SignupPageContent() {
     >
       <div className="relative min-h-screen w-auto bg-[color:var(--tokens-color-surface-surface-primary)]">
         {/* Header with Logo */}
-        <header className="relative top-[37px] left-[44px] w-auto md:absolute h-[60px]">
+        <header className="relative top-[37px] left-[-2px] md:left-[44px] w-auto md:absolute h-[60px]">
           <div className="max-w-7xl mx-auto ml-0">
-            <div className="flex justify-start md:justify-center">
+            <div className="flex justify-center">
               <a 
                 href="/" 
                 className="flex flex-col w-[120px] sm:w-[140px] lg:w-[154px] items-start gap-2.5 cursor-pointer hover:opacity-80 transition-opacity duration-200"
