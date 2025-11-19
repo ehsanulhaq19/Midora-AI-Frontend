@@ -117,8 +117,8 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       {/* Welcome Section */}
       <div className="flex flex-col w-full max-w-[808px] items-center gap-6 relative flex-[0_0_auto] mx-auto">
         <div className="inline-flex items-center gap-[15px] relative flex-[0_0_auto]">
-          <div className="flex flex-col w-[37px] h-9 items-start gap-2.5 relative aspect-[1.02]">
-            <LogoOnly className="relative self-stretch w-full mb-[-0.45px] aspect-[1.02]" />
+          <div className="flex flex-col w-[28px] h-[28px] items-start gap-2.5 relative aspect-[1.02]">
+            <LogoOnly className="relative self-stretch w-full aspect-[1.02]" />
           </div>
           <p className="relative flex items-center justify-center w-fit app-text-28 text-[color:var(--tokens-color-text-text-seconary)] font-h02-heading02 font-[number:var(--h02-heading02-font-weight)] text-center">
             {tWithParams('chat.welcomeBack',{name:userName })}

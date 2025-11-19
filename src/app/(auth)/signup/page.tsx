@@ -240,7 +240,7 @@ function SignupPageContent() {
                 /> */}
 
                 <img
-                  className="absolute w-[120px] h-[120px] lg:w-[202px] lg:h-[202px] top-[67%] right-[31%] aspect-[1] object-cover opacity-60"
+                  className="absolute w-[120px] h-[120px] lg:w-[202px] lg:h-[202px] top-[65%] right-[35%] aspect-[1] object-cover opacity-60"
                   alt="Image"
                   src="/img/image-18.png"
                 />

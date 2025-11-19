@@ -132,7 +132,7 @@ export const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>(({
             onChange={(e) => setMessage(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder={isStreaming ? t('chat.waitingForResponse') : t('chat.howCanIHelp')}
-            className={`w-full border-none h-full px-4 pt-4 pb-16 text-lg lg:text-xl font-h02-heading02 font-[number:var(--text-large-font-weight)] text-[color:var(--tokens-color-text-text-primary)] placeholder-[color:var(--tokens-color-text-text-brand)] [font-style:var(--text-large-font-style)] min-h-[120px] max-h-[200px] resize-none ${textAreaClassName}`}
+            className={`w-full border-none h-full px-4 pt-4 pb-16 text-lg lg:text-xl font-h02-heading02 font-[number:var(--text-large-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] placeholder-[color:var(--tokens-color-text-text-brand)] [font-style:var(--text-large-font-style)] min-h-[120px] max-h-[200px] resize-none ${textAreaClassName}`}
             variant="outline"
             disabled={isStreaming || isUploading}
           />

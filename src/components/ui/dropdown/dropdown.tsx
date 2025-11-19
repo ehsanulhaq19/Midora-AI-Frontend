@@ -103,27 +103,22 @@ export const Dropdown: React.FC<DropdownProps> = ({
   const getButtonContent = () => {
     if (variant === "model-selector") {
       return (
-        <div className="flex items-center gap-[10px] w-full">
-          <div className="flex items-center gap-2">
-            {modeText && (
-              <span className="font-h02-heading02 font-[number:var(--text-medium-font-weight)] text-tokens-color-text-text-neutral text-sm tracking-[var(--text-medium-letter-spacing)] leading-[var(--text-medium-line-height)] whitespace-nowrap [font-style:var(--text-medium-font-style)]">
-                {modeText}
-              </span>
-            )}
-            {selectedOption?.icon && (
-              <div className="flex-shrink-0">{selectedOption.icon}</div>
-            )}
-            {selectedOption?.image && (
-              <img
-                src={selectedOption.image}
-                alt={selectedOption.label}
-                className="w-4 h-4 rounded flex-shrink-0"
-              />
-            )}
-            <span className="font-text-medium font-[number:var(--text-medium-font-weight)] text-[color:var(--tokens-color-text-text-brand)] text-sm tracking-[var(--text-medium-letter-spacing)] leading-[var(--text-medium-line-height)] whitespace-nowrap [font-style:var(--text-medium-font-style)]">
-              {selectedOption?.label || placeholder}
+        <div className="flex items-center gap-2 w-full">
+          {modeText && (
+            <span className="font-h02-heading02 font-[number:var(--text-medium-font-weight)] text-tokens-color-text-text-neutral text-sm tracking-[var(--text-medium-letter-spacing)] leading-[var(--text-medium-line-height)] whitespace-nowrap [font-style:var(--text-medium-font-style)]">
+              {modeText}
             </span>
-          </div>
+          )}
+          {selectedOption?.icon && (
+            <div className="flex-shrink-0">{selectedOption.icon}</div>
+          )}
+          {selectedOption?.image && (
+            <img
+              src={selectedOption.image}
+              alt={selectedOption.label}
+              className="w-4 h-4 rounded flex-shrink-0"
+            />
+          )}
           {isOpen ? (
             <ArrowUpSm
               color="rgba(31, 23, 64, 0.9)"
@@ -135,6 +130,9 @@ export const Dropdown: React.FC<DropdownProps> = ({
               className="transition-transform duration-200 flex-shrink-0 w-3 h-3"
             />
           )}
+          <span className="font-text-medium font-[number:var(--text-medium-font-weight)] text-[color:var(--tokens-color-text-text-brand)] text-sm tracking-[var(--text-medium-letter-spacing)] leading-[var(--text-medium-line-height)] whitespace-nowrap [font-style:var(--text-medium-font-style)]">
+            {selectedOption?.label || placeholder}
+          </span>
         </div>
       );
     }
@@ -149,16 +147,6 @@ export const Dropdown: React.FC<DropdownProps> = ({
         {selectedOption?.icon && (
           <div className="flex-shrink-0">{selectedOption.icon}</div>
         )}
-
-        <ArrowDownSm
-          color={
-            variant === "model-selector" ? "rgba(31, 23, 64, 0.9)" : "#FFFFFF"
-          }
-          className={`transition-transform duration-200 ${
-            isOpen ? "rotate-180" : ""
-          }`}
-        />
-
         {selectedOption?.image && (
           <img
             src={selectedOption.image}
@@ -166,7 +154,12 @@ export const Dropdown: React.FC<DropdownProps> = ({
             className="w-4 h-4 rounded flex-shrink-0"
           />
         )}
-
+        <ArrowDownSm
+          color="#FFFFFF"
+          className={`transition-transform duration-200 ${
+            isOpen ? "rotate-180" : ""
+          }`}
+        />
         <span className="font-h02-heading02 font-[number:var(--text-medium-font-weight)] text-tokens-color-text-text-neutral text-sm tracking-[var(--text-medium-letter-spacing)] leading-[var(--text-medium-line-height)] whitespace-nowrap [font-style:var(--text-medium-font-style)]">
           {selectedOption?.label || placeholder}
         </span>
