@@ -541,8 +541,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
               <button
                 onClick={() => setIsNewFolderModalOpen(true)}
                 className="w-10 h-10 rounded-lg mb-2 flex items-center justify-center transition-colors hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]"
-                title={t("chat.newFolder")}
-              >
+                title={t("chat.newFolder")}>
                 <FoldersIcon />
               </button>
             ) : (
