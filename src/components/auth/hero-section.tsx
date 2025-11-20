@@ -32,7 +32,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ className }) => {
           src="/img/rectangle.png"
         />
 
-        <div className="flex flex-col w-full max-w-[734px] min-h-[250px] items-start gap-2.5 p-4 relative rounded-3xl backdrop-blur-[12.6px] backdrop-brightness-[100%] [-webkit-backdrop-filter:blur(12.6px)_brightness(100%)] bg-[linear-gradient(293deg,rgba(94,77,116,0.4)_2%,rgba(255,255,255,0.2)_100%)] bg-tokens-color-surface-surface-button-inactiv">
+        <div className="flex flex-col w-full max-w-[734px] min-h-[250px] items-start gap-2.5 p-4 relative rounded-3xl backdrop-blur-[4px] backdrop-brightness-[100%] [-webkit-backdrop-filter:blur(4px)_brightness(100%)] bg-[linear-gradient(293deg,rgba(94,77,116,0.4)_2%,rgba(255,255,255,0.2)_100%)] bg-tokens-color-surface-surface-button-inactiv">
           <div className="flex flex-col w-full max-w-[643.04px] items-start gap-6 relative flex-[0_0_auto]">
             <div className="flex flex-col items-start gap-6 relative self-stretch w-full flex-[0_0_auto]">
               <div className="flex flex-col items-start relative self-stretch w-full flex-[0_0_auto] gap-3">
@@ -96,7 +96,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ className }) => {
           </div>
         </div>
 
-        <div className="flex flex-col w-full max-w-[367px] h-[200px] items-start gap-2.5 p-4 relative rounded-[var(--premitives-corner-radius-corner-radius-5)] bg-[linear-gradient(138deg,rgba(31,23,64,1)_0%,rgba(94,77,116,1)_100%)] bg-tokens-color-surface-surface-button">
+        <div className="flex flex-col w-full max-w-[367px] h-[200px] items-start gap-2.5 p-4 relative rounded-[var(--premitives-corner-radius-corner-radius-5)] bg-[linear-gradient(138deg,#1F1740_0%,#6B4392_100%)] bg-tokens-color-surface-surface-button">
           <div className="flex flex-col w-full items-start relative flex-[0_0_auto]">
             <div className="relative self-stretch mt-[-1.00px] font-h02-heading02 font-medium text-[color:var(--tokens-color-surface-surface-primary)] text-2xl tracking-[-2.40px] leading-[1.2]">
               {t("hero.activeUsers")}
@@ -119,7 +119,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ className }) => {
             src="/img/rectangle.png"
           />
 
-          <div className="flex flex-col w-full max-w-[367px] h-[250px] md:h-[300px] lg:h-[352px] items-start gap-2.5 p-6 lg:p-9 relative rounded-[var(--premitives-corner-radius-corner-radius-5)] bg-[linear-gradient(138deg,rgba(31,23,64,1)_0%,rgba(94,77,116,1)_100%)] bg-tokens-color-surface-surface-button">
+          <div className="flex flex-col w-full max-w-[367px] h-[250px] md:h-[300px] lg:h-[352px] items-start gap-2.5 p-6 lg:p-9 relative rounded-[var(--premitives-corner-radius-corner-radius-5)] bg-[linear-gradient(138deg,#1F1740_0%,#6B4392_100%)] bg-tokens-color-surface-surface-button">
             <div className="flex flex-col w-full items-start relative flex-[0_0_auto]">
               <div className="relative self-stretch mt-[-1.00px] font-h02-heading02 font-medium text-[color:var(--tokens-color-surface-surface-primary)] text-3xl md:text-4xl lg:text-5xl tracking-[-2.40px] leading-[1.2]">
                 {t("hero.activeUsers")}
@@ -133,7 +133,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ className }) => {
         </div>
 
         {/* Second row: Content card */}
-        <div className="flex flex-col w-full max-w-[734px] min-h-[250px] md:h-[300px] lg:h-[352px] items-start gap-2.5 p-6 lg:p-9 relative rounded-3xl backdrop-blur-[12.6px] backdrop-brightness-[100%] [-webkit-backdrop-filter:blur(12.6px)_brightness(100%)] bg-[linear-gradient(293deg,rgba(94,77,116,0.4)_2%,rgba(255,255,255,0.2)_100%)] bg-tokens-color-surface-surface-button-inactiv">
+        <div className="flex flex-col w-full max-w-[734px] min-h-[250px] md:h-[300px] lg:h-[352px] items-start gap-2.5 p-6 lg:p-9 relative rounded-3xl backdrop-blur-[4px] backdrop-brightness-[100%] [-webkit-backdrop-filter:blur(4px)_brightness(100%)] bg-[linear-gradient(293deg,rgba(94,77,116,0.4)_2%,rgba(255,255,255,0.2)_100%)] bg-tokens-color-surface-surface-button-inactiv">
           <div className="flex flex-col w-full max-w-[643.04px] items-start gap-6 lg:gap-[59px] relative flex-[0_0_auto]">
             <div className="flex flex-col items-start gap-6 relative self-stretch w-full flex-[0_0_auto]">
               <div className="flex flex-col sm:flex-row items-start sm:items-center relative self-stretch w-full flex-[0_0_auto] gap-3 sm:gap-0">
@@ -206,7 +206,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ className }) => {
           src="/img/rectangle.png"
         />
 
-        <div className="flex flex-col w-full max-w-[734px] h-[352px] items-start gap-2.5 p-9 relative rounded-3xl backdrop-blur-[12.6px] backdrop-brightness-[100%] [-webkit-backdrop-filter:blur(12.6px)_brightness(100%)] bg-[linear-gradient(293deg,rgba(94,77,116,0.4)_2%,rgba(255,255,255,0.2)_100%)]">
+        <div className="flex flex-col w-full max-w-[734px] h-[352px] items-start gap-2.5 p-9 relative rounded-3xl backdrop-blur-[4px] backdrop-brightness-[100%] [-webkit-backdrop-filter:blur(4px)_brightness(100%)] bg-[linear-gradient(293deg,rgba(94,77,116,0.4)_2%,rgba(255,255,255,0.2)_100%)]">
           <div className="flex flex-col w-full max-w-[643.04px] items-start gap-6 lg:gap-[59px] relative flex-[0_0_auto]">
             <div className="flex flex-col items-start gap-6 relative self-stretch w-full flex-[0_0_auto]">
               <div className="flex items-start relative self-stretch w-full flex-[0_0_auto]">
@@ -270,7 +270,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ className }) => {
           </div>
         </div>
 
-        <div className="flex flex-col w-[367px] h-[352px] items-start gap-2.5 p-9 relative rounded-[var(--premitives-corner-radius-corner-radius-5)] bg-[linear-gradient(138deg,rgba(31,23,64,1)_0%,rgba(94,77,116,1)_100%)] bg-tokens-color-surface-surface-button">
+        <div className="flex flex-col w-[367px] h-[352px] items-start gap-2.5 p-9 relative rounded-[var(--premitives-corner-radius-corner-radius-5)] bg-[linear-gradient(138deg,#1F1740_0%,#6B4392_100%)] bg-tokens-color-surface-surface-button">
           <div className="flex flex-col w-[273px] items-start relative flex-[0_0_auto]">
             <div className="relative self-stretch  font-h02-heading02 font-medium text-[color:var(--tokens-color-surface-surface-primary)] text-5xl tracking-[-0.8px] leading-[140%]">
               {t("hero.activeUsers")}

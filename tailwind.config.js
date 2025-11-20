@@ -96,6 +96,13 @@ module.exports = {
           error: 'var(--border-error)',
           success: 'var(--border-success)',
         },
+
+        // ===== LIGHT MODE COLOR TOKENS =====
+        'light-mode-colors': {
+          'dark-gray': {
+            900: 'var(--light-mode-colors-dark-gray-900)',
+          },
+        },
         
         // ===== LEGACY COMPATIBILITY =====
         'gray0-white': 'var(--gray0-white)',

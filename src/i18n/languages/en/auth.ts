@@ -62,7 +62,6 @@ export const auth = {
   enterResetCode: 'Enter reset code',
   enterNewPassword: 'Enter new password',
   confirmNewPassword: 'Confirm new password',
-  resetPassword: 'Reset Password',
   resettingPassword: 'Resetting password...',
   passwordResetSuccess: 'Password reset successfully',
   passwordResetSuccessMessage: 'Your password has been reset successfully. You can now sign in with your new password.',
@@ -104,7 +103,6 @@ export const auth = {
   passwordRequirementLowercase: 'One lowercase letter',
   passwordRequirementDigit: 'One digit',
   passwordRequirementSpecial: 'One special character',
-  passwordsDoNotMatch: 'Passwords do not match',
   signUpUser: 'Sign Up',
   signingUp: 'Signing up...',
   showPassword: 'Show password',
@@ -113,7 +111,7 @@ export const auth = {
   // OTP Verification
   verifyEmailTitle: 'Verify your email',
   verifyEmailSubtitle: 'We\'ve sent a 6-digit verification code to',
-  enterOtpCode: 'Enter 6-digit code',
+  enterOtpCodeSixDigit: 'Enter 6-digit code',
   verifyOtpCode: 'Verify OTP Code',
   verifyingOtpCode: 'Verifying...',
   checkYourEmail: 'Check your email:',
@@ -153,7 +151,6 @@ export const auth = {
   back: 'Back',
 
   // SSO Authentication
-  signInWithGoogle: 'Continue with Google',
   signInWithMicrosoft: 'Continue with Microsoft',
   signInWithGitHub: 'Continue with GitHub',
   ssoSigningIn: 'Signing in with {provider}...',

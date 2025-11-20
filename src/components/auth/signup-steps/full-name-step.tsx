@@ -31,8 +31,8 @@ export const FullNameStep = ({
 
   return (
     <div className={`relative w-full bg-tokens-color-surface-surface-primary flex flex-col justify-center ${className}`}>
-      <div className="inline-flex flex-col items-start gap-9 w-[431px] px-1">   
-      <div className="flex justify-start md:justify-center">
+      <div className="inline-flex flex-col items-start gap-6 w-full max-w-[480px] px-1 sm:px-2 mx-auto">   
+      <div className="flex justify-start w-full">
               <a 
                 href="/" 
                 className="flex flex-col w-[120px] sm:w-[140px] lg:w-[154px] items-start gap-2.5 cursor-pointer hover:opacity-80 transition-opacity duration-200"
@@ -46,7 +46,7 @@ export const FullNameStep = ({
             </div>   
         <div className="flex flex-col items-start gap-4 relative self-stretch w-full flex-[0_0_auto]">
           <div className="flex items-center gap-2.5 relative self-stretch w-full">
-            <h1 className="relative w-fit [font-family:'Poppins',Helvetica] font-normal text-[color:var(--tokens-color-text-text-seconary)] text-[24px] tracking-[-1.80px] leading-[100%]">
+            <h1 className="relative w-fit [font-family:'Poppins',Helvetica] font-normal text-[color:var(--tokens-color-text-text-seconary)] text-lg sm:text-xl md:text-2xl tracking-[-1.80px] leading-tight">
             Before we get started what we call you?
             </h1>
           </div>

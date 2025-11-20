@@ -24,7 +24,7 @@ export const WelcomeStep = ({
 
   return (
     <div className={`flex flex-col w-full items-center justify-between bg-tokens-color-surface-surface-primary ${className}`}>
-      <div className="flex flex-col w-[440px] items-start gap-[36px]">
+      <div className="flex flex-col w-full max-w-[475px] items-start gap-[36px]">
 
            <div className="flex justify-start md:justify-center">
               <a 
@@ -79,7 +79,7 @@ export const WelcomeStep = ({
           </div>
         </div>
 
-        <p className="relative [font-family:'SF_Pro-Regular',Helvetica] font-normal [color:var(--tokens-color-text-text-inactive-2)] text-[14px] tracking-[0] leading-[100%] !w-[410px]">
+        <p className="relative [font-family:'SF_Pro-Regular',Helvetica] font-normal [color:var(--tokens-color-text-text-inactive-2)] text-[14px] tracking-[0] leading-[100%] w-full max-w-[410px]">
           <span className="[font-family:'SF_Pro-Regular',Helvetica] font-normal [color:var(--tokens-color-text-text-inactive-2)] tracking-[0]">
             {t('auth.privacyNoticeText')}{' '}
           </span>

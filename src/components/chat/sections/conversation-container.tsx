@@ -166,7 +166,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
           }`}
         >
           {isUser ? (
-            <p className="whitespace-pre-wrap text-sm">{message.content}</p>
+            <p className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-surface-surface-button-pressed)] text-[14px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height) [font-style:var(--text-font-style)] whitespace-pre-wrap">{message.content}</p>
           ) : (
             <div className="text-sm">
               {isThisMessageRegenerating && isStreaming ? (

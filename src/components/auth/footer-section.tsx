@@ -22,7 +22,7 @@ export const FooterSection: React.FC<FooterSectionProps> = ({ className }) => {
         <img
           className="relative w-[120px] sm:w-[150.55px] h-[23px] sm:h-[29px] bg-blend-luminosity aspect-[5.19] object-cover"
           alt="Logo"
-          src="/img/logo-1.png"
+          src="/img/Footer_logo.png"
         />
 
         <div className="flex flex-col gap-6 w-full xl:w-auto">
@@ -31,7 +31,7 @@ export const FooterSection: React.FC<FooterSectionProps> = ({ className }) => {
           </p>
 
           <InputWithButton
-            className="!self-stretch !w-full md:!w-[432px] xl:w-auto"
+            className="!self-stretch !w-full md:!w-[350px] xl:w-auto"
             placeholder="Enter your personal or work email"
             // onSubmit={handleNewsletterSubmit}
             value={email}
@@ -43,7 +43,7 @@ export const FooterSection: React.FC<FooterSectionProps> = ({ className }) => {
       </div>
 
       {/* Columns 2-4: Use Cases, Company, Contact */}
-      <div className="flex flex-col xl:flex-row gap-8 xl:gap-[128px] ">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10 xl:gap-[128px]">
         {/* Column 2: Use Cases */}
         <div className="flex flex-col gap-4 lg:gap-6">
           <h3 className="font-h02-heading02 font-normal text-base leading-[1.4] tracking-normal text-white">

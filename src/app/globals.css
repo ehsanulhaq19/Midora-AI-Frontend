@@ -32,8 +32,8 @@
   --h05-heading05-font-family: "Poppins", Helvetica;
   --h05-heading05-font-size: 16px;
   --h05-heading05-font-style: normal;
-  --h05-heading05-font-weight: 500;
-  --h05-heading05-letter-spacing: 0px;
+  --h05-heading05-font-weight: 600;
+  --h05-heading05-letter-spacing: -0.05em;
   --h05-heading05-line-height: 139.9999976158142%;
   --text-small-font-family: "SF Pro", Helvetica;
   --text-small-font-size: 14px;
@@ -50,7 +50,9 @@
   --premitives-color-dark-puprle-1000: rgba(31, 23, 64, 1);
   --premitives-color-dark-puprle-900: rgba(31, 23, 64, 0.9);
   --premitives-color-darkgray-900: rgba(41, 50, 65, 0.9);
+  --light-mode-colors-dark-gray-900: rgba(41, 50, 65, 0.9); /* #293241 at 90% */
   --premitives-color-darkgray-conversation: rgba(41, 50, 65, 0.9);
+  --premitives-color-darkgray-50: rgba(41, 50, 65, 0.05);
   --premitives-color-light-gray-1000: rgba(242, 242, 242, 1);
   --premitives-color-light-gray-2000: rgba(255, 255, 255, 1);
   --premitives-color-light-gray-300: rgba(242, 242, 242, 0.3);
@@ -136,6 +138,7 @@
   --tokens-color-surface-surface-sidebar-shrunk: rgba(41, 50, 65, 0.05);
   --tokens-color-surface-surface-conversation-canvas: rgba(41, 50, 65, 0.10);
   --tokens-color-surface-surface-input-canvas: rgba(41, 50, 65, 0.05);
+  --tokens-color-surface-surface-darkgray-50: var(--premitives-color-darkgray-50);
   --sidebar-conversations-max-height: calc(100vh - 450px);
 
   /* Surface colors for Tailwind config */
@@ -391,6 +394,12 @@
     line-height: 1.4;
   }
 
+  .app-text-28 {
+    font-size: 28px;
+    line-height: 140%;
+    letter-spacing: 0;
+  }
+
   .app-text-5xl {
     font-size: 32px;
     line-height: 1.4;
@@ -615,7 +624,9 @@
       linear-gradient(90deg, rgba(168, 85, 247, 0.1) 1px, transparent 1px);
     background-size: 20px 20px;
   }
-
+  .app-border-inactive {
+    border-color: var(--tokens-color-border-border-inactive);
+  }
   .bg-dots-pattern {
     background-image: radial-gradient(
       circle,

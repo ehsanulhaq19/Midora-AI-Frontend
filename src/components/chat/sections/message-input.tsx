@@ -113,7 +113,7 @@ export const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>(({
   }
 
   return (
-    <div className={`relative w-full max-w-[698px] mx-auto bg-[color:var(--tokens-color-surface-surface-neutral)] rounded-[var(--premitives-corner-radius-corner-radius-3)] min-h-[120px] max-h-[400px] ${className}`}>
+    <div className={`relative w-full max-w-[698px] mx-auto bg-[color:var(--tokens-color-surface-surface-darkgray-50)] rounded-[var(--premitives-corner-radius-corner-radius-3)] min-h-[120px] max-h-[400px] ${className}`}>
       {/* Hidden file input */}
       <input
         ref={fileInputRef}
@@ -132,7 +132,7 @@ export const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>(({
             onChange={(e) => setMessage(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder={isStreaming ? t('chat.waitingForResponse') : t('chat.howCanIHelp')}
-            className={`w-full border-none h-full px-4 pt-4 pb-16 text-lg lg:text-xl font-text-large font-[number:var(--text-large-font-weight)] text-[color:var(--tokens-color-text-text-primary)] placeholder-[color:var(--tokens-color-text-text-brand)] [font-style:var(--text-large-font-style)] min-h-[120px] max-h-[200px] resize-none ${textAreaClassName}`}
+            className={`w-full border-none h-full px-4 pt-4 pb-16 text-lg lg:text-xl font-h02-heading02 font-[number:var(--text-large-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] placeholder-[color:var(--tokens-color-text-text-brand)] [font-style:var(--text-large-font-style)] min-h-[120px] max-h-[200px] resize-none ${textAreaClassName}`}
             variant="outline"
             disabled={isStreaming || isUploading}
           />
@@ -144,7 +144,7 @@ export const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>(({
               <IconButton
                 type="button"
                 variant="outline"
-                size="lg"
+                size="md"
                 icon={<Plus01_5 className="w-5 h-5" color="#6B4392" />}
                 aria-label="Add attachment"
                 className="border-[color:var(--tokens-color-border-border-subtle)] bg-[#F4F5F5]"
@@ -155,8 +155,8 @@ export const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>(({
               <IconButton
                 type="button"
                 variant="outline"
-                size="lg"
-                icon={<Filters className="w-7 h-7" color="#6B4392" />}
+                size="md"
+                icon={<Filters className="" color="#6B4392" />}
                 aria-label="Voice input"
                 className="border-[color:var(--tokens-color-border-border-subtle)] bg-[#F4F5F5]"
                 disabled={isStreaming || isUploading}
@@ -183,7 +183,7 @@ export const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>(({
                 type="submit"
                 disabled={(!message.trim() && files.length === 0) || isStreaming || isUploading}
                 variant="primary"
-                size="lg"
+                size="md"
                 icon={<ArrowUpSm className="w-6 h-6" color="white" />}
                 aria-label={isStreaming ? t('chat.waitingForResponse') : t('chat.sendMessage')}
               />

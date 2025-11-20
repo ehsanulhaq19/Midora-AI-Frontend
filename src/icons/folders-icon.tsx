@@ -5,25 +5,26 @@ interface FoldersIconProps {
   color?: string
 }
 
-export const FoldersIcon: React.FC<FoldersIconProps> = ({ 
-  className = "w-5 h-5", 
-  color = "#1F1740" 
+export const FoldersIcon: React.FC<FoldersIconProps> = ({
+  className = "w-5 h-5",
+  color = "#1F1740",
 }) => (
-  <svg 
-    width="24" 
-    height="24" 
-    viewBox="0 0 24 24" 
-    fill="none" 
+  <svg
     xmlns="http://www.w3.org/2000/svg"
+    width="19"
+    height="16"
+    viewBox="0 0 19 16"
+    fill="none"
     className={className}
   >
-    <path 
-      d="M12 16.7998L12 13.4057M12 13.4057L12 10.0116M12 13.4057L8.60587 13.4057M12 13.4057L15.3941 13.4057M2.40093 17.5408L2.40102 8.41649C2.40102 7.50257 2.40068 6.20083 2.40039 5.25829C2.40019 4.59537 2.93752 4.05859 3.60044 4.05859H9.31865L12.0837 7.01223H20.4C21.0627 7.01223 21.6 7.54951 21.6 8.21227L21.5997 17.5409C21.5996 18.8664 20.5251 19.9409 19.1997 19.9409L4.80092 19.9408C3.47543 19.9408 2.40091 18.8663 2.40093 17.5408Z" 
-      stroke={color} 
-      strokeOpacity="0.9" 
-      strokeWidth="2" 
-      strokeLinecap="round" 
+    <path
+      d="M9.24966 13.9852H2.75045C1.64587 13.9852 0.750435 13.0897 0.750446 11.9852L0.750521 4.38158C0.750526 3.61998 0.750242 2.5352 0.75 1.74974C0.74983 1.19731 1.19761 0.75 1.75004 0.75H6.51522L8.81941 3.21136H15.7497C16.3019 3.21136 16.7497 3.65908 16.7497 4.21136V6.86768M14.7497 14.6959L14.7497 11.8674M14.7497 11.8674L14.7497 9.03902M14.7497 11.8674L11.9212 11.8674M14.7497 11.8674L17.5781 11.8674"
+      stroke={color}
+      strokeOpacity="0.9"
+      strokeWidth="1.5"
+      strokeLinecap="round"
       strokeLinejoin="round"
     />
   </svg>
-)
+);
+

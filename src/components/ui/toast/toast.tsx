@@ -4,7 +4,7 @@ import React, { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import { removeToast } from '@/store/slices/toastSlice'
 import { Toast as ToastType } from '@/store/slices/toastSlice'
-import { Check, X, AlertTriangle, Info, X as CloseIcon } from 'lucide-react'
+import { Check, X, AlertTriangle, AlertOctagon, Info } from 'lucide-react'
 
 interface ToastProps {
   toast: ToastType
@@ -32,7 +32,7 @@ const Toast: React.FC<ToastProps> = ({ toast }) => {
       case 'success':
         return <Check className="w-5 h-5 text-green-600" />
       case 'error':
-        return <X className="w-5 h-5 text-red-600" />
+        return <AlertOctagon className="w-5 h-5 text-red-600" />
       case 'warning':
         return <AlertTriangle className="w-5 h-5 text-yellow-600" />
       case 'info':
@@ -123,7 +123,7 @@ const Toast: React.FC<ToastProps> = ({ toast }) => {
         className="flex-shrink-0 p-1 rounded-md hover:bg-black/5 transition-colors"
         aria-label="Close notification"
       >
-        <CloseIcon className="w-4 h-4 text-gray-500" />
+        <X className="w-4 h-4 text-gray-500" />
       </button>
     </div>
   )

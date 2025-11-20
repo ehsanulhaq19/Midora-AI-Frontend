@@ -29,20 +29,31 @@ function SignupPageContent() {
   const { data, updateData } = useSignupData()
   const { error: showErrorToast, success: showSuccessToast } = useToast()
   const { getCurrentUser, updateProfile, completeOnboarding } = useAuth()
-  const [showOnboarding, setShowOnboarding] = useState(false)
+  
+  const stepParam = searchParams.get('step')
+  const isInOnboardingFlow = stepParam && ['welcome', 'fullName', 'profession', 'password', 'otp', 'success'].includes(stepParam)
+  
+  const [showOnboarding, setShowOnboarding] = useState(isInOnboardingFlow)
   const [isSSOOnboarding, setIsSSOOnboarding] = useState(false)
   const [isProcessingSSO, setIsProcessingSSO] = useState(false)
-  const [initialOnboardingStep, setInitialOnboardingStep] = useState<string | undefined>(undefined)
+  const [initialOnboardingStep, setInitialOnboardingStep] = useState<string | undefined>(stepParam || undefined)
+  
+  useEffect(() => {
+    if (isInOnboardingFlow) {
+      setShowOnboarding(true)
+      setInitialOnboardingStep(stepParam || undefined)
+    } else {
+      setShowOnboarding(false)
+      setInitialOnboardingStep(undefined)
+    }
+  }, [stepParam, isInOnboardingFlow])
 
-  // Handle SSO onboarding from stored tokens (new flow)
   useEffect(() => {
     const checkSSOOnboarding = async () => {
-      // Check if we have valid tokens and user is not authenticated
       tokenManager.debugTokenState()
       const tokens = tokenManager.getTokens()
       if (tokens.accessToken && tokens.refreshToken && !isProcessingSSO) {
         try {
-          // Get user details from backend
           const userData = await getCurrentUser()
           if (userData && !userData.is_onboarded) { 
             // Store user data for SSO onboarding
@@ -50,8 +61,11 @@ function SignupPageContent() {
               email: userData.email,
               fullName: `${userData.first_name} ${userData.last_name}`.trim()
             })
-            // Show SSO onboarding flow
+            // Show SSO onboarding flow with query parameter
             setIsSSOOnboarding(true)
+            const params = new URLSearchParams(searchParams.toString())
+            params.set('step', 'welcome')
+            router.push(`/signup?${params.toString()}`, { scroll: false })
             setShowOnboarding(true)
           } else if (userData && userData.is_onboarded) {
             // User is already onboarded, redirect to chat
@@ -108,9 +122,16 @@ function SignupPageContent() {
   }
 
   const handleOnShowOnboarding = (step?: string) => {
+    // Navigate to the appropriate step using query parameters
+    const params = new URLSearchParams(searchParams.toString())
     if (step) {
+      params.set('step', step)
       setInitialOnboardingStep(step)
+    } else {
+      params.set('step', 'welcome')
+      setInitialOnboardingStep('welcome')
     }
+    router.push(`/signup?${params.toString()}`, { scroll: false })
     setShowOnboarding(true)
   }
   // Show onboarding flow in full screen blank layout if needed
@@ -139,7 +160,7 @@ function SignupPageContent() {
           {/* Footer */}
           <div className="flex justify-center px-4 pb-8">
             <p className="font-h02-heading02 font-[number:var(--text-font-weight)] [color:var(--tokens-color-text-text-inactive-2)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-center  max-w-full">
-              <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[#29324180] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
+              <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[color:var(--light-mode-colors-dark-gray-900)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
                 All rights reserved@ 2025, midora.ai, You can view our{" "}
               </span>
               <button 
@@ -148,7 +169,7 @@ function SignupPageContent() {
             Privacy Policy
             </button>
           
-              <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[#29324180] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
+              <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[color:var(--light-mode-colors-dark-gray-900)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
                 {" "}here
               </span>
             </p>
@@ -167,9 +188,9 @@ function SignupPageContent() {
     >
       <div className="relative min-h-screen w-auto bg-[color:var(--tokens-color-surface-surface-primary)]">
         {/* Header with Logo */}
-        <header className="relative top-[37px] left-[44px] w-auto md:absolute h-[60px]">
+        <header className="relative top-[37px] left-[-2px] md:left-[44px] w-auto md:absolute h-[60px]">
           <div className="max-w-7xl mx-auto ml-0">
-            <div className="flex justify-start md:justify-center">
+            <div className="flex justify-center">
               <a 
                 href="/" 
                 className="flex flex-col w-[120px] sm:w-[140px] lg:w-[154px] items-start gap-2.5 cursor-pointer hover:opacity-80 transition-opacity duration-200"
@@ -190,12 +211,12 @@ function SignupPageContent() {
           <section className="w-full pt-4 lg:pt-8 pb-6 lg:pb-12">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 xl:gap-16 min-h-[600px]">
               {/* Signup Form Section */}
-              <div className="order-2 lg:order-1 flex justify-center lg:justify-center px-4 sm:px-6 lg:px-8 m-auto items-end w-full h-full">
+              <div className="order-1 lg:order-1 flex justify-center lg:justify-center px-4 sm:px-6 lg:px-8 m-auto items-end w-full h-full">
                 <SignupFormSection onShowOnboarding={(step: string | undefined) => handleOnShowOnboarding(step)} />
               </div>
 
               {/* Group Wrapper - Sales Funnel Chart */}
-              <div className="order-1 lg:order-2 flex justify-center lg:justify-end px-4 sm:px-6 lg:px-8">
+              <div className="order-2 lg:order-2 flex justify-center lg:justify-end px-4 sm:px-6 lg:px-8">
                 <GroupWrapper />
               </div>
             </div>
@@ -219,7 +240,7 @@ function SignupPageContent() {
                 /> */}
 
                 <img
-                  className="absolute w-[120px] h-[120px] lg:w-[202px] lg:h-[202px] top-[67%] right-[31%] aspect-[1] object-cover opacity-60"
+                  className="absolute w-[120px] h-[120px] lg:w-[202px] lg:h-[202px] top-[65%] right-[35%] aspect-[1] object-cover opacity-60"
                   alt="Image"
                   src="/img/image-18.png"
                 />

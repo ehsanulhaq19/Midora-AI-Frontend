@@ -57,13 +57,13 @@ export const GroupWrapper: React.FC<GroupWrapperProps> = ({ className }) => {
               ? 'opacity-100 translate-y-0 scale-100' 
               : 'opacity-0 translate-y-4 scale-95'
           }`}>
-            <div className="relative w-full h-[42px] sm:h-[50px] md:h-[54px] bg-[#f3e8ff] rounded-[9.36px] shadow-[0px_3.74px_3.74px_rgba(209,173,249,0.2)] p-2 sm:p-3">
+            <div className="relative w-full h-[42px] sm:h-[50px] md:h-[54px] bg-white rounded-[9.36px] shadow-[0px_3.74px_3.74px_rgba(209,173,249,0.2)] p-2 sm:p-3">
               <img
                 className="absolute w-[22px] sm:w-[26px] md:w-[30px] h-[22px] sm:h-[26px] md:h-[30px] top-[6px] sm:top-[8px] md:top-[9px] left-2 sm:left-3 object-cover rounded-full"
                 alt="User avatar"
                 src="/img/ellipse-27.png"
               />
-              <p className="absolute top-[6px] sm:top-[9px] md:top-[10px] left-[28px] sm:left-[38px] md:left-[42px] right-2 sm:right-3 font-SF-Pro font-medium text-black text-[9px] sm:text-[11px] md:text-[12px] tracking-[0] leading-[1.3]">
+              <p className="absolute top-[6px] sm:top-[9px] md:top-[10px] left-[36px] sm:left-[38px] md:left-[48px] right-2 sm:right-3 font-SF-Pro font-medium text-black text-[9px] sm:text-[11px] md:text-[12px] tracking-[0] leading-[1.3]">
                 There's a problem in our sales funnel. I'm
                 <br className="hidden sm:block" />
                 <span className="sm:hidden"> </span>Thinking its a leak in our pipeline
@@ -132,8 +132,8 @@ export const GroupWrapper: React.FC<GroupWrapperProps> = ({ className }) => {
                   </div>
 
                   {/* Y-Axis Tick Marks */}
-                  <div className="absolute left-0 top-0 bottom-0 w-[5px] flex flex-col justify-between pointer-events-none">
-                    {CHART_DATA.yAxisLabels.map((_, index) => (
+                  <div className="absolute left-0 top-0 bottom-0  flex flex-col justify-between pointer-events-none">
+                    {/* {CHART_DATA.yAxisLabels.map((_, index) => (
                       <div
                         key={`tick-${index}`}
                         className="w-[5px] h-[1px] bg-black"
@@ -142,7 +142,7 @@ export const GroupWrapper: React.FC<GroupWrapperProps> = ({ className }) => {
                           marginBottom: index === CHART_DATA.yAxisLabels.length - 1 ? '0' : 'auto',
                         }}
                       />
-                    ))}
+                    ))} */}
                   </div>
 
                   {/* Chart Bars */}
@@ -207,7 +207,6 @@ export const GroupWrapper: React.FC<GroupWrapperProps> = ({ className }) => {
                 </div>
 
                 {/* Right Y-Axis Line */}
-                <div className="absolute right-0 top-0 bottom-0 w-[1px] bg-black" />
               </div>
             </div>
           </div>

@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils'
 
 interface TopicCardProps {
-  icon: React.ComponentType<{ className?: string }>
+  icon: React.ComponentType<{ className?: string; color?: string }>
   text: string
   isSelected: boolean
   onClick: () => void
@@ -31,10 +31,11 @@ export const TopicCard = ({
           "h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0",
           isSelected ? "text-white" : "text-tokens-color-text-text-brand"
         )}
+        color={isSelected ? '#FFFFFF' : undefined}
       />
       <div
         className={cn(
-          "relative w-fit mt-[-1.00px] font-text-small font-[number:var(--text-small-font-weight)] text-[length:var(--text-small-font-size)] tracking-[var(--text-small-letter-spacing)] leading-[var(--text-small-line-height)] [font-style:var(--text-small-font-style)] truncate",
+          "relative w-fit mt-[-1.00px] font-h02-heading02 font-[number:var(--text-small-font-weight)] text-[length:var(--text-small-font-size)] tracking-[var(--text-small-letter-spacing)] leading-[var(--text-small-line-height)] [font-style:var(--text-small-font-style)] truncate",
           isSelected ? "text-white" : "text-tokens-color-text-text-brand"
         )}
       >

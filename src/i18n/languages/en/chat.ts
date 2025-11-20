@@ -11,6 +11,9 @@ export const chat = {
   sendMessage: 'Send Message',
   waitingForResponse: 'Waiting for AI response...',
   newChat: 'New Chat',
+  brandName: 'Midora',
+  expandSidebar: 'Expand sidebar',
+  shrinkSidebar: 'Collapse sidebar',
   chatHistory: 'Chat History',
   clearChat: 'Clear Chat',
   exportChat: 'Export Chat',
@@ -35,7 +38,7 @@ export const chat = {
   facialRecognition: 'Facial recognition and analysis',
   manual: 'Manual',
   claude: 'Claude',
-  upgradeToPro: 'Upgrade to Pro+',
+  upgradeToPro: 'Upgrade to Pro +',
   
   // AI Model Selection
   auto: 'Auto',
