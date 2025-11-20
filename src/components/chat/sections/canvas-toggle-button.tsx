@@ -47,9 +47,9 @@ export const CanvasToggleButton: React.FC<CanvasToggleButtonProps> = ({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        'w-full px-4 py-3 rounded-lg transition-all duration-200 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed text-left cursor-pointer',
+        'w-full px-4 py-3 rounded-[16px] border app-border-inactive transition-all duration-200 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed text-left cursor-pointer',
         isActive
-          ? 'bg-[color:var(--tokens-color-surface-surface-tertiary)] border-2 border-[color:var(--tokens-color-text-text-brand)] shadow-md'
+          ? 'bg-[color:var(--tokens-color-surface-surface-conversation-canvas)] border border-[color:var(--tokens-color-text-text-brand)]'
           : 'bg-gray-100 hover:bg-gray-200/80 border-2 border-transparent hover:border-gray-200 shadow-sm',
         className
       )}
@@ -61,10 +61,10 @@ export const CanvasToggleButton: React.FC<CanvasToggleButtonProps> = ({
           {/* First line - title/content preview */}
           {firstLine && (
             <div className={cn(
-              'font-bold text-sm truncate mb-1.5',
+              ' truncate mb-[5px]  font-h02-heading02 font-[number:var(--h05-heading05-font-weight)] text-[16px] tracking-[var(--h05-heading05-letter-spacing)] leading-[var(--h05-heading05-line-height)] whitespace-nowrap [font-style:var(--h05-heading05-font-style)]',
               isActive 
-                ? 'text-[color:var(--tokens-color-text-text-brand)]' 
-                : 'text-gray-900'
+                ? 'text-[color:var(--tokens-color-text-text-seconary)]' 
+                : 'text-[color:var(--tokens-color-text-text-seconary)]'
             )}>
               {firstLine}
             </div>
@@ -72,10 +72,10 @@ export const CanvasToggleButton: React.FC<CanvasToggleButtonProps> = ({
           {/* Content type tag */}
           {contentType && (
             <div className={cn(
-              'text-xs font-medium',
+              ' truncate font-h02-heading02 font-[number:var(--h02-heading02-font-weight)] text-[14px] tracking-[var(--text-small-letter-spacing)] leading-[var(--h01-heading-01-line-height)] whitespace-nowrap [font-style:var(--h02-heading02-font-style)]',
               isActive
                 ? 'text-[color:var(--tokens-color-text-text-brand)]'
-                : 'text-purple-600'
+                : 'text-[color:var(--tokens-color-text-text-brand)]'
             )}>
               {contentType}
             </div>

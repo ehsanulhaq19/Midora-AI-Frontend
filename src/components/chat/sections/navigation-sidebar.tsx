@@ -354,11 +354,11 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
         {/* Header */}
         <div
           className={`flex flex-col items-start flex-shrink-0 pb-6 ${
-            isShrunk ? "gap-6" : "gap-3"
+            isShrunk ? "gap-" : "gap-"
           }`}
         >
           <div
-            className={`flex h-[68px] items-center py-0 relative w-full transition-all duration-300 ${
+            className={`flex items-center mt-4 py-0 relative w-full transition-all duration-300 ${
               isShrunk ? "px-2 justify-center" : "px-5 justify-between"
             }`}
           >
@@ -397,7 +397,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
           </div>
 
           <div
-            className={`flex flex-col items-start gap-1 relative w-full ${
+            className={`flex flex-col items-start relative w-full ${
               isShrunk ? "px-2 items-center" : ""
             }`}
           >
@@ -405,7 +405,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
               <>
                 <button
                   onClick={handleNewChat}
-                  className="w-10 h-10 rounded-lg mb-2 flex items-center justify-center transition-colors hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]"
+                  className="w-10 h-10 rounded-lg flex items-center justify-center transition-colors hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]"
                   title={t("chat.newChat")}
                 >
                   <div className="w-6 h-6 flex items-center justify-center gap-2.5 rounded-[4px] bg-[color:var(--tokens-color-icon-surface-icon-inactive-brand)] text-white">
@@ -413,7 +413,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                   </div>
                 </button>
                 <button
-                  className="w-10 h-10 rounded-lg mb-2 flex items-center justify-center transition-colors hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]"
+                  className="w-10 h-10 rounded-lg flex items-center justify-center transition-colors hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]"
                   title={t("chat.searchChat")}
                 >
                   <Search02 className="w-5 h-5" />
@@ -465,22 +465,30 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
             {isShrunk ? (
               <div className="flex flex-col items-center relative w-full px-2">
                 <button
-                  className="w-10 h-10 rounded-lg mb-2 flex items-center justify-center transition-colors hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]"
+                  className="w-10 h-10 rounded-lg  flex items-center justify-center transition-colors hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]"
                   title="Midoras"
                 >
                   <Plus01_5 className="relative w-5 h-5" color="#1F1740" />
                 </button>
                 <button
-                  className="w-10 h-10 rounded-lg mb-2 flex items-center justify-center transition-colors hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]"
+                  className="w-10 h-10 rounded-lg flex items-center justify-center transition-colors hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]"
                   title="AI Detection"
                 >
-                  <img alt="AI Humanizer" src="/img/ai-detection.png" className="w-5 h-5" />
+                  <img
+                    alt="AI Humanizer"
+                    src="/img/ai-detection.png"
+                    className="w-5 h-5"
+                  />
                 </button>
                 <button
-                  className="w-10 h-10 rounded-lg mb-2 flex items-center justify-center transition-colors hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]"
+                  className="w-10 h-10 rounded-lg flex items-center justify-center transition-colors hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]"
                   title="AI Humanizer"
                 >
-                  <img alt="AI Humanizer" src="/img/ai-image.png" className="w-5 h-5" />
+                  <img
+                    alt="AI Humanizer"
+                    src="/img/ai-image.png"
+                    className="w-5 h-5"
+                  />
                 </button>
               </div>
             ) : (
@@ -491,7 +499,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                 >
                   <Plus01_5 className="relative w-5 h-5" color="#1F1740" />
                   <div className="relative flex items-center justify-center w-fit font-h02-heading02 font-[number:var(--text-font-weight)] text-[color:var(--light-mode-colors-dark-gray-900)] text-[14px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] whitespace-nowrap [font-style:var(--text-font-style)]">
-                    Midoras
+                    Explore
                   </div>
                 </button>
 
@@ -519,7 +527,11 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
           </div>
 
           {/* Projects Section */}
-          <div className={`flex flex-col items-start relative w-full flex-shrink-0 ${isShrunk ? "mt-6 items-center px-2" : "mt-6"}`}>
+          <div
+            className={`flex flex-col items-start relative w-full flex-shrink-0 ${
+              isShrunk ? "mt-6 items-center px-2" : "mt-6"
+            }`}
+          >
             {!isShrunk && (
               <div className="relative flex items-center justify-center w-fit mb-[8px] font-h02-heading02 font-[number:var(--text-small-font-weight)] [color:var(--tokens-color-text-text-inactive-2)] text-[14px] tracking-[var(--text-small-letter-spacing)] leading-[var(--text-small-line-height)] whitespace-nowrap [font-style:var(--text-small-font-style)] px-5">
                 Projects
