@@ -76,7 +76,6 @@ function SignupPageContent() {
         }
       }
     }
-
     // Only check if we're not already processing SSO and no query params
     if (!isProcessingSSO && searchParams.has('access_token') && searchParams.has('refresh_token')) {
       tokenManager.storeTokens(searchParams.get('access_token')!, searchParams.get('refresh_token')!, searchParams.get('auth_method')!)
