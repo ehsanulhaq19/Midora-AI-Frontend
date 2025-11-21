@@ -36,8 +36,9 @@ function SignupPageContent() {
   const [showOnboarding, setShowOnboarding] = useState(isInOnboardingFlow)
   const [isSSOOnboarding, setIsSSOOnboarding] = useState(false)
   const [isProcessingSSO, setIsProcessingSSO] = useState(false)
+  const [showSSOLoader, setShowSSOLoader] = useState(false)
   const [initialOnboardingStep, setInitialOnboardingStep] = useState<string | undefined>(stepParam || undefined)
-  
+
   useEffect(() => {
     if (isInOnboardingFlow) {
       setShowOnboarding(true)
@@ -55,6 +56,7 @@ function SignupPageContent() {
       if (tokens.accessToken && tokens.refreshToken && !isProcessingSSO) {
         try {
           setIsProcessingSSO(true)
+          setShowSSOLoader(true)
           const userData = await getCurrentUser()
           if (userData) {
             // Regardless of onboarding status, persist auth state and go to chat
@@ -72,12 +74,14 @@ function SignupPageContent() {
           tokenManager.clearTokens()
         } finally {
           setIsProcessingSSO(false)
+          setShowSSOLoader(false)
           dispatch(setLoading(false))
         }
       }
     }
     // Only check if we're not already processing SSO and no query params
     if (!isProcessingSSO && searchParams.has('access_token') && searchParams.has('refresh_token')) {
+      setShowSSOLoader(true)
       tokenManager.storeTokens(searchParams.get('access_token')!, searchParams.get('refresh_token')!, searchParams.get('auth_method')!)
       console.log('Stored tokens from query params')
       checkSSOOnboarding()
@@ -123,6 +127,19 @@ function SignupPageContent() {
     router.push(`/signup?${params.toString()}`, { scroll: false })
     setShowOnboarding(true)
   }
+  if (showSSOLoader) {
+    return (
+      <LoadingWrapper 
+        message="Signing you in..."
+        minLoadingTime={300}
+        showInitially={true}
+        isLoading={showSSOLoader}
+      >
+        <div />
+      </LoadingWrapper>
+    )
+  }
+
   // Show onboarding flow in full screen blank layout if needed
   if (showOnboarding) {
     return (
