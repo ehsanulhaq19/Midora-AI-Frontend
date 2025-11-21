@@ -15,12 +15,15 @@ import {
   FolderOpen01,
   Logout,
 } from "@/icons";
-import { Tooltip } from "@/components/ui";
+import { Tooltip, ConversationMenu } from "@/components/ui";
+import { NewProjectModal } from "./new-project-modal";
 import Image from "next/image";
 import { t } from "@/i18n";
 import { useAuthRedux } from "@/hooks/use-auth-redux";
 import { useConversation } from "@/hooks/use-conversation";
 import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
+import { chat } from "@/i18n/languages/en/chat";
 
 const translateWithFallback = (key: string, fallback: string) => {
   const translated = t(key);
@@ -31,26 +34,47 @@ interface ChatListItemProps {
   text: string;
   isSelected: boolean;
   onClick: () => void;
+  conversationUuid?: string;
+  onShare?: (conversationUuid: string) => void;
+  onRemoveFromFolder?: (conversationUuid: string) => void;
+  onArchive?: (conversationUuid: string) => void;
+  onDelete?: (conversationUuid: string) => void;
 }
 
 const ChatListItem: React.FC<ChatListItemProps> = ({
   text,
   isSelected,
   onClick,
+  conversationUuid,
+  onShare,
+  onRemoveFromFolder,
+  onArchive,
+  onDelete,
 }) => (
-  <button
-    onClick={onClick}
-    className={`w-full flex items-center gap-2.5 px-5 py-2 text-left transition-colors hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] ${
+  <div
+    className={`w-full flex items-center gap-2.5 px-5 py-2 transition-colors hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] ${
       isSelected
         ? "bg-[color:var(--tokens-color-surface-surface-tertiary)] text-[color:var(--tokens-color-text-text-brand)]"
         : "text-[color:var(--tokens-color-text-text-conversation)] hover:bg-[color:var(--tokens-color-surface-surface-secondary)]"
     }`}
   >
-    <div className="font-h02-heading02 text-[color:var(--light-mode-colors-dark-gray-900)] flex-1  tracking-[var(--text-small-letter-spacing)] text-[14px] [font-style:var(--text-small-font-style)] font-[number:var(--text-small-font-weight)] leading-[var(--text-small-line-height)] truncate">
-      {text}
-    </div>
-    {isSelected && <MoreOptions className="w-4 h-4" />}
-  </button>
+    <button
+      onClick={onClick}
+      className="flex-1 text-left"
+    >
+      <div className="font-h02-heading02 text-[color:var(--light-mode-colors-dark-gray-900)] flex-1 tracking-[var(--text-small-letter-spacing)] text-[14px] [font-style:var(--text-small-font-style)] font-[number:var(--text-small-font-weight)] leading-[var(--text-small-line-height)] truncate">
+        {text}
+      </div>
+    </button>
+    {isSelected && conversationUuid && (
+      <ConversationMenu
+        onShare={onShare ? () => onShare(conversationUuid) : undefined}
+        onRemoveFromFolder={onRemoveFromFolder ? () => onRemoveFromFolder(conversationUuid) : undefined}
+        onArchive={onArchive ? () => onArchive(conversationUuid) : undefined}
+        onDelete={onDelete ? () => onDelete(conversationUuid) : undefined}
+      />
+    )}
+  </div>
 );
 
 interface ProjectFolderItemProps {
@@ -103,11 +127,19 @@ const ProjectFolderItem: React.FC<ProjectFolderItemProps> = ({
   </div>
 );
 
+interface Project {
+  id: string;
+  name: string;
+  category?: string;
+}
+
 interface NavigationSidebarProps {
   isOpen: boolean;
   onClose: () => void;
   onNewChat?: () => void;
   showFullSidebar?: boolean;
+  selectedProjectId?: string;
+  onProjectSelect?: (project: Project | null) => void;
 }
 
 export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
@@ -115,6 +147,8 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
   onClose,
   onNewChat,
   showFullSidebar = true,
+  selectedProjectId,
+  onProjectSelect,
 }) => {
   const [selectedChat, setSelectedChat] = useState<number | null>(null);
   const [expandedProjects, setExpandedProjects] = useState<
@@ -127,10 +161,33 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
     if (typeof window === "undefined") return false;
     return window.innerWidth < 1024;
   });
+  const [isNewFolderModalOpen, setIsNewFolderModalOpen] = useState(false);
+  const [userFolders, setUserFolders] = useState<Array<{ id: string; name: string; category?: string }>>([]);
+  const [expandedUserProjects, setExpandedUserProjects] = useState<Record<string, boolean>>({});
   const dropdownRef = useRef<HTMLDivElement>(null);
   const conversationsContainerRef = useRef<HTMLDivElement>(null);
   const { userName } = useAuthRedux();
   const { logout } = useAuth();
+  const router = useRouter();
+
+  // Load folders from localStorage on mount
+  useEffect(() => {
+    const storedFolders = localStorage.getItem('userProjects');
+    if (storedFolders) {
+      setUserFolders(JSON.parse(storedFolders));
+    }
+    
+    // Auto-expand selected project
+    if (selectedProjectId) {
+      setExpandedUserProjects(prev => ({ ...prev, [selectedProjectId]: true }));
+    }
+  }, [selectedProjectId]);
+
+  // Save folders to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('userProjects', JSON.stringify(userFolders));
+  }, [userFolders]);
+  
   const brandNameLabel = translateWithFallback("chat.brandName", "Midora");
   const expandSidebarLabel = translateWithFallback(
     "chat.expandSidebar",
@@ -161,6 +218,20 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
     conversationPagination,
     isLoadingMoreConversations,
   } = useConversation();
+
+  // Get conversations for a project
+  const getProjectConversations = useCallback((projectId: string) => {
+    const projectConversations = JSON.parse(localStorage.getItem('projectConversations') || '{}');
+    const conversationUuids = projectConversations[projectId] || [];
+    return conversations.filter(conv => conversationUuids.includes(conv.uuid));
+  }, [conversations]);
+  
+  const toggleUserProject = (projectId: string) => {
+    setExpandedUserProjects((prev) => ({
+      ...prev,
+      [projectId]: !prev[projectId],
+    }));
+  };
 
   const handleNewChat = () => {
     setIsManuallyShrunk(false);
@@ -468,13 +539,14 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
             )}
             {isShrunk ? (
               <button
-                className="w-10 h-10 rounded-lg flex items-center justify-center transition-colors hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]"
-                title={t("chat.newFolder")}
-              >
+                onClick={() => setIsNewFolderModalOpen(true)}
+                className="w-10 h-10 rounded-lg mb-2 flex items-center justify-center transition-colors hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]"
+                title={t("chat.newFolder")}>
                 <FoldersIcon />
               </button>
             ) : (
               <button
+                onClick={() => setIsNewFolderModalOpen(true)}
                 className="flex items-center relative w-full hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded transition-colors px-5 py-2 gap-2"
                 title={t("chat.newFolder")}
               >
@@ -487,6 +559,71 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
 
             {!isShrunk && (
               <div className="flex flex-col items-start relative w-full max-h-48 overflow-y-auto scrollbar-hide scroll-smooth">
+                {/* User Created Folders */}
+                {userFolders.map((folder) => {
+                  const isSelected = selectedProjectId === folder.id;
+                  const isExpanded = expandedUserProjects[folder.id] || isSelected;
+                  const projectConversations = getProjectConversations(folder.id);
+                  
+                  return (
+                    <div key={folder.id} className="w-full">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          toggleUserProject(folder.id);
+                          if (onProjectSelect) {
+                            onProjectSelect(folder);
+                          }
+                        }}
+                        className={`w-full pt-[5px] pb-[8px] px-2 gap-[8px] flex items-center pl-5 hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded transition-colors ${
+                          isSelected
+                            ? "bg-[color:var(--tokens-color-surface-surface-tertiary)] text-[color:var(--tokens-color-text-text-brand)]"
+                            : ""
+                        }`}
+                      >
+                        <FolderOpen01 
+                          className={`w-5 h-5 transition-transform ${
+                            isExpanded ? "rotate-6" : "rotate-0"
+                          } ${isSelected ? "text-[color:var(--tokens-color-text-text-brand)]" : ""}`} 
+                        />
+                        <span className={`font-h02-heading02 font-[number:var(--text-font-weight)] text-[14px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] whitespace-nowrap [font-style:var(--text-font-style)] ${
+                          isSelected
+                            ? "text-[color:var(--tokens-color-text-text-brand)]"
+                            : "text-[color:var(--light-mode-colors-dark-gray-900)]"
+                        }`}>
+                          {folder.name}
+                        </span>
+                      </button>
+                      
+                      {/* Project Conversations */}
+                      {isExpanded && projectConversations.length > 0 && (
+                        <div className="ml-11 mt-1 flex flex-col gap-1">
+                          {projectConversations
+                            .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+                            .map((conversation) => (
+                              <button
+                                key={conversation.uuid}
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleSelectChat(conversation.uuid);
+                                }}
+                                className={`text-left text-[13px] transition-colors px-2 py-1 rounded hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] ${
+                                  currentConversation?.uuid === conversation.uuid
+                                    ? "text-[color:var(--tokens-color-text-text-brand)] font-medium"
+                                    : "text-[color:var(--tokens-color-text-text-inactive-2)] hover:text-[color:var(--light-mode-colors-dark-gray-900)]"
+                                }`}
+                              >
+                                <div className="truncate">{conversation.name}</div>
+                              </button>
+                            ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+                
+                {/* Existing Projects */}
                 {projects.map((project, index) => (
                   <div key={project.title + index} className="w-full">
                     <button
@@ -602,6 +739,23 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                             currentConversation?.uuid === conversation.uuid
                           }
                           onClick={() => handleSelectChat(conversation.uuid)}
+                          conversationUuid={conversation.uuid}
+                          onShare={(uuid) => {
+                            // TODO: Implement share functionality
+                            console.log('Share conversation:', uuid);
+                          }}
+                          onRemoveFromFolder={(uuid) => {
+                            // TODO: Implement remove from folder functionality
+                            console.log('Remove from folder:', uuid);
+                          }}
+                          onArchive={(uuid) => {
+                            // TODO: Implement archive functionality
+                            console.log('Archive conversation:', uuid);
+                          }}
+                          onDelete={(uuid) => {
+                            // TODO: Implement delete functionality
+                            console.log('Delete conversation:', uuid);
+                          }}
                         />
                       ))}
                     {/* Loading indicator for more conversations */}
@@ -692,6 +846,24 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
           )}
         </div>
       </div>
+
+      {/* New Project Modal */}
+      <NewProjectModal
+        isOpen={isNewFolderModalOpen}
+        onClose={() => setIsNewFolderModalOpen(false)}
+        onConfirm={(newProject) => {
+          const updatedFolders = [...userFolders, newProject];
+          setUserFolders(updatedFolders);
+          // Save immediately to localStorage
+          localStorage.setItem('userProjects', JSON.stringify(updatedFolders));
+          // Select the newly created project
+          if (onProjectSelect) {
+            onProjectSelect(newProject);
+          }
+          // Start new chat in project context
+          startNewChat();
+        }}
+      />
     </>
   );
 };

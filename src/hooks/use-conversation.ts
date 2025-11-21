@@ -153,7 +153,7 @@ export const useConversation = () => {
   }, [dispatch, conversations, messages])
 
   // Send a message
-  const sendMessage = useCallback(async (content: string, modelUuid?: string, conversationUuid?: string, fileUuids?: string[], uploadedFiles?: any[]) => {
+  const sendMessage = useCallback(async (content: string, modelUuid?: string, conversationUuid?: string, fileUuids?: string[], uploadedFiles?: any[], projectId?: string) => {
     try {
       dispatch(clearError())
       
@@ -174,6 +174,28 @@ export const useConversation = () => {
         dispatch(addConversation(newConversation))
         dispatch(setCurrentConversation(newConversation))
         targetConversationUuid = newConversation.uuid
+        
+        // Store project association if projectId is provided
+        if (projectId) {
+          const projectConversations = JSON.parse(localStorage.getItem('projectConversations') || '{}')
+          if (!projectConversations[projectId]) {
+            projectConversations[projectId] = []
+          }
+          projectConversations[projectId].push(targetConversationUuid)
+          localStorage.setItem('projectConversations', JSON.stringify(projectConversations))
+        }
+      } else {
+        // Associate existing conversation with project if projectId is provided
+        if (projectId) {
+          const projectConversations = JSON.parse(localStorage.getItem('projectConversations') || '{}')
+          if (!projectConversations[projectId]) {
+            projectConversations[projectId] = []
+          }
+          if (!projectConversations[projectId].includes(targetConversationUuid)) {
+            projectConversations[projectId].push(targetConversationUuid)
+            localStorage.setItem('projectConversations', JSON.stringify(projectConversations))
+          }
+        }
       }
       
       // Convert uploaded files to LinkedFile format

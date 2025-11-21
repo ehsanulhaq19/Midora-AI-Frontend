@@ -19,6 +19,12 @@ export { Toast, ToastContainer, showSuccessToast, showErrorToast, showWarningToa
 // Tooltip components
 export { Tooltip } from './tooltip'
 
+// Modal components
+export { NewFolderModal } from './modal'
+
+// Conversation menu
+export { ConversationMenu } from './conversation-menu'
+
 // Other components
 export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from './card'
 export { ErrorDisplay } from './error-display'
