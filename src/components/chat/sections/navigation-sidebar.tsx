@@ -60,9 +60,9 @@ const ChatListItem: React.FC<ChatListItemProps> = ({
   >
     <button
       onClick={onClick}
-      className="flex-1 text-left"
+      className="flex-1 text-left max-w-[180px]"
     >
-      <div className="font-h02-heading02 text-[color:var(--light-mode-colors-dark-gray-900)] flex-1 tracking-[var(--text-small-letter-spacing)] text-[14px] [font-style:var(--text-small-font-style)] font-[number:var(--text-small-font-weight)] leading-[var(--text-small-line-height)] truncate">
+      <div className="font-h02-heading02  text-[color:var(--light-mode-colors-dark-gray-900)] flex-1 tracking-[var(--text-small-letter-spacing)] text-[14px] [font-style:var(--text-small-font-style)] font-[number:var(--text-small-font-weight)] leading-[var(--text-small-line-height)] truncate ">
         {text}
       </div>
     </button>

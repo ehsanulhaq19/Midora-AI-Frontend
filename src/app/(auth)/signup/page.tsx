@@ -54,21 +54,10 @@ function SignupPageContent() {
       const tokens = tokenManager.getTokens()
       if (tokens.accessToken && tokens.refreshToken && !isProcessingSSO) {
         try {
+          setIsProcessingSSO(true)
           const userData = await getCurrentUser()
-          if (userData && !userData.is_onboarded) { 
-            // Store user data for SSO onboarding
-            updateData({ 
-              email: userData.email,
-              fullName: `${userData.first_name} ${userData.last_name}`.trim()
-            })
-            // Show SSO onboarding flow with query parameter
-            setIsSSOOnboarding(true)
-            const params = new URLSearchParams(searchParams.toString())
-            params.set('step', 'welcome')
-            router.push(`/signup?${params.toString()}`, { scroll: false })
-            setShowOnboarding(true)
-          } else if (userData && userData.is_onboarded) {
-            // User is already onboarded, redirect to chat
+          if (userData) {
+            // Regardless of onboarding status, persist auth state and go to chat
             dispatch(loginSuccess({
               user: userData,
               accessToken: tokens.accessToken,
@@ -82,11 +71,11 @@ function SignupPageContent() {
           // Clear invalid tokens
           tokenManager.clearTokens()
         } finally {
+          setIsProcessingSSO(false)
           dispatch(setLoading(false))
         }
       }
     }
-
     // Only check if we're not already processing SSO and no query params
     if (!isProcessingSSO && searchParams.has('access_token') && searchParams.has('refresh_token')) {
       tokenManager.storeTokens(searchParams.get('access_token')!, searchParams.get('refresh_token')!, searchParams.get('auth_method')!)
