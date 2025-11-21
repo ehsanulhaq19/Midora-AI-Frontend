@@ -38,7 +38,7 @@ function SignupPageContent() {
   const [isProcessingSSO, setIsProcessingSSO] = useState(false)
   const [showSSOLoader, setShowSSOLoader] = useState(false)
   const [initialOnboardingStep, setInitialOnboardingStep] = useState<string | undefined>(stepParam || undefined)
-  
+
   useEffect(() => {
     if (isInOnboardingFlow) {
       setShowOnboarding(true)
