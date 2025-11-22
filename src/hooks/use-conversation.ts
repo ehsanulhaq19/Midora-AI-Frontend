@@ -1,6 +1,7 @@
-import { useCallback } from 'react'
+import { useCallback, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '@/store'
+import { addConversationToProject, setProjectConversationsData } from '@/store/slices/projectsSlice'
 import { conversationApi } from '@/api/conversation/api'
 import { aiApi } from '@/api/ai/api'
 import { useAuthRedux } from '@/hooks/use-auth-redux'
@@ -11,6 +12,7 @@ import {
   clearError,
   setConversations,
   addConversation,
+  removeConversation,
   setCurrentConversation,
   setMessages,
   prependMessages,
@@ -49,6 +51,11 @@ export const useConversation = () => {
     conversationPagination,
     isLoadingMoreConversations,
   } = useSelector((state: RootState) => state.conversation)
+  
+  const { projectConversationsData } = useSelector((state: RootState) => state.projects)
+  
+  // Track which conversations are being loaded to prevent duplicate API calls
+  const loadingConversationsRef = useRef<Set<string>>(new Set())
 
   // Load conversations
   const loadConversations = useCallback(async () => {
@@ -106,51 +113,111 @@ export const useConversation = () => {
 
   // Select a conversation
   const selectConversation = useCallback(async (conversationUuid: string) => {
+    // Skip if already the current conversation and messages are loaded
+    if (currentConversation?.uuid === conversationUuid && messages[conversationUuid]) {
+      return
+    }
+    
+    // Prevent duplicate API calls for the same conversation
+    if (loadingConversationsRef.current.has(conversationUuid)) {
+      return
+    }
+    
     try {
       dispatch(clearError())
       
-      // Find conversation in current list
-      const conversation = conversations[conversationUuid]
+      // First, check if conversation exists in regular conversations
+      let conversation = conversations[conversationUuid]
+      
+      // If not found, check if it's linked to a project
+      let isProjectConversation = false
+      if (!conversation) {
+        // Check project conversations data
+        const projectIds = Object.keys(projectConversationsData)
+        for (const projectId of projectIds) {
+          const projectConvs = projectConversationsData[projectId] || []
+          const projectConv = projectConvs.find((c: any) => c.uuid === conversationUuid)
+          if (projectConv) {
+            // Found in project conversations - convert to Conversation format
+            // DO NOT add to conversations store - project conversations should only exist in projects slice
+            conversation = {
+              id: projectConv.uuid, // Use uuid as id
+              uuid: projectConv.uuid,
+              name: projectConv.name,
+              created_by: 0, // Will be updated when fetched from API if needed
+              created_at: projectConv.created_at,
+              updated_at: projectConv.created_at, // Use created_at as fallback
+            } as Conversation
+            isProjectConversation = true
+            break
+          }
+        }
+      }
+      
       if (conversation) {
         dispatch(setCurrentConversation(conversation))
         
         // Load messages if not already loaded
         if (!messages[conversationUuid]) {
-          const response = await conversationApi.getMessages(conversationUuid, 1, 50)
-          if (response.error) {
-            throw new Error(response.error)
+          loadingConversationsRef.current.add(conversationUuid)
+          try {
+            const response = await conversationApi.getMessages(conversationUuid, 1, 50)
+            if (response.error) {
+              throw new Error(response.error)
+            }
+            dispatch(setMessages({ 
+              conversationUuid, 
+              messages: response.data?.messages || [], 
+              pagination: response.data?.pagination 
+            }))
+          } finally {
+            loadingConversationsRef.current.delete(conversationUuid)
+          }
+        }
+      } else {
+        // Conversation not found in either place, fetch it from API
+        // Only add to conversations store if it's NOT a project conversation
+        loadingConversationsRef.current.add(conversationUuid)
+        try {
+          const conversationResponse = await conversationApi.getConversation(conversationUuid)
+          if (conversationResponse.error) {
+            throw new Error(conversationResponse.error)
+          }
+          const fetchedConversation = conversationResponse.data!
+          
+          // Check if this conversation is linked to a project before adding to conversation slice
+          const isLinkedToProject = Object.keys(projectConversationsData).some(projectId => {
+            const projectConvs = projectConversationsData[projectId] || []
+            return projectConvs.some((c: any) => c.uuid === conversationUuid)
+          })
+          
+          // Only add to conversations store if NOT linked to a project
+          if (!isLinkedToProject) {
+            dispatch(addConversation(fetchedConversation))
+          }
+          
+          dispatch(setCurrentConversation(fetchedConversation))
+          
+          const messagesResponse = await conversationApi.getMessages(conversationUuid, 1, 50)
+          if (messagesResponse.error) {
+            throw new Error(messagesResponse.error)
           }
           dispatch(setMessages({ 
             conversationUuid, 
-            messages: response.data?.messages || [], 
-            pagination: response.data?.pagination 
+            messages: messagesResponse.data?.messages || [], 
+            pagination: messagesResponse.data?.pagination 
           }))
+        } finally {
+          loadingConversationsRef.current.delete(conversationUuid)
         }
-      } else {
-        // Load conversation from API if not in current list
-        const conversationResponse = await conversationApi.getConversation(conversationUuid)
-        if (conversationResponse.error) {
-          throw new Error(conversationResponse.error)
-        }
-        dispatch(setCurrentConversation(conversationResponse.data))
-        
-        const messagesResponse = await conversationApi.getMessages(conversationUuid, 1, 50)
-        if (messagesResponse.error) {
-          throw new Error(messagesResponse.error)
-        }
-        dispatch(setMessages({ 
-          conversationUuid, 
-          messages: messagesResponse.data?.messages || [], 
-          pagination: messagesResponse.data?.pagination 
-        }))
       }
     } catch (err) {
       const errorMessage = handleApiError(err)
       dispatch(setError(errorMessage))
       showErrorToast('Failed to Load Conversation', errorMessage)
-    } finally {
+      loadingConversationsRef.current.delete(conversationUuid)
     }
-  }, [dispatch, conversations, messages])
+  }, [dispatch, conversations, messages, projectConversationsData, showErrorToast, currentConversation])
 
   // Send a message
   const sendMessage = useCallback(async (content: string, modelUuid?: string, conversationUuid?: string, fileUuids?: string[], uploadedFiles?: any[], projectId?: string) => {
@@ -171,29 +238,27 @@ export const useConversation = () => {
           throw new Error(JSON.stringify(errorObject))
         }
         const newConversation = response.data!
-        dispatch(addConversation(newConversation))
+        
+        // Only add to conversation slice if NOT linked to a project
+        // Project conversations should only exist in projects slice
+        if (!projectId) {
+          dispatch(addConversation(newConversation))
+        }
+        
         dispatch(setCurrentConversation(newConversation))
         targetConversationUuid = newConversation.uuid
         
         // Store project association if projectId is provided
         if (projectId) {
-          const projectConversations = JSON.parse(localStorage.getItem('projectConversations') || '{}')
-          if (!projectConversations[projectId]) {
-            projectConversations[projectId] = []
-          }
-          projectConversations[projectId].push(targetConversationUuid)
-          localStorage.setItem('projectConversations', JSON.stringify(projectConversations))
+          dispatch(addConversationToProject({ projectId, conversationUuid: targetConversationUuid }))
         }
       } else {
         // Associate existing conversation with project if projectId is provided
         if (projectId) {
-          const projectConversations = JSON.parse(localStorage.getItem('projectConversations') || '{}')
-          if (!projectConversations[projectId]) {
-            projectConversations[projectId] = []
-          }
-          if (!projectConversations[projectId].includes(targetConversationUuid)) {
-            projectConversations[projectId].push(targetConversationUuid)
-            localStorage.setItem('projectConversations', JSON.stringify(projectConversations))
+          dispatch(addConversationToProject({ projectId, conversationUuid: targetConversationUuid }))
+          // Remove from conversation slice if it exists there (it's now a project conversation)
+          if (conversations[targetConversationUuid]) {
+            dispatch(removeConversation(targetConversationUuid))
           }
         }
       }
@@ -262,7 +327,7 @@ export const useConversation = () => {
       
       // Generate AI response with streaming
       await aiApi.generateContentStream(
-        { query: content, conversation_uuid: targetConversationUuid, stream: true, ai_model_uuid: modelUuid, file_uuids: fileUuids },
+        { query: content, conversation_uuid: targetConversationUuid, stream: true, ai_model_uuid: modelUuid, file_uuids: fileUuids, project_uuid: projectId },
         (chunk: string, type: string, metadata?: any) => {
           if (type === 'metadata') {
             // Handle metadata stream responses - update metadata state only
@@ -339,6 +404,37 @@ export const useConversation = () => {
               content: accumulatedContent,
               metadata
             }))
+            
+                // Link conversation to project if projectId was provided
+                if (projectId && targetConversationUuid) {
+                  dispatch(addConversationToProject({ projectId, conversationUuid: targetConversationUuid }))
+                  
+                  // Remove from conversation slice if it exists there (it's now a project conversation)
+                  if (conversations[targetConversationUuid]) {
+                    dispatch(removeConversation(targetConversationUuid))
+                  }
+                  
+                  // Add conversation data to projectConversationsData
+                  const conversation = conversations[targetConversationUuid] || {
+                    uuid: targetConversationUuid,
+                    name: metadata.conversation_name || content.substring(0, 50) + '...',
+                    created_at: new Date().toISOString(),
+                  }
+                  const conversationData = {
+                    uuid: conversation.uuid || targetConversationUuid,
+                    name: conversation.name || metadata.conversation_name || content.substring(0, 50) + '...',
+                    created_at: conversation.created_at || new Date().toISOString()
+                  }
+                  // Get existing conversations for this project
+                  const existingConversations = projectConversationsData[projectId] || []
+                  // Check if conversation already exists
+                  if (!existingConversations.find((c: any) => c.uuid === conversationData.uuid)) {
+                    dispatch(setProjectConversationsData({
+                      projectId,
+                      conversations: [...existingConversations, conversationData]
+                    }))
+                  }
+                }
           }
         },
         (error: string) => {
@@ -354,7 +450,7 @@ export const useConversation = () => {
       dispatch(setError(errorMessage))
       showErrorToast('Failed to Send Message', errorMessage)
     }
-  }, [dispatch, currentConversation, createConversation])
+  }, [dispatch, currentConversation, createConversation, showErrorToast, conversations, projectConversationsData])
 
   // Load more messages for pagination
   const loadMoreMessages = useCallback(async (conversationUuid: string) => {

@@ -58,12 +58,14 @@ export interface GenerateContentRequest {
   max_tokens?: number
   temperature?: number
   file_uuids?: string[]
+  project_uuid?: string
 }
 
 // Regenerate Content types
 export interface RegenerateContentRequest {
   message_uuid: string
-  ai_model_uuid: string
+  ai_model_uuid?: string
+  project_uuid?: string
 }
 
 export interface GenerateContentResponse {

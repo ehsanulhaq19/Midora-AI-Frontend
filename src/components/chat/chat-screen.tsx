@@ -1,26 +1,23 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import React, { useState, useEffect, useRef } from 'react'
 import { NavigationSidebar } from './sections/navigation-sidebar'
 import { ChatInterface } from './sections/chat-interface'
 import { ConversationContainer } from './sections/conversation-container'
 import { ChatHeader } from './sections/chat-header'
 import { useConversation } from '@/hooks/use-conversation'
-import { useAIModels } from '@/hooks'
-
-interface Project {
-  id: string
-  name: string
-  category?: string
-}
+import { useAIModels, useProjects } from '@/hooks'
+import { useDispatch, useSelector } from 'react-redux'
+import { RootState } from '@/store'
+import { setSelectedProject, Project } from '@/store/slices/projectsSlice'
 
 export const ChatScreen: React.FC = () => {
   const [hasFiles, setHasFiles] = useState(false)
   const [isCanvasOpen, setIsCanvasOpen] = useState(false)
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null)
-  const searchParams = useSearchParams()
-  const router = useRouter()
+  const hasInitialized = useRef(false)
+  const dispatch = useDispatch()
+  const { selectedProjectId, projects } = useSelector((state: RootState) => state.projects)
+  const selectedProject = selectedProjectId ? projects[selectedProjectId] || null : null
   const {
     currentConversation,
     conversations,
@@ -34,53 +31,36 @@ export const ChatScreen: React.FC = () => {
   } = useConversation()
 
   const { fetchServiceProviders } = useAIModels()
+  const { loadProjects } = useProjects()
   
   const handleCanvasStateChange = (isOpen: boolean) => {
     setIsCanvasOpen(isOpen)
   }
 
   useEffect(() => {
-    // Load initial data
-    loadConversations()
-    fetchServiceProviders()
-  }, [loadConversations, fetchServiceProviders])
-
-  // Load project from URL on mount
-  useEffect(() => {
-    const projectId = searchParams.get('project')
-    if (projectId) {
-      // Load project from localStorage
-      const storedFolders = localStorage.getItem('userProjects')
-      if (storedFolders) {
-        const folders: Project[] = JSON.parse(storedFolders)
-        const project = folders.find(f => f.id === projectId)
-        if (project) {
-          setSelectedProject(project)
-        }
-      }
-    } else {
-      setSelectedProject(null)
+    // Load initial data only once on mount
+    if (!hasInitialized.current) {
+      hasInitialized.current = true
+      loadConversations()
+      fetchServiceProviders()
+      loadProjects(1, 10) // Load first page of projects
     }
-  }, [searchParams])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const handleProjectSelect = (project: Project | null) => {
-    setSelectedProject(project)
     if (project) {
-      // Update URL with project ID
-      const params = new URLSearchParams(searchParams.toString())
-      params.set('project', project.id)
-      router.push(`/chat?${params.toString()}`, { scroll: false })
+      dispatch(setSelectedProject(project.id))
       // Start new chat in project context
       startNewChat()
     } else {
-      // Clear project from URL
-      const params = new URLSearchParams(searchParams.toString())
-      params.delete('project')
-      router.push(`/chat?${params.toString()}`, { scroll: false })
+      dispatch(setSelectedProject(null))
     }
   }
 
   const handleSendMessage = async (message: string, modelUuid?: string, fileUuids?: string[], uploadedFiles?: any[]) => {
+    // Pass project UUID (encoded) to sendMessage
+    // The project.id is already the encoded UUID from Redux
     await sendMessage(message, modelUuid, undefined, fileUuids, uploadedFiles, selectedProject?.id)
   }
 
@@ -95,7 +75,7 @@ export const ChatScreen: React.FC = () => {
           setIsCanvasOpen(false)
         }}
         showFullSidebar={!isCanvasOpen}
-        selectedProjectId={selectedProject?.id}
+        selectedProjectId={selectedProjectId || undefined}
         onProjectSelect={handleProjectSelect}
       />
       

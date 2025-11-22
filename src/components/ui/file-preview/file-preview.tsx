@@ -10,6 +10,7 @@ interface FilePreviewProps {
   file: FilePreviewType
   onRemove: (uuid: string) => void
   className?: string
+  showPendingStatus?: boolean
 }
 
 // File type icons mapping
@@ -88,10 +89,11 @@ const formatFileSize = (bytes: number): string => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
 }
 
-export const FilePreview: React.FC<FilePreviewProps> = ({ file, onRemove, className = '' }) => {
+export const FilePreview: React.FC<FilePreviewProps> = ({ file, onRemove, className = '', showPendingStatus = false }) => {
   const fileTypeInfo = getFileTypeInfo(file.file_type, file.file_extension)
   const isImage = fileTypeInfo.category === 'image'
   const isUploading = file.uuid.startsWith('temp-')
+  const isPending = showPendingStatus && (file as any).status === 'pending'
   
   // Get file extension without dot
   const fileExtension = file.file_extension.replace('.', '').toUpperCase()
@@ -105,6 +107,13 @@ export const FilePreview: React.FC<FilePreviewProps> = ({ file, onRemove, classN
             <Spinner size="md" color="white" />
             <span className="app-text-xs app-text-primary text-white">{t('common.fileUpload.uploading')}</span>
           </div>
+        </div>
+      )}
+      
+      {/* Pending status badge */}
+      {isPending && !isUploading && (
+        <div className="absolute top-2 left-2 px-2 py-1 bg-yellow-500/90 text-white text-xs font-medium rounded z-10">
+          Pending
         </div>
       )}
       
