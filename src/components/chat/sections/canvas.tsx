@@ -6,7 +6,7 @@ import { Close, Copy } from "@/icons";
 import { IconButton } from "@/components/ui/buttons";
 import { Tooltip } from "@/components/ui/tooltip";
 import { t } from "@/i18n";
-import { markdownToTextSync } from "@/lib/markdown-utils";
+import { markdownToTextSync, markdownToHtmlSync } from "@/lib/markdown-utils";
 import { cn } from "@/lib/utils";
 import { appConfig } from "@/config/app";
 import { baseApiClient } from "@/api/base";
@@ -67,8 +67,18 @@ export const Canvas: React.FC<CanvasProps> = ({
     if (isCopied) return;
 
     try {
+      const htmlContent = markdownToHtmlSync(content);
       const plainText = markdownToTextSync(content);
-      await navigator.clipboard.writeText(plainText);
+      
+      // Create clipboard items with both HTML and plain text formats
+      const clipboardItems = [
+        new ClipboardItem({
+          'text/html': new Blob([htmlContent], { type: 'text/html' }),
+          'text/plain': new Blob([plainText], { type: 'text/plain' })
+        })
+      ];
+      
+      await navigator.clipboard.write(clipboardItems);
 
       setIsCopied(true);
 
@@ -76,7 +86,17 @@ export const Canvas: React.FC<CanvasProps> = ({
         setIsCopied(false);
       }, 2000);
     } catch (err) {
-      console.error("Failed to copy text: ", err);
+      // Fallback to plain text if HTML copy fails
+      try {
+        const plainText = markdownToTextSync(content);
+        await navigator.clipboard.writeText(plainText);
+        setIsCopied(true);
+        setTimeout(() => {
+          setIsCopied(false);
+        }, 2000);
+      } catch (fallbackErr) {
+        console.error("Failed to copy text: ", fallbackErr);
+      }
     }
 
     if (onCopy) {

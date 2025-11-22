@@ -9,7 +9,7 @@ import { Spinner } from '@/components/ui/loaders'
 import { Tooltip } from '@/components/ui/tooltip'
 import { t } from '@/i18n'
 import { MarkdownRenderer } from '@/components/markdown'
-import { markdownToTextSync } from '@/lib/markdown-utils'
+import { markdownToTextSync, markdownToHtmlSync } from '@/lib/markdown-utils'
 import { useRegenerate } from '@/hooks/use-regenerate'
 import './style.css'
 import { useAuthRedux } from '@/hooks/use-auth-redux'
@@ -117,9 +117,24 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
     if (isCopied) return // Prevent multiple copies while showing feedback
     
     try {
-      // Convert markdown to plain text for copying
-      const plainText = isUser ? message.content : markdownToTextSync(message.content)
-      await navigator.clipboard.writeText(plainText)
+      if (isUser) {
+        // For user messages, copy as plain text
+        await navigator.clipboard.writeText(message.content)
+      } else {
+        // For AI messages, copy as formatted HTML
+        const htmlContent = markdownToHtmlSync(message.content)
+        const plainText = markdownToTextSync(message.content)
+        
+        // Create clipboard items with both HTML and plain text formats
+        const clipboardItems = [
+          new ClipboardItem({
+            'text/html': new Blob([htmlContent], { type: 'text/html' }),
+            'text/plain': new Blob([plainText], { type: 'text/plain' })
+          })
+        ]
+        
+        await navigator.clipboard.write(clipboardItems)
+      }
       
       // Show feedback
       setIsCopied(true)
@@ -129,7 +144,17 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
         setIsCopied(false)
       }, 2000)
     } catch (err) {
-      console.error('Failed to copy text: ', err)
+      // Fallback to plain text if HTML copy fails
+      try {
+        const plainText = isUser ? message.content : markdownToTextSync(message.content)
+        await navigator.clipboard.writeText(plainText)
+        setIsCopied(true)
+        setTimeout(() => {
+          setIsCopied(false)
+        }, 2000)
+      } catch (fallbackErr) {
+        console.error('Failed to copy text: ', fallbackErr)
+      }
     }
   }
 
@@ -333,8 +358,10 @@ const StreamingMessage: React.FC<StreamingMessageProps> = ({
   const hasInitialContent = initialContent.length > 0
   
   // Check if content should show canvas (threshold: 100 words)
+  // Hide canvas toggle button if we're showing initial_content (local model preview)
+  const isShowingInitialContent = hasInitialContent && !hasContent
   const displayContent = content || initialContent
-  const shouldShowCanvas = exceedsWordThreshold(displayContent, 100)
+  const shouldShowCanvas = !isShowingInitialContent && exceedsWordThreshold(displayContent, 100)
   const { truncated: truncatedContent, wasTruncated } = shouldShowCanvas
     ? truncateMarkdown(displayContent, 50)
     : { truncated: displayContent, wasTruncated: false }
@@ -372,9 +399,19 @@ const StreamingMessage: React.FC<StreamingMessageProps> = ({
     if (isCopied) return // Prevent multiple copies while showing feedback
     
     try {
-      // Convert markdown to plain text for copying
+      // Convert markdown to HTML for formatted copying
+      const htmlContent = markdownToHtmlSync(content)
       const plainText = markdownToTextSync(content)
-      await navigator.clipboard.writeText(plainText)
+      
+      // Create clipboard items with both HTML and plain text formats
+      const clipboardItems = [
+        new ClipboardItem({
+          'text/html': new Blob([htmlContent], { type: 'text/html' }),
+          'text/plain': new Blob([plainText], { type: 'text/plain' })
+        })
+      ]
+      
+      await navigator.clipboard.write(clipboardItems)
       
       // Show feedback
       setIsCopied(true)
@@ -384,7 +421,17 @@ const StreamingMessage: React.FC<StreamingMessageProps> = ({
         setIsCopied(false)
       }, 2000)
     } catch (err) {
-      console.error('Failed to copy text: ', err)
+      // Fallback to plain text if HTML copy fails
+      try {
+        const plainText = markdownToTextSync(content)
+        await navigator.clipboard.writeText(plainText)
+        setIsCopied(true)
+        setTimeout(() => {
+          setIsCopied(false)
+        }, 2000)
+      } catch (fallbackErr) {
+        console.error('Failed to copy text: ', fallbackErr)
+      }
     }
   }
   
@@ -454,7 +501,8 @@ const StreamingMessage: React.FC<StreamingMessageProps> = ({
           )}
           
           {/* Canvas Toggle Button - shown for streaming messages over 100 words - full width */}
-          {shouldShowCanvas && onCanvasToggle && messageUuid && (
+          {/* Hide canvas toggle button when showing initial_content (local model preview) */}
+          {shouldShowCanvas && !isShowingInitialContent && onCanvasToggle && messageUuid && (
             <div className="mt-3 mb-2 -mx-4 px-4">
               <CanvasToggleButton
                 isCanvasOpen={isCanvasOpen}
