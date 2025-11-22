@@ -61,7 +61,7 @@ export const CanvasToggleButton: React.FC<CanvasToggleButtonProps> = ({
           {/* First line - title/content preview */}
           {firstLine && (
             <div className={cn(
-              ' truncate mb-[5px]  font-h02-heading02 font-[number:var(--h05-heading05-font-weight)] text-[16px] tracking-[var(--h05-heading05-letter-spacing)] leading-[var(--h05-heading05-line-height)] whitespace-nowrap [font-style:var(--h05-heading05-font-style)]',
+              ' truncate mb-[5px]  font-h02-heading02 font-[number:var(--h05-heading05-font-weight)] tracking-[var(--h05-heading05-letter-spacing)] leading-[var(--h05-heading05-line-height)] whitespace-nowrap [font-style:var(--h05-heading05-font-style)]',
               isActive 
                 ? 'text-[color:var(--tokens-color-text-text-seconary)]' 
                 : 'text-[color:var(--tokens-color-text-text-seconary)]'

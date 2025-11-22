@@ -24,6 +24,10 @@ import { useConversation } from "@/hooks/use-conversation";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { chat } from "@/i18n/languages/en/chat";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/store";
+import { addProject, setSelectedProject, Project } from "@/store/slices/projectsSlice";
+import { useProjects } from "@/hooks/use-projects";
 
 const translateWithFallback = (key: string, fallback: string) => {
   const translated = t(key);
@@ -77,61 +81,6 @@ const ChatListItem: React.FC<ChatListItemProps> = ({
   </div>
 );
 
-interface ProjectFolderItemProps {
-  title: string;
-  chats: string[];
-  isExpanded: boolean;
-  onToggle: () => void;
-}
-
-const ProjectFolderItem: React.FC<ProjectFolderItemProps> = ({
-  title,
-  chats,
-  isExpanded,
-  onToggle,
-}) => (
-  <div className="flex flex-col items-start relative w-full">
-    <button
-      onClick={onToggle}
-      className={`flex items-center gap-2 px-5 py-2 relative w-full transition-colors rounded-[var(--premitives-corner-radius-corner-radius)] ${
-        isExpanded
-          ? "bg-[color:var(--tokens-color-surface-surface-tertiary)]"
-          : "hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]"
-      }`}
-    >
-      <FolderOpen className="w-5 h-5" />
-      <div
-        className={`relative flex items-center justify-center flex-1 mt-[-1.00px] font-h02-heading02 font-[number:var(--text-small-font-weight)] text-[14px] tracking-[var(--text-small-letter-spacing)] leading-[var(--text-small-line-height)] [font-style:var(--text-small-font-style)] text-left ${
-          isExpanded
-            ? "text-[color:var(--tokens-color-text-text-brand)]"
-            : "text-[color:var(--tokens-color-text-text-seconary)]"
-        }`}
-      >
-        {title}
-      </div>
-      {isExpanded && <MoreOptions className="w-4 h-4" />}
-    </button>
-
-    {isExpanded && (
-      <div className="flex flex-col items-start relative w-full pl-2">
-        {chats.map((chat, index) => (
-          <ChatListItem
-            key={index}
-            text={chat}
-            isSelected={false}
-            onClick={() => {}}
-          />
-        ))}
-      </div>
-    )}
-  </div>
-);
-
-interface Project {
-  id: string;
-  name: string;
-  category?: string;
-}
 
 interface NavigationSidebarProps {
   isOpen: boolean;
@@ -151,9 +100,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
   onProjectSelect,
 }) => {
   const [selectedChat, setSelectedChat] = useState<number | null>(null);
-  const [expandedProjects, setExpandedProjects] = useState<
-    Record<number, boolean>
-  >({});
+  const [selectedProjectConversationUuid, setSelectedProjectConversationUuid] = useState<string | null>(null);
   const [searchHovered, setSearchHovered] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [logoHovered, setLogoHovered] = useState(false);
@@ -162,31 +109,18 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
     return window.innerWidth < 1024;
   });
   const [isNewFolderModalOpen, setIsNewFolderModalOpen] = useState(false);
-  const [userFolders, setUserFolders] = useState<Array<{ id: string; name: string; category?: string }>>([]);
-  const [expandedUserProjects, setExpandedUserProjects] = useState<Record<string, boolean>>({});
   const dropdownRef = useRef<HTMLDivElement>(null);
   const conversationsContainerRef = useRef<HTMLDivElement>(null);
+  const projectsContainerRef = useRef<HTMLDivElement>(null);
   const { userName } = useAuthRedux();
   const { logout } = useAuth();
   const router = useRouter();
-
-  // Load folders from localStorage on mount
-  useEffect(() => {
-    const storedFolders = localStorage.getItem('userProjects');
-    if (storedFolders) {
-      setUserFolders(JSON.parse(storedFolders));
-    }
-    
-    // Auto-expand selected project
-    if (selectedProjectId) {
-      setExpandedUserProjects(prev => ({ ...prev, [selectedProjectId]: true }));
-    }
-  }, [selectedProjectId]);
-
-  // Save folders to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem('userProjects', JSON.stringify(userFolders));
-  }, [userFolders]);
+  const dispatch = useDispatch();
+  
+  // Get projects from Redux store
+  const { projects, projectConversations, projectConversationsData, projectsPagination, isLoadingMoreProjects, selectedProjectId: reduxSelectedProjectId } = useSelector((state: RootState) => state.projects);
+  const userFolders = Object.keys(projects).map(key => projects[key]);
+  const { loadProjects, loadProjectConversations } = useProjects();
   
   const brandNameLabel = translateWithFallback("chat.brandName", "Midora");
   const expandSidebarLabel = translateWithFallback(
@@ -219,19 +153,67 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
     isLoadingMoreConversations,
   } = useConversation();
 
-  // Get conversations for a project
+  // Sync selectedProjectConversationUuid and selectedProjectId when currentConversation changes
+  useEffect(() => {
+    if (currentConversation) {
+      // Check if current conversation is a project conversation
+      const projectIds = Object.keys(projectConversationsData);
+      let foundInProject = false;
+      for (const projectId of projectIds) {
+        const projectConvs = projectConversationsData[projectId] || [];
+        const isProjectConv = projectConvs.some((c: any) => c.uuid === currentConversation.uuid);
+        if (isProjectConv) {
+          setSelectedProjectConversationUuid(currentConversation.uuid);
+          // Also ensure the project is selected
+          if (reduxSelectedProjectId !== projectId) {
+            dispatch(setSelectedProject(projectId));
+          }
+          foundInProject = true;
+          break;
+        }
+      }
+      // If not a project conversation, clear project conversation selection
+      if (!foundInProject) {
+        setSelectedProjectConversationUuid(null);
+      }
+    } else {
+      setSelectedProjectConversationUuid(null);
+    }
+  }, [currentConversation, projectConversationsData, reduxSelectedProjectId, dispatch]);
+
+  // Get conversations for a project from Redux store
   const getProjectConversations = useCallback((projectId: string) => {
-    const projectConversations = JSON.parse(localStorage.getItem('projectConversations') || '{}');
+    // First try to get from projectConversationsData (full conversation objects)
+    if (projectConversationsData[projectId] && projectConversationsData[projectId].length > 0) {
+      return projectConversationsData[projectId];
+    }
+    // Fallback to conversationUuids and filter from conversations
     const conversationUuids = projectConversations[projectId] || [];
     return conversations.filter(conv => conversationUuids.includes(conv.uuid));
-  }, [conversations]);
-  
-  const toggleUserProject = (projectId: string) => {
-    setExpandedUserProjects((prev) => ({
-      ...prev,
-      [projectId]: !prev[projectId],
-    }));
-  };
+  }, [conversations, projectConversations, projectConversationsData]);
+
+  // Handle scroll to load more projects
+  const handleProjectsScroll = useCallback(
+    (e: React.UIEvent<HTMLDivElement>) => {
+      const container = e.currentTarget;
+      const scrollTop = container.scrollTop;
+      const scrollHeight = container.scrollHeight;
+      const clientHeight = container.clientHeight;
+
+      const threshold = 10;
+      const isNearBottom = scrollTop + clientHeight >= scrollHeight - threshold;
+
+      if (
+        isNearBottom &&
+        !isLoadingMoreProjects &&
+        projectsPagination &&
+        projectsPagination.page < projectsPagination.total_pages
+      ) {
+        loadProjects(projectsPagination.page + 1, projectsPagination.per_page);
+      }
+    },
+    [isLoadingMoreProjects, projectsPagination, loadProjects]
+  );
 
   const handleNewChat = () => {
     setIsManuallyShrunk(false);
@@ -240,6 +222,11 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
   };
 
   const handleSelectChat = (conversationUuid: string) => {
+    // Unselect project and project conversations
+    dispatch(setSelectedProject(null));
+    setSelectedProjectConversationUuid(null);
+    
+    // Select the conversation
     selectConversation(conversationUuid);
     setSelectedChat(
       conversations.findIndex((conv) => conv.uuid === conversationUuid)
@@ -302,27 +289,6 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
     };
   }, [isDropdownOpen]);
 
-  const projects = [
-    {
-      title: "Project Discussion",
-      chats: [
-        "Image to watercolor painting",
-        "Image to digital sketch",
-        "Image to oil painting",
-      ],
-    },
-    {
-      title: "Main Stream Media",
-      chats: ["Media analysis", "Content strategy", "Brand guidelines"],
-    },
-  ];
-
-  const toggleProject = (index: number) => {
-    setExpandedProjects((prev) => ({
-      ...prev,
-      [index]: !prev[index],
-    }));
-  };
 
   return (
     <>
@@ -558,21 +524,41 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
             )}
 
             {!isShrunk && (
-              <div className="flex flex-col items-start relative w-full max-h-48 overflow-y-auto scrollbar-hide scroll-smooth">
-                {/* User Created Folders */}
+              <div 
+                ref={projectsContainerRef}
+                className="flex flex-col items-start relative w-full max-h-48 overflow-y-auto scrollbar-hide scroll-smooth"
+                onScroll={handleProjectsScroll}
+              >
+                {/* User Created Projects */}
                 {userFolders.map((folder) => {
-                  const isSelected = selectedProjectId === folder.id;
-                  const isExpanded = expandedUserProjects[folder.id] || isSelected;
-                  const projectConversations = getProjectConversations(folder.id);
+                  // Check if any conversation from this project is selected
+                  const hasSelectedConversation = projectConversationsData[folder.id]?.some(
+                    (c: any) => c.uuid === selectedProjectConversationUuid
+                  ) || false;
+                  
+                  // Project is selected if:
+                  // 1. It's the reduxSelectedProjectId AND no project conversation is selected, OR
+                  // 2. A conversation from this project is selected
+                  const isSelected = (reduxSelectedProjectId === folder.id && selectedProjectConversationUuid === null) || hasSelectedConversation;
+                  const projectConvs = getProjectConversations(folder.id);
                   
                   return (
                     <div key={folder.id} className="w-full">
                       <button
                         type="button"
                         onClick={() => {
-                          toggleUserProject(folder.id);
+                          // Unselect recent chat conversations
+                          setSelectedChat(null);
+                          setSelectedProjectConversationUuid(null);
+                          
+                          // Select the project
+                          dispatch(setSelectedProject(folder.id));
                           if (onProjectSelect) {
                             onProjectSelect(folder);
+                          }
+                          // Load project conversations if not already loaded
+                          if (!projectConversationsData[folder.id] || projectConversationsData[folder.id].length === 0) {
+                            loadProjectConversations(folder.id, 1, 10, false);
                           }
                         }}
                         className={`w-full pt-[5px] pb-[8px] px-2 gap-[8px] flex items-center pl-5 hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded transition-colors ${
@@ -582,9 +568,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                         }`}
                       >
                         <FolderOpen01 
-                          className={`w-5 h-5 transition-transform ${
-                            isExpanded ? "rotate-6" : "rotate-0"
-                          } ${isSelected ? "text-[color:var(--tokens-color-text-text-brand)]" : ""}`} 
+                          className={`w-5 h-5 transition-transform ${isSelected ? "rotate-6 text-[color:var(--tokens-color-text-text-brand)]" : ""}`} 
                         />
                         <span className={`font-h02-heading02 font-[number:var(--text-font-weight)] text-[14px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] whitespace-nowrap [font-style:var(--text-font-style)] ${
                           isSelected
@@ -595,67 +579,65 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                         </span>
                       </button>
                       
-                      {/* Project Conversations */}
-                      {isExpanded && projectConversations.length > 0 && (
-                        <div className="ml-11 mt-1 flex flex-col gap-1">
-                          {projectConversations
-                            .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-                            .map((conversation) => (
+                      {/* Show conversations under selected project - show if project is selected OR if a conversation from this project is selected */}
+                      {isSelected && projectConvs.length > 0 && (
+                        <div className="w-full pl-8 pr-2 py-1">
+                          {projectConvs.map((conv: any) => {
+                            const convUuid = typeof conv === 'string' ? conv : conv.uuid;
+                            const convName = typeof conv === 'string' 
+                              ? conversations.find(c => c.uuid === conv)?.name || 'Conversation'
+                              : conv.name;
+                            const isConvSelected = selectedProjectConversationUuid === convUuid || currentConversation?.uuid === convUuid;
+                            
+                            return (
                               <button
-                                key={conversation.uuid}
+                                key={convUuid}
                                 type="button"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handleSelectChat(conversation.uuid);
+                                  // Unselect recent chat conversations
+                                  setSelectedChat(null);
+                                  // Ensure project is selected (expanded) and mark conversation as selected
+                                  if (reduxSelectedProjectId !== folder.id) {
+                                    dispatch(setSelectedProject(folder.id));
+                                    if (onProjectSelect) {
+                                      onProjectSelect(folder);
+                                    }
+                                  }
+                                  // Select this project conversation
+                                  setSelectedProjectConversationUuid(convUuid);
+                                  // Select the conversation
+                                  selectConversation(convUuid);
                                 }}
-                                className={`text-left text-[13px] transition-colors px-2 py-1 rounded hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] ${
-                                  currentConversation?.uuid === conversation.uuid
-                                    ? "text-[color:var(--tokens-color-text-text-brand)] font-medium"
-                                    : "text-[color:var(--tokens-color-text-text-inactive-2)] hover:text-[color:var(--light-mode-colors-dark-gray-900)]"
+                                className={`w-full py-1.5 px-2 rounded text-left hover:bg-[color:var(--tokens-color-surface-surface-secondary)] transition-colors ${
+                                  selectedProjectConversationUuid === convUuid || isConvSelected
+                                    ? "bg-[color:var(--tokens-color-surface-surface-secondary)] text-[color:var(--tokens-color-text-text-brand)]"
+                                    : "text-[color:var(--tokens-color-text-text-conversation)]"
                                 }`}
                               >
-                                <div className="truncate">{conversation.name}</div>
+                                <div className="font-h02-heading02 text-[13px] tracking-[var(--text-small-letter-spacing)] [font-style:var(--text-small-font-style)] font-[number:var(--text-small-font-weight)] leading-[var(--text-small-line-height)] truncate">
+                                  {convName}
+                                </div>
                               </button>
-                            ))}
+                            );
+                          })}
                         </div>
                       )}
                     </div>
                   );
                 })}
                 
-                {/* Existing Projects */}
-                {projects.map((project, index) => (
-                  <div key={project.title + index} className="w-full">
-                    <button
-                      type="button"
-                      onClick={() => toggleProject(index)}
-                      className="w-full pt-[5px] pb-[8px] px-2 gap-[8px] flex items-center pl-5 hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded"
-                      aria-expanded={!!expandedProjects[index]}
-                    >
-                      <FolderOpen01
-                        className={`w-5 h-5 transition-transform ${
-                          expandedProjects[index] ? "rotate-6" : "rotate-0"
-                        }`}
-                      />
-                      <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[color:var(--light-mode-colors-dark-gray-900)] text-[14px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] whitespace-nowrap [font-style:var(--text-font-style)]">
-                        {project.title}
+                {/* Loading indicator for more projects */}
+                {isLoadingMoreProjects && (
+                  <div className="w-full p-3 text-center text-[color:var(--tokens-color-text-text-inactive-2)]">
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[color:var(--tokens-color-text-text-inactive-2)]"></div>
+                      <span className="text-[14px]">
+                        Loading more projects...
                       </span>
-                    </button>
-                    {expandedProjects[index] && (
-                      <div className="ml-11 mt-1 flex flex-col gap-1">
-                        {project.chats.map((chat) => (
-                          <button
-                            key={chat}
-                            type="button"
-                            className="text-left text-[13px] text-[color:var(--tokens-color-text-text-inactive-2)] hover:text-[color:var(--light-mode-colors-dark-gray-900)] transition-colors"
-                          >
-                            {chat}
-                          </button>
-                        ))}
-                      </div>
-                    )}
+                    </div>
                   </div>
-                ))}
+                )}
               </div>
             )}
           </div>
@@ -695,7 +677,9 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                           key={conversation.uuid}
                           onClick={() => handleSelectChat(conversation.uuid)}
                           className={`w-10 h-10 rounded-lg mb-2 flex items-center justify-center transition-colors ${
-                            currentConversation?.uuid === conversation.uuid
+                            currentConversation?.uuid === conversation.uuid &&
+                            selectedProjectConversationUuid === null &&
+                            reduxSelectedProjectId === null
                               ? "bg-[color:var(--tokens-color-surface-surface-tertiary)] text-[color:var(--tokens-color-text-text-brand)]"
                               : "hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] text-[color:var(--tokens-color-text-text-conversation)]"
                           }`}
@@ -736,7 +720,9 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                           key={conversation.uuid}
                           text={conversation.name}
                           isSelected={
-                            currentConversation?.uuid === conversation.uuid
+                            currentConversation?.uuid === conversation.uuid && 
+                            selectedProjectConversationUuid === null &&
+                            reduxSelectedProjectId === null
                           }
                           onClick={() => handleSelectChat(conversation.uuid)}
                           conversationUuid={conversation.uuid}
@@ -807,7 +793,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                 {userName?.charAt(0).toUpperCase() || "U"}
               </div>
               <div className="flex flex-col items-start grow gap-1 flex-1 relative">
-                <div className="font-h02-heading02 w-fit tracking-[var(--h05-heading05-letter-spacing)] text-[16px] [font-style:var(--h05-heading05-font-style)] text-[color:var(--tokens-color-text-text-brand)] font-[number:var(--h02-heading02-font-weight)] text-center whitespace-nowrap leading-[var(--h05-heading05-line-height)] relative">
+                <div className="font-h02-heading02 w-fit tracking-[var(--h05-heading05-letter-spacing)] [font-style:var(--h05-heading05-font-style)] text-[color:var(--tokens-color-text-text-brand)] font-[number:var(--h02-heading02-font-weight)] text-center whitespace-nowrap leading-[var(--h05-heading05-line-height)] relative">
                   {userName || "User"}
                 </div>
                 <div className="font-h02-heading02 w-fit tracking-[var(--text-small-letter-spacing)] text-[14px] [font-style:var(--text-small-font-style)] text-[color:var(--tokens-color-text-text-inactive-2)] font-[number:var(--text-small-font-weight)] text-center whitespace-nowrap leading-[var(--text-small-line-height)] relative">
@@ -852,10 +838,9 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
         isOpen={isNewFolderModalOpen}
         onClose={() => setIsNewFolderModalOpen(false)}
         onConfirm={(newProject) => {
-          const updatedFolders = [...userFolders, newProject];
-          setUserFolders(updatedFolders);
-          // Save immediately to localStorage
-          localStorage.setItem('userProjects', JSON.stringify(updatedFolders));
+          // Add project to Redux store
+          dispatch(addProject(newProject));
+          dispatch(setSelectedProject(newProject.id));
           // Select the newly created project
           if (onProjectSelect) {
             onProjectSelect(newProject);

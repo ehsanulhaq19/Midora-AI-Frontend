@@ -22,6 +22,8 @@ import { Canvas } from './canvas'
 import { CanvasToggleButton } from './canvas-toggle-button'
 import { countWords, exceedsWordThreshold, truncateMarkdown, getFirstLine } from '@/lib/content-utils'
 import { MessageInput, MessageInputHandle } from './message-input'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/store'
 
 interface ConversationContainerProps {
   conversationUuid: string | null
@@ -523,6 +525,7 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
   const messageInputRef = useRef<MessageInputHandle>(null)
   const { user } = useAuthRedux()
   const { regenerateMessage, isRegenerating } = useRegenerate()
+  const { projectConversations } = useSelector((state: RootState) => state.projects)
   
   // Track which message is being regenerated
   const [regeneratingMessageUuid, setRegeneratingMessageUuid] = useState<string | null>(null)
@@ -809,8 +812,12 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
     return ''
   }, [activeCanvasMessageUuid, messages, isStreaming, streamingContent, isRegenerating, regeneratingMessageUuid, streamingMessageUuid, lastStreamingContent])
 
+  // Track last selected conversation to prevent duplicate calls
+  const lastSelectedConversationRef = useRef<string | null>(null)
+  
   useEffect(() => {
-    if (conversationUuid) {
+    if (conversationUuid && lastSelectedConversationRef.current !== conversationUuid) {
+      lastSelectedConversationRef.current = conversationUuid
       selectConversation(conversationUuid)
     }
   }, [conversationUuid, selectConversation])
@@ -945,8 +952,14 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
   const handleRegenerate = (messageUuid: string) => {
     if (conversationUuid) {
       setRegeneratingMessageUuid(messageUuid)
-      const aiModelUuid = isAutoMode ? '' : selectedModel?.uuid
-      regenerateMessage(messageUuid, aiModelUuid, conversationUuid)
+      const aiModelUuid = isAutoMode ? undefined : selectedModel?.uuid
+      // Get project UUID from Redux if conversation is linked to a project
+      const projectId = Object.keys(projectConversations).find(pid => {
+        const projectConvs = projectConversations[pid] || []
+        return projectConvs.includes(conversationUuid)
+      })
+      const projectUuid = projectId || undefined
+      regenerateMessage(messageUuid, aiModelUuid || '', conversationUuid, projectUuid)
     }
   }
 

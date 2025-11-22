@@ -91,7 +91,7 @@ export const NewFolderModal: React.FC<NewFolderModalProps> = ({
 
       {/* Modal */}
       <div
-        className="relative bg-[color:var(--tokens-color-surface-surface-primary)] rounded-lg shadow-xl w-full max-w-md mx-4"
+        className="relative bg-[color:var(--tokens-color-surface-surface-primary)] rounded-lg shadow-xl w-full max-w-xl mx-4"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}

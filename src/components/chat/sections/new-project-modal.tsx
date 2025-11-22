@@ -4,6 +4,7 @@ import React from "react";
 import { NewFolderModal } from "@/components/ui";
 import { Investing, Homework, Writing, Health, Travel } from "@/icons";
 import { t } from "@/i18n";
+import { useProjects } from "@/hooks/use-projects";
 
 interface Project {
   id: string;
@@ -22,14 +23,14 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
   onClose,
   onConfirm,
 }) => {
-  const handleConfirm = (projectName: string, selectedCategory?: string) => {
+  const { createProject } = useProjects();
+
+  const handleConfirm = async (projectName: string, selectedCategory?: string) => {
     if (projectName.trim()) {
-      const newProject: Project = {
-        id: `folder-${Date.now()}`,
-        name: projectName.trim(),
-        category: selectedCategory,
-      };
-      onConfirm(newProject);
+      const newProject = await createProject(projectName.trim(), selectedCategory);
+      if (newProject) {
+        onConfirm(newProject);
+      }
     }
   };
 

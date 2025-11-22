@@ -31,7 +31,8 @@ export const useRegenerate = () => {
   const regenerateMessage = useCallback(async (
     messageUuid: string,
     aiModelUuid: string,
-    conversationUuid: string
+    conversationUuid: string,
+    projectUuid?: string
   ) => {
     try {
       setIsRegenerating(true)
@@ -56,7 +57,7 @@ export const useRegenerate = () => {
       
       // Regenerate AI response with streaming
       await aiApi.regenerateContentStream(
-        { message_uuid: messageUuid, ai_model_uuid: aiModelUuid },
+        { message_uuid: messageUuid, ai_model_uuid: aiModelUuid, project_uuid: projectUuid },
         (chunk: string, type: string, metadata?: any) => {
           if (type === 'metadata') {
             // Handle metadata stream responses - update metadata state only
