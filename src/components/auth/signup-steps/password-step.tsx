@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { t } from '@/i18n'
 import { LogoOnly } from '@/icons'
-import { PasswordInput, PrimaryButton } from '../../ui'
+import { PasswordInput, PrimaryButton, BackButton } from '../../ui'
 import { handleApiError } from '@/lib/error-handler'
 
 interface PasswordStepProps {
@@ -99,7 +99,8 @@ export const PasswordStep = ({
   return (
     <div className={`relative w-full bg-tokens-color-surface-surface-primary flex flex-col justify-center ${className}`}>
       <div className="inline-flex flex-col items-start gap-9 max-w-[475px] w-full px-1">   
-      <div className="flex justify-start md:justify-center">
+      <div className="flex relative items-center gap-3 justify-start md:justify-center">
+      <div className='absolute left-[-250px] top-0'> <BackButton /></div>
               <a 
                 href="/" 
                 className="flex flex-col w-[120px] sm:w-[140px] lg:w-[154px] items-start gap-2.5 cursor-pointer hover:opacity-80 transition-opacity duration-200"

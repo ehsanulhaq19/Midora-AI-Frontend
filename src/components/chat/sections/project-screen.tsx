@@ -175,11 +175,11 @@ export const ProjectScreen: React.FC<ProjectScreenProps> = ({
     <>
       <div className="flex flex-col items-center gap-[50px] px-4 lg:px-0 py-6 relative flex-1 grow min-h-screen w-full">
         {/* Project Header Section */}
-        <div className="flex items-start flex-col w-full max-w-[808px] gap-6 relative flex-[0_0_auto] mx-auto">
+        <div className="flex items-start flex-col w-full max-w-[698px] gap-6 relative flex-[0_0_auto] mx-auto">
           <div className="flex items-center justify-between w-full gap-4 max-w-[700px] m-auto">
             <div className="inline-flex items-center gap-[15px] relative flex-[0_0_auto]">
-              <div className="flex flex-col w-[37px] h-[20px] items-start gap-2.5 relative aspect-[1.02]">
-                <FolderOpen01 className="relative self-stretch w-full aspect-[1.02]" />
+              <div className="flex flex-col  items-start gap-2.5 relative aspect-[1.02] ">
+                <FolderOpen01 className="relative !w-8 !h-8 self-stretch  aspect-[1.02]" />
               </div>
               <p className="relative flex items-center justify-center w-fit app-text-28 text-[color:var(--tokens-color-text-text-seconary)] font-h02-heading02 font-[number:var(--h02-heading02-font-weight)] text-center">
                 {project.name}
@@ -187,7 +187,7 @@ export const ProjectScreen: React.FC<ProjectScreenProps> = ({
             </div>
             <button
               onClick={() => setIsFilesModalOpen(true)}
-              className="px-4 py-2 text-sm font-medium text-[color:var(--tokens-color-text-text-primary)] bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded-full transition-colors hover:bg-[color:var(--tokens-color-surface-surface-secondary)]"
+              className="px-4 py-2 text-sm font-medium text-[color:var(--tokens-color-text-text-primary)] bg-[color:var(--tokens-color-surface-surface-tertiary)] hover:text-white rounded-full transition-colors hover:bg-[color:var(--tokens-color-surface-surface-button)]"
             >
               Add files
             </button>

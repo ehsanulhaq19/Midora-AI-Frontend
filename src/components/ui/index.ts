@@ -36,6 +36,7 @@ export { ThemeToggle } from './theme-toggle'
 export { UnauthorizedDisplay } from './unauthorized-display'
 export { TopicCard } from './topic-card'
 export { NameInput } from './name-input'
+export { BackButton } from './BackButton'
 
 // Legacy exports for backward compatibility
 export { PrimaryButton as Buttons } from './buttons'
