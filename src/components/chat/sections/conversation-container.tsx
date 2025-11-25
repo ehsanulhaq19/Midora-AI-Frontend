@@ -1113,7 +1113,7 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
       
       {/* Canvas Sidebar */}
       {isCanvasOpen && (
-        <div className="relative z-50 flex-shrink-0 w-1/2" style={{ height: '100%' }}>
+        <div className="relative z-40 flex-shrink-0 w-1/2" style={{ height: '100%' }}>
           <Canvas
             isOpen={isCanvasOpen}
             content={getCanvasContent()}

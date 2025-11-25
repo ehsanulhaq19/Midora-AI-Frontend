@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { t } from '@/i18n'
 import { LogoOnly } from '@/icons'
-import { InputWithButton } from '../../ui'
+import { InputWithButton, BackButton } from '../../ui'
 
 interface FullNameStepProps {
   onNext: (fullName: string) => void
@@ -32,7 +32,8 @@ export const FullNameStep = ({
   return (
     <div className={`relative w-full bg-tokens-color-surface-surface-primary flex flex-col justify-center ${className}`}>
       <div className="inline-flex flex-col items-start gap-6 w-full max-w-[480px] px-1 sm:px-2 mx-auto">   
-      <div className="flex justify-start w-full">
+      <div className="flex relativeitems-center gap-3 justify-start w-full">
+      <div className='absolute left-[-250px] top-0'> <BackButton /></div>
               <a 
                 href="/" 
                 className="flex flex-col w-[120px] sm:w-[140px] lg:w-[154px] items-start gap-2.5 cursor-pointer hover:opacity-80 transition-opacity duration-200"

@@ -7,6 +7,8 @@ interface SignupData {
   fullName: string
   profession: string
   password: string
+  selectedTopics: string[]
+  otherTopicsInput: string
 }
 
 interface SignupDataContextType {
@@ -29,7 +31,9 @@ export const SignupDataProvider: React.FC<SignupDataProviderProps> = ({ children
     email: '',
     fullName: '',
     profession: '',
-    password: ''
+    password: '',
+    selectedTopics: [],
+    otherTopicsInput: ''
   })
 
   // Load data from sessionStorage on mount
@@ -63,7 +67,7 @@ export const SignupDataProvider: React.FC<SignupDataProviderProps> = ({ children
 
   const clearData = useCallback(() => {
     console.log('Clearing signup data')
-    setData({ email: '', fullName: '', profession: '', password: '' })
+    setData({ email: '', fullName: '', profession: '', password: '', selectedTopics: [], otherTopicsInput: '' })
     if (typeof window !== 'undefined') {
       sessionStorage.removeItem(STORAGE_KEY)
     }

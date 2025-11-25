@@ -8,6 +8,7 @@ import { useAppDispatch } from '@/store/hooks'
 import { loginSuccess } from '@/store/slices/authSlice'
 import { tokenManager } from '@/lib/token-manager'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { useSignupData } from '@/contexts/SignupDataContext'
 
 interface MultiStepContainerProps {
   onComplete: (data: { email: string; fullName: string; profession: string }) => void
@@ -24,6 +25,8 @@ type Step = 'email' | 'welcome' | 'fullName' | 'profession' | 'password' | 'otp'
 // Step order for determining navigation direction
 const STEP_ORDER: Step[] = ['welcome', 'fullName', 'profession', 'password', 'otp', 'success']
 
+const STORAGE_KEY = 'signupFormData'
+
 export const MultiStepContainer: React.FC<MultiStepContainerProps> = ({ 
   onComplete, 
   initialEmail = '',
@@ -37,6 +40,7 @@ export const MultiStepContainer: React.FC<MultiStepContainerProps> = ({
   const { verifyOTP, register, regenerateOTP, updateProfile, completeOnboarding, getCurrentUser } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { updateData: updateSignupData } = useSignupData()
   
   // Get current step from query parameters, fallback to initialStep or default
   const getStepFromParams = (): Step => {
@@ -64,16 +68,78 @@ export const MultiStepContainer: React.FC<MultiStepContainerProps> = ({
       setCurrentStep(newStep)
     }
   }, [searchParams, initialStep, isSSOOnboarding, currentStep])
-  const [formData, setFormData] = useState({
-    email: initialEmail,
-    fullName: initialFullName,
-    profession: '',
-    password: initialPassword,
-    selectedTopics: [] as string[],
-    otherTopicsInput: ''
-  })
+  
+  // Initialize formData from localStorage or initial values
+  const initializeFormData = () => {
+    if (typeof window !== 'undefined') {
+      const stored = sessionStorage.getItem(STORAGE_KEY)
+      if (stored) {
+        try {
+          const parsedData = JSON.parse(stored)
+          return {
+            email: parsedData.email || initialEmail,
+            fullName: parsedData.fullName || initialFullName,
+            profession: parsedData.profession || '',
+            password: parsedData.password || initialPassword,
+            selectedTopics: parsedData.selectedTopics || [],
+            otherTopicsInput: parsedData.otherTopicsInput || ''
+          }
+        } catch (error) {
+          console.error('Error parsing stored form data:', error)
+        }
+      }
+    }
+    return {
+      email: initialEmail,
+      fullName: initialFullName,
+      profession: '',
+      password: initialPassword,
+      selectedTopics: [] as string[],
+      otherTopicsInput: ''
+    }
+  }
+  
+  const [formData, setFormData] = useState(initializeFormData)
   const { success: showSuccessToast, error: showErrorToast } = useToast()
   const isOtpEmailSend = useRef(false)
+  
+  // Persist formData to sessionStorage whenever it changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(formData))
+      // Also sync with SignupDataContext
+      updateSignupData({
+        email: formData.email,
+        fullName: formData.fullName,
+        profession: formData.profession,
+        password: formData.password,
+        selectedTopics: formData.selectedTopics,
+        otherTopicsInput: formData.otherTopicsInput
+      })
+    }
+  }, [formData, updateSignupData])
+  
+  // Restore formData when navigating back/forward (step changes)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const stored = sessionStorage.getItem(STORAGE_KEY)
+      if (stored) {
+        try {
+          const parsedData = JSON.parse(stored)
+          setFormData(prev => ({
+            email: parsedData.email || prev.email,
+            fullName: parsedData.fullName || prev.fullName,
+            profession: parsedData.profession || prev.profession,
+            password: parsedData.password || prev.password,
+            selectedTopics: parsedData.selectedTopics || prev.selectedTopics,
+            otherTopicsInput: parsedData.otherTopicsInput || prev.otherTopicsInput
+          }))
+        } catch (error) {
+          console.error('Error parsing stored form data on step change:', error)
+        }
+      }
+    }
+  }, [currentStep])
   
   // Helper function to navigate to a step using query parameters
   const navigateToStep = (step: Step, direction: 'left' | 'right' = 'right') => {

@@ -1,7 +1,7 @@
 'use client'
 
 import { t } from '@/i18n'
-import { Buttons } from '../../ui'
+import { Buttons, BackButton } from '../../ui'
 import { Paperclip, Lightbulb, Lightning, Grid, LogoOnly } from '@/icons'
 
 interface WelcomeStepProps {
@@ -25,8 +25,9 @@ export const WelcomeStep = ({
   return (
     <div className={`flex flex-col w-full items-center justify-between bg-tokens-color-surface-surface-primary ${className}`}>
       <div className="flex flex-col w-full max-w-[475px] items-start gap-[36px]">
-
-           <div className="flex justify-start md:justify-center">
+             
+           <div className="relative flex items-center gap-3 justify-start md:justify-center">
+          <div className='absolute left-[-250px] top-0'> <BackButton /></div>
               <a 
                 href="/" 
                 className="flex flex-col w-[120px] sm:w-[140px] lg:w-[154px] items-start gap-2.5 cursor-pointer hover:opacity-80 transition-opacity duration-200"

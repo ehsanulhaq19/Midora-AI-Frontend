@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { t } from '@/i18n'
 import { Search, Star, Lightbulb, Stars, Scale, Code } from '@/icons'
-import { TopicCard, NameInput, Buttons } from '../../ui'
+import { TopicCard, NameInput, Buttons, BackButton } from '../../ui'
 import { LogoOnly } from '@/icons'
 import { useToast } from '@/hooks/use-toast'
 
@@ -81,7 +81,8 @@ export const ProfessionStep = ({
   return (
     <div className={`relative bg-tokens-color-surface-surface-primary ${className}`}>
       <div className="flex flex-col items-start gap-4">
-      <div className="flex justify-start md:justify-center mb-2">
+      <div className="flex relative items-center gap-3 justify-start md:justify-center mb-2">
+      <div className='absolute left-[-250px] top-0'> <BackButton /></div>
               <a 
                 href="/" 
                 className="flex flex-col w-[120px] sm:w-[140px] lg:w-[154px] items-start gap-2.5 cursor-pointer hover:opacity-80 transition-opacity duration-200"

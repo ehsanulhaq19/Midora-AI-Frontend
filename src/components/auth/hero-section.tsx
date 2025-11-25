@@ -179,7 +179,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ className }) => {
                 <span className="tracking-[-0.80px] text-base flex-1 font-normal font-h02-heading02 leading-4 text-white text-start">
                   {t("hero.readMore")}
                 </span>
-                <ArrowRightSm className="relative w-5 h-5" color="white" />
+                <ArrowRightSm className="relative w-5 h-5" color="black" />
               </button>
 
               <button
