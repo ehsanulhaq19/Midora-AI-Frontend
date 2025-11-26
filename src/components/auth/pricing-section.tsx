@@ -1,19 +1,29 @@
-import React from "react";
+'use client'
+
+import React, { useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { CheckBroken4 } from "@/icons";
 import { pricingData } from "@/lib/pricing-data";
 import { PricingPlan } from "@/types/pricing";
 import { Slider } from "@/components/ui";
+import { useSubscriptionPlans } from "@/hooks/use-subscription-plans";
+import { SubscriptionPlan } from "@/api/subscription-plans/types";
 
 interface PricingSectionProps {
   className?: string;
 }
 
 interface PricingCardProps {
-  plan: PricingPlan;
+  plan: SubscriptionPlan;
+  onClick?: (() => void) | undefined;
 }
 
-const PricingCard: React.FC<PricingCardProps> = ({ plan }) => {
+const PricingCard: React.FC<PricingCardProps> = ({ plan, onClick }) => {
   const [isHovered, setIsHovered] = React.useState(false);
+  
+  // Convert subscription plan to pricing plan format for display
+  const displayPrice = plan.monthly_price;
+  const displayPeriod = '/month';
 
   const baseClasses =
     "flex flex-col items-start gap-[88px] p-12 relative rounded-[var(--premitives-corner-radius-corner-radius-5)] transition-all duration-300 ease-in-out cursor-pointer group max-h-[525px] w-full max-w-[383px] hover:scale-110 transform origin-center";
@@ -34,6 +44,7 @@ const PricingCard: React.FC<PricingCardProps> = ({ plan }) => {
       className={cardClasses}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={onClick}
     >
       <div className="flex flex-col items-start gap-12 relative self-stretch w-full flex-[0_0_auto]">
         <div className="flex flex-col items-start gap-[7px] relative self-stretch w-full flex-[0_0_auto]">
@@ -51,11 +62,44 @@ const PricingCard: React.FC<PricingCardProps> = ({ plan }) => {
         </div>
 
         <div className="flex flex-col items-start gap-5 relative self-stretch w-full flex-[0_0_auto]">
-          {plan.features.map((feature, index) => (
-            <div
-              key={index}
-              className="flex items-start gap-3 relative self-stretch w-full flex-[0_0_auto]"
+          <div className="flex items-start gap-3 relative self-stretch w-full flex-[0_0_auto]">
+            <CheckBroken4
+              className="!relative !w-[18px] !h-[18px] !aspect-[1] transition-colors duration-300"
+              color={iconColor}
+              opacity={iconOpacity}
+            />
+            <p
+              className={`relative flex-1 mt-[-1.00px] font-h02-heading02 font-[number:var(--text-font-weight)] ${textColorClasses} text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]`}
             >
+              {plan.credits_per_month.toLocaleString()} credits/month
+            </p>
+          </div>
+          <div className="flex items-start gap-3 relative self-stretch w-full flex-[0_0_auto]">
+            <CheckBroken4
+              className="!relative !w-[18px] !h-[18px] !aspect-[1] transition-colors duration-300"
+              color={iconColor}
+              opacity={iconOpacity}
+            />
+            <p
+              className={`relative flex-1 mt-[-1.00px] font-h02-heading02 font-[number:var(--text-font-weight)] ${textColorClasses} text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]`}
+            >
+              {plan.file_storage_gb} GB file storage
+            </p>
+          </div>
+          <div className="flex items-start gap-3 relative self-stretch w-full flex-[0_0_auto]">
+            <CheckBroken4
+              className="!relative !w-[18px] !h-[18px] !aspect-[1] transition-colors duration-300"
+              color={iconColor}
+              opacity={iconOpacity}
+            />
+            <p
+              className={`relative flex-1 mt-[-1.00px] font-h02-heading02 font-[number:var(--text-font-weight)] ${textColorClasses} text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]`}
+            >
+              {plan.vector_storage_entries.toLocaleString()} vector entries
+            </p>
+          </div>
+          {plan.priority_support && (
+            <div className="flex items-start gap-3 relative self-stretch w-full flex-[0_0_auto]">
               <CheckBroken4
                 className="!relative !w-[18px] !h-[18px] !aspect-[1] transition-colors duration-300"
                 color={iconColor}
@@ -64,10 +108,24 @@ const PricingCard: React.FC<PricingCardProps> = ({ plan }) => {
               <p
                 className={`relative flex-1 mt-[-1.00px] font-h02-heading02 font-[number:var(--text-font-weight)] ${textColorClasses} text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]`}
               >
-                {feature.text}
+                Priority support
               </p>
             </div>
-          ))}
+          )}
+          {plan.api_access !== 'none' && (
+            <div className="flex items-start gap-3 relative self-stretch w-full flex-[0_0_auto]">
+              <CheckBroken4
+                className="!relative !w-[18px] !h-[18px] !aspect-[1] transition-colors duration-300"
+                color={iconColor}
+                opacity={iconOpacity}
+              />
+              <p
+                className={`relative flex-1 mt-[-1.00px] font-h02-heading02 font-[number:var(--text-font-weight)] ${textColorClasses} text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]`}
+              >
+                API Access: {plan.api_access}
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
@@ -85,11 +143,11 @@ const PricingCard: React.FC<PricingCardProps> = ({ plan }) => {
             className={`relative w-fit mt-[-1.00px] font-h02-heading02 font-normal ${priceColorClasses} text-4xl leading-9 whitespace-nowrap`}
           >
             <span className="tracking-[var(--h02-heading02-letter-spacing)] font-h02-heading02 [font-style:var(--h02-heading02-font-style)] font-[number:var(--h02-heading02-font-weight)] leading-[var(--h02-heading02-line-height)] text-[length:var(--h02-heading02-font-size)]">
-              {plan.price}
+              {displayPrice.toFixed(2)}
             </span>
 
             <span className="font-h02-heading02 text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] font-[number:var(--text-font-weight)]">
-              {plan.period}
+              {displayPeriod}
             </span>
           </p>
         </div>
@@ -99,8 +157,36 @@ const PricingCard: React.FC<PricingCardProps> = ({ plan }) => {
 };
 
 export const PricingSection: React.FC<PricingSectionProps> = ({
-  className,
+  className = "",
 }) => {
+  const router = useRouter();
+  const { plans, loadPlans, selectPlan, isLoading } = useSubscriptionPlans();
+  const hasLoadedRef = useRef(false);
+
+  useEffect(() => {
+    // Only load plans once on mount if they haven't been loaded yet
+    if (!hasLoadedRef.current && plans.length === 0 && !isLoading) {
+      hasLoadedRef.current = true;
+      loadPlans(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty dependency array - only run once on mount
+
+  const handlePlanClick = (plan: SubscriptionPlan) => {
+    selectPlan(plan);
+    router.push(`/checkout?plan=${plan.uuid}`);
+  };
+
+  if (isLoading) {
+    return (
+      <div className={`flex flex-col w-full items-center gap-8 lg:gap-[88px] ${className}`}>
+        <div className="flex items-center justify-center p-12">
+          <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       className={`flex flex-col w-full items-center gap-8 lg:gap-[88px] ${className}`}
@@ -119,8 +205,8 @@ export const PricingSection: React.FC<PricingSectionProps> = ({
 
       {/* Desktop Grid Layout */}
       <div className="hidden lg:flex flex-wrap items-center justify-center gap-[48px_48px] relative self-stretch w-full flex-[0_0_auto]">
-        {pricingData.plans.map((plan) => (
-          <PricingCard key={plan.id} plan={plan} />
+        {plans.map((plan) => (
+          <PricingCard key={plan.uuid} plan={plan} onClick={() => handlePlanClick(plan)} />
         ))}
       </div>
 
@@ -135,8 +221,8 @@ export const PricingSection: React.FC<PricingSectionProps> = ({
           centerPadding="60px"
           className="px-4"
         >
-          {pricingData.plans.map((plan) => (
-            <PricingCard key={plan.id} plan={plan} />
+          {plans.map((plan) => (
+            <PricingCard key={plan.uuid} plan={plan} onClick={() => handlePlanClick(plan)} />
           ))}
         </Slider>
       </div>
@@ -150,8 +236,8 @@ export const PricingSection: React.FC<PricingSectionProps> = ({
           infinite={true}
           className="px-4"
         >
-          {pricingData.plans.map((plan) => (
-            <PricingCard key={plan.id} plan={plan} />
+          {plans.map((plan) => (
+            <PricingCard key={plan.uuid} plan={plan} onClick={() => handlePlanClick(plan)} />
           ))}
         </Slider>
       </div>
