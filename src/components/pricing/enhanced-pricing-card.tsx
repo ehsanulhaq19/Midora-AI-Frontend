@@ -31,8 +31,6 @@ export const EnhancedPricingCard: React.FC<EnhancedPricingCardProps> = ({
   // Button text
   const getButtonText = () => {
     if (isCurrentPlan) return 'Current Plan'
-    if (plan.id === 'power') return 'Get Power Plan'
-    if (plan.id === 'lite-2') return 'Get Plus'
     return `Get ${plan.name} Plan`
   }
 
