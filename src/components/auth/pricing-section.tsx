@@ -21,13 +21,13 @@ const PricingCard: React.FC<PricingCardProps> = ({ plan }) => {
   const cardClasses = `${baseClasses} bg-premitives-color-light-gray-1000 hover:bg-[linear-gradient(150deg,#1F1740_0%,#6B4392_100%)] hover:bg-tokens-color-surface-surface-button`;
 
   const textColorClasses =
-    "text-tokens-color-text-text-primary group-hover:text-tokens-color-text-text-neutral transition-colors duration-300";
+    "text-[color:var(--tokens-color-text-text-seconary)] group-hover:text-tokens-color-text-text-neutral transition-colors duration-300";
 
   const iconColor = isHovered ? "white" : "#293241";
   const iconOpacity = "0.9";
 
   const priceColorClasses =
-    "text-tokens-color-text-text-primary group-hover:text-tokens-color-text-text-neutral transition-colors duration-300";
+    "text-[color:var(--tokens-color-text-text-seconary)] group-hover:text-tokens-color-text-text-neutral transition-colors duration-300";
 
   return (
     <div
@@ -38,7 +38,7 @@ const PricingCard: React.FC<PricingCardProps> = ({ plan }) => {
       <div className="flex flex-col items-start gap-12 relative self-stretch w-full flex-[0_0_auto]">
         <div className="flex flex-col items-start gap-[7px] relative self-stretch w-full flex-[0_0_auto]">
           <div
-            className={`relative self-stretch mt-[-1.00px] font-h02-heading02 font-[number:var(--h02-heading02-font-weight)] ${textColorClasses} text-[length:var(--h02-heading02-font-size)] tracking-[var(--h02-heading02-letter-spacing)] leading-[var(--h02-heading02-line-height)] [font-style:var(--h02-heading02-font-style)]`}
+            className={`relative self-stretch mt-[-1.00px] font-h02-heading02 font-[number:var(--h02-heading02-font-weight)] ${textColorClasses} app-text-3xl tracking-[var(--h05-heading05-letter-spacing)] leading-[var(--h02-heading02-line-height)] [font-style:var(--h02-heading02-font-style)]`}
           >
             {plan.name}
           </div>
@@ -74,7 +74,7 @@ const PricingCard: React.FC<PricingCardProps> = ({ plan }) => {
       <div className="flex items-start relative self-stretch w-full flex-[0_0_auto]">
         <div className="inline-flex flex-col items-center gap-2.5 relative flex-[0_0_auto]">
           <div
-            className={`relative w-fit mt-[-1.00px] font-h02-heading02-large font-[number:var(--text-large-font-weight)] ${priceColorClasses} text-[length:var(--text-large-font-size)] tracking-[var(--text-large-letter-spacing)] leading-[var(--text-large-line-height)] whitespace-nowrap [font-style:var(--text-large-font-style)]`}
+            className={`relative w-fit font-h02-heading02 font-[number:var(--text-large-font-weight)] ${priceColorClasses} text-[length:var(--text-large-font-size)] tracking-[var(--text-large-letter-spacing)] leading-[var(--text-large-line-height)] whitespace-nowrap [font-style:var(--text-large-font-style)]`}
           >
             {plan.currency}
           </div>
@@ -84,7 +84,7 @@ const PricingCard: React.FC<PricingCardProps> = ({ plan }) => {
           <p
             className={`relative w-fit mt-[-1.00px] font-h02-heading02 font-normal ${priceColorClasses} text-4xl leading-9 whitespace-nowrap`}
           >
-            <span className="tracking-[var(--h02-heading02-letter-spacing)] font-h02-heading02 [font-style:var(--h02-heading02-font-style)] font-[number:var(--h02-heading02-font-weight)] leading-[var(--h02-heading02-line-height)] text-[length:var(--h02-heading02-font-size)]">
+            <span className="tracking-[var(--h05-heading05-letter-spacing)] font-h02-heading02 [font-style:var(--h02-heading02-font-style)] font-[number:var(--h01-heading-01-font-weight)] leading-[var(--h05-heading05-line-height)] text-[length:var(--h01-heading-01-font-size)]">
               {plan.price}
             </span>
 
@@ -111,7 +111,7 @@ export const PricingSection: React.FC<PricingSectionProps> = ({
         </p>
 
         <div className="flex items-center justify-center gap-2.5 relative self-stretch w-full flex-[0_0_auto]">
-          <p className="relative w-full max-w-[930px] font-h02-heading02 font-[number:var(--text-large-font-weight)] text-tokens-color-text-text-primary text-base sm:text-lg lg:text-[length:var(--text-large-font-size)] text-center tracking-[var(--text-large-letter-spacing)] leading-[var(--text-large-line-height)] [font-style:var(--text-large-font-style)]">
+          <p className="relative w-full max-w-[930px] font-h02-heading02 font-[number:var(--text-large-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-base sm:text-lg lg:text-[length:var(--text-large-font-size)] text-center tracking-[var(--text-large-letter-spacing)] leading-[var(--text-large-line-height)] [font-style:var(--text-large-font-style)]">
             {pricingData.subtitle}
           </p>
         </div>

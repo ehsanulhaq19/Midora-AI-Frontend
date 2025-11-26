@@ -22,7 +22,7 @@ import { t } from "@/i18n";
 import { useAuthRedux } from "@/hooks/use-auth-redux";
 import { useConversation } from "@/hooks/use-conversation";
 import { useAuth } from "@/contexts/AuthContext";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { chat } from "@/i18n/languages/en/chat";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
@@ -120,6 +120,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
   const { userName } = useAuthRedux();
   const { logout } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
   const dispatch = useDispatch();
 
   // Get projects from Redux store
@@ -155,6 +156,13 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
   const handleToggleSidebar = () => {
     setIsManuallyShrunk(!isManuallyShrunk);
   };
+
+  const navigateToChat = useCallback(() => {
+    if (pathname !== "/chat") {
+      router.push("/chat");
+    }
+  }, [pathname, router]);
+
   const {
     conversations,
     currentConversation,
@@ -246,6 +254,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
     setIsManuallyShrunk(false);
     startNewChat();
     onNewChat?.();
+    navigateToChat();
   };
 
   const handleSelectChat = (conversationUuid: string) => {
@@ -258,6 +267,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
     setSelectedChat(
       conversations.findIndex((conv) => conv.uuid === conversationUuid)
     );
+    navigateToChat();
   };
 
   const handleLogout = async () => {
@@ -600,6 +610,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                           ) {
                             loadProjectConversations(folder.id, 1, 10, false);
                           }
+                          navigateToChat();
                         }}
                         className={`w-full pt-[5px] pb-[8px] px-2 gap-[8px] flex items-center pl-5 hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded-[var(--premitives-corner-radius-corner-radius)] transition-colors ${
                           isSelected
@@ -659,6 +670,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                                   setSelectedProjectConversationUuid(convUuid);
                                   // Select the conversation
                                   selectConversation(convUuid);
+                                  navigateToChat();
                                 }}
                                 className={`w-full py-1.5 px-2 rounded text-left hover:bg-[color:var(--tokens-color-surface-surface-secondary)] transition-colors ${
                                   selectedProjectConversationUuid ===

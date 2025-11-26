@@ -23,6 +23,8 @@ const ROUTES = {
     '/settings',
     '/chat',
     '/app-documents',
+    '/pricing',
+    '/checkout',
   ],
 } as const
 

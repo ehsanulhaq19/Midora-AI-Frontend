@@ -32,9 +32,10 @@ export const BackButton: React.FC<BackButtonProps> = ({
       type="button"
     >
       <ArrowRightSm 
-        className="relative w-7 h-7 rotate-180" 
+        className="relative w-5 h-5 rotate-180" 
         color="var(--tokens-color-text-text-primary)" 
       />
+      
     </button>
   )
 }

@@ -10,6 +10,7 @@ import { useAuthRedux } from "@/hooks/use-auth-redux";
 import { useToast } from "@/hooks";
 import { Conversation } from "@/api/conversation/types";
 import { ProjectScreen } from "./project-screen";
+import { useRouter } from "next/navigation";
 
 interface Project {
   id: string;
@@ -45,7 +46,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const [isDragOver, setIsDragOver] = useState(false);
   const { error: showErrorToast } = useToast();
   const messageInputRef = useRef<MessageInputHandle>(null);
-
+  const router = useRouter()
   const handleProjectFilesSelect = useCallback(
     async (files: FileList | null) => {
       if (!files || files.length === 0) return;
@@ -187,7 +188,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         </div>
 
         <div className="flex items-center gap-2">
-          <button className="hidden sm:inline-flex items-center justify-center gap-2 h-[40px] p-2 bg-[color:var(--premitives-color-brand-purple-1000)] rounded-[var(--premitives-corner-radius-corner-radius-2)] hover:bg-[color:var(--tokens-color-surface-surface-button-pressed)]  transition-colors">
+          <button  onClick={() => router.push('/pricing')} className="hidden sm:inline-flex items-center justify-center gap-2 h-[40px] p-2 bg-[color:var(--premitives-color-brand-purple-1000)] rounded-[var(--premitives-corner-radius-corner-radius-2)] hover:bg-[color:var(--tokens-color-surface-surface-button-pressed)]  transition-colors">
             <div className="relative w-fit  font-h02-heading02 text-[14px]  text-white tracking-[var(--h05-heading05-letter-spacing)] leading-[var(--h05-heading05-line-height)] whitespace-nowrap [font-style:var(--h05-heading05-font-style)]">
               {t("chat.upgradeToPro")}
             </div>
