@@ -4,6 +4,7 @@ import conversationReducer from './slices/conversationSlice'
 import aiModelsReducer from './slices/aiModelsSlice'
 import toastReducer from './slices/toastSlice'
 import projectsReducer from './slices/projectsSlice'
+import subscriptionPlansReducer from './slices/subscription-plans-slice'
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     aiModels: aiModelsReducer,
     toast: toastReducer,
     projects: projectsReducer,
+    subscriptionPlans: subscriptionPlansReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
