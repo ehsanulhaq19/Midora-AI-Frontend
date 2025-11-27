@@ -19,6 +19,9 @@ export { Toast, ToastContainer, showSuccessToast, showErrorToast, showWarningToa
 // Tooltip components
 export { Tooltip } from './tooltip'
 
+// Toggle components
+export { Toggle } from './toggle'
+
 // Modal components
 export { NewFolderModal } from './modal'
 
