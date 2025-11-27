@@ -370,6 +370,15 @@
     letter-spacing: var(--h05-heading05-letter-spacing);
   }
 
+  .checkout-plan-name {
+    font-family: "Poppins", Helvetica;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 100%;
+    letter-spacing: -1.2px; /* -5% of 24px */
+  }
+
   /* Default text class - 14px (same as body default) */
   .app-text {
     font-size: 14px;
