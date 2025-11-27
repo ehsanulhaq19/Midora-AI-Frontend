@@ -265,7 +265,6 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
               />
             </div>
           )}
-          
           <div className={`flex items-center gap-2 mt-2 ${isUser ? 'justify-end' : 'justify-start'}`}>
             {/* Version Navigation for AI messages with multiple versions */}
             {!isUser && (
