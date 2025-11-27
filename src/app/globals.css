@@ -46,6 +46,7 @@
   --text-medium-font-style: normal;
   --text-medium-font-weight: 400;
   --text-medium-letter-spacing: 0px;
+  --text-extra-large-letter-spacing: 3%;
   --text-medium-line-height: 139.9999976158142%;
   --premitives-color-dark-puprle-1000: rgba(31, 23, 64, 1);
   --premitives-color-dark-puprle-900: rgba(31, 23, 64, 0.9);
@@ -239,10 +240,18 @@
   }
 
   body {
-    @apply text-text-primary bg-surface-primary font-sans;
+    @apply text-text-primary bg-surface-primary;
+    font-family: "Poppins", Helvetica, Arial, sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
     font-size: 14px; /* Ensure body uses 14px as base */
     line-height: 1.4; /* Consistent line height with app text classes */
+  }
+
+  input,
+  button,
+  textarea,
+  select {
+    font-family: "Poppins", Helvetica, Arial, sans-serif;
   }
 
   h1,
@@ -351,6 +360,14 @@
   .app-text-xs {
     font-size: 10px;
     line-height: 1.4;
+  }
+
+  .checkout-emphasis {
+    font-family: var(--h05-heading05-font-family);
+    font-size: var(--h05-heading05-font-size);
+    font-weight: var(--h05-heading05-font-weight);
+    line-height: var(--h05-heading05-line-height);
+    letter-spacing: var(--h05-heading05-letter-spacing);
   }
 
   /* Default text class - 14px (same as body default) */

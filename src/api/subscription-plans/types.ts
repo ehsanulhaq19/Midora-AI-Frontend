@@ -6,6 +6,8 @@ export interface SubscriptionPlan {
   uuid: string
   name: string
   slug: string
+  description?: string
+  currency?: string
   monthly_price: number
   annual_price: number
   credits_per_month: number
