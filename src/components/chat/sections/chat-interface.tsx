@@ -202,7 +202,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
           <div className="flex flex-col items-start gap-2.5 relative aspect-[1.02]">
             <LogoOnly className="relative h-9 w-9 self-stretch  aspect-[1.02] " />
           </div>
-          <p className="relative flex items-center justify-center max-w-[180px] truncate w-fit app-text-28 text-[color:var(--tokens-color-text-text-seconary)] font-h02-heading02 font-[number:var(--h02-heading02-font-weight)] text-center">
+          <p className="relative flex items-center justify-center w-fit app-text-28 text-[color:var(--tokens-color-text-text-seconary)] font-h02-heading02 font-[number:var(--h02-heading02-font-weight)] text-center">
             {tWithParams("chat.welcomeBack", { name: userName })}
           </p>
         </div>
