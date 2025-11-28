@@ -22,6 +22,9 @@ export { Tooltip } from './tooltip'
 // Toggle components
 export { Toggle } from './toggle'
 
+// Pagination components
+export { Pagination } from './pagination'
+
 // Modal components
 export { NewFolderModal } from './modal'
 
