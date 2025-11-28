@@ -26,7 +26,7 @@ export const Toggle: React.FC<ToggleProps> = ({
   return (
     <div className={`flex items-center gap-3 ${className}`}>
       {label && (
-        <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-primary)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
+        <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-inactive-2)] text-[14px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
           {label}
         </span>
       )}
@@ -38,7 +38,7 @@ export const Toggle: React.FC<ToggleProps> = ({
         disabled={disabled}
         className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[color:var(--tokens-color-text-text-brand)] focus:ring-offset-2 ${
           checked
-            ? 'bg-[color:var(--premitives-color-brand-purple-1000)]'
+            ? 'bg-[color:var(--premitives-color-dropdown-icon)]'
             : 'bg-gray-300'
         } ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
       >

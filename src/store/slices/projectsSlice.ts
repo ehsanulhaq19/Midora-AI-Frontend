@@ -36,7 +36,10 @@ const projectsSlice = createSlice({
   reducers: {
     // Add a new project
     addProject: (state, action: PayloadAction<Project>) => {
-      state.projects[action.payload.id] = action.payload
+      state.projects = {
+        [action.payload.id]: action.payload,
+        ...state.projects
+      }
       if (!state.projectConversations[action.payload.id]) {
         state.projectConversations[action.payload.id] = []
       }

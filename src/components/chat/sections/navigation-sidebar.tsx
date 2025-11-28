@@ -577,7 +577,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                   className="flex flex-col items-start relative w-full gap-1 transition-all"
                   style={
                     !showAllProjects && projectsOverflow
-                      ? { maxHeight: PROJECTS_MAX_HEIGHT, overflow: "hidden" }
+                      ? { maxHeight: '190px', overflow: "hidden" }
                       : undefined
                   }
                 >

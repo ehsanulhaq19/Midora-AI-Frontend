@@ -45,8 +45,8 @@ export const AccountSidebar: React.FC<AccountSidebarProps> = ({
   onClose
 }) => {
   return (
-    <div className="w-[271px] h-full bg-[var(--Color-Icon-Icon-Neutral)] backdrop-blur-[2.91px] border-r border-[#EFEFF5] flex flex-col">
-      <div className="flex flex-col p-[20px] border">
+    <div className="w-[271px] h-full bg-[var(--Color-Icon-Icon-Neutral)] backdrop-blur-[2.91px] border-[#EFEFF5] flex flex-col">
+      <div className="flex flex-col px-[20px] py-9 mt-6">
         {menuItems.map((item) => {
           const isActive = activeSection === item.id
           return (
@@ -62,7 +62,7 @@ export const AccountSidebar: React.FC<AccountSidebarProps> = ({
               <div className="flex-shrink-0 w-5 h-5">
                 {item.icon(isActive)}
               </div>
-              <span className={`font-h02-heading02 font-[number:var(--text-font-weight)] text-[14px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] ${
+              <span className={`font-h02-heading02 font-[number:var(--text-font-weight)] text-[16px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] ${
                 isActive
                   ? 'text-[color:var(--tokens-color-text-text-brand)]'
                   : 'text-[color:var(--light-mode-colors-dark-gray-900)]'
