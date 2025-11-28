@@ -8,7 +8,8 @@ import {
   SubscriptionPlan, 
   AiModelEstimate,
   SubscriptionCheckoutRequest,
-  SubscriptionCheckoutResponse
+  SubscriptionCheckoutResponse,
+  ActiveSubscription
 } from './types'
 
 class SubscriptionPlansApiClient {
@@ -39,6 +40,24 @@ class SubscriptionPlansApiClient {
     return this.baseClient.post<SubscriptionCheckoutResponse>(
       '/api/v1/user-subscription-checkout',
       data
+    )
+  }
+
+  /**
+   * Get active subscription for current user
+   */
+  async getActiveSubscription(): Promise<ApiResponse<ActiveSubscription>> {
+    return this.baseClient.get<ActiveSubscription>(
+      '/api/v1/user-subscription-checkout/active'
+    )
+  }
+
+  /**
+   * Cancel subscription
+   */
+  async cancelSubscription(subscriptionUuid: string): Promise<ApiResponse<ActiveSubscription>> {
+    return this.baseClient.post<ActiveSubscription>(
+      `/api/v1/user-subscription-checkout/${subscriptionUuid}/cancel`
     )
   }
 }

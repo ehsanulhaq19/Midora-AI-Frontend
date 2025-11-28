@@ -10,6 +10,8 @@ interface EnhancedPricingCardProps {
   isSelected?: boolean
   onClick?: () => void
   onButtonClick?: () => void
+  onCancelClick?: () => void
+  showCancelButton?: boolean
 }
 
 export const EnhancedPricingCard: React.FC<EnhancedPricingCardProps> = ({ 
@@ -17,7 +19,9 @@ export const EnhancedPricingCard: React.FC<EnhancedPricingCardProps> = ({
   isCurrentPlan = false,
   isSelected = false,
   onClick,
-  onButtonClick
+  onButtonClick,
+  onCancelClick,
+  showCancelButton = false
 }) => {
   const baseClasses = "flex flex-col items-start gap-6 p-6 sm:p-9 relative rounded-3xl w-full max-w-[383px] min-h-[500px] sm:min-h-[616px] box-border cursor-pointer transition-all duration-300";
   
@@ -93,19 +97,36 @@ export const EnhancedPricingCard: React.FC<EnhancedPricingCardProps> = ({
         </div>
 
         {/* Button */}
-        <button 
-          className={buttonClasses}
-          onClick={(e) => {
-            e.stopPropagation()
-            if (onButtonClick) {
-              onButtonClick()
-            }
-          }}
-        >
-          <div className={`relative w-fit font-SF-Pro text-[16px] tracking-[var(--text-extra-large-letter-spacing)] leading-[var(--h02-heading02-line-height)] whitespace-nowrap [font-style:var(--h05-heading05-font-style)] ${buttonTextClasses}`}>
-            {getButtonText()}
-          </div>
-        </button>
+        <div className="flex flex-col gap-2 w-full">
+          <button 
+            className={buttonClasses}
+            onClick={(e) => {
+              e.stopPropagation()
+              if (onButtonClick) {
+                onButtonClick()
+              }
+            }}
+          >
+            <div className={`relative w-fit font-SF-Pro text-[16px] tracking-[var(--text-extra-large-letter-spacing)] leading-[var(--h02-heading02-line-height)] whitespace-nowrap [font-style:var(--h05-heading05-font-style)] ${buttonTextClasses}`}>
+              {getButtonText()}
+            </div>
+          </button>
+          {showCancelButton && isCurrentPlan && (
+            <button
+              className="w-full flex items-center justify-center gap-2 h-[40px] p-2 bg-red-600 hover:bg-red-700 rounded-[var(--premitives-corner-radius-corner-radius-2)] transition-all text-white"
+              onClick={(e) => {
+                e.stopPropagation()
+                if (onCancelClick) {
+                  onCancelClick()
+                }
+              }}
+            >
+              <div className="relative w-fit font-SF-Pro text-[16px] tracking-[var(--text-extra-large-letter-spacing)] leading-[var(--h02-heading02-line-height)] whitespace-nowrap">
+                Cancel Subscription
+              </div>
+            </button>
+          )}
+        </div>
 
         {/* Features */}
         <div className="flex flex-col items-start gap-3 sm:gap-5 relative self-stretch w-full flex-[0_0_auto]">

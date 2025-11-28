@@ -1,17 +1,21 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { SubscriptionPlan } from '@/api/subscription-plans/types'
+import { SubscriptionPlan, ActiveSubscription } from '@/api/subscription-plans/types'
 
 export interface SubscriptionPlansState {
   plans: SubscriptionPlan[]
   selectedPlan: SubscriptionPlan | null
+  activeSubscription: ActiveSubscription | null
   isLoading: boolean
+  isSubscriptionLoading: boolean
   error: string | null
 }
 
 const initialState: SubscriptionPlansState = {
   plans: [],
   selectedPlan: null,
+  activeSubscription: null,
   isLoading: false,
+  isSubscriptionLoading: false,
   error: null,
 }
 
@@ -35,6 +39,12 @@ const subscriptionPlansSlice = createSlice({
     clearError: (state) => {
       state.error = null
     },
+    setActiveSubscription: (state, action: PayloadAction<ActiveSubscription | null>) => {
+      state.activeSubscription = action.payload
+    },
+    setSubscriptionLoading: (state, action: PayloadAction<boolean>) => {
+      state.isSubscriptionLoading = action.payload
+    },
   },
 })
 
@@ -44,6 +54,8 @@ export const {
   setLoading,
   setError,
   clearError,
+  setActiveSubscription,
+  setSubscriptionLoading,
 } = subscriptionPlansSlice.actions
 
 export default subscriptionPlansSlice.reducer

@@ -6,6 +6,7 @@ import { EnhancedPricingCard } from './enhanced-pricing-card'
 import { PricingPlan } from '@/types/pricing'
 import { useSubscriptionPlans } from '@/hooks/use-subscription-plans'
 import { SubscriptionPlan } from '@/api/subscription-plans/types'
+import { useToast } from '@/hooks/use-toast'
 
 const currencySymbols: Record<string, string> = {
   USD: '$',
@@ -62,11 +63,16 @@ export const EnhancedPricingSection: React.FC = () => {
     loadPlans,
     selectPlan,
     selectedPlan,
+    activeSubscription,
+    loadActiveSubscription,
+    cancelSubscription,
     isLoading,
   } = useSubscriptionPlans()
+  const { success: showSuccessToast, error: showErrorToast } = useToast()
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null)
   const hasLoadedPlansRef = useRef(false)
-  const currentPlanId = selectedPlan?.uuid ?? null
+  const hasLoadedSubscriptionRef = useRef(false)
+  const currentPlanId = activeSubscription?.plan?.uuid ?? null
 
   useEffect(() => {
     if (!hasLoadedPlansRef.current && plans.length === 0 && !isLoading) {
@@ -76,6 +82,18 @@ export const EnhancedPricingSection: React.FC = () => {
       })
     }
   }, [plans.length, isLoading, loadPlans])
+
+  useEffect(() => {
+    if (!hasLoadedSubscriptionRef.current) {
+      hasLoadedSubscriptionRef.current = true
+      loadActiveSubscription().catch((err) => {
+        // Only reset on actual errors, not on "not found" (which returns null, not an error)
+        // If an error was thrown, it means there was a real error (network, server, etc.)
+        // SUBSCRIPTION_NOT_FOUND returns null without throwing, so this catch won't execute for that case
+        console.error('Error loading subscription:', err)
+      })
+    }
+  }, []) // Empty dependency array - only run once on mount
 
   useEffect(() => {
     setSelectedPlanId(selectedPlan?.uuid ?? null)
@@ -88,6 +106,20 @@ export const EnhancedPricingSection: React.FC = () => {
   const handleButtonClick = (plan: SubscriptionPlan) => {
     selectPlan(plan)
     router.push(`/checkout?plan=${plan.uuid}`)
+  }
+
+  const handleCancelClick = async (plan: SubscriptionPlan) => {
+    if (!activeSubscription) return
+    
+    if (window.confirm(`Are you sure you want to cancel your ${plan.name} subscription?`)) {
+      try {
+        await cancelSubscription(activeSubscription.uuid)
+        showSuccessToast('Subscription Canceled', 'Your subscription has been canceled successfully.')
+        await loadActiveSubscription()
+      } catch (error) {
+        // Error already handled in hook
+      }
+    }
   }
 
   if (isLoading && plans.length === 0) {
@@ -134,6 +166,8 @@ export const EnhancedPricingSection: React.FC = () => {
               isSelected={plan.uuid === selectedPlanId}
               onClick={() => handleCardClick(plan.uuid)}
               onButtonClick={() => handleButtonClick(plan)}
+              onCancelClick={() => handleCancelClick(plan)}
+              showCancelButton={true}
             />
           )
         })}
@@ -151,6 +185,8 @@ export const EnhancedPricingSection: React.FC = () => {
               isSelected={plan.uuid === selectedPlanId}
               onClick={() => handleCardClick(plan.uuid)}
               onButtonClick={() => handleButtonClick(plan)}
+              onCancelClick={() => handleCancelClick(plan)}
+              showCancelButton={true}
             />
           )
         })}

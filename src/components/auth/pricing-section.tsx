@@ -160,14 +160,27 @@ export const PricingSection: React.FC<PricingSectionProps> = ({
   className = "",
 }) => {
   const router = useRouter();
-  const { plans, loadPlans, selectPlan, isLoading } = useSubscriptionPlans();
+  const { plans, loadPlans, selectPlan, activeSubscription, loadActiveSubscription, isLoading } = useSubscriptionPlans();
   const hasLoadedRef = useRef(false);
+  const hasLoadedSubscriptionRef = useRef(false);
 
   useEffect(() => {
     // Only load plans once on mount if they haven't been loaded yet
     if (!hasLoadedRef.current && plans.length === 0 && !isLoading) {
       hasLoadedRef.current = true;
       loadPlans(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty dependency array - only run once on mount
+
+  useEffect(() => {
+    if (!hasLoadedSubscriptionRef.current) {
+      hasLoadedSubscriptionRef.current = true;
+      loadActiveSubscription().catch((err) => {
+        // Only log actual errors, not "not found" (which returns null, not an error)
+        // SUBSCRIPTION_NOT_FOUND returns null without throwing, so this catch won't execute for that case
+        console.error('Error loading subscription:', err);
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Empty dependency array - only run once on mount
