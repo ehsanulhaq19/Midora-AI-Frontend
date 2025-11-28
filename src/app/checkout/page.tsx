@@ -16,7 +16,7 @@ import {
   useStripe,
   useElements,
 } from "@stripe/react-stripe-js";
-import { ArrowRightSm, MoreOptions, CheckBroken4 } from "@/icons";
+import { ArrowRightSm, MoreOptions, TickIcon } from "@/icons";
 
 // Initialize Stripe
 const stripePromise = loadStripe(
@@ -385,10 +385,10 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
             </button>
           </div>
 
-          <div className="flex flex-col gap-6 mt-8">
+          <div className="flex flex-col gap-6 mt-4">
             {/* Plan Selection */}
             <div className="flex flex-col gap-9 p-4 rounded-2xl bg-white shadow-sm">
-              <h1 className="checkout-emphasis text-[length:var(--h02-heading02-font-size)] leading-[var(--h02-heading02-line-height)] text-[color:var(--tokens-color-text-text-primary)]">
+              <h1 className="checkout-plan-name text-[color:var(--tokens-color-text-text-brand)]">
                 {plan.name}
               </h1>
 
@@ -410,16 +410,16 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
                     }`}
                   >
                     {billingCycle === "monthly" && (
-                      <CheckBroken4 className="w-3 h-3" color="#ffffff" />
+                      <TickIcon className="w-3 h-3" color="white" />
                     )}
                   </div>
                   <div className="flex flex-col gap-1 flex-1 relative">
 
                       <div
-                        className={`checkout-emphasis text-start ${
+                        className={`checkout-emphasis  text-start ${
                           billingCycle === "monthly"
                             ? "text-white"
-                            : "text-[#1F1740]"
+                            : "text-[color:var(--tokens-color-text-text-brand)]"
                         }`}
                       >
                         Monthly
@@ -429,7 +429,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
                         className={`${
                           billingCycle === "monthly"
                             ? "text-white/90"
-                            : "text-gray-500"
+                            : "text-[color:var(--tokens-color-text-text-inactive-2)]"
                         }`}
                       >
                         ${plan.monthly_price.toFixed(2)}/month + Tax
@@ -455,7 +455,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
                     }`}
                   >
                     {billingCycle === "annual" && (
-                      <CheckBroken4 className="w-3 h-3" color="#ffffff" />
+                      <TickIcon className="w-3 h-3" color="white" />
                     )}
                   </div>
                   <div className="flex flex-col gap-1 flex-1 relative">
@@ -464,7 +464,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
                         className={`checkout-emphasis ${
                           billingCycle === "annual"
                             ? "text-white"
-                            : "text-[#1F1740]"
+                            : "text-[color:var(--tokens-color-text-text-brand)]"
                         }`}
                       >
                         Yearly
@@ -481,7 +481,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
                       className={`${
                         billingCycle === "annual"
                           ? "text-white/90"
-                          : "text-gray-500"
+                          : "text-[color:var(--tokens-color-text-text-inactive-2)]"
                       }`}
                     >
                       ${effectiveMonthlyPrice.toFixed(2)}/month + Tax
@@ -693,7 +693,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
                   />
                   <label
                     htmlFor="terms"
-                    className="checkout-emphasis text-[color:var(--tokens-color-text-text-primary)]"
+                    className="checkout-emphasis text-black"
                   >
                     You agree that midora will charge your card{" "}
                     {billingCycle === "annual" ? "annually" : "monthly"} in the

@@ -21,7 +21,7 @@
   --h02-heading02-font-size: 36px;
   --h02-heading02-font-style: normal;
   --h02-heading02-font-weight: 400;
-  --h02-heading02-letter-spacing: -1.8px;
+  --h02-heading02-letter-spacing: -1.2px;
   --h02-heading02-line-height: 100%;
   --h03-heading-light-font-family: "Poppins", Helvetica;
   --h03-heading-light-font-size: 36px;
@@ -141,6 +141,7 @@
   --tokens-color-surface-surface-input-canvas: rgba(41, 50, 65, 0.05);
   --tokens-color-surface-surface-darkgray-50: var(--premitives-color-darkgray-50);
   --sidebar-conversations-max-height: calc(100vh - 450px);
+  --account-section-card-bg: rgba(41, 50, 65, 0.05);
 
   /* Surface colors for Tailwind config */
   --surface-primary: var(--premitives-color-light-gray-2000);
@@ -368,6 +369,15 @@
     font-weight: var(--h05-heading05-font-weight);
     line-height: var(--h05-heading05-line-height);
     letter-spacing: var(--h05-heading05-letter-spacing);
+  }
+
+  .checkout-plan-name {
+    font-family: "Poppins", Helvetica;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 100%;
+    letter-spacing: -1.2px; /* -5% of 24px */
   }
 
   /* Default text class - 14px (same as body default) */

@@ -5,20 +5,32 @@ interface MoreOptionsProps {
   color?: string
 }
 
-export const MoreOptions: React.FC<MoreOptionsProps> = ({ 
-  className = "w-6 h-6", 
-  color = "currentColor" 
+export const MoreOptions: React.FC<MoreOptionsProps> = ({
+  className = 'w-6 h-6',
+  color = '#1F1740'
 }) => (
-  <svg 
-    width="16" 
-    height="16" 
-    viewBox="0 0 24 24" 
-    fill="none" 
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
     xmlns="http://www.w3.org/2000/svg"
     className={className}
   >
-    <circle cx="12" cy="12" r="1" fill={color}/>
-    <circle cx="19" cy="12" r="1" fill={color}/>
-    <circle cx="5" cy="12" r="1" fill={color}/>
+    <path
+      d="M11.9996 7.20039C10.6741 7.20039 9.59961 6.12587 9.59961 4.80039C9.59961 3.47491 10.6741 2.40039 11.9996 2.40039C13.3251 2.40039 14.3996 3.47491 14.3996 4.80039C14.3996 6.12587 13.3251 7.20039 11.9996 7.20039Z"
+      fill={color}
+      fillOpacity="0.9"
+    />
+    <path
+      d="M11.9996 14.4004C10.6741 14.4004 9.59961 13.3259 9.59961 12.0004C9.59961 10.6749 10.6741 9.60039 11.9996 9.60039C13.3251 9.60039 14.3996 10.6749 14.3996 12.0004C14.3996 13.3259 13.3251 14.4004 11.9996 14.4004Z"
+      fill={color}
+      fillOpacity="0.9"
+    />
+    <path
+      d="M11.9996 21.6004C10.6741 21.6004 9.59961 20.5259 9.59961 19.2004C9.59961 17.8749 10.6741 16.8004 11.9996 16.8004C13.3251 16.8004 14.3996 17.8749 14.3996 19.2004C14.3996 20.5259 13.3251 21.6004 11.9996 21.6004Z"
+      fill={color}
+      fillOpacity="0.9"
+    />
   </svg>
 )

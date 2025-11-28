@@ -1,23 +1,29 @@
-'use client'
+"use client";
 
-import React, { useState, useEffect, useRef } from 'react'
-import { NavigationSidebar } from './sections/navigation-sidebar'
-import { ChatInterface } from './sections/chat-interface'
-import { ConversationContainer } from './sections/conversation-container'
-import { ChatHeader } from './sections/chat-header'
-import { useConversation } from '@/hooks/use-conversation'
-import { useAIModels, useProjects } from '@/hooks'
-import { useDispatch, useSelector } from 'react-redux'
-import { RootState } from '@/store'
-import { setSelectedProject, Project } from '@/store/slices/projectsSlice'
+import React, { useState, useEffect, useRef } from "react";
+import { NavigationSidebar } from "./sections/navigation-sidebar";
+import { ChatInterface } from "./sections/chat-interface";
+import { ConversationContainer } from "./sections/conversation-container";
+import { ChatHeader } from "./sections/chat-header";
+import { useConversation } from "@/hooks/use-conversation";
+import { AccountScreen } from "../account/account-screen";
+import { useAIModels, useProjects } from "@/hooks";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/store";
+import { setSelectedProject, Project } from "@/store/slices/projectsSlice";
 
 export const ChatScreen: React.FC = () => {
-  const [hasFiles, setHasFiles] = useState(false)
-  const [isCanvasOpen, setIsCanvasOpen] = useState(false)
-  const hasInitialized = useRef(false)
-  const dispatch = useDispatch()
-  const { selectedProjectId, projects } = useSelector((state: RootState) => state.projects)
-  const selectedProject = selectedProjectId ? projects[selectedProjectId] || null : null
+  const [hasFiles, setHasFiles] = useState(false);
+  const [isCanvasOpen, setIsCanvasOpen] = useState(false);
+  const [isAccountOpen, setIsAccountOpen] = useState(false);
+  const hasInitialized = useRef(false);
+  const dispatch = useDispatch();
+  const { selectedProjectId, projects } = useSelector(
+    (state: RootState) => state.projects
+  );
+  const selectedProject = selectedProjectId
+    ? projects[selectedProjectId] || null
+    : null;
   const {
     currentConversation,
     conversations,
@@ -28,64 +34,85 @@ export const ChatScreen: React.FC = () => {
     isLoading,
     error,
     isStreaming,
-  } = useConversation()
+  } = useConversation();
 
-  const { fetchServiceProviders } = useAIModels()
-  const { loadProjects } = useProjects()
-  
+  const { fetchServiceProviders } = useAIModels();
+  const { loadProjects } = useProjects();
+
   const handleCanvasStateChange = (isOpen: boolean) => {
-    setIsCanvasOpen(isOpen)
-  }
+    setIsCanvasOpen(isOpen);
+  };
 
   useEffect(() => {
     // Load initial data only once on mount
     if (!hasInitialized.current) {
-      hasInitialized.current = true
-      loadConversations()
-      fetchServiceProviders()
-      loadProjects(1, 10) // Load first page of projects
+      hasInitialized.current = true;
+      loadConversations();
+      fetchServiceProviders();
+      loadProjects(1, 10); // Load first page of projects
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, []);
 
   const handleProjectSelect = (project: Project | null) => {
     if (project) {
-      dispatch(setSelectedProject(project.id))
+      dispatch(setSelectedProject(project.id));
       // Start new chat in project context
-      startNewChat()
+      startNewChat();
     } else {
-      dispatch(setSelectedProject(null))
+      dispatch(setSelectedProject(null));
     }
-  }
+  };
 
-  const handleSendMessage = async (message: string, modelUuid?: string, fileUuids?: string[], uploadedFiles?: any[]) => {
+  const handleSendMessage = async (
+    message: string,
+    modelUuid?: string,
+    fileUuids?: string[],
+    uploadedFiles?: any[]
+  ) => {
     // Pass project UUID (encoded) to sendMessage
     // The project.id is already the encoded UUID from Redux
-    await sendMessage(message, modelUuid, undefined, fileUuids, uploadedFiles, selectedProject?.id)
-  }
+    await sendMessage(
+      message,
+      modelUuid,
+      undefined,
+      fileUuids,
+      uploadedFiles,
+      selectedProject?.id
+    );
+  };
 
   return (
     <div className="min-h-screen flex bg-[color:var(--tokens-color-surface-surface-primary)]">
-      <NavigationSidebar 
-        isOpen={true} 
+      <NavigationSidebar
+        isOpen={true}
         onClose={() => {}}
         onNewChat={() => {
-          handleProjectSelect(null)
-          startNewChat()
-          setIsCanvasOpen(false)
+          handleProjectSelect(null);
+          startNewChat();
+          setIsCanvasOpen(false);
         }}
         showFullSidebar={!isCanvasOpen}
         selectedProjectId={selectedProjectId || undefined}
         onProjectSelect={handleProjectSelect}
+        onAccountClick={() => setIsAccountOpen(true)}
       />
-      
+
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
-        {currentConversation ? (
+        {isAccountOpen ? (
+          <AccountScreen onClose={() => setIsAccountOpen(false)} />
+        ) : currentConversation ? (
           <>
             {!isCanvasOpen && <ChatHeader />}
-            <ConversationContainer 
+            <ConversationContainer
               conversationUuid={currentConversation.uuid}
-              className={`flex-1 ${isCanvasOpen ? 'h-screen' : hasFiles ? 'max-h-[calc(100vh-380px)]' : 'max-h-[calc(100vh-270px)]'}`}
+              className={`flex-1 ${
+                isCanvasOpen
+                  ? "h-screen"
+                  : hasFiles
+                  ? "max-h-[calc(100vh-380px)]"
+                  : "max-h-[calc(100vh-270px)]"
+              }`}
               onCanvasStateChange={handleCanvasStateChange}
               onSendMessage={isCanvasOpen ? handleSendMessage : undefined}
               isStreaming={isStreaming}
@@ -94,7 +121,7 @@ export const ChatScreen: React.FC = () => {
             />
             {!isCanvasOpen && (
               <div className="">
-                <ChatInterface 
+                <ChatInterface
                   onSendMessage={handleSendMessage}
                   isCompact={true}
                   isStreaming={isStreaming}
@@ -105,7 +132,7 @@ export const ChatScreen: React.FC = () => {
             )}
           </>
         ) : (
-          <ChatInterface 
+          <ChatInterface
             onSendMessage={handleSendMessage}
             isCompact={false}
             isStreaming={isStreaming}
@@ -116,5 +143,5 @@ export const ChatScreen: React.FC = () => {
         )}
       </div>
     </div>
-  )
-}
+  );
+};

@@ -66,8 +66,8 @@ const ChatListItem: React.FC<ChatListItemProps> = ({
         : "text-[color:var(--tokens-color-text-text-conversation)] hover:bg-[color:var(--tokens-color-surface-surface-secondary)]"
     }`}
   >
-    <button onClick={onClick} className="flex-1 text-left max-w-[180px]">
-      <div className="font-h02-heading02  text-[color:var(--light-mode-colors-dark-gray-900)] flex-1 tracking-[var(--text-small-letter-spacing)] text-[14px] [font-style:var(--text-small-font-style)] font-[number:var(--text-small-font-weight)] leading-[var(--text-small-line-height)] truncate ">
+    <button onClick={onClick} className="flex-1 text-left max-w-[160px]">
+      <div className="font-h02-heading02 text-[color:var(--light-mode-colors-dark-gray-900)] flex-1 tracking-[var(--text-small-letter-spacing)] text-[14px] [font-style:var(--text-small-font-style)] font-[number:var(--text-small-font-weight)] leading-[var(--text-small-line-height)] truncate max-w-[160px]">
         {text}
       </div>
     </button>
@@ -93,6 +93,7 @@ interface NavigationSidebarProps {
   showFullSidebar?: boolean;
   selectedProjectId?: string;
   onProjectSelect?: (project: Project | null) => void;
+  onAccountClick?: () => void;
 }
 
 export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
@@ -102,6 +103,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
   showFullSidebar = true,
   selectedProjectId,
   onProjectSelect,
+  onAccountClick,
 }) => {
   const [selectedChat, setSelectedChat] = useState<number | null>(null);
   const [selectedProjectConversationUuid, setSelectedProjectConversationUuid] =
@@ -115,8 +117,8 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
   });
   const [isNewFolderModalOpen, setIsNewFolderModalOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const conversationsContainerRef = useRef<HTMLDivElement>(null);
-  const projectsContainerRef = useRef<HTMLDivElement>(null);
+  const projectsListRef = useRef<HTMLDivElement>(null);
+  const conversationsListRef = useRef<HTMLDivElement>(null);
   const { userName } = useAuthRedux();
   const { logout } = useAuth();
   const router = useRouter();
@@ -145,6 +147,27 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
     "Collapse sidebar"
   );
 
+  const PROJECTS_MAX_HEIGHT = 200;
+  const RECENTS_MAX_HEIGHT = 200;
+
+  const [projectsOverflow, setProjectsOverflow] = useState(false);
+  const [showAllProjects, setShowAllProjects] = useState(false);
+  const [conversationsOverflow, setConversationsOverflow] = useState(false);
+  const [showAllConversations, setShowAllConversations] = useState(false);
+
+  useEffect(() => {
+    if (projectsListRef.current) {
+      setProjectsOverflow(
+        projectsListRef.current.scrollHeight > PROJECTS_MAX_HEIGHT
+      );
+    }
+  }, [
+    userFolders.length,
+    projectConversationsData,
+    showAllProjects,
+    selectedProjectConversationUuid,
+  ]);
+
   // Determine if sidebar should be shrunk
   // Sidebar is shrunk if: canvas is open (!showFullSidebar) OR manually shrunk by user
   const isShrunk = !showFullSidebar || isManuallyShrunk;
@@ -172,6 +195,19 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
     conversationPagination,
     isLoadingMoreConversations,
   } = useConversation();
+
+  useEffect(() => {
+    if (conversationsListRef.current) {
+      setConversationsOverflow(
+        conversationsListRef.current.scrollHeight > RECENTS_MAX_HEIGHT
+      );
+    }
+  }, [
+    conversations.length,
+    showAllConversations,
+    selectedProjectConversationUuid,
+    reduxSelectedProjectId,
+  ]);
 
   // Sync selectedProjectConversationUuid and selectedProjectId when currentConversation changes
   useEffect(() => {
@@ -228,27 +264,15 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
   );
 
   // Handle scroll to load more projects
-  const handleProjectsScroll = useCallback(
-    (e: React.UIEvent<HTMLDivElement>) => {
-      const container = e.currentTarget;
-      const scrollTop = container.scrollTop;
-      const scrollHeight = container.scrollHeight;
-      const clientHeight = container.clientHeight;
-
-      const threshold = 10;
-      const isNearBottom = scrollTop + clientHeight >= scrollHeight - threshold;
-
-      if (
-        isNearBottom &&
-        !isLoadingMoreProjects &&
-        projectsPagination &&
-        projectsPagination.page < projectsPagination.total_pages
-      ) {
-        loadProjects(projectsPagination.page + 1, projectsPagination.per_page);
-      }
-    },
-    [isLoadingMoreProjects, projectsPagination, loadProjects]
-  );
+  const handleLoadMoreProjects = useCallback(() => {
+    if (
+      !isLoadingMoreProjects &&
+      projectsPagination &&
+      projectsPagination.page < projectsPagination.total_pages
+    ) {
+      loadProjects(projectsPagination.page + 1, projectsPagination.per_page);
+    }
+  }, [isLoadingMoreProjects, projectsPagination, loadProjects]);
 
   const handleNewChat = () => {
     setIsManuallyShrunk(false);
@@ -278,32 +302,13 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
     }
   };
 
-  // Handle scroll to load more conversations
-  const handleConversationsScroll = useCallback(
-    (e: React.UIEvent<HTMLDivElement>) => {
-      const container = e.currentTarget;
-      const scrollTop = container.scrollTop;
-      const scrollHeight = container.scrollHeight;
-      const clientHeight = container.clientHeight;
-
-      // Check if scrolled to bottom (with a small threshold)
-      const threshold = 10;
-      const isNearBottom = scrollTop + clientHeight >= scrollHeight - threshold;
-
-      if (
-        isNearBottom &&
-        !isLoadingMoreConversations &&
-        conversationPagination &&
-        conversationPagination.page < conversationPagination.total_pages
-      ) {
-        loadMoreConversations();
-      }
-    },
-    [isLoadingMoreConversations, conversationPagination, loadMoreConversations]
-  );
-
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  const handleAccountClick = () => {
+    onAccountClick?.();
+    setIsDropdownOpen(false);
   };
 
   // Handle click outside to close dropdown
@@ -567,13 +572,18 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
             )}
 
             {!isShrunk && (
-              <div
-                ref={projectsContainerRef}
-                className="flex flex-col items-start relative w-full max-h-48 overflow-y-auto scrollbar-hide scroll-smooth"
-                onScroll={handleProjectsScroll}
-              >
-                {/* User Created Projects */}
-                {userFolders.map((folder) => {
+              <>
+                <div
+                  className="flex flex-col items-start relative w-full gap-1 transition-all"
+                  style={
+                    !showAllProjects && projectsOverflow
+                      ? { maxHeight: '190px', overflow: "hidden" }
+                      : undefined
+                  }
+                >
+                  <div ref={projectsListRef} className="flex flex-col w-full gap-1">
+                    {/* User Created Projects */}
+                    {userFolders.map((folder) => {
                   // Check if any conversation from this project is selected
                   const hasSelectedConversation =
                     projectConversationsData[folder.id]?.some(
@@ -626,7 +636,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                           }`}
                         />
                         <span
-                          className={`font-h02-heading02 font-[number:var(--text-font-weight)] text-[14px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] whitespace-nowrap [font-style:var(--text-font-style)] ${
+                          className={`font-h02-heading02 font-[number:var(--text-font-weight)] text-[14px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] whitespace-nowrap [font-style:var(--text-font-style)] truncate max-w-[160px] ${
                             isSelected
                               ? "text-[color:var(--tokens-color-text-text-brand)]"
                               : "text-[color:var(--light-mode-colors-dark-gray-900)]"
@@ -679,7 +689,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                                     : "text-[color:var(--tokens-color-text-text-conversation)]"
                                 }`}
                               >
-                                <div className="font-h02-heading02 text-[13px] tracking-[var(--text-small-letter-spacing)] [font-style:var(--text-small-font-style)] font-[number:var(--text-small-font-weight)] leading-[var(--text-small-line-height)] truncate">
+                                <div className="font-h02-heading02 text-[13px] tracking-[var(--text-small-letter-spacing)] [font-style:var(--text-small-font-style)] font-[number:var(--text-small-font-weight)] leading-[var(--text-small-line-height)] truncate max-w-[160px]">
                                   {convName}
                                 </div>
                               </button>
@@ -688,21 +698,36 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                         </div>
                       )}
                     </div>
-                  );
-                })}
+                      );
+                    })}
+                  </div>
+                </div>
 
                 {/* Loading indicator for more projects */}
                 {isLoadingMoreProjects && (
-                  <div className="w-full p-3 text-center text-[color:var(--tokens-color-text-text-inactive-2)]">
-                    <div className="flex items-center justify-center gap-2">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[color:var(--tokens-color-text-text-inactive-2)]"></div>
-                      <span className="text-[14px]">
-                        Loading more projects...
-                      </span>
-                    </div>
+                  <div className="w-full px-5 py-2 text-sm text-[color:var(--tokens-color-text-text-inactive-2)]">
+                    Loading...
                   </div>
                 )}
-              </div>
+                {(projectsOverflow && !showAllProjects) ||
+                (projectsPagination &&
+                  projectsPagination.page < projectsPagination.total_pages) ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (projectsOverflow && !showAllProjects) {
+                        setShowAllProjects(true);
+                      } else {
+                        handleLoadMoreProjects();
+                      }
+                    }}
+                    className="flex items-center gap-2 text-sm px-5 py-2 text-[color:var(--tokens-color-text-text-inactive-2)] hover:text-[color:var(--tokens-color-text-text-brand)] transition-colors"
+                  >
+                    <span className="text-lg leading-none">…</span>
+                    See more
+                  </button>
+                ) : null}
+              </>
             )}
           </div>
 
@@ -718,15 +743,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
 
             {isShrunk ? (
               // Icon-only view for conversations
-              <div
-                ref={conversationsContainerRef}
-                className="flex flex-col items-center relative w-full scroll-smooth px-2"
-                style={{
-                  maxHeight: "var(--sidebar-conversations-max-height)",
-                  minHeight: "200px",
-                }}
-                onScroll={handleConversationsScroll}
-              >
+              <div className="flex flex-col items-center relative w-full px-2 gap-2">
                 {conversations.length > 0 ? (
                   <>
                     {conversations
@@ -762,70 +779,83 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                 )}
               </div>
             ) : (
-              <div
-                ref={conversationsContainerRef}
-                className="flex flex-col items-start relative w-full overflow-y-auto scroll-smooth"
-                style={{
-                  maxHeight: "var(--sidebar-conversations-max-height)",
-                  minHeight: "200px",
-                }}
-                onScroll={handleConversationsScroll}
-              >
-                {conversations.length > 0 ? (
-                  <>
-                    {conversations
-                      .sort(
-                        (a, b) =>
-                          new Date(b.created_at).getTime() -
-                          new Date(a.created_at).getTime()
-                      )
-                      .map((conversation, index) => (
-                        <ChatListItem
-                          key={conversation.uuid}
-                          text={conversation.name}
-                          isSelected={
-                            currentConversation?.uuid === conversation.uuid &&
-                            selectedProjectConversationUuid === null &&
-                            reduxSelectedProjectId === null
-                          }
-                          onClick={() => handleSelectChat(conversation.uuid)}
-                          conversationUuid={conversation.uuid}
-                          onShare={(uuid) => {
-                            // TODO: Implement share functionality
-                            console.log("Share conversation:", uuid);
-                          }}
-                          onRemoveFromFolder={(uuid) => {
-                            // TODO: Implement remove from folder functionality
-                            console.log("Remove from folder:", uuid);
-                          }}
-                          onArchive={(uuid) => {
-                            // TODO: Implement archive functionality
-                            console.log("Archive conversation:", uuid);
-                          }}
-                          onDelete={(uuid) => {
-                            // TODO: Implement delete functionality
-                            console.log("Delete conversation:", uuid);
-                          }}
-                        />
-                      ))}
-                    {/* Loading indicator for more conversations */}
-                    {isLoadingMoreConversations && (
+              <>
+                <div
+                  className="flex flex-col items-start relative w-full gap-1 transition-all"
+                  style={
+                    !showAllConversations && conversationsOverflow
+                      ? { maxHeight: RECENTS_MAX_HEIGHT, overflow: "hidden" }
+                      : undefined
+                  }
+                >
+                  <div ref={conversationsListRef} className="flex flex-col w-full gap-1">
+                    {conversations.length > 0 ? (
+                      <>
+                        {conversations
+                          .sort(
+                            (a, b) =>
+                              new Date(b.created_at).getTime() -
+                              new Date(a.created_at).getTime()
+                          )
+                          .map((conversation) => (
+                            <ChatListItem
+                              key={conversation.uuid}
+                              text={conversation.name}
+                              isSelected={
+                                currentConversation?.uuid === conversation.uuid &&
+                                selectedProjectConversationUuid === null &&
+                                reduxSelectedProjectId === null
+                              }
+                              onClick={() => handleSelectChat(conversation.uuid)}
+                              conversationUuid={conversation.uuid}
+                              onShare={(uuid) => {
+                                // TODO: Implement share functionality
+                                console.log("Share conversation:", uuid);
+                              }}
+                              onRemoveFromFolder={(uuid) => {
+                                // TODO: Implement remove from folder functionality
+                                console.log("Remove from folder:", uuid);
+                              }}
+                              onArchive={(uuid) => {
+                                // TODO: Implement archive functionality
+                                console.log("Archive conversation:", uuid);
+                              }}
+                              onDelete={(uuid) => {
+                                // TODO: Implement delete functionality
+                                console.log("Delete conversation:", uuid);
+                              }}
+                            />
+                          ))}
+                      </>
+                    ) : (
                       <div className="w-full p-3 text-center text-[color:var(--tokens-color-text-text-inactive-2)]">
-                        <div className="flex items-center justify-center gap-2">
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[color:var(--tokens-color-text-text-inactive-2)]"></div>
-                          <span className="text-[14px]">
-                            {t("chat.loadingMoreConversations")}
-                          </span>
-                        </div>
+                        {t("chat.noConversations")}
                       </div>
                     )}
-                  </>
-                ) : (
+                  </div>
+                </div>
+                {conversationsOverflow && !showAllConversations && (
+                  <button
+                    type="button"
+                    onClick={() => setShowAllConversations(true)}
+                    className="flex items-center gap-2 text-sm px-5 py-2 text-[color:var(--tokens-color-text-text-inactive-2)] hover:text-[color:var(--tokens-color-text-text-brand)] transition-colors"
+                  >
+                    <span className="text-lg leading-none">…</span>
+                    See more
+                  </button>
+                )}
+                {/* Loading indicator for more conversations */}
+                {isLoadingMoreConversations && (
                   <div className="w-full p-3 text-center text-[color:var(--tokens-color-text-text-inactive-2)]">
-                    {t("chat.noConversations")}
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[color:var(--tokens-color-text-text-inactive-2)]"></div>
+                      <span className="text-[14px]">
+                        {t("chat.loadingMoreConversations")}
+                      </span>
+                    </div>
                   </div>
                 )}
-              </div>
+              </>
             )}
           </div>
         </div>
@@ -839,7 +869,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
         >
           {isShrunk ? (
             <button
-              onClick={toggleDropdown}
+              onClick={handleAccountClick}
               className="w-10 h-10 rounded-lg flex items-center justify-center transition-colors hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] bg-[color:var(--tokens-color-surface-surface-primary)]"
               title={userName || "User"}
             >
@@ -849,7 +879,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
             </button>
           ) : (
             <button
-              onClick={toggleDropdown}
+              onClick={handleAccountClick}
               className="flex items-center gap-2 px-3 py-2 rounded-[var(--premitives-corner-radius-corner-radius-5)] relative w-full bg-[color:var(--tokens-color-surface-surface-primary)] hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] transition-colors"
               title={userName || "User"}
             >
