@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSubscriptionPlans } from "@/hooks/use-subscription-plans";
+import { useDispatch } from "react-redux";
+import { setActiveSubscription } from "@/store/slices/subscription-plans-slice";
 import { subscriptionPlansApi } from "@/api/subscription-plans/api";
 import { SubscriptionCheckoutRequest } from "@/api/subscription-plans/types";
 import { useToast } from "@/hooks/use-toast";
@@ -21,6 +23,153 @@ const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || ""
 );
 
+// List of all countries with ISO 3166-1 alpha-2 codes
+const COUNTRIES = [
+  { name: "United States", code: "US" },
+  { name: "United Kingdom", code: "GB" },
+  { name: "Canada", code: "CA" },
+  { name: "Australia", code: "AU" },
+  { name: "Germany", code: "DE" },
+  { name: "France", code: "FR" },
+  { name: "Italy", code: "IT" },
+  { name: "Spain", code: "ES" },
+  { name: "Netherlands", code: "NL" },
+  { name: "Belgium", code: "BE" },
+  { name: "Switzerland", code: "CH" },
+  { name: "Austria", code: "AT" },
+  { name: "Sweden", code: "SE" },
+  { name: "Norway", code: "NO" },
+  { name: "Denmark", code: "DK" },
+  { name: "Finland", code: "FI" },
+  { name: "Poland", code: "PL" },
+  { name: "Ireland", code: "IE" },
+  { name: "Portugal", code: "PT" },
+  { name: "Greece", code: "GR" },
+  { name: "Czech Republic", code: "CZ" },
+  { name: "Hungary", code: "HU" },
+  { name: "Romania", code: "RO" },
+  { name: "Bulgaria", code: "BG" },
+  { name: "Croatia", code: "HR" },
+  { name: "Slovakia", code: "SK" },
+  { name: "Slovenia", code: "SI" },
+  { name: "Lithuania", code: "LT" },
+  { name: "Latvia", code: "LV" },
+  { name: "Estonia", code: "EE" },
+  { name: "Luxembourg", code: "LU" },
+  { name: "Malta", code: "MT" },
+  { name: "Cyprus", code: "CY" },
+  { name: "Iceland", code: "IS" },
+  { name: "Japan", code: "JP" },
+  { name: "South Korea", code: "KR" },
+  { name: "China", code: "CN" },
+  { name: "India", code: "IN" },
+  { name: "Singapore", code: "SG" },
+  { name: "Malaysia", code: "MY" },
+  { name: "Thailand", code: "TH" },
+  { name: "Indonesia", code: "ID" },
+  { name: "Philippines", code: "PH" },
+  { name: "Vietnam", code: "VN" },
+  { name: "Hong Kong", code: "HK" },
+  { name: "Taiwan", code: "TW" },
+  { name: "New Zealand", code: "NZ" },
+  { name: "South Africa", code: "ZA" },
+  { name: "Brazil", code: "BR" },
+  { name: "Mexico", code: "MX" },
+  { name: "Argentina", code: "AR" },
+  { name: "Chile", code: "CL" },
+  { name: "Colombia", code: "CO" },
+  { name: "Peru", code: "PE" },
+  { name: "Uruguay", code: "UY" },
+  { name: "Paraguay", code: "PY" },
+  { name: "Venezuela", code: "VE" },
+  { name: "Ecuador", code: "EC" },
+  { name: "Bolivia", code: "BO" },
+  { name: "Costa Rica", code: "CR" },
+  { name: "Panama", code: "PA" },
+  { name: "Guatemala", code: "GT" },
+  { name: "Honduras", code: "HN" },
+  { name: "El Salvador", code: "SV" },
+  { name: "Nicaragua", code: "NI" },
+  { name: "Dominican Republic", code: "DO" },
+  { name: "Jamaica", code: "JM" },
+  { name: "Trinidad and Tobago", code: "TT" },
+  { name: "Barbados", code: "BB" },
+  { name: "Bahamas", code: "BS" },
+  { name: "Belize", code: "BZ" },
+  { name: "Guyana", code: "GY" },
+  { name: "Suriname", code: "SR" },
+  { name: "Israel", code: "IL" },
+  { name: "United Arab Emirates", code: "AE" },
+  { name: "Saudi Arabia", code: "SA" },
+  { name: "Qatar", code: "QA" },
+  { name: "Kuwait", code: "KW" },
+  { name: "Bahrain", code: "BH" },
+  { name: "Oman", code: "OM" },
+  { name: "Jordan", code: "JO" },
+  { name: "Lebanon", code: "LB" },
+  { name: "Egypt", code: "EG" },
+  { name: "Turkey", code: "TR" },
+  { name: "Russia", code: "RU" },
+  { name: "Ukraine", code: "UA" },
+  { name: "Belarus", code: "BY" },
+  { name: "Kazakhstan", code: "KZ" },
+  { name: "Uzbekistan", code: "UZ" },
+  { name: "Azerbaijan", code: "AZ" },
+  { name: "Armenia", code: "AM" },
+  { name: "Georgia", code: "GE" },
+  { name: "Moldova", code: "MD" },
+  { name: "Albania", code: "AL" },
+  { name: "North Macedonia", code: "MK" },
+  { name: "Bosnia and Herzegovina", code: "BA" },
+  { name: "Serbia", code: "RS" },
+  { name: "Montenegro", code: "ME" },
+  { name: "Kosovo", code: "XK" },
+  { name: "Mongolia", code: "MN" },
+  { name: "Myanmar", code: "MM" },
+  { name: "Cambodia", code: "KH" },
+  { name: "Laos", code: "LA" },
+  { name: "Bangladesh", code: "BD" },
+  { name: "Sri Lanka", code: "LK" },
+  { name: "Nepal", code: "NP" },
+  { name: "Bhutan", code: "BT" },
+  { name: "Pakistan", code: "PK" },
+  { name: "Afghanistan", code: "AF" },
+  { name: "Iran", code: "IR" },
+  { name: "Iraq", code: "IQ" },
+  { name: "Yemen", code: "YE" },
+  { name: "Syria", code: "SY" },
+  { name: "Palestine", code: "PS" },
+  { name: "Libya", code: "LY" },
+  { name: "Tunisia", code: "TN" },
+  { name: "Algeria", code: "DZ" },
+  { name: "Morocco", code: "MA" },
+  { name: "Sudan", code: "SD" },
+  { name: "Ethiopia", code: "ET" },
+  { name: "Kenya", code: "KE" },
+  { name: "Tanzania", code: "TZ" },
+  { name: "Uganda", code: "UG" },
+  { name: "Ghana", code: "GH" },
+  { name: "Nigeria", code: "NG" },
+  { name: "Senegal", code: "SN" },
+  { name: "Ivory Coast", code: "CI" },
+  { name: "Cameroon", code: "CM" },
+  { name: "Angola", code: "AO" },
+  { name: "Zambia", code: "ZM" },
+  { name: "Zimbabwe", code: "ZW" },
+  { name: "Botswana", code: "BW" },
+  { name: "Namibia", code: "NA" },
+  { name: "Mozambique", code: "MZ" },
+  { name: "Madagascar", code: "MG" },
+  { name: "Mauritius", code: "MU" },
+  { name: "Seychelles", code: "SC" },
+  { name: "Fiji", code: "FJ" },
+  { name: "Papua New Guinea", code: "PG" },
+  { name: "Solomon Islands", code: "SB" },
+  { name: "Vanuatu", code: "VU" },
+  { name: "Samoa", code: "WS" },
+  { name: "Tonga", code: "TO" },
+].sort((a, b) => a.name.localeCompare(b.name));
+
 interface CheckoutFormProps {
   plan: any;
   billingCycle: "monthly" | "annual";
@@ -35,6 +184,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
   const router = useRouter();
   const stripe = useStripe();
   const elements = useElements();
+  const dispatch = useDispatch();
   const { success: showSuccessToast, error: showErrorToast } = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -165,11 +315,30 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
         throw new Error(JSON.stringify(errorObject));
       }
 
-      showSuccessToast(
-        "Subscription Created",
-        "Your subscription has been successfully created!"
-      );
-      router.push("/dashboard");
+      // Check if response has subscription data
+      if (response.data && response.data.subscription) {
+        // Update Redux store with the new subscription
+        const subscription = response.data.subscription;
+        dispatch(setActiveSubscription(subscription));
+        
+        // Show success message
+        showSuccessToast(
+          "Subscription Created",
+          response.data.message || "Your subscription has been successfully created!"
+        );
+        
+        // Redirect to dashboard after a short delay
+        setTimeout(() => {
+          router.push("/pricing");
+        }, 500);
+      } else {
+        // Fallback: Still show success even if subscription data is missing
+        showSuccessToast(
+          "Subscription Created",
+          "Your subscription has been successfully created!"
+        );
+        router.push("/pricing");
+      }
     } catch (err) {
       const errorMessage = handleApiError(err);
       showErrorToast("Checkout Failed", errorMessage);
@@ -432,15 +601,28 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
                     Country or Region
                   </label>
                   <div className={inputClasses}>
-                    <input
-                      type="text"
+                    <select
                       value={formData.country}
                       onChange={(e) =>
                         handleInputChange("country", e.target.value)
                       }
-                      placeholder="Enter your country"
-                      className="w-full bg-transparent border-none outline-none placeholder:text-[#A1A1A1] text-black text-sm"
-                    />
+                      className="w-full bg-transparent border-none outline-none text-black text-sm cursor-pointer appearance-none"
+                      style={{
+                        backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E\")",
+                        backgroundRepeat: "no-repeat",
+                        backgroundPosition: "right 1rem center",
+                        paddingRight: "2.5rem",
+                      }}
+                    >
+                      <option value="" disabled>
+                        Select your country
+                      </option>
+                      {COUNTRIES.map((country) => (
+                        <option key={country.code} value={country.code}>
+                          {country.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   {errors.country && (
                     <p className="text-sm text-red-600">{errors.country}</p>

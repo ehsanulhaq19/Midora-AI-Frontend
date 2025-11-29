@@ -9,6 +9,8 @@ import {
   setLoading,
   setError,
   clearError,
+  setActiveSubscription,
+  setSubscriptionLoading,
 } from '@/store/slices/subscription-plans-slice'
 import { useToast } from './use-toast'
 import { handleApiError } from '@/lib/error-handler'
@@ -19,7 +21,9 @@ export const useSubscriptionPlans = () => {
   const {
     plans,
     selectedPlan,
+    activeSubscription,
     isLoading,
+    isSubscriptionLoading,
     error,
   } = useSelector((state: RootState) => state.subscriptionPlans)
 
@@ -70,14 +74,100 @@ export const useSubscriptionPlans = () => {
     return plans.find(plan => plan.uuid === uuid)
   }, [plans])
 
+  /**
+   * Load active subscription
+   */
+  const loadActiveSubscription = useCallback(async () => {
+    try {
+      dispatch(setSubscriptionLoading(true))
+      dispatch(clearError())
+
+      const response = await subscriptionPlansApi.getActiveSubscription()
+
+      if (response.error) {
+        // Check for SUBSCRIPTION_NOT_FOUND error type or 404 status
+        // This is not an error - it just means the user doesn't have a subscription
+        const errorType = response.processedError?.error_type || response.error_type
+        if (response.status === 404 || errorType === 'SUBSCRIPTION_NOT_FOUND') {
+          dispatch(setActiveSubscription(null))
+          return null
+        }
+        
+        // For other errors, throw and show error toast
+        const errorObject = response.processedError || {
+          error_type: 'SUBSCRIPTION_LOAD_FAILED',
+          error_message: response.error,
+          error_id: response.error_id,
+          status: response.status
+        }
+        dispatch(setError(response.error))
+        throw new Error(JSON.stringify(errorObject))
+      }
+
+      const subscriptionData = response.data
+      dispatch(setActiveSubscription(subscriptionData))
+      return subscriptionData
+    } catch (err) {
+      const errorMessage = handleApiError(err)
+      // Check if this is a "not found" error (subscription doesn't exist)
+      if (errorMessage.includes('404') || 
+          errorMessage.includes('not found') || 
+          errorMessage.includes('SUBSCRIPTION_NOT_FOUND')) {
+        dispatch(setActiveSubscription(null))
+        return null
+      }
+      // Only show error toast for actual errors, not "not found"
+      showErrorToast('Failed to Load Subscription', errorMessage)
+      throw err
+    } finally {
+      dispatch(setSubscriptionLoading(false))
+    }
+  }, [dispatch, showErrorToast])
+
+  /**
+   * Cancel subscription
+   */
+  const cancelSubscription = useCallback(async (subscriptionUuid: string) => {
+    try {
+      dispatch(setSubscriptionLoading(true))
+      dispatch(clearError())
+
+      const response = await subscriptionPlansApi.cancelSubscription(subscriptionUuid)
+
+      if (response.error) {
+        const errorObject = response.processedError || {
+          error_type: 'SUBSCRIPTION_CANCEL_FAILED',
+          error_message: response.error,
+          error_id: response.error_id,
+          status: response.status
+        }
+        dispatch(setError(response.error))
+        throw new Error(JSON.stringify(errorObject))
+      }
+
+      dispatch(setActiveSubscription(null))
+      return response.data
+    } catch (err) {
+      const errorMessage = handleApiError(err)
+      showErrorToast('Failed to Cancel Subscription', errorMessage)
+      throw err
+    } finally {
+      dispatch(setSubscriptionLoading(false))
+    }
+  }, [dispatch, showErrorToast])
+
   return {
     plans,
     selectedPlan,
+    activeSubscription,
     isLoading,
+    isSubscriptionLoading,
     error,
     loadPlans,
     selectPlan,
     getPlanByUuid,
+    loadActiveSubscription,
+    cancelSubscription,
   }
 }
 

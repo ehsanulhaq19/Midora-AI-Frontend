@@ -217,7 +217,7 @@ function SignupPageContent() {
           <section className="w-full pt-4 lg:pt-8 pb-6 lg:pb-12">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 xl:gap-16 min-h-[600px]">
               {/* Signup Form Section */}
-              <div className="order-1 lg:order-1 flex justify-center lg:justify-center px-4 sm:px-6 lg:px-8 m-auto items-end w-full h-full">
+              <div id="signup-form-section" className="order-1 lg:order-1 flex justify-center lg:justify-center px-4 sm:px-6 lg:px-8 m-auto items-end w-full h-full">
                 <SignupFormSection onShowOnboarding={(step: string | undefined) => handleOnShowOnboarding(step)} />
               </div>
 
@@ -265,7 +265,7 @@ function SignupPageContent() {
           {/* Pricing Section */}
           <section className="w-full py-8 lg:py-16">
             <div className="w-full px-4 sm:px-6 lg:px-8">
-              <PricingSection />
+              <PricingSection onSignupPage={true} signupFormId="signup-form-section" />
             </div>
           </section>
 

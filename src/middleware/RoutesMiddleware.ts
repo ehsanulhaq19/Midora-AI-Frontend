@@ -18,7 +18,6 @@ const ROUTES = {
   ],
   // Protected routes that require authentication
   PROTECTED: [
-    '/dashboard',
     '/profile',
     '/settings',
     '/chat',

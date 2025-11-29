@@ -245,7 +245,7 @@ export const ProjectFilesModal: React.FC<ProjectFilesModalProps> = ({
               {uploadedFilesWithStatus.length > 0 && (
                 <div className="mb-4">
                   <div className="text-sm font-medium text-[color:var(--tokens-color-text-text-primary)] mb-2">
-                    Uploaded Files (Pending)
+                    Uploaded Files (Ready to upload)
                   </div>
                   <div className="flex flex-wrap gap-3">
                     {uploadedFilesWithStatus.map((file: UploadedFileWithStatus) => (
