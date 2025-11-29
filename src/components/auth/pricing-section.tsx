@@ -11,6 +11,8 @@ import { SubscriptionPlan } from "@/api/subscription-plans/types";
 
 interface PricingSectionProps {
   className?: string;
+  onSignupPage?: boolean;
+  signupFormId?: string;
 }
 
 interface PricingCardProps {
@@ -158,6 +160,8 @@ const PricingCard: React.FC<PricingCardProps> = ({ plan, onClick }) => {
 
 export const PricingSection: React.FC<PricingSectionProps> = ({
   className = "",
+  onSignupPage = false,
+  signupFormId = "signup-form-section",
 }) => {
   const router = useRouter();
   const { plans, loadPlans, selectPlan, activeSubscription, loadActiveSubscription, isLoading } = useSubscriptionPlans();
@@ -174,6 +178,11 @@ export const PricingSection: React.FC<PricingSectionProps> = ({
   }, []); // Empty dependency array - only run once on mount
 
   useEffect(() => {
+    // Don't load active subscription on signup page
+    if (onSignupPage) {
+      return;
+    }
+    
     if (!hasLoadedSubscriptionRef.current) {
       hasLoadedSubscriptionRef.current = true;
       loadActiveSubscription().catch((err) => {
@@ -183,11 +192,21 @@ export const PricingSection: React.FC<PricingSectionProps> = ({
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Empty dependency array - only run once on mount
+  }, [onSignupPage]); // Include onSignupPage in dependencies
 
   const handlePlanClick = (plan: SubscriptionPlan) => {
     selectPlan(plan);
-    router.push(`/checkout?plan=${plan.uuid}`);
+    
+    if (onSignupPage) {
+      // Scroll to signup form section
+      const signupFormElement = document.getElementById(signupFormId);
+      if (signupFormElement) {
+        signupFormElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    } else {
+      // Navigate to checkout page
+      router.push(`/checkout?plan=${plan.uuid}`);
+    }
   };
 
   if (isLoading) {

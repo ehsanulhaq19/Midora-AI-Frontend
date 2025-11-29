@@ -12,6 +12,7 @@ interface EnhancedPricingCardProps {
   onButtonClick?: () => void
   onCancelClick?: () => void
   showCancelButton?: boolean
+  renewalDate?: string | null
 }
 
 export const EnhancedPricingCard: React.FC<EnhancedPricingCardProps> = ({ 
@@ -21,27 +22,63 @@ export const EnhancedPricingCard: React.FC<EnhancedPricingCardProps> = ({
   onClick,
   onButtonClick,
   onCancelClick,
-  showCancelButton = false
+  showCancelButton = false,
+  renewalDate = null
 }) => {
   const baseClasses = "flex flex-col items-start gap-6 p-6 sm:p-9 relative rounded-3xl w-full max-w-[383px] min-h-[500px] sm:min-h-[616px] box-border cursor-pointer transition-all duration-300";
   
-  // Card styling based on selection
-  const cardClasses = isSelected
-    ? `${baseClasses} bg-[color:var(--tokens-color-surface-surface-button-pressed)] text-white`
-    : `${baseClasses} bg-[color:var(--tokens-color-surface-surface-sidebar-shrunk)]`;
+  // Card styling based on selection and current plan
+  let cardClasses = baseClasses;
+  if (isSelected) {
+    cardClasses = `${baseClasses} bg-[color:var(--tokens-color-surface-surface-button-pressed)] text-white`;
+  } else if (isCurrentPlan) {
+    // Current plan gets a border highlight
+    cardClasses = `${baseClasses} bg-[color:var(--tokens-color-surface-surface-sidebar-shrunk)] border-2 border-green-500`;
+  } else {
+    cardClasses = `${baseClasses} bg-[color:var(--tokens-color-surface-surface-sidebar-shrunk)]`;
+  }
 
   const textColorClasses = isSelected ? 'text-white' : 'text-[color:var(--tokens-color-text-text-seconary)]';
 
+  // Format renewal date
+  const formatRenewalDate = (dateString: string | null): string => {
+    if (!dateString) return 'Renews soon'
+    try {
+      const date = new Date(dateString)
+      return `Renews on ${date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric' 
+      })}`
+    } catch (error) {
+      return 'Renews soon'
+    }
+  }
+
   // Button text
   const getButtonText = () => {
-    if (isCurrentPlan) return 'Current Plan'
+    if (isCurrentPlan) {
+      if (plan.name === 'Free') {
+        return 'Current plan'
+      }
+      return formatRenewalDate(renewalDate)
+    }
     return `Get ${plan.name} Plan`
   }
 
   // Button styling
-  const buttonClasses = isSelected
-    ? 'w-full flex items-center justify-center gap-2 h-[40px] p-2 bg-[color:var(--premitives-color-brand-purple-1000)] rounded-[var(--premitives-corner-radius-corner-radius-2)] hover:opacity-90 transition-all'
-    : 'w-full flex items-center justify-center gap-2 h-[40px] p-2 bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded-[var(--premitives-corner-radius-corner-radius-2)] hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] transition-colors';
+  const getButtonClasses = () => {
+    if (isCurrentPlan || plan.name === 'Free') {
+      // Disabled state for current plan
+      return 'w-full flex items-center justify-center gap-2 h-[40px] p-2 bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded-[var(--premitives-corner-radius-corner-radius-2)] opacity-60 cursor-not-allowed'
+    }
+    if (isSelected) {
+      return 'w-full flex items-center justify-center gap-2 h-[40px] p-2 bg-[color:var(--premitives-color-brand-purple-1000)] rounded-[var(--premitives-corner-radius-corner-radius-2)] hover:opacity-90 transition-all'
+    }
+    return 'w-full flex items-center justify-center gap-2 h-[40px] p-2 bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded-[var(--premitives-corner-radius-corner-radius-2)] hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] transition-colors'
+  }
+  
+  const buttonClasses = getButtonClasses()
 
   const buttonTextClasses = isSelected 
     ? 'text-white' 
@@ -66,6 +103,13 @@ export const EnhancedPricingCard: React.FC<EnhancedPricingCardProps> = ({
       tabIndex={0}
       onKeyDown={handleKeyDown}
     >
+      {/* Current Plan Badge */}
+      {isCurrentPlan && (
+        <div className="absolute top-4 right-4 px-3 py-1 bg-green-500 text-white text-xs font-semibold rounded-full z-10">
+          Current Plan
+        </div>
+      )}
+      
       <div className="flex flex-col items-start gap-4 sm:gap-6 relative self-stretch w-full flex-[0_0_auto]">
         {/* Title */}
         <div className={`relative self-stretch mt-[-1.00px] font-h02-heading02 font-[number:var(--h02-heading02-font-weight)] ${textColorClasses} app-text-3xl tracking-[var(--h05-heading05-letter-spacing)] leading-[var(--h02-heading02-line-height)] [font-style:var(--h02-heading02-font-style)]`}>
@@ -100,9 +144,10 @@ export const EnhancedPricingCard: React.FC<EnhancedPricingCardProps> = ({
         <div className="flex flex-col gap-2 w-full">
           <button 
             className={buttonClasses}
+            disabled={isCurrentPlan || plan.name === 'Free'}
             onClick={(e) => {
               e.stopPropagation()
-              if (onButtonClick) {
+              if (!isCurrentPlan && onButtonClick) {
                 onButtonClick()
               }
             }}
@@ -111,7 +156,7 @@ export const EnhancedPricingCard: React.FC<EnhancedPricingCardProps> = ({
               {getButtonText()}
             </div>
           </button>
-          {showCancelButton && isCurrentPlan && (
+          {showCancelButton && isCurrentPlan && plan.name !== 'Free' && (
             <button
               className="w-full flex items-center justify-center gap-2 h-[40px] p-2 bg-red-600 hover:bg-red-700 rounded-[var(--premitives-corner-radius-corner-radius-2)] transition-all text-white"
               onClick={(e) => {

@@ -113,7 +113,7 @@ export const FilePreview: React.FC<FilePreviewProps> = ({ file, onRemove, classN
       {/* Pending status badge */}
       {isPending && !isUploading && (
         <div className="absolute top-2 left-2 px-2 py-1 bg-yellow-500/90 text-white text-xs font-medium rounded z-10">
-          Pending
+          Ready to upload
         </div>
       )}
       

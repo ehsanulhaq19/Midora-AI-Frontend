@@ -329,7 +329,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
         
         // Redirect to dashboard after a short delay
         setTimeout(() => {
-          router.push("/dashboard");
+          router.push("/pricing");
         }, 500);
       } else {
         // Fallback: Still show success even if subscription data is missing
@@ -337,7 +337,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
           "Subscription Created",
           "Your subscription has been successfully created!"
         );
-        router.push("/dashboard");
+        router.push("/pricing");
       }
     } catch (err) {
       const errorMessage = handleApiError(err);
