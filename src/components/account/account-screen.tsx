@@ -13,7 +13,7 @@ export const AccountScreen: React.FC<AccountScreenProps> = ({ onClose }) => {
   const [activeSection, setActiveSection] = useState<AccountSection>('account')
 
   return (
-    <div className="w-full h-full bg-[#F8F8FC] flex">
+    <div className="w-full h-full bg-[#F8F8FC] flex relative z-0 pointer-events-auto">
       {/* Account Sidebar - 30% width */}
       <AccountSidebar
         activeSection={activeSection}
@@ -22,7 +22,7 @@ export const AccountScreen: React.FC<AccountScreenProps> = ({ onClose }) => {
       />
 
       {/* Account Content - 70% width */}
-      <div className="flex-1 flex flex-col overflow-y-auto relative bg-[#F8F8FC]">
+      <div className="flex-1 flex flex-col overflow-y-auto relative bg-[#F8F8FC] z-0">
         <AccountContent section={activeSection} />
         
         {/* Close button */}

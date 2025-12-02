@@ -91,16 +91,23 @@ export const ChatScreen: React.FC = () => {
           handleProjectSelect(null);
           startNewChat();
           setIsCanvasOpen(false);
+          setIsAccountOpen(false);
         }}
         showFullSidebar={!isCanvasOpen}
         selectedProjectId={selectedProjectId || undefined}
-        onProjectSelect={handleProjectSelect}
+        onProjectSelect={(project) => {
+          handleProjectSelect(project);
+          setIsAccountOpen(false);
+        }}
         onAccountClick={() => setIsAccountOpen(true)}
+        onNavigate={() => setIsAccountOpen(false)}
       />
 
-      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+      <div className="flex-1 flex flex-col h-screen overflow-hidden relative z-0 min-w-0">
         {isAccountOpen ? (
-          <AccountScreen onClose={() => setIsAccountOpen(false)} />
+          <div className="w-full h-full relative z-0">
+            <AccountScreen onClose={() => setIsAccountOpen(false)} />
+          </div>
         ) : currentConversation ? (
           <>
             {!isCanvasOpen && <ChatHeader />}
