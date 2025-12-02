@@ -25,11 +25,13 @@ export const EnhancedPricingCard: React.FC<EnhancedPricingCardProps> = ({
   showCancelButton = false,
   renewalDate = null
 }) => {
+  const [isHovered, setIsHovered] = React.useState(false);
+  
   const baseClasses = "flex flex-col items-start gap-6 p-6 sm:p-9 relative rounded-3xl w-full max-w-[383px] min-h-[500px] sm:min-h-[616px] box-border cursor-pointer transition-all duration-300";
   
-  // Card styling based on selection and current plan
+  // Card styling based on hover and current plan
   let cardClasses = baseClasses;
-  if (isSelected) {
+  if (isHovered) {
     cardClasses = `${baseClasses} bg-[color:var(--tokens-color-surface-surface-button-pressed)] text-white`;
   } else if (isCurrentPlan) {
     // Current plan gets a border highlight
@@ -38,7 +40,7 @@ export const EnhancedPricingCard: React.FC<EnhancedPricingCardProps> = ({
     cardClasses = `${baseClasses} bg-[color:var(--tokens-color-surface-surface-sidebar-shrunk)]`;
   }
 
-  const textColorClasses = isSelected ? 'text-white' : 'text-[color:var(--tokens-color-text-text-seconary)]';
+  const textColorClasses = isHovered ? 'text-white' : 'text-[color:var(--tokens-color-text-text-seconary)]';
 
   // Format renewal date
   const formatRenewalDate = (dateString: string | null): string => {
@@ -72,7 +74,7 @@ export const EnhancedPricingCard: React.FC<EnhancedPricingCardProps> = ({
       // Disabled state for current plan
       return 'w-full flex items-center justify-center gap-2 h-[40px] p-2 bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded-[var(--premitives-corner-radius-corner-radius-2)] opacity-60 cursor-not-allowed'
     }
-    if (isSelected) {
+    if (isHovered) {
       return 'w-full flex items-center justify-center gap-2 h-[40px] p-2 bg-[color:var(--premitives-color-brand-purple-1000)] rounded-[var(--premitives-corner-radius-corner-radius-2)] hover:opacity-90 transition-all'
     }
     return 'w-full flex items-center justify-center gap-2 h-[40px] p-2 bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded-[var(--premitives-corner-radius-corner-radius-2)] hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] transition-colors'
@@ -80,11 +82,11 @@ export const EnhancedPricingCard: React.FC<EnhancedPricingCardProps> = ({
   
   const buttonClasses = getButtonClasses()
 
-  const buttonTextClasses = isSelected 
+  const buttonTextClasses = isHovered 
     ? 'text-white' 
     : 'text-[color:var(--tokens-color-text-text-brand)]';
 
-  const checkmarkColor = isSelected 
+  const checkmarkColor = isHovered 
     ? '#ffffff' 
     : 'var(--light-mode-colors-dark-gray-900)';
 
@@ -99,6 +101,8 @@ export const EnhancedPricingCard: React.FC<EnhancedPricingCardProps> = ({
     <div 
       className={cardClasses}
       onClick={onClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       role="button"
       tabIndex={0}
       onKeyDown={handleKeyDown}

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState } from "react";
 import { MoreOptions, Share, Pencil, Archive, Trash } from "@/icons";
 
 interface ConversationMenuProps {
@@ -19,26 +19,6 @@ export const ConversationMenu: React.FC<ConversationMenuProps> = ({
   className = "",
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        menuRef.current &&
-        !menuRef.current.contains(event.target as Node)
-      ) {
-        setIsOpen(false);
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isOpen]);
 
   const handleAction = (callback?: () => void) => {
     if (callback) {
@@ -48,14 +28,14 @@ export const ConversationMenu: React.FC<ConversationMenuProps> = ({
   };
 
   return (
-    <div className={`relative ${className}`} ref={menuRef}>
+    <div
+      className={`relative ${className}`}
+      onMouseEnter={() => setIsOpen(true)}
+      onMouseLeave={() => setIsOpen(false)}
+    >
       <button
         type="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          setIsOpen(!isOpen);
-        }}
-        className="flex items-center justify-center hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded transition-colors p-1"
+        className="flex items-center justify-center rounded transition-colors  p-1 "
         aria-label="More options"
       >
         <MoreOptions className="w-4 h-4" />

@@ -60,9 +60,9 @@ const ChatListItem: React.FC<ChatListItemProps> = ({
   onDelete,
 }) => (
   <div
-    className={`w-full flex items-center gap-2.5 px-5 py-2 transition-colors hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded-[var(--premitives-corner-radius-corner-radius)] ${
+    className={`group w-full flex items-center gap-2.5 px-5 py-2 transition-colors hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded-[var(--premitives-corner-radius-corner-radius)] ${
       isSelected
-        ? "bg-[color:var(--tokens-color-surface-surface-tertiary)] text-[color:var(--tokens-color-text-text-brand)]"
+        ? "bg-[color:var(--tokens-color-surface-surface-tertiary)]   text-[color:var(--tokens-color-text-text-brand)]"
         : "text-[color:var(--tokens-color-text-text-conversation)] hover:bg-[color:var(--tokens-color-surface-surface-secondary)]"
     }`}
   >
@@ -71,8 +71,11 @@ const ChatListItem: React.FC<ChatListItemProps> = ({
         {text}
       </div>
     </button>
-    {isSelected && conversationUuid && (
+    {conversationUuid && (
       <ConversationMenu
+        className={`opacity-0 group-hover:opacity-100 transition-opacity duration-150 ${
+          isSelected ? "opacity-100" : ""
+        }`}
         onShare={onShare ? () => onShare(conversationUuid) : undefined}
         onRemoveFromFolder={
           onRemoveFromFolder
@@ -94,6 +97,7 @@ interface NavigationSidebarProps {
   selectedProjectId?: string;
   onProjectSelect?: (project: Project | null) => void;
   onAccountClick?: () => void;
+  onNavigate?: () => void;
 }
 
 export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
@@ -104,6 +108,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
   selectedProjectId,
   onProjectSelect,
   onAccountClick,
+  onNavigate,
 }) => {
   const [selectedChat, setSelectedChat] = useState<number | null>(null);
   const [selectedProjectConversationUuid, setSelectedProjectConversationUuid] =
@@ -278,6 +283,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
     setIsManuallyShrunk(false);
     startNewChat();
     onNewChat?.();
+    onNavigate?.();
     navigateToChat();
   };
 
@@ -291,6 +297,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
     setSelectedChat(
       conversations.findIndex((conv) => conv.uuid === conversationUuid)
     );
+    onNavigate?.();
     navigateToChat();
   };
 
@@ -347,7 +354,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
       {/* Sidebar */}
       <div
         className={`
-        fixed lg:relative top-0 left-0 z-50 transform transition-all duration-300 ease-in-out
+        fixed lg:relative top-0 left-0 z-[60] lg:z-auto transform transition-all duration-300 ease-in-out
         ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
         ${isShrunk ? "w-[70px] lg:w-[70px]" : "w-[258px]"}
         ${
@@ -355,7 +362,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
             ? "bg-[color:var(--tokens-color-surface-surface-sidebar-shrunk)]"
             : "bg-[color:var(--tokens-color-surface-surface-neutral)]"
         }
-        flex flex-col h-[100vh] relative
+        flex flex-col h-[100vh] relative pointer-events-auto
       `}
       >
         {/* Header */}
@@ -469,7 +476,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
           }`}
         >
           {/* Tools Section */}
-          <div className="flex flex-col items-start relative w-full flex-shrink-0">
+          {/* <div className="flex mb-6 flex-col items-start relative w-full flex-shrink-0">
             {!isShrunk && (
               <div className="relative flex items-center justify-center w-fit mb-[8px] mt-[-1.00px] font-h02-heading02 font-[number:var(--text-small-font-weight)]  text-[14px] tracking-[var(--text-small-letter-spacing)] [color:var(--tokens-color-text-text-inactive-2)] leading-[var(--text-small-line-height)] whitespace-nowrap [font-style:var(--text-small-font-style)] px-5">
                 Midoras
@@ -537,12 +544,12 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                 </button>
               </>
             )}
-          </div>
+          </div> */}
 
           {/* Projects Section */}
           <div
             className={`flex flex-col items-start relative w-full flex-shrink-0 ${
-              isShrunk ? "mt-6 items-center px-2" : "mt-6"
+              isShrunk ? " items-center px-2" : ""
             }`}
           >
             {!isShrunk && (
@@ -620,6 +627,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                           ) {
                             loadProjectConversations(folder.id, 1, 10, false);
                           }
+                          onNavigate?.();
                           navigateToChat();
                         }}
                         className={`w-full pt-[5px] pb-[8px] px-2 gap-[8px] flex items-center pl-5 hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded-[var(--premitives-corner-radius-corner-radius)] transition-colors ${
@@ -680,6 +688,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                                   setSelectedProjectConversationUuid(convUuid);
                                   // Select the conversation
                                   selectConversation(convUuid);
+                                  onNavigate?.();
                                   navigateToChat();
                                 }}
                                 className={`w-full py-1.5 px-2 rounded text-left hover:bg-[color:var(--tokens-color-surface-surface-secondary)] transition-colors ${
@@ -723,7 +732,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                     }}
                     className="flex items-center gap-2 text-sm px-5 py-2 text-[color:var(--tokens-color-text-text-inactive-2)] hover:text-[color:var(--tokens-color-text-text-brand)] transition-colors"
                   >
-                    <span className="text-lg leading-none">…</span>
+                    {/* <span className="text-lg leading-none">…</span> */}
                     See more
                   </button>
                 ) : null}
@@ -757,12 +766,12 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                         <button
                           key={conversation.uuid}
                           onClick={() => handleSelectChat(conversation.uuid)}
-                          className={`w-10 h-10 rounded-lg mb-2 flex items-center justify-center transition-colors ${
+                          className={`w-10 h-10 rounded-lg mb-2 flex items-center  justify-center transition-colors ${
                             currentConversation?.uuid === conversation.uuid &&
                             selectedProjectConversationUuid === null &&
                             reduxSelectedProjectId === null
-                              ? "bg-[color:var(--tokens-color-surface-surface-tertiary)] text-[color:var(--tokens-color-text-text-brand)]"
-                              : "hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] text-[color:var(--tokens-color-text-text-conversation)]"
+                              ? "bg-[color:var(--tokens-color-surface-surface-tertiary)]  text-[color:var(--tokens-color-text-text-brand)]"
+                              : "hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]  text-[color:var(--tokens-color-text-text-conversation)]"
                           }`}
                           title={conversation.name}
                         >

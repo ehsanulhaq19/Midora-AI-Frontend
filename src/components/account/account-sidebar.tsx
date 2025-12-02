@@ -3,7 +3,7 @@
 import React from 'react'
 import { AccountIcon, ProfileIcon, LanguageIcon, BillingIcon, NotificationsIcon } from '@/icons'
 
-export type AccountSection = 'account' | 'profile' | 'language' | 'billing' | 'notifications'
+export type AccountSection = 'account' | 'profile' | 'language' | 'sunscription' | 'notifications'
 
 interface AccountSidebarProps {
   activeSection: AccountSection
@@ -28,8 +28,8 @@ const menuItems: Array<{ id: AccountSection; label: string; icon: (isActive: boo
     icon: (isActive) => <LanguageIcon color={isActive ? "var(--tokens-color-text-text-brand)" : "#000000"} />
   },
   {
-    id: 'billing',
-    label: 'Billing',
+    id: 'sunscription',
+    label: 'Sunscription',
     icon: (isActive) => <BillingIcon color={isActive ? "var(--tokens-color-text-text-brand)" : "#000000"} />
   },
   {

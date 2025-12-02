@@ -20,7 +20,7 @@ export const AccountContent: React.FC<AccountContentProps> = ({ section }) => {
       return <ProfileSection />
     case 'language':
       return <LanguageSection />
-    case 'billing':
+    case 'sunscription':
       return <BillingSection />
     case 'notifications':
       return <NotificationsSection />

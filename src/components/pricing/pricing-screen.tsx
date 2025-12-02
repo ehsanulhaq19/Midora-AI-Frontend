@@ -18,7 +18,7 @@ export const PricingScreen: React.FC = () => {
         showFullSidebar={!isCanvasOpen}
       />
 
-      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+      <div className="flex-1 flex flex-col h-screen overflow-hidden relative z-0 min-w-0">
         <PricingContent />
       </div>
     </div>

@@ -72,7 +72,6 @@ export const EnhancedPricingSection: React.FC = () => {
     isLoading,
   } = useSubscriptionPlans()
   const { success: showSuccessToast, error: showErrorToast } = useToast()
-  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null)
   const [showCancelModal, setShowCancelModal] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [showSwitchModal, setShowSwitchModal] = useState(false)
@@ -106,13 +105,6 @@ export const EnhancedPricingSection: React.FC = () => {
   }, [loadActiveSubscription]) // Include loadActiveSubscription in dependencies
   
 
-  useEffect(() => {
-    setSelectedPlanId(selectedPlan?.uuid ?? null)
-  }, [selectedPlan])
-  
-  const handleCardClick = (planId: string) => {
-    setSelectedPlanId((prev) => (planId === prev ? null : planId))
-  }
 
   const handleButtonClick = (plan: SubscriptionPlan) => {
     // Check if user has an active subscription (non-Free plan)
@@ -238,8 +230,7 @@ export const EnhancedPricingSection: React.FC = () => {
               key={plan.uuid} 
               plan={displayPlan}
               isCurrentPlan={isCurrent}
-              isSelected={plan.uuid === selectedPlanId}
-              onClick={() => handleCardClick(plan.uuid)}
+              onClick={() => {}}
               onButtonClick={() => handleButtonClick(plan)}
               onCancelClick={() => handleCancelClick(plan)}
               showCancelButton={isCurrent && !!activeSubscription}
@@ -262,8 +253,7 @@ export const EnhancedPricingSection: React.FC = () => {
               key={plan.uuid} 
               plan={displayPlan}
               isCurrentPlan={isCurrent}
-              isSelected={plan.uuid === selectedPlanId}
-              onClick={() => handleCardClick(plan.uuid)}
+              onClick={() => {}}
               onButtonClick={() => handleButtonClick(plan)}
               onCancelClick={() => handleCancelClick(plan)}
               showCancelButton={isCurrent && !!activeSubscription}
