@@ -124,6 +124,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
   const dropdownRef = useRef<HTMLDivElement>(null);
   const projectsListRef = useRef<HTMLDivElement>(null);
   const conversationsListRef = useRef<HTMLDivElement>(null);
+  const scrollableContentRef = useRef<HTMLDivElement>(null);
   const { userName } = useAuthRedux();
   const { logout } = useAuth();
   const router = useRouter();
@@ -248,6 +249,30 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
     reduxSelectedProjectId,
     dispatch,
   ]);
+
+  // Handle scroll to load more conversations
+  const handleScrollableContentScroll = useCallback(
+    (e: React.UIEvent<HTMLDivElement>) => {
+      const container = e.currentTarget;
+      const scrollTop = container.scrollTop;
+      const scrollHeight = container.scrollHeight;
+      const clientHeight = container.clientHeight;
+
+      // Check if we're near the bottom (within 100px)
+      const threshold = 100;
+      const isNearBottom = scrollTop + clientHeight >= scrollHeight - threshold;
+
+      if (
+        isNearBottom &&
+        !isLoadingMoreConversations &&
+        conversationPagination &&
+        conversationPagination.page < conversationPagination.total_pages
+      ) {
+        loadMoreConversations();
+      }
+    },
+    [isLoadingMoreConversations, conversationPagination, loadMoreConversations]
+  );
 
   // Get conversations for a project from Redux store
   const getProjectConversations = useCallback(
@@ -471,6 +496,8 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
 
         {/* Scrollable Content */}
         <div
+          ref={scrollableContentRef}
+          onScroll={handleScrollableContentScroll}
           className={`flex-1 overflow-hidden overflow-y-auto flex flex-col ${
             isShrunk ? "px-2" : "px-4"
           }`}
@@ -791,11 +818,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
               <>
                 <div
                   className="flex flex-col items-start relative w-full gap-1 transition-all"
-                  style={
-                    !showAllConversations && conversationsOverflow
-                      ? { maxHeight: RECENTS_MAX_HEIGHT, overflow: "hidden" }
-                      : undefined
-                  }
+                  // Remove maxHeight restriction to allow scrolling and infinite scroll
                 >
                   <div ref={conversationsListRef} className="flex flex-col w-full gap-1">
                     {conversations.length > 0 ? (
@@ -843,16 +866,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                     )}
                   </div>
                 </div>
-                {conversationsOverflow && !showAllConversations && (
-                  <button
-                    type="button"
-                    onClick={() => setShowAllConversations(true)}
-                    className="flex items-center gap-2 text-sm px-5 py-2 text-[color:var(--tokens-color-text-text-inactive-2)] hover:text-[color:var(--tokens-color-text-text-brand)] transition-colors"
-                  >
-                    <span className="text-lg leading-none">…</span>
-                    See more
-                  </button>
-                )}
+                {/* Removed "See more" button - now using infinite scroll instead */}
                 {/* Loading indicator for more conversations */}
                 {isLoadingMoreConversations && (
                   <div className="w-full p-3 text-center text-[color:var(--tokens-color-text-text-inactive-2)]">
