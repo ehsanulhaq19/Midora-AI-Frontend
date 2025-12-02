@@ -40,7 +40,6 @@ export const PricingScreen: React.FC = () => {
         onAccountClick={() => setIsAccountOpen(true)}
         onNavigate={() => setIsAccountOpen(false)}
       />
-
       <div className="flex-1 flex flex-col h-screen overflow-hidden relative z-0 min-w-0">
         {isAccountOpen ? (
           <div className="w-full h-full relative z-0">
