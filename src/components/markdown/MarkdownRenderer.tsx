@@ -51,7 +51,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
 
           // Paragraphs
           p: ({ children }) => (
-            <p className="app-text-md app-text-primary mb-3 relative font-h02-heading02 font-[number:var(--text-font-weight)] text-[color:var(--light-mode-colors-dark-gray-900)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] break-words">
+            <p className="app-text-md inline-block app-text-primary mb-3 relative font-h02-heading02 font-[number:var(--text-font-weight)] text-[color:var(--light-mode-colors-dark-gray-900)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] break-words">
               {children}
             </p>
           ),
