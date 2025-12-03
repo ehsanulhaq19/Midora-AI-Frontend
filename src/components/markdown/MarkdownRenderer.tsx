@@ -1,16 +1,16 @@
-'use client'
+"use client";
 
-import React from 'react'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
-import { oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism'
-import type { MarkdownRendererProps } from './types'
+import React from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
+import type { MarkdownRendererProps } from "./types";
 
-export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ 
-  content, 
-  className = '',
-  onLinkClick
+export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
+  content,
+  className = "",
+  onLinkClick,
 }) => {
   return (
     <div className={`markdown-content ${className}`}>
@@ -51,7 +51,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
 
           // Paragraphs
           p: ({ children }) => (
-            <p className="app-text-md inline-block app-text-primary mb-3 relative font-h02-heading02 font-[number:var(--text-font-weight)] text-[color:var(--light-mode-colors-dark-gray-900)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] break-words">
+            <p className="markdown-paragraph app-text-md app-text-primary mb-3 relative font-h02-heading02 font-[number:var(--text-font-weight)] text-[color:var(--light-mode-colors-dark-gray-900)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] break-words">
               {children}
             </p>
           ),
@@ -68,9 +68,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
             </ol>
           ),
           li: ({ children }) => (
-            <li className="app-text-primary">
-              {children}
-            </li>
+            <li className="app-text-primary">{children}</li>
           ),
 
           // Tables with theme styling
@@ -86,11 +84,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
               {children}
             </thead>
           ),
-          tbody: ({ children }) => (
-            <tbody>
-              {children}
-            </tbody>
-          ),
+          tbody: ({ children }) => <tbody>{children}</tbody>,
           tr: ({ children }) => (
             <tr className="border-b border-[color:var(--tokens-color-border-border-inactive)]">
               {children}
@@ -118,14 +112,14 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
 
           // Links
           a: ({ href, children }) => (
-            <a 
-              href={href} 
+            <a
+              href={href}
               className="text-[color:var(--tokens-color-text-text-brand)] hover:text-[color:var(--tokens-color-text-text-brand)] underline hover:no-underline transition-colors"
               target="_blank"
               rel="noopener noreferrer"
               onClick={(event) => {
                 if (onLinkClick) {
-                  onLinkClick(event, href)
+                  onLinkClick(event, href);
                 }
               }}
             >
@@ -135,8 +129,8 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
 
           // Code blocks with syntax highlighting - white background
           code: ({ node, inline, className, children, ...props }) => {
-            const match = /language-(\w+)/.exec(className || '')
-            
+            const match = /language-(\w+)/.exec(className || "");
+
             if (!inline && match) {
               return (
                 <div className="my-4 rounded-lg overflow-hidden border border-[color:var(--tokens-color-border-border-inactive)]">
@@ -146,34 +140,34 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
                     PreTag="div"
                     className="!bg-white !text-gray-800"
                     customStyle={{
-                      backgroundColor: '#ffffff',
+                      backgroundColor: "#ffffff",
                       margin: 0,
-                      borderRadius: '0.5rem',
-                      fontSize: '0.875rem',
-                      lineHeight: '1.5',
-                      padding: '1rem',
+                      borderRadius: "0.5rem",
+                      fontSize: "0.875rem",
+                      lineHeight: "1.5",
+                      padding: "1rem",
                     }}
                     codeTagProps={{
                       style: {
-                        color: '#1f2937',
-                      }
+                        color: "#1f2937",
+                      },
                     }}
                     {...props}
                   >
-                    {String(children).replace(/\n$/, '')}
+                    {String(children).replace(/\n$/, "")}
                   </SyntaxHighlighter>
                 </div>
-              )
+              );
             }
-            
+
             return (
-              <code 
+              <code
                 className="bg-[color:var(--tokens-color-surface-surface-secondary)] text-[color:var(--tokens-color-text-text-primary)] px-1.5 py-0.5 rounded text-sm font-mono"
                 {...props}
               >
                 {children}
               </code>
-            )
+            );
           },
 
           // Horizontal rule
@@ -195,9 +189,9 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
 
           // Images
           img: ({ src, alt }) => (
-            <img 
-              src={src} 
-              alt={alt} 
+            <img
+              src={src}
+              alt={alt}
               className="max-w-full h-auto rounded-lg my-4 border border-[color:var(--tokens-color-border-border-inactive)]"
             />
           ),
@@ -206,5 +200,5 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
         {content}
       </ReactMarkdown>
     </div>
-  )
-}
+  );
+};
