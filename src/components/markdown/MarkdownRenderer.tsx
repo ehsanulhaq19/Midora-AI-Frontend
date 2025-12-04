@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import React from 'react'
 import ReactMarkdown from 'react-markdown'
@@ -8,10 +8,10 @@ import { oneLight, oneDark } from 'react-syntax-highlighter/dist/esm/styles/pris
 import { useTheme } from '@/hooks/use-theme'
 import type { MarkdownRendererProps } from './types'
 
-export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ 
-  content, 
-  className = '',
-  onLinkClick
+export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
+  content,
+  className = "",
+  onLinkClick,
 }) => {
   const { theme } = useTheme()
   const isDark = theme === 'dark'
@@ -54,7 +54,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
 
           // Paragraphs
           p: ({ children }) => (
-            <p className={`app-text-md app-text-primary mb-3 relative font-h02-heading02 font-[number:var(--text-font-weight)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] break-words ${isDark ? 'text-white' : 'text-[color:var(--light-mode-colors-dark-gray-900)]'}`}>
+            <p className={`markdown-paragraph app-text-md app-text-primary mb-3 relative font-h02-heading02 font-[number:var(--text-font-weight)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] break-words ${isDark ? 'text-white' : 'text-[color:var(--light-mode-colors-dark-gray-900)]'}`}>
               {children}
             </p>
           ),
@@ -71,9 +71,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
             </ol>
           ),
           li: ({ children }) => (
-            <li className="app-text-primary">
-              {children}
-            </li>
+            <li className="app-text-primary">{children}</li>
           ),
 
           // Tables with theme styling
@@ -89,11 +87,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
               {children}
             </thead>
           ),
-          tbody: ({ children }) => (
-            <tbody>
-              {children}
-            </tbody>
-          ),
+          tbody: ({ children }) => <tbody>{children}</tbody>,
           tr: ({ children }) => (
             <tr className="border-b border-[color:var(--tokens-color-border-border-inactive)]">
               {children}
@@ -121,14 +115,14 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
 
           // Links
           a: ({ href, children }) => (
-            <a 
-              href={href} 
+            <a
+              href={href}
               className="text-[color:var(--tokens-color-text-text-brand)] hover:text-[color:var(--tokens-color-text-text-brand)] underline hover:no-underline transition-colors"
               target="_blank"
               rel="noopener noreferrer"
               onClick={(event) => {
                 if (onLinkClick) {
-                  onLinkClick(event, href)
+                  onLinkClick(event, href);
                 }
               }}
             >
@@ -167,20 +161,20 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
                     }}
                     {...props}
                   >
-                    {String(children).replace(/\n$/, '')}
+                    {String(children).replace(/\n$/, "")}
                   </SyntaxHighlighter>
                 </div>
-              )
+              );
             }
-            
+
             return (
-              <code 
+              <code
                 className="bg-[color:var(--tokens-color-surface-surface-secondary)] text-[color:var(--tokens-color-text-text-primary)] px-1.5 py-0.5 rounded text-sm font-mono"
                 {...props}
               >
                 {children}
               </code>
-            )
+            );
           },
 
           // Horizontal rule
@@ -202,9 +196,9 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
 
           // Images
           img: ({ src, alt }) => (
-            <img 
-              src={src} 
-              alt={alt} 
+            <img
+              src={src}
+              alt={alt}
               className="max-w-full h-auto rounded-lg my-4 border border-[color:var(--tokens-color-border-border-inactive)]"
             />
           ),
@@ -213,5 +207,5 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
         {content}
       </ReactMarkdown>
     </div>
-  )
-}
+  );
+};

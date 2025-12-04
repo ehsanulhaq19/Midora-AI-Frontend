@@ -1,20 +1,10 @@
 "use client";
 
-import React from "react";
-import {
-  AccountIcon,
-  ProfileIcon,
-  LanguageIcon,
-  BillingIcon,
-  NotificationsIcon,
-} from "@/icons";
+import React from 'react'
+import { AccountIcon, ProfileIcon, LanguageIcon, BillingIcon, NotificationsIcon } from '@/icons'
 import { useTheme } from '@/hooks/use-theme'
-export type AccountSection =
-  | "account"
-  | "profile"
-  | "language"
-  | "sunscription"
-  | "notifications";
+
+export type AccountSection = 'account' | 'profile' | 'language' | 'subscription' | 'notifications'
 
 interface AccountSidebarProps {
   activeSection: AccountSection;
@@ -67,17 +57,9 @@ const menuItems: Array<{
     ),
   },
   {
-    id: "sunscription",
-    label: "Sunscription",
-    icon: (isActive) => (
-      <BillingIcon
-        color={
-          isActive
-            ? "var(--tokens-color-text-text-brand)"
-            : "var(--tokens-color-text-text-primary)"
-        }
-      />
-    ),
+    id: 'subscription',
+    label: 'Subscription',
+    icon: (isActive) => <BillingIcon color={isActive ? "var(--tokens-color-text-text-brand)" : "#000000"} />
   },
   {
     id: "notifications",

@@ -5,8 +5,16 @@ import { MarkdownRenderer } from "@/components/markdown";
 import { Close, Copy } from "@/icons";
 import { IconButton } from "@/components/ui/buttons";
 import { Tooltip } from "@/components/ui/tooltip";
+import { DownloadDropdown } from "@/components/ui/download-dropdown";
 import { t } from "@/i18n";
 import { markdownToTextSync, markdownToHtmlSync } from "@/lib/markdown-utils";
+
+import { 
+  downloadAsPDF, 
+  downloadAsExcel, 
+  downloadAsWord, 
+  downloadAsText 
+} from "@/lib/download-utils";
 import { cn } from "@/lib/utils";
 import { appConfig } from "@/config/app";
 import { baseApiClient } from "@/api/base";
@@ -72,6 +80,8 @@ export const Canvas: React.FC<CanvasProps> = ({
     try {
       const htmlContent = markdownToHtmlSync(content);
       const plainText = markdownToTextSync(content);
+
+      // plainText = content.replace(/\n{2,}/g, '\n\n');
       
       // Create clipboard items with both HTML and plain text formats
       const clipboardItems = [
@@ -104,6 +114,32 @@ export const Canvas: React.FC<CanvasProps> = ({
 
     if (onCopy) {
       onCopy();
+    }
+  };
+
+  const handleDownload = (format: string) => {
+    const timestamp = new Date().toISOString().split('T')[0];
+    const baseFilename = `midora-export-${timestamp}`;
+
+    try {
+      switch (format) {
+        case 'pdf':
+          downloadAsPDF(content, baseFilename);
+          break;
+        case 'excel':
+          downloadAsExcel(content, baseFilename);
+          break;
+        case 'word':
+          downloadAsWord(content, baseFilename);
+          break;
+        case 'text':
+          downloadAsText(content, baseFilename);
+          break;
+        default:
+          console.warn(`Unknown download format: ${format}`);
+      }
+    } catch (error) {
+      console.error(`Error downloading as ${format}:`, error);
     }
   };
 
@@ -171,8 +207,7 @@ export const Canvas: React.FC<CanvasProps> = ({
         className
       )}
       style={{ 
-        height: "100%",
-        backgroundColor: isDark ? 'var(--tokens-color-surface-surface-card-hover)' : '#ffffff'
+        height: "100%"
       }}
       tabIndex={-1}
       role="region"
@@ -181,10 +216,7 @@ export const Canvas: React.FC<CanvasProps> = ({
     >
       {/* Canvas Header */}
       <div 
-        className="h-14 flex items-center justify-between px-6 border-b border-[color:var(--tokens-color-border-border-inactive)] flex-shrink-0"
-        style={{
-          backgroundColor: isDark ? 'var(--tokens-color-surface-surface-card-hover)' : '#ffffff'
-        }}
+        className="h-14 flex items-center justify-between px-6 border-b border-[color:var(--tokens-color-border-border-inactive)] bg-white flex-shrink-0"
       >
         <div className="flex items-center gap-3">
           <button
@@ -215,6 +247,7 @@ export const Canvas: React.FC<CanvasProps> = ({
               </>
             )}
           </button>
+          <DownloadDropdown onDownload={handleDownload} />
           <button className="px-4 py-1.5 bg-[color:var(--tokens-color-surface-surface-button-pressed)] text-white text-sm font-medium rounded-full hover:bg-opacity-90 transition-colors">
             Publish
           </button>
@@ -224,7 +257,7 @@ export const Canvas: React.FC<CanvasProps> = ({
       {/* Canvas Content */}
       <div
         ref={contentRef}
-        className="flex-1 overflow-y-auto p-6"
+        className="flex-1 overflow-y-auto p-6 border-x-gray0-white"
         style={{
           scrollBehavior: "smooth",
           minHeight: 0,

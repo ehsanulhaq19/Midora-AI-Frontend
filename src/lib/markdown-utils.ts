@@ -10,26 +10,43 @@
 export const markdownToTextSync = (markdown: string): string => {
   try {
     return markdown
-      .replace(/#{1,6}\s+/g, '') // Remove headers
-      .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold
-      .replace(/\*(.*?)\*/g, '$1') // Remove italic
-      .replace(/`(.*?)`/g, '$1') // Remove inline code
-      .replace(/```[\s\S]*?```/g, '') // Remove code blocks
-      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Remove links, keep text
-      .replace(/^\s*[-*+]\s+/gm, '') // Remove list bullets
-      .replace(/^\s*\d+\.\s+/gm, '') // Remove numbered lists
-      .replace(/\n\s*\n/g, '\n') // Clean up multiple newlines
-      .replace(/>\s*/g, '') // Remove blockquote markers
-      .replace(/^\s*[-*+]\s*/gm, '') // Remove list markers
-      .replace(/^\s*\d+\.\s*/gm, '') // Remove numbered list markers
-      .replace(/\|/g, ' ') // Replace table separators with spaces
-      .replace(/-{3,}/g, '') // Remove table separators
-      .replace(/\s+/g, ' ') // Replace multiple spaces with single space
-      .trim()
+      // Headings: Add blank lines before and after
+      .replace(/#{1,6}\s+(.*)/g, '\n$1\n\n')
+
+      // Bold/italic/inline code: keep text only
+      .replace(/\*\*(.*?)\*\*/g, '$1')
+      .replace(/\*(.*?)\*/g, '$1')
+      .replace(/`(.*?)`/g, '$1')
+
+      // Code blocks: preserve content with newlines
+      .replace(/```([\s\S]*?)```/g, (_, code) => `\n${code.trim()}\n\n`)
+
+      // Links: keep link text
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+
+      // Blockquotes: prepend '> ' and keep line breaks
+      .replace(/^>\s?(.*)/gm, '> $1\n')
+
+      // Lists: unordered
+      .replace(/^\s*[-*+]\s+(.*)/gm, '- $1\n')
+      // Lists: ordered
+      .replace(/^\s*\d+\.\s+(.*)/gm, '$1\n')
+
+      // Tables: replace pipes with spaces, remove extra dashes
+      .replace(/\|/g, ' ')
+      .replace(/-{3,}/g, '')
+      
+      // Collapse multiple spaces/tabs but keep newlines
+      .replace(/[ \t]+/g, ' ')
+      // Collapse 3+ newlines to 2
+      .replace(/\n{3,}/g, '\n\n')
+      // Trim leading/trailing whitespace
+      .trim();
   } catch (error) {
-    return markdown
+    return markdown;
   }
 }
+
 
 /**
  * Async version of markdown to text conversion

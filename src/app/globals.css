@@ -884,3 +884,12 @@
     opacity: 0.6;
   }
 }
+
+.markdown-paragraph {
+  display: block;
+}
+
+/* Paragraphs that are first child inside list items: inline-block to stay on the same line as the bullet */
+.markdown-content li > .markdown-paragraph:first-child {
+  display: inline-block;
+}

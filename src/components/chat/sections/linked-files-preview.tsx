@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { LinkedFile } from '@/api/conversation/types'
 import { FileTypeInfo } from '@/api/files/types'
 import { Spinner } from '@/components/ui/loaders'
+import { ArrowDownSm } from '@/icons'
 import { t } from '@/i18n'
 import { appConfig } from '@/config/app'
 import { baseApiClient } from '@/api/base'
@@ -97,6 +98,7 @@ const LinkedFilePreview: React.FC<{ linkedFile: LinkedFile; isUser: boolean }> =
   const fileExtension = linkedFile.file_extension.replace('.', '').toUpperCase()
   const isUploading = linkedFile.uuid?.startsWith('temp-') || false
   const [isDownloading, setIsDownloading] = useState(false)
+  const [isHovered, setIsHovered] = useState(false)
   
   // Determine background color based on message type
   const backgroundColor = isUser 
@@ -144,26 +146,18 @@ const LinkedFilePreview: React.FC<{ linkedFile: LinkedFile; isUser: boolean }> =
     }
   }
 
-  // Determine if file is clickable (only AI responses, not uploading)
-  const isClickable = !isUser && !isUploading
+  // Determine if download is available (only AI responses, not uploading)
+  const canDownload = !isUser && !isUploading
 
   return (
     <div 
       className={`relative ${backgroundColor} border rounded-[var(--premitives-corner-radius-corner-radius-2)] p-3 w-[200px] h-[120px] flex flex-col shadow-sm transition-shadow flex-shrink-0 ${
-        isClickable 
-          ? 'hover:shadow-md cursor-pointer hover:border-[color:var(--tokens-color-border-border-active)]' 
+        canDownload && isHovered
+          ? 'hover:shadow-md hover:border-[color:var(--tokens-color-border-border-active)]' 
           : ''
       }`}
-      onClick={isClickable ? handleFileDownload : undefined}
-      role={isClickable ? 'button' : undefined}
-      tabIndex={isClickable ? 0 : undefined}
-      aria-label={isClickable ? `Download ${linkedFile.filename}` : undefined}
-      onKeyDown={isClickable ? (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault()
-          handleFileDownload(e as any)
-        }
-      } : undefined}
+      onMouseEnter={() => canDownload && setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       {/* Uploading overlay */}
       {isUploading && (
@@ -175,13 +169,26 @@ const LinkedFilePreview: React.FC<{ linkedFile: LinkedFile; isUser: boolean }> =
         </div>
       )}
 
-      {/* Downloading overlay */}
+      {/* Download icon - shown on hover */}
+      {canDownload && isHovered && !isDownloading && (
+        <button
+          onClick={handleFileDownload}
+          className="absolute top-2 right-2 z-10 p-1.5 rounded-full bg-[color:var(--tokens-color-surface-surface-card-default)] border border-[color:var(--tokens-color-border-border-subtle)] shadow-md hover:bg-[color:var(--tokens-color-surface-surface-card-hover)] transition-colors"
+          aria-label={`Download ${linkedFile.filename}`}
+          type="button"
+        >
+          <ArrowDownSm 
+            className="w-4 h-4" 
+            color='var(--tokens-color-text-text-primary)'
+          />
+        </button>
+      )}
+
+      {/* Downloading spinner - shown when downloading */}
       {isDownloading && (
-        <div className="absolute inset-0 bg-black/50 rounded-[var(--premitives-corner-radius-corner-radius-2)] flex items-center justify-center z-20">
-          <div className="flex flex-col items-center gap-2">
-            <Spinner size="md" color="white" />
-            <span className="app-text-xs app-text-primary text-white">Downloading...</span>
-          </div>
+        <div className="absolute top-2 right-2 z-10 p-1.5 rounded-full bg-[color:var(--tokens-color-surface-surface-card-default)] border border-[color:var(--tokens-color-border-border-subtle)] shadow-md">
+        <Spinner size="sm" color='gray' />
+
         </div>
       )}
       
