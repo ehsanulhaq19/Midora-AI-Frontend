@@ -121,50 +121,28 @@ export const downloadAsExcel = (content: string, filename: string = 'content.xls
  * Download content as CSV file
  */
 export const downloadAsCSV = (content: string, filename: string = 'content.csv'): void => {
-  const plainText = markdownToTextSync(content)
-  
-  // Try to extract tables from markdown
-  const lines = content.split('\n')
-  const tables: string[][] = []
-  let currentTable: string[] = []
-  
-  for (const line of lines) {
-    if (line.trim().startsWith('|') && !line.trim().match(/^\|\s*:?-+:?\s*\|/)) {
-      const cells = line.split('|').map(cell => cell.trim()).filter(cell => cell.length > 0)
-      currentTable.push(cells)
-    } else {
-      if (currentTable.length > 0) {
-        tables.push(...currentTable)
-        currentTable = []
-      }
-    }
-  }
-  
-  if (currentTable.length > 0) {
-    tables.push(...currentTable)
-  }
-  
-  let csvContent = ''
-  if (tables.length > 0) {
-    // Convert table data to CSV
-    csvContent = tables.map(row => 
-      row.map(cell => `"${cell.replace(/"/g, '""')}"`).join(',')
-    ).join('\n')
-  } else {
-    // Use plain text, wrap in quotes
-    csvContent = `"${plainText.replace(/"/g, '""')}"`
-  }
-  
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = filename.endsWith('.csv') ? filename : `${filename}.csv`
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
-  URL.revokeObjectURL(url)
-}
+  // Split content into lines to preserve nested bullets and headings
+  const lines = content.split('\n');
+
+  // Wrap each line in quotes and escape any quotes inside
+  const csvRows = lines.map(line => `"${line.replace(/"/g, '""')}"`);
+
+  // Join with \n so Excel reads each line as a new row
+  const csvContent = csvRows.join('\n');
+
+  // Create Blob and trigger download
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename.endsWith('.csv') ? filename : `${filename}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+};
+
+
 
 /**
  * Download content as Word document (HTML format that Word can open)
