@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { t } from '@/i18n'
 import { LogoOnly } from '@/icons'
+import { useTheme } from '@/hooks/use-theme'
 import { InputWithButton, BackButton } from '../../ui'
 
 interface FullNameStepProps {
@@ -28,7 +29,8 @@ export const FullNameStep = ({
     console.log("Privacy Policy clicked")
     // Add your privacy policy navigation logic here
   }
-
+  const { theme } = useTheme()
+  const isDark = theme === 'dark'
   return (
     <div className={`relative w-full bg-tokens-color-surface-surface-primary flex flex-col justify-center ${className}`}>
       <div className="inline-flex flex-col items-start gap-6 w-full max-w-[480px] px-1 sm:px-2 mx-auto">   
@@ -38,11 +40,19 @@ export const FullNameStep = ({
                 href="/" 
                 className="flex flex-col w-[120px] sm:w-[140px] lg:w-[154px] items-start gap-2.5 cursor-pointer hover:opacity-80 transition-opacity duration-200"
               >
-                <img
-                  className="relative self-stretch w-full aspect-[5.19] object-cover"
-                  alt="Midora AI Logo"
-                  src="/img/logo.png"
-                />
+               {isDark ? (
+                  <img
+                    className="relative self-stretch w-full "
+                    alt="Midora AI Logo"
+                    src="/img/dark-logo-text.png"
+                  />
+                ) : (
+                  <img
+                    className="relative self-stretch w-full aspect-[5.19] object-cover"
+                    alt="Midora AI Logo"
+                    src="/img/logo.png"
+                  />
+                )}
               </a>
             </div>   
         <div className="flex flex-col items-start gap-4 relative self-stretch w-full flex-[0_0_auto]">

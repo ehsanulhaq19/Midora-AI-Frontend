@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { Filters, Search02, MoreOptions, InvoiceIcon } from '@/icons'
 import { Pagination } from '@/components/ui'
 import { cn } from '@/lib/utils'
+import { useTheme } from '@/hooks/use-theme'
 
 type BillingHistoryItem = {
   id: number
@@ -68,7 +69,7 @@ const billingColumns: Array<{
     label: 'Actions',
     className: 'lg:flex-row lg:items-center lg:justify-end',
     render: () => (
-      <button className="inline-flex h-5 w-5 items-center justify-center rounded-lg border border-transparent text-[color:var(--tokens-color-text-text-seconary)] transition-colors hover:border-gray-200 hover:bg-gray-50">
+      <button className="inline-flex h-5 w-5 items-center justify-center rounded-lg border border-transparent transition-colors hover:border-[color:var(--tokens-color-border-border-subtle)] hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]" style={{ color: 'var(--tokens-color-text-text-primary)' }}>
         <MoreOptions className="w-5 h-5" />
       </button>
     )
@@ -76,6 +77,8 @@ const billingColumns: Array<{
 ]
 
 export const BillingSection: React.FC = () => {
+  const { theme } = useTheme()
+  const isDark = theme === 'dark'
   const [searchQuery, setSearchQuery] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
 
@@ -132,7 +135,15 @@ export const BillingSection: React.FC = () => {
         <div className="flex flex-col gap-6">
           {/* Plan Card */}
           <div className="w-full flex justify-center lg:justify-start">
-            <div className="w-full max-w-[335px] bg-[color:var(--account-section-card-bg)] rounded-[24px] p-6 border border-gray-200">
+            <div 
+              className={`w-full max-w-[335px] rounded-[24px] p-6 border  ${
+                isDark ? '!bg-[color:var(--tokens-color-surface-surface-card-hover)]' : 'bg-[color:var(--account-section-card-bg)] border-[color:var(--tokens-color-border-border-subtle)]'
+              }`}
+              style={isDark ? {
+                backgroundColor: 'var(--tokens-color-surface-surface-card-default)',
+                borderColor: 'var(--tokens-color-border-border-subtle)'
+              } : {}}
+            >
               <div className="flex flex-col gap-6">
               {/* Plan Name */}
               <div className="checkout-plan-name text-[color:var(--tokens-color-text-text-seconary)] ">
@@ -171,7 +182,13 @@ export const BillingSection: React.FC = () => {
             <div className="flex flex-col lg:flex-row items-stretch sm:items-stat gap-3 w-full md:w-auto">
               <button
                 onClick={handleFilter}
-                className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-colors"
+                className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
+                  isDark ? '' : 'border-[color:var(--tokens-color-border-border-subtle)] bg-[color:var(--tokens-color-surface-surface-primary)] hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]'
+                }`}
+                style={isDark ? {
+                  borderColor: 'var(--tokens-color-border-border-subtle)',
+                  backgroundColor: 'var(--tokens-color-surface-surface-card-default)'
+                } : {}}
               >
                 <Filters className="w-5 h-5 text-[color:var(--tokens-color-text-text-seconary)]" />
                 <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-primary)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
@@ -180,19 +197,30 @@ export const BillingSection: React.FC = () => {
               </button>
               
               <div className="relative flex-1 sm:flex-none">
-                <Search02 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Search02 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: 'var(--tokens-color-text-text-inactive-2)' }} />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search"
-                  className="pl-10 pr-4 py-2 rounded-lg border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[color:var(--premitives-color-brand-purple-1000)] focus:border-[color:var(--premitives-color-brand-purple-1000)] font-h02-heading02 font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-primary)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]"
+                  className={`pl-10 pr-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-[color:var(--premitives-color-brand-purple-1000)] focus:border-[color:var(--premitives-color-brand-purple-1000)] font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] ${
+                    isDark ? '' : ''
+                  }`}
+                  style={isDark ? {
+                    borderColor: 'var(--tokens-color-border-border-subtle)',
+                    backgroundColor: 'var(--tokens-color-surface-surface-card-default)',
+                    color: 'var(--tokens-color-text-text-primary)'
+                  } : {
+                    borderColor: 'var(--tokens-color-border-border-subtle)',
+                    backgroundColor: 'var(--tokens-color-surface-surface-primary)',
+                    color: 'var(--tokens-color-text-text-primary)'
+                  }}
                 />
               </div>
               
               <button
                 onClick={handleDownload}
-                className="px-4 py-2 bg-[color:var(--premitives-color-brand-purple-1000)] text-white rounded-lg hover:opacity-90 transition-opacity font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] w-full sm:w-auto"
+                className={`px-4 py-2 ${isDark ? 'bg-[color:var(--tokens-color-surface-surface-card-purple)]' : 'bg-[color:var(--premitives-color-brand-purple-1000)]'} text-white rounded-lg hover:opacity-90 transition-opacity font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] w-full sm:w-auto`}
               >
                 Download
               </button>
@@ -200,16 +228,24 @@ export const BillingSection: React.FC = () => {
           </div>
 
           {/* Billing History Table */}
-          <div className="w-full overflow-hidden rounded-[24px] border border-gray-200 bg-[color:var(--account-section-card-bg)]">
+          <div 
+            className={`w-full overflow-hidden rounded-[24px] border ${
+              isDark ? '' : 'border-[color:var(--tokens-color-border-border-subtle)] bg-[color:var(--account-section-card-bg)]'
+            }`}
+            style={isDark ? {
+              borderColor: 'var(--tokens-color-border-border-subtle)',
+              backgroundColor: 'var(--tokens-color-surface-surface-card-default)'
+            } : {}}
+          >
             <div role="table" className="w-full">
               <div
                 role="rowgroup"
-                className="hidden border-b border-gray-200 px-6 py-4 lg:grid lg:grid-cols-[2fr_repeat(3,minmax(0,1fr))_auto]"
+                className="hidden border-b border-[color:var(--tokens-color-border-border-subtle)] px-6 py-4 lg:grid lg:grid-cols-[2fr_repeat(3,minmax(0,1fr))_auto]"
               >
                 {billingColumns.map((column) => (
                   <span
                     key={column.key}
-                    className="text-left text-xs font-semibold uppercase tracking-[0.08em] text-[color:var(--tokens-color-text-text-inactive-2)]"
+                    className="text-left text-xs font-semibold uppercase tracking-[0.08em] text-[color:var(--tokens-color-text-text-inactive-2)] "
                   >
                     {column.label}
                   </span>
@@ -231,7 +267,7 @@ export const BillingSection: React.FC = () => {
                     <div
                       role="row"
                       key={item.id}
-                      className="grid grid-cols-1 gap-4 border-b border-gray-100 px-4 py-3 transition-colors last:border-b-0 hover:bg-gray-50 lg:grid-cols-[2fr_repeat(3,minmax(0,1fr))_auto] lg:px-6"
+                      className="grid grid-cols-1 gap-8 border-b border-[color:var(--tokens-color-border-border-subtle)] px-4 py-3 transition-colors last:border-b-0 hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] lg:grid-cols-[2fr_repeat(3,minmax(0,1fr))_auto] lg:px-6"
                     >
                       {billingColumns.map((column) => {
                         const content = column.render ? (

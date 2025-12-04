@@ -24,6 +24,7 @@ import { countWords, exceedsWordThreshold, truncateMarkdown, getFirstLine } from
 import { MessageInput, MessageInputHandle } from './message-input'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/store'
+import { useTheme } from '@/hooks/use-theme'
 
 interface ConversationContainerProps {
   conversationUuid: string | null
@@ -86,6 +87,8 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
   onCanvasToggle,
   showInChat = true
 }) => {
+  const { theme } = useTheme()
+  const isDark = theme === 'dark'
   const [isCopied, setIsCopied] = useState(false)
   const { switchMessageVersion } = useRegenerate()
   
@@ -188,12 +191,15 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
         <div
         className={`p-[12px] rounded-lg break-words whitespace-pre-wrap ${textClassName} ${
             isUser
-              ? 'bg-[#6B4392]/10 text-[color:var(--tokens-color-text-text-primary)] border border-[#6B4392]/20'
-              : 'text-[color:var(--tokens-color-text-text-primary)] rounded-bl-sm'
+              ? `${isDark ? '' : 'bg-[#6B4392]/10'} ${isDark ? 'text-white' : 'text-[color:var(--tokens-color-text-text-primary)]'} ${isDark ? '' : 'border border-[#6B4392]/20'}`
+              : `${isDark ? 'text-white' : 'text-[color:var(--tokens-color-text-text-primary)]'} rounded-bl-sm`
           }`}
+        style={isDark && isUser ? {
+          backgroundColor: 'var(--tokens-color-surface-surface-card-default)'
+        } : {}}
         >
           {isUser ? (
-            <p className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-surface-surface-button-pressed)] text-[14px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height) [font-style:var(--text-font-style)] whitespace-pre-wrap">{message.content}</p>
+            <p className={`font-h02-heading02 font-[number:var(--text-font-weight)] text-[14px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] whitespace-pre-wrap ${isDark ? 'text-white' : 'text-[color:var(--tokens-color-surface-surface-button-pressed)]'}`}>{message.content}</p>
           ) : (
             <div className="text-sm">
               {isThisMessageRegenerating && isStreaming ? (

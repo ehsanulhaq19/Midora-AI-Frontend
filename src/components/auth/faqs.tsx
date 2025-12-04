@@ -13,7 +13,7 @@ export const Faqs: React.FC<FaqsProps> = ({ property1, className }) => {
     >
       <button 
         type="button"
-        className="inline-flex items-center justify-between w-full text-left hover:bg-gray-50 rounded-lg p-2 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+        className="inline-flex items-center justify-between w-full text-left rounded-lg p-2 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
         onClick={() => {}}
         aria-expanded={property1 === "expanded"}
         aria-label="Toggle FAQ: What is midora and how does it work?"

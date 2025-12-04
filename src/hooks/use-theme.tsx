@@ -41,6 +41,9 @@ export function ThemeProvider({ children, defaultTheme = 'light' }: ThemeProvide
 
     const root = window.document.documentElement
     
+    // Temporarily disable transitions for instant theme switching
+    root.classList.add('theme-transitioning')
+    
     // Set data-theme attribute for CSS variables
     if (theme === 'dark') {
       root.setAttribute('data-theme', 'dark')
@@ -50,6 +53,11 @@ export function ThemeProvider({ children, defaultTheme = 'light' }: ThemeProvide
     
     // Save theme preference to localStorage
     localStorage.setItem(THEME_STORAGE_KEY, theme)
+    
+    // Re-enable transitions after theme change (for hover effects, etc.)
+    requestAnimationFrame(() => {
+      root.classList.remove('theme-transitioning')
+    })
   }, [theme, mounted])
 
   const setTheme = (newTheme: Theme) => {

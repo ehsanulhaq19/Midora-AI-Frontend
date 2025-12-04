@@ -2,12 +2,16 @@ import React from "react";
 import { ButtonGroup } from "./button-group";
 import { ArrowRightSm } from "@/icons";
 import { t } from "@/i18n";
+import { useTheme } from "@/hooks/use-theme";
 
 interface HeroSectionProps {
   className?: string;
 }
 
 export const HeroSection: React.FC<HeroSectionProps> = ({ className }) => {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+
   return (
     <div
       className={`flex flex-col w-full items-center gap-8 lg:gap-[88px] ${className}`}
@@ -98,7 +102,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ className }) => {
 
         <div className="flex flex-col w-full max-w-[367px] h-[200px] items-start gap-2.5 p-4 relative rounded-[var(--premitives-corner-radius-corner-radius-5)] bg-[linear-gradient(138deg,#1F1740_0%,#6B4392_100%)] bg-tokens-color-surface-surface-button">
           <div className="flex flex-col w-full items-start relative flex-[0_0_auto]">
-            <div className="relative self-stretch mt-[-1.00px] font-h02-heading02 font-medium text-[color:var(--tokens-color-surface-surface-primary)] text-2xl tracking-[-2.40px] leading-[1.2]">
+            <div className={`relative self-stretch mt-[-1.00px] font-h02-heading02 font-medium text-2xl tracking-[-2.40px] leading-[1.2] ${isDark ? 'text-white' : 'text-[color:var(--tokens-color-surface-surface-primary)]'}`}>
               {t("hero.activeUsers")}
             </div>
 
@@ -121,7 +125,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ className }) => {
 
           <div className="flex flex-col w-full max-w-[367px] h-[250px] md:h-[300px] lg:h-[352px] items-start gap-2.5 p-6 lg:p-9 relative rounded-[var(--premitives-corner-radius-corner-radius-5)] bg-[linear-gradient(138deg,#1F1740_0%,#6B4392_100%)] bg-tokens-color-surface-surface-button">
             <div className="flex flex-col w-full items-start relative flex-[0_0_auto]">
-              <div className="relative self-stretch mt-[-1.00px] font-h02-heading02 font-medium text-[color:var(--tokens-color-surface-surface-primary)] text-3xl md:text-4xl lg:text-5xl tracking-[-2.40px] leading-[1.2]">
+              <div className={`relative self-stretch mt-[-1.00px] font-h02-heading02 font-medium text-3xl md:text-4xl lg:text-5xl tracking-[-2.40px] leading-[1.2] ${isDark ? 'text-white' : 'text-[color:var(--tokens-color-surface-surface-primary)]'}`}>
                 {t("hero.activeUsers")}
               </div>
 
@@ -257,11 +261,11 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ className }) => {
 
               <button
                 type="button"
-                className="rounded-[var(--premitives-corner-radius-corner-radius-5)] h-12 min-h-[unset] border-[unset] px-5 py-1.5 bg-tokens-color-surface-surface-button-inactive w-[177px] hover:bg-opacity-80 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 flex gap-1.5 items-center"
+                className={`rounded-[var(--premitives-corner-radius-corner-radius-5)] h-12 min-h-[unset] border-[unset] px-5 py-1.5 ${isDark ? 'bg-tokens-color-surface-surface-button-pressed' : 'bg-tokens-color-surface-surface-button-inactive'}  w-[177px] hover:bg-opacity-80 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 flex gap-1.5 items-center`}
                 onClick={() => {}}
                 aria-label="Add to wishlist"
               >
-                <span className="text-tokens-color-surface-surface-button tracking-[-0.80px] text-base flex-1 font-normal font-h02-heading02 leading-4">
+                <span className={`${isDark ?  'text-white' : 'text-tokens-color-surface-surface-button'}  tracking-[-0.80px] text-base flex-1 font-normal font-h02-heading02 leading-4`}>
                   {t("hero.wishlist")}
                 </span>
                 <ArrowRightSm className="relative w-5 h-5" color="#5E4D74" />
@@ -272,7 +276,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ className }) => {
 
         <div className="flex flex-col w-[367px] h-[352px] items-start gap-2.5 p-9 relative rounded-[var(--premitives-corner-radius-corner-radius-5)] bg-[linear-gradient(138deg,#1F1740_0%,#6B4392_100%)] bg-tokens-color-surface-surface-button">
           <div className="flex flex-col w-[273px] items-start relative flex-[0_0_auto]">
-            <div className="relative self-stretch  font-h02-heading02 font-medium text-[color:var(--tokens-color-surface-surface-primary)] text-5xl tracking-[-0.8px] leading-[140%]">
+            <div className={`relative self-stretch font-h02-heading02 font-medium text-5xl tracking-[-0.8px] leading-[140%] ${isDark ? 'text-white' : 'text-[color:var(--tokens-color-surface-surface-primary)]'}`}>
               {t("hero.activeUsers")}
             </div>
 

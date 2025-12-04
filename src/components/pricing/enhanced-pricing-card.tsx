@@ -3,6 +3,7 @@
 import React from 'react'
 import { CheckBroken4 } from '@/icons'
 import { PricingPlan } from '@/types/pricing'
+import { useTheme } from '@/hooks/use-theme'
 
 interface EnhancedPricingCardProps {
   plan: PricingPlan
@@ -25,22 +26,41 @@ export const EnhancedPricingCard: React.FC<EnhancedPricingCardProps> = ({
   showCancelButton = false,
   renewalDate = null
 }) => {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const [isHovered, setIsHovered] = React.useState(false);
   
   const baseClasses = "flex flex-col items-start gap-6 p-6 sm:p-9 relative rounded-3xl w-full max-w-[383px] min-h-[500px] sm:min-h-[616px] box-border cursor-pointer transition-all duration-300";
   
   // Card styling based on hover and current plan
   let cardClasses = baseClasses;
+  let cardStyle: React.CSSProperties = {};
+  
+  // Add dark mode border
+  if (isDark) {
+    cardStyle.border = '1px solid var(--tokens-color-surface-surface-card-purple)';
+  }
+  
+  // Use CSS variables for better maintainability
   if (isHovered) {
-    cardClasses = `${baseClasses} bg-[color:var(--tokens-color-surface-surface-button-pressed)] text-white`;
+    cardStyle.backgroundColor = 'var(--tokens-color-surface-surface-card-hover)';
+    cardClasses = `${baseClasses} text-white`;
   } else if (isCurrentPlan) {
     // Current plan gets a border highlight
-    cardClasses = `${baseClasses} bg-[color:var(--tokens-color-surface-surface-sidebar-shrunk)] border-2 border-green-500`;
+    cardClasses = `${baseClasses} border-2 border-green-500 ${isDark ? 'text-white' : ''}`;
+    cardStyle.backgroundColor = 'var(--tokens-color-surface-surface-card-default)';
+    // Override dark mode border for current plan with green border
+    if (isDark) {
+      cardStyle.border = '2px solid #10b981'; // green-500
+    }
   } else {
-    cardClasses = `${baseClasses} bg-[color:var(--tokens-color-surface-surface-sidebar-shrunk)]`;
+    cardStyle.backgroundColor = 'var(--tokens-color-surface-surface-card-default)';
+    cardClasses = `${baseClasses} ${isDark ? 'text-white' : ''}`;
   }
 
-  const textColorClasses = isHovered ? 'text-white' : 'text-[color:var(--tokens-color-text-text-seconary)]';
+  const textColorClasses = isDark 
+    ? 'text-white' 
+    : (isHovered ? 'text-white' : 'text-[color:var(--tokens-color-text-text-seconary)]');
 
   // Format renewal date
   const formatRenewalDate = (dateString: string | null): string => {
@@ -77,7 +97,11 @@ export const EnhancedPricingCard: React.FC<EnhancedPricingCardProps> = ({
     if (isHovered) {
       return 'w-full flex items-center justify-center gap-2 h-[40px] p-2 bg-[color:var(--premitives-color-brand-purple-1000)] rounded-[var(--premitives-corner-radius-corner-radius-2)] hover:opacity-90 transition-all'
     }
-    return 'w-full flex items-center justify-center gap-2 h-[40px] p-2 bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded-[var(--premitives-corner-radius-corner-radius-2)] hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] transition-colors'
+    return `w-full flex items-center justify-center gap-2 h-[40px] p-2 bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded-[var(--premitives-corner-radius-corner-radius-2)] transition-colors ${
+      isDark 
+        ? 'hover:bg-[color:var(--tokens-color-surface-surface-card-purple)]'
+        : 'hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]'
+    }`
   }
   
   const buttonClasses = getButtonClasses()
@@ -86,9 +110,9 @@ export const EnhancedPricingCard: React.FC<EnhancedPricingCardProps> = ({
     ? 'text-white' 
     : 'text-[color:var(--tokens-color-text-text-brand)]';
 
-  const checkmarkColor = isHovered 
+  const checkmarkColor = isDark 
     ? '#ffffff' 
-    : 'var(--light-mode-colors-dark-gray-900)';
+    : (isHovered ? '#ffffff' : 'var(--light-mode-colors-dark-gray-900)');
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -100,6 +124,7 @@ export const EnhancedPricingCard: React.FC<EnhancedPricingCardProps> = ({
   return (
     <div 
       className={cardClasses}
+      style={cardStyle}
       onClick={onClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}

@@ -146,9 +146,12 @@ export const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>(({
                 type="button"
                 variant="outline"
                 size="md"
-                icon={<Plus01_5 className="w-5 h-5" color="#6B4392" />}
+                icon={<Plus01_5 className="w-5 h-5" color="currentColor" />}
                 aria-label="Add attachment"
-                className="border-[color:var(--tokens-color-border-border-subtle)] bg-[#F4F5F5]"
+                className="border-[color:var(--tokens-color-border-border-subtle)] message-input-icon-button"
+                style={{
+                  backgroundColor: '#F4F5F5'
+                }}
                 disabled={isStreaming || isUploading}
                 onClick={handleAddAttachment}
               />
@@ -157,9 +160,12 @@ export const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>(({
                 type="button"
                 variant="outline"
                 size="md"
-                icon={<Filters className="" color="#6B4392" />}
+                icon={<Filters className="" color="currentColor" />}
                 aria-label="Voice input"
-                className="border-[color:var(--tokens-color-border-border-subtle)] bg-[#F4F5F5]"
+                className="border-[color:var(--tokens-color-border-border-subtle)] message-input-icon-button"
+                style={{
+                  backgroundColor: '#F4F5F5'
+                }}
                 disabled={isStreaming || isUploading}
               />
             </div>

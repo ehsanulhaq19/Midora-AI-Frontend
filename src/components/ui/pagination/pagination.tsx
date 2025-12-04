@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react'
 import { cn } from '@/lib/utils'
+import { useTheme } from '@/hooks/use-theme'
 
 const DOTS = 'DOTS'
 
@@ -25,6 +26,8 @@ export const Pagination: React.FC<PaginationProps> = ({
   ariaLabel = 'Pagination Navigation',
   isLoading = false
 }) => {
+  const { theme } = useTheme()
+  const isDark = theme === 'dark'
   const paginationRange = useMemo(() => {
     if (totalPages <= 1) {
       return []
@@ -110,10 +113,19 @@ export const Pagination: React.FC<PaginationProps> = ({
               className={cn(
                 'inline-flex h-8 w-8 items-center justify-center rounded-[8px] text-sm font-semibold transition-all',
                 currentPage === page
-                  ? 'bg-[color:var(--tokens-color-text-text-seconary)] text-white shadow-[0_4px_12px_rgba(31,23,64,0.25)]'
-                  : 'text-[color:var(--tokens-color-text-text-primary)] hover:bg-[rgba(31,23,64,0.08)]',
+                  ? isDark
+                    ? 'text-white'
+                    : 'bg-[color:var(--tokens-color-text-text-seconary)] text-white shadow-[0_4px_12px_rgba(31,23,64,0.25)]'
+                  : isDark
+                    ? 'text-[color:var(--tokens-color-text-text-primary)]'
+                    : 'text-[color:var(--tokens-color-text-text-primary)] hover:bg-[rgba(31,23,64,0.08)]',
                 isLoading && 'opacity-50'
               )}
+              style={isDark && currentPage === page ? {
+                backgroundColor: 'var(--tokens-color-surface-surface-card-default)'
+              } : isDark && currentPage !== page ? {
+                backgroundColor: 'transparent'
+              } : {}}
             >
               {page}
             </button>

@@ -17,6 +17,7 @@ import {
   useElements,
 } from "@stripe/react-stripe-js";
 import { ArrowRightSm, MoreOptions, TickIcon } from "@/icons";
+import { useTheme } from "@/hooks/use-theme";
 
 // Initialize Stripe
 const stripePromise = loadStripe(
@@ -186,6 +187,8 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
   const elements = useElements();
   const dispatch = useDispatch();
   const { success: showSuccessToast, error: showErrorToast } = useToast();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     full_name: "",
@@ -348,7 +351,15 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
   };
 
   const inputClasses =
-    "flex h-[54px] items-center gap-3 relative self-stretch w-full rounded-xl border border-solid border-[#dbdbdb] bg-white transition-all duration-200 focus-within:ring-2 focus-within:ring-purple-500 focus-within:ring-offset-2 focus-within:border-transparent px-4";
+    "flex h-[54px] items-center gap-3 relative self-stretch w-full rounded-xl border border-solid transition-all duration-200 focus-within:ring-2 focus-within:ring-purple-500 focus-within:ring-offset-2 focus-within:border-transparent px-4";
+  
+  const inputStyle: React.CSSProperties = isDark ? {
+    backgroundColor: '#303030',
+    borderColor: 'var(--tokens-color-border-border-subtle)',
+  } : {
+    backgroundColor: '#ffffff',
+    borderColor: '#dbdbdb',
+  };
   const formattedRenewalDate = renewalDate.toLocaleDateString("en-US", {
     month: "numeric",
     day: "numeric",
@@ -387,8 +398,8 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
 
           <div className="flex flex-col gap-6 mt-4">
             {/* Plan Selection */}
-            <div className="flex flex-col gap-9 p-4 rounded-2xl bg-white shadow-sm">
-              <h1 className="checkout-plan-name text-[color:var(--tokens-color-text-text-brand)]">
+            <div className={`flex flex-col gap-9 p-4 rounded-2xl shadow-sm ${isDark ? 'bg-[color:var(--tokens-color-surface-surface-primary)]' : 'bg-white'}`}>
+              <h1 className={`checkout-plan-name ${isDark ? 'text-white' : 'text-[color:var(--tokens-color-text-text-brand)]'}`}>
                 {plan.name}
               </h1>
 
@@ -397,10 +408,16 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
                   type="button"
                   onClick={() => onBillingCycleChange("monthly")}
                   className={`flex-1 flex flex-col items-start gap-3 p-4 rounded-xl border transition-all relative ${
-                    billingCycle === "monthly"
-                      ? "bg-[#1F1740] border-0 text-white shadow-lg"
-                      : "bg-[#F8F8FC] border border-gray-300"
+                    isDark 
+                      ? 'text-white' 
+                      : billingCycle === "monthly"
+                        ? "bg-[#1F1740] border-0 text-white shadow-lg"
+                        : "bg-[#F8F8FC] border border-gray-300"
                   }`}
+                  style={isDark ? {
+                    backgroundColor: billingCycle === "monthly" ? '#181818' : '#303030',
+                    borderColor: billingCycle === "monthly" ? 'transparent' : 'var(--tokens-color-border-border-subtle)',
+                  } : {}}
                 >
                   <div
                     className={`flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center mt-0.5 ${
@@ -414,24 +431,22 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
                     )}
                   </div>
                   <div className="flex flex-col gap-1 flex-1 relative">
-
-                      <div
-                        className={`checkout-emphasis  text-start ${
-                          billingCycle === "monthly"
+                      <div className={`checkout-emphasis text-start ${
+                        isDark 
+                          ? 'text-white' 
+                          : billingCycle === "monthly"
                             ? "text-white"
                             : "text-[color:var(--tokens-color-text-text-brand)]"
-                        }`}
-                      >
+                      }`}>
                         Monthly
                       </div>
-
-                      <span
-                        className={`${
-                          billingCycle === "monthly"
+                      <span className={
+                        isDark 
+                          ? 'text-white/90' 
+                          : billingCycle === "monthly"
                             ? "text-white/90"
                             : "text-[color:var(--tokens-color-text-text-inactive-2)]"
-                        }`}
-                      >
+                      }>
                         ${plan.monthly_price.toFixed(2)}/month + Tax
                       </span>
                     </div>
@@ -442,10 +457,16 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
                   type="button"
                   onClick={() => onBillingCycleChange("annual")}
                   className={`flex-1 flex flex-col items-start gap-3 p-4 rounded-xl border transition-all relative ${
-                    billingCycle === "annual"
-                      ? "bg-[#1F1740] border-0 text-white shadow-lg"
-                      : "bg-[#F8F8FC] border border-gray-300"
+                    isDark 
+                      ? 'text-white' 
+                      : billingCycle === "annual"
+                        ? "bg-[#1F1740] border-0 text-white shadow-lg"
+                        : "bg-[#F8F8FC] border border-gray-300"
                   }`}
+                  style={isDark ? {
+                    backgroundColor: billingCycle === "annual" ? '#181818' : '#303030',
+                    borderColor: billingCycle === "annual" ? 'transparent' : 'var(--tokens-color-border-border-subtle)',
+                  } : {}}
                 >
                   <div
                     className={`flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center mt-0.5 ${
@@ -460,13 +481,13 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
                   </div>
                   <div className="flex flex-col gap-1 flex-1 relative">
                     <div className="flex items-center justify-between">
-                      <span
-                        className={`checkout-emphasis ${
-                          billingCycle === "annual"
+                      <span className={`checkout-emphasis ${
+                        isDark 
+                          ? 'text-white' 
+                          : billingCycle === "annual"
                             ? "text-white"
                             : "text-[color:var(--tokens-color-text-text-brand)]"
-                        }`}
-                      >
+                      }`}>
                         Yearly
                       </span>
                       {savingsPercent > 0 && billingCycle === "annual" && (
@@ -477,13 +498,13 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
                         </div>
                       )}
                     </div>
-                    <span
-                      className={`${
-                        billingCycle === "annual"
+                    <span className={
+                      isDark 
+                        ? 'text-white/90' 
+                        : billingCycle === "annual"
                           ? "text-white/90"
                           : "text-[color:var(--tokens-color-text-text-inactive-2)]"
-                      }`}
-                    >
+                    }>
                       ${effectiveMonthlyPrice.toFixed(2)}/month + Tax
                     </span>
                   </div>
@@ -493,48 +514,48 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
 
             {/* Order Details */}
             <div className="flex flex-col gap-4 px-4">
-              <div className="flex flex-col items-start p-4 gap-6 bg-gray-100 rounded-xl w-full">
+              <div className={`flex flex-col items-start p-4 gap-6 rounded-xl w-full ${isDark ? '' : 'bg-gray-100'}`} style={isDark ? { backgroundColor: 'var(--tokens-color-surface-surface-card-hover)' } : {}}>
                 <h2
-                  className="text-[20px] font-semibold text-[color:var(--premitives-color-brand-purple-1000)]"
+                  className={`text-[20px] font-semibold ${isDark ? 'text-white' : 'text-[color:var(--premitives-color-brand-purple-1000)]'}`}
                   style={{ fontFamily: "Poppins, Helvetica" }}
                 >
                   Order Details
                 </h2>
                 <div className="flex flex-col w-full gap-4">
-                  <div className="flex items-center justify-between pb-4 border-b border-gray-200">
-                    <span className="checkout-emphasis text-gray-700">
+                  <div className={`flex items-center justify-between pb-4 border-b ${isDark ? '' : 'border-gray-200'}`} style={isDark ? { borderColor: 'rgba(255, 255, 255, 0.1)' } : {}}>
+                    <span className={`checkout-emphasis ${isDark ? 'text-white' : 'text-gray-700'}`}>
                       {plan.name} / {subtotalLabel}
                     </span>
-                    <span className="checkout-emphasis text-gray-700">
+                    <span className={`checkout-emphasis ${isDark ? 'text-white' : 'text-gray-700'}`}>
                       ${price.toFixed(2)}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between pb-4 border-b border-gray-200">
-                    <span className="checkout-emphasis text-gray-700">
+                  <div className={`flex items-center justify-between pb-4 border-b ${isDark ? '' : 'border-gray-200'}`} style={isDark ? { borderColor: 'rgba(255, 255, 255, 0.1)' } : {}}>
+                    <span className={`checkout-emphasis ${isDark ? 'text-white' : 'text-gray-700'}`}>
                       Subtotal
                     </span>
-                    <span className="checkout-emphasis text-gray-700">
+                    <span className={`checkout-emphasis ${isDark ? 'text-white' : 'text-gray-700'}`}>
                       ${price.toFixed(2)}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="checkout-emphasis text-gray-700 font-semibold">
+                    <span className={`checkout-emphasis font-semibold ${isDark ? 'text-white' : 'text-gray-700'}`}>
                       Total due today
                     </span>
-                    <span className="checkout-emphasis text-gray-700 font-semibold">
+                    <span className={`checkout-emphasis font-semibold ${isDark ? 'text-white' : 'text-gray-700'}`}>
                       ${price.toFixed(2)}
                     </span>
                   </div>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3 p-4 rounded-xl border border-orange-200 bg-orange-50 w-full">
-                <div className="flex items-center justify-center w-5 h-5 rounded-full border-2 border-orange-400 bg-orange-100 mt-0.5 flex-shrink-0">
-                  <span className="text-orange-600 text-xs font-semibold leading-none">
+              <div className={`flex items-start gap-3 p-4 rounded-xl border w-full ${isDark ? '' : 'border-orange-200 bg-orange-50'}`} style={isDark ? { borderColor: 'rgba(255, 165, 0, 0.3)', backgroundColor: 'rgba(255, 165, 0, 0.1)' } : {}}>
+                <div className={`flex items-center justify-center w-5 h-5 rounded-full border-2 mt-0.5 flex-shrink-0 ${isDark ? '' : 'border-orange-400 bg-orange-100'}`} style={isDark ? { borderColor: 'rgba(255, 165, 0, 0.5)', backgroundColor: 'rgba(255, 165, 0, 0.2)' } : {}}>
+                  <span className={`text-xs font-semibold leading-none ${isDark ? 'text-orange-400' : 'text-orange-600'}`}>
                     i
                   </span>
                 </div>
-                <p className="text-orange-800 text-sm flex-1">
+                <p className={`text-sm flex-1 ${isDark ? 'text-orange-200' : 'text-orange-800'}`}>
                   Your subscription will automatically renew on{" "}
                   {formattedRenewalDate}. You will be charged $
                   {price.toFixed(2)}/
@@ -546,7 +567,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
             {/* Payment Method */}
             <div className="flex flex-col items-start p-4 gap-8">
               <h2
-                className="text-[20px] font-semibold text-[color:var(--premitives-color-brand-purple-1000)]"
+                className={`text-[20px] font-semibold ${isDark ? 'text-white' : 'text-[color:var(--premitives-color-brand-purple-1000)]'}`}
                 style={{ fontFamily: "Poppins, Helvetica" }}
               >
                 Payment Method
@@ -557,10 +578,10 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
                 className="flex flex-col gap-4 w-full"
               >
                 <div className="flex flex-col gap-2 w-full">
-                  <label className="checkout-emphasis text-[color:var(--tokens-color-text-text-primary)]">
+                  <label className={`checkout-emphasis ${isDark ? 'text-white' : 'text-[color:var(--tokens-color-text-text-primary)]'}`}>
                     Full Name
                   </label>
-                  <div className={inputClasses}>
+                  <div className={inputClasses} style={inputStyle}>
                     <input
                       type="text"
                       value={formData.full_name}
@@ -568,19 +589,19 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
                         handleInputChange("full_name", e.target.value)
                       }
                       placeholder="Enter your personal or work email"
-                      className="w-full bg-transparent border-none outline-none placeholder:text-[#A1A1A1] text-black text-sm"
+                      className={`w-full bg-transparent border-none outline-none placeholder:text-[#A1A1A1] text-sm ${isDark ? 'text-white' : 'text-black'}`}
                     />
                   </div>
                   {errors.full_name && (
-                    <p className="text-sm text-red-600">{errors.full_name}</p>
+                    <p className="text-sm text-red-400">{errors.full_name}</p>
                   )}
                 </div>
 
                 <div className="flex flex-col gap-2 w-full">
-                  <label className="text-sm font-semibold text-[color:var(--tokens-color-text-text-primary)]">
+                  <label className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-[color:var(--tokens-color-text-text-primary)]'}`}>
                     Email
                   </label>
-                  <div className={inputClasses}>
+                  <div className={inputClasses} style={inputStyle}>
                     <input
                       type="email"
                       value={formData.email}
@@ -588,52 +609,54 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
                         handleInputChange("email", e.target.value)
                       }
                       placeholder="Enter your personal or work email"
-                      className="w-full bg-transparent border-none outline-none placeholder:text-[#A1A1A1] text-black text-sm"
+                      className={`w-full bg-transparent border-none outline-none placeholder:text-[#A1A1A1] text-sm ${isDark ? 'text-white' : 'text-black'}`}
                     />
                   </div>
                   {errors.email && (
-                    <p className="text-sm text-red-600">{errors.email}</p>
+                    <p className="text-sm text-red-400">{errors.email}</p>
                   )}
                 </div>
 
                 <div className="flex flex-col gap-2 w-full">
-                  <label className="checkout-emphasis text-[color:var(--tokens-color-text-text-primary)]">
+                  <label className={`checkout-emphasis ${isDark ? 'text-white' : 'text-[color:var(--tokens-color-text-text-primary)]'}`}>
                     Country or Region
                   </label>
-                  <div className={inputClasses}>
+                  <div className={inputClasses} style={inputStyle}>
                     <select
                       value={formData.country}
                       onChange={(e) =>
                         handleInputChange("country", e.target.value)
                       }
-                      className="w-full bg-transparent border-none outline-none text-black text-sm cursor-pointer appearance-none"
+                      className={`w-full bg-transparent border-none outline-none text-sm cursor-pointer appearance-none ${isDark ? 'text-white' : 'text-black'}`}
                       style={{
-                        backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E\")",
+                        backgroundImage: isDark 
+                          ? "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M6 9L1 4h10z'/%3E%3C/svg%3E\")"
+                          : "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E\")",
                         backgroundRepeat: "no-repeat",
                         backgroundPosition: "right 1rem center",
                         paddingRight: "2.5rem",
                       }}
                     >
-                      <option value="" disabled>
+                      <option value="" disabled style={isDark ? { backgroundColor: '#303030', color: '#ffffff' } : {}}>
                         Select your country
                       </option>
                       {COUNTRIES.map((country) => (
-                        <option key={country.code} value={country.code}>
+                        <option key={country.code} value={country.code} style={isDark ? { backgroundColor: '#303030', color: '#ffffff' } : {}}>
                           {country.name}
                         </option>
                       ))}
                     </select>
                   </div>
                   {errors.country && (
-                    <p className="text-sm text-red-600">{errors.country}</p>
+                    <p className="text-sm text-red-400">{errors.country}</p>
                   )}
                 </div>
 
                 <div className="flex flex-col gap-2 w-full">
-                  <label className="checkout-emphasis text-[color:var(--tokens-color-text-text-primary)]">
+                  <label className={`checkout-emphasis ${isDark ? 'text-white' : 'text-[color:var(--tokens-color-text-text-primary)]'}`}>
                     Address line 1
                   </label>
-                  <div className={inputClasses}>
+                  <div className={inputClasses} style={inputStyle}>
                     <input
                       type="text"
                       value={formData.address_line_1}
@@ -641,28 +664,28 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
                         handleInputChange("address_line_1", e.target.value)
                       }
                       placeholder="Enter your address"
-                      className="w-full bg-transparent border-none outline-none placeholder:text-[#A1A1A1] text-black text-sm"
+                      className={`w-full bg-transparent border-none outline-none placeholder:text-[#A1A1A1] text-sm ${isDark ? 'text-white' : 'text-black'}`}
                     />
                   </div>
                   {errors.address_line_1 && (
-                    <p className="text-sm text-red-600">
+                    <p className="text-sm text-red-400">
                       {errors.address_line_1}
                     </p>
                   )}
                 </div>
 
                 <div className="flex flex-col gap-2 w-full">
-                  <label className="checkout-emphasis text-[color:var(--tokens-color-text-text-primary)]">
+                  <label className={`checkout-emphasis ${isDark ? 'text-white' : 'text-[color:var(--tokens-color-text-text-primary)]'}`}>
                     Card Number
                   </label>
-                  <div className={`${inputClasses} !px-0`}>
+                  <div className={`${inputClasses} !px-0`} style={inputStyle}>
                     <div className="w-full px-4">
                       <CardElement
                         options={{
                           style: {
                             base: {
                               fontSize: "16px",
-                              color: "#424770",
+                              color: isDark ? "#ffffff" : "#424770",
                               fontFamily:
                                 "system-ui, -apple-system, sans-serif",
                               "::placeholder": {
@@ -670,7 +693,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
                               },
                             },
                             invalid: {
-                              color: "#9e2146",
+                              color: isDark ? "#ff6b6b" : "#9e2146",
                             },
                           },
                           hidePostalCode: true,
@@ -693,7 +716,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
                   />
                   <label
                     htmlFor="terms"
-                    className="checkout-emphasis text-black"
+                    className={`checkout-emphasis ${isDark ? 'text-white' : 'text-black'}`}
                   >
                     You agree that midora will charge your card{" "}
                     {billingCycle === "annual" ? "annually" : "monthly"} in the
@@ -701,7 +724,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
                   </label>
                 </div>
                 {errors.terms && (
-                  <p className="text-sm text-red-600">{errors.terms}</p>
+                  <p className="text-sm text-red-400">{errors.terms}</p>
                 )}
 
                 <button

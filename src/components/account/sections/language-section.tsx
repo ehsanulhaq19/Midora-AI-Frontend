@@ -2,10 +2,13 @@
 
 import React, { useState } from "react";
 import { CaretDown, ArrowRightSm, DownArrow } from "@/icons";
+import { useTheme } from "@/hooks/use-theme";
 
 export const LanguageSection: React.FC = () => {
   const [selectedLanguage, setSelectedLanguage] = useState("auto-detect");
   const [isOpen, setIsOpen] = useState(false);
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
   const languages = [
     { value: "auto-detect", label: "Auto Detect" },
@@ -24,7 +27,7 @@ export const LanguageSection: React.FC = () => {
 
   return (
     <div className="flex-1 flex flex-col p-4 sm:p-9">
-      <div className="flex flex-col mt-9 bg-[color:var(--account-section-card-bg)] gap-6 p-6 sm:p-9 rounded-[16px] border">
+      <div className={`flex flex-col mt-9  gap-6 p-6 sm:p-9 rounded-[16px] ${isDark ? 'bg-[color:var(--tokens-color-surface-surface-card-hover)]' : 'border bg-[color:var(--account-section-card-bg)]'} `}>
         <h1 className="text-[length:var(--text-large-font-size)] leading-[100%] tracking-[-1px] font-[number:var(--h05-heading05-font-weight)] font-[family-name:var(--h02-heading02-font-family)] text-[color:var(--tokens-color-text-text-seconary)]">
           Languages
         </h1>
@@ -46,11 +49,15 @@ export const LanguageSection: React.FC = () => {
                 selectedLanguage === "auto-detect"
                   ? "text-[color:var(--tokens-color-text-text-inactive-2)]"
                   : "text-[color:var(--tokens-color-text-text-primary)]"
-              } ${
-                isOpen
-                  ? "border-[color:var(--tokens-color-text-text-seconary)]"
-                  : "border-[#dbdbdb]"
               }`}
+              style={{
+                borderColor: isOpen
+                  ? 'var(--tokens-color-text-text-seconary)'
+                  : isDark
+                    ? 'var(--tokens-color-border-border-inactive)'
+                    : '#dbdbdb',
+                backgroundColor: isDark ? 'var(--tokens-color-surface-surface-card-default)' : undefined
+              }}
             >
               {languages.map((lang) => (
                 <option
@@ -61,6 +68,11 @@ export const LanguageSection: React.FC = () => {
                       ? "text-[color:var(--tokens-color-text-text-inactive-2)]"
                       : "text-black"
                   }
+                  style={{
+                    color: lang.value === "auto-detect"
+                      ? 'var(--tokens-color-text-text-inactive-2)'
+                      : 'var(--tokens-color-text-text-primary)'
+                  }}
                 >
                   {lang.label}
                 </option>

@@ -143,6 +143,10 @@
   --sidebar-conversations-max-height: calc(100vh - 450px);
   --account-section-card-bg: rgba(41, 50, 65, 0.05);
 
+  /* Pricing card specific colors - Light mode */
+  --tokens-color-surface-surface-card-default: var(--tokens-color-surface-surface-sidebar-shrunk);
+  --tokens-color-surface-surface-card-hover: var(--tokens-color-surface-surface-button-pressed);
+
   /* Surface colors for Tailwind config */
   --surface-primary: var(--premitives-color-light-gray-2000);
   --surface-secondary: var(--premitives-color-light-gray-1000);
@@ -177,68 +181,88 @@
   --border-success: #10b981;
 }
 
-/* Dark Mode CSS Variables */
+/* Dark Mode CSS Variables - ChatGPT-inspired design */
 [data-theme="dark"] {
+  /* Main background: #212121, Sidebar panel: #181818 */
   --tokens-color-text-text-primary: #ffffff;
-  --tokens-color-text-text-seconary: #e5e7eb;
+  --tokens-color-text-text-seconary: #ffffff;
   --tokens-color-text-text-neutral: #ffffff;
-  --tokens-color-surface-surface-primary: #1f1740;
-  --tokens-color-surface-surface-button: #5e4d74;
-  --tokens-color-surface-surface-button-inactive: rgba(94, 77, 116, 0.4);
-  --tokens-color-surface-surface-button-pressed: #1f1740;
-  --tokens-color-surface-surface-dark: #0f0f23;
-  --tokens-color-surface-surface-tertiary: rgba(94, 77, 116, 0.2);
-  --tokens-color-text-text-inactive-2: rgba(156, 163, 175, 0.6);
-  --tokens-color-text-text-inactive-3: rgba(41, 50, 65, 0.5);
-  --tokens-color-surface-surface-neutral: #374151;
-  --tokens-color-surface-surface-secondary: #4b5563;
-  --tokens-color-surface-surface-brand: #5e4d74;
-  --tokens-color-icon-surface-icon-inactive-brand: #6b4392;
-  --tokens-color-border-border-inactive: #4b5563;
-  --tokens-color-border-border-active: #5e4d74;
-  --tokens-color-border-border-subtle: rgba(41, 50, 65, 0.1);
+  --tokens-color-surface-surface-primary: #212121;
+  --tokens-color-surface-surface-button: #40414f;
+  --tokens-color-surface-surface-button-inactive: rgba(64, 65, 79, 0.4);
+  --tokens-color-surface-surface-button-pressed: #343541;
+  --tokens-color-surface-surface-dark: #181818;
+  --tokens-color-surface-surface-tertiary: rgba(255, 255, 255, 0.1);
+  --tokens-color-text-text-inactive-2: rgba(255, 255, 255, 0.5);
+  --tokens-color-text-text-inactive-3: rgba(255, 255, 255, 0.4);
+  --tokens-color-surface-surface-neutral: #181818;
+  --tokens-color-surface-surface-sidebar-shrunk: #181818;
+  --tokens-color-surface-surface-secondary: rgba(255, 255, 255, 0.05);
+  --tokens-color-surface-surface-brand: #40414f;
+  --tokens-color-icon-surface-icon-inactive-brand: #ffffff;
+  --tokens-color-border-border-inactive: rgba(255, 255, 255, 0.1);
+  --tokens-color-border-border-active: rgba(255, 255, 255, 0.2);
+  --tokens-color-border-border-subtle: rgba(255, 255, 255, 0.05);
   --tokens-color-text-text-section-header: rgba(255, 255, 255, 0.5);
+  --tokens-color-text-text-brand: #ffffff;
+  --tokens-color-text-text-conversation: #ffffff;
   --sidebar-conversations-max-height: calc(100vh - 450px);
 
-  /* Dark mode surface colors */
-  --surface-primary: #1f1740;
-  --surface-secondary: #0f0f23;
-  --surface-tertiary: rgba(94, 77, 116, 0.2);
-  --surface-card: #1f1740;
-  --surface-overlay: rgba(0, 0, 0, 0.7);
-  --surface-backdrop: rgba(0, 0, 0, 0.3);
-  --surface-button: #5e4d74;
-  --surface-button-hover: #6b5b7a;
-  --surface-button-active: #1f1740;
-  --surface-button-inactive: rgba(94, 77, 116, 0.4);
-  --surface-button-disabled: rgba(94, 77, 116, 0.2);
+  /* Dark mode surface colors - ChatGPT style */
+  --surface-primary: #212121;
+  --surface-secondary: #181818;
+  --surface-tertiary: rgba(255, 255, 255, 0.1);
+  --surface-card: #181818;
+  --surface-overlay: rgba(0, 0, 0, 0.8);
+  --surface-backdrop: rgba(0, 0, 0, 0.5);
+  --surface-button: #40414f;
+  --surface-button-hover: #4a4b5a;
+  --surface-button-active: #343541;
+  --surface-button-inactive: rgba(64, 65, 79, 0.4);
+  --surface-button-disabled: rgba(64, 65, 79, 0.2);
+  --surface-sidebar: #181818;
 
-  /* Dark mode text colors */
+  /* Dark mode text colors - Pure white */
   --text-primary: #ffffff;
-  --text-secondary: #e5e7eb;
-  --text-tertiary: #9ca3af;
-  --text-inverse: #1f1740;
-  --text-muted: #6b7280;
-  --text-brand: #5e4d74;
-  --text-accent: #8b5cf6;
+  --text-secondary: #ffffff;
+  --text-tertiary: rgba(255, 255, 255, 0.7);
+  --text-inverse: #212121;
+  --text-muted: rgba(255, 255, 255, 0.5);
+  --text-brand: #ffffff;
+  --text-accent: #ffffff;
   --text-success: #10b981;
   --text-warning: #f59e0b;
   --text-error: #ef4444;
   --text-info: #3b82f6;
 
   /* Dark mode border colors */
-  --border-primary: #374151;
-  --border-secondary: #4b5563;
-  --border-focus: #5e4d74;
+  --border-primary: rgba(255, 255, 255, 0.1);
+  --border-secondary: rgba(255, 255, 255, 0.05);
+  --border-focus: rgba(255, 255, 255, 0.2);
   --border-error: #ef4444;
   --border-success: #10b981;
+
+  /* Pricing card specific colors - Dark mode */
+  --tokens-color-surface-surface-card-default: #303030;
+  --tokens-color-surface-surface-card-hover: #181818;
+  --tokens-color-surface-surface-card-purple: #D1ADF9;
 }
 
 @layer base {
   html {
     scroll-behavior: smooth;
     font-size: 16px; /* Set 14px as default font size */
+    /* Removed global transitions for instant theme switching */
   }
+  
+  /* Disable all transitions during theme changes for instant switching */
+  html.theme-transitioning *,
+  html.theme-transitioning *::before,
+  html.theme-transitioning *::after {
+    transition: none !important;
+  }
+  
+  /* Media and SVG elements don't need transitions for theme changes */
 
   body {
     @apply text-text-primary bg-surface-primary;
@@ -246,6 +270,11 @@
     font-feature-settings: "rlig" 1, "calt" 1;
     font-size: 14px; /* Ensure body uses 14px as base */
     line-height: 1.4; /* Consistent line height with app text classes */
+  }
+
+  /* Ensure dark mode body background is #212121 */
+  [data-theme="dark"] body {
+    background-color: #212121;
   }
 
   input,
@@ -306,17 +335,18 @@
     background: #9ca3af;
   }
 
-  /* Dark mode scrollbar */
+  /* Dark mode scrollbar - ChatGPT style */
   [data-theme="dark"] ::-webkit-scrollbar-track {
     background: transparent;
   }
 
   [data-theme="dark"] ::-webkit-scrollbar-thumb {
-    background: #4b5563;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
   }
 
   [data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
-    background: #6b7280;
+    background: rgba(255, 255, 255, 0.3);
   }
 
   /* File preview scrollbar - ensure visibility */
@@ -607,6 +637,69 @@
   [data-theme="dark"] .glass-effect {
     @apply bg-gray-800/80 border-gray-700/20;
   }
+
+  /* Dark mode icon colors - white stroke only, no fill */
+  [data-theme="dark"] svg {
+    color: #ffffff;
+  }
+
+  /* Apply white stroke only, remove fill */
+  [data-theme="dark"] svg path {
+    stroke: #ffffff;
+    fill: none;
+  }
+
+  /* Midora logo icons - keep original purple color in both light and dark mode */
+  [data-theme="dark"] svg.midora-logo path,
+  [data-theme="dark"] svg[data-logo="midora"] path {
+    fill: #6B4392 !important;
+    stroke: none !important;
+  }
+
+  /* Textarea dark mode background - preserve border-radius from light mode */
+  [data-theme="dark"] textarea {
+    background-color: #303030 !important;
+    border-radius: var(--premitives-corner-radius-corner-radius-3);
+  }
+
+  /* Message input icon buttons - inherit background in dark mode */
+  [data-theme="dark"] .message-input-icon-button {
+    background-color: inherit !important;
+  }
+
+  /* Select dropdown options - dark mode background */
+  [data-theme="dark"] select {
+    background-color: var(--tokens-color-surface-surface-card-default) !important;
+  }
+
+  [data-theme="dark"] select option {
+    background-color: var(--tokens-color-surface-surface-card-default) !important;
+    color: var(--tokens-color-text-text-primary) !important;
+  }
+
+  /* Sidebar separator styling */
+  .sidebar-separator {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 8px 0;
+  }
+
+  [data-theme="light"] .sidebar-separator {
+    background: rgba(0, 0, 0, 0.1);
+  }
+
+  /* Sidebar menu item hover effects */
+  .sidebar-menu-item {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .sidebar-menu-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  [data-theme="light"] .sidebar-menu-item:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
 }
 
 @layer utilities {
@@ -780,5 +873,14 @@
   51%,
   100% {
     opacity: 0;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.6;
   }
 }

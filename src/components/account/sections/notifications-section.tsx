@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import { Toggle } from '@/components/ui/toggle'
+import { useTheme } from '@/hooks/use-theme'
 
 interface NotificationSettings {
   responses: {
@@ -31,7 +32,8 @@ export const NotificationsSection: React.FC = () => {
       email: false
     }
   })
-
+  const { theme } = useTheme()
+  const isDark = theme === 'dark'
   const updateSetting = (
     category: keyof NotificationSettings,
     type: 'push' | 'email',
@@ -51,13 +53,13 @@ export const NotificationsSection: React.FC = () => {
 
   return (
     <div className="flex-1 flex flex-col p-4 sm:p-9">
-      <div className="flex flex-col mt-9 bg-[color:var(--account-section-card-bg)] gap-9 p-6 sm:p-9 rounded-xl border">
+      <div className={`flex flex-col mt-9 bg-[color:var(--account-section-card-bg)] gap-9 p-6 sm:p-9 rounded-xl ${isDark ? '' : 'border'}`}>
         <h1 className="text-[length:var(--text-large-font-size)] leading-[100%] tracking-[-1px] font-[number:var(--h05-heading05-font-weight)] font-[family-name:var(--h02-heading02-font-family)] text-[color:var(--tokens-color-text-text-seconary)]">
           Notifications
         </h1>
 
         {/* Responses Section */}
-        <div className="flex flex-col gap-4 pb-9 border-b border-gray-200">
+        <div className={`flex flex-col gap-4 pb-9 border-b ${isDark ? 'border-[color:var(--tokens-color-text-text-inactive-2)]' : 'border-[color:var(--tokens-color-border-border-subtle)]'} `}>
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex flex-col gap-2 flex-1">
               <h2 className="font-[family-name:var(--h05-heading05-font-family)] text-[length:var(--text-font-size)] font-[number:var(--h05-heading05-font-weight)] leading-[140%] tracking-[-0.8px] [font-style:var(--h05-heading05-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
@@ -78,7 +80,7 @@ export const NotificationsSection: React.FC = () => {
         </div>
 
         {/* Tasks Section */}
-        <div className="flex flex-col gap-4 pb-9 border-b border-gray-200">
+        <div className={`flex flex-col gap-4 pb-9 border-b ${isDark ? 'border-[color:var(--tokens-color-text-text-inactive-2)]' : 'border-[color:var(--tokens-color-border-border-subtle)]'}`}>
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex flex-col gap-2 flex-1">
               <h2 className="font-[family-name:var(--h05-heading05-font-family)] text-[length:var(--text-font-size)] font-[number:var(--h05-heading05-font-weight)] leading-[140%] tracking-[-0.8px] [font-style:var(--h05-heading05-font-style)] text-[color:var(--tokens-color-text-text-primary)]">

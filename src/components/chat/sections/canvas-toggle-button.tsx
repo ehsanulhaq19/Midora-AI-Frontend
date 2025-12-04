@@ -5,6 +5,7 @@ import { Expand } from '@/icons'
 import { cn } from '@/lib/utils'
 import { t } from '@/i18n'
 import { getFirstLine } from '@/lib/content-utils'
+import { useTheme } from '@/hooks/use-theme'
 
 interface CanvasToggleButtonProps {
   isCanvasOpen: boolean
@@ -23,6 +24,9 @@ export const CanvasToggleButton: React.FC<CanvasToggleButtonProps> = ({
   className = '',
   content = ''
 }) => {
+  const { theme } = useTheme()
+  const isDark = theme === 'dark'
+  
   // Get first line of content for preview
   const firstLine = content ? getFirstLine(content, 60) : ''
   
@@ -49,10 +53,13 @@ export const CanvasToggleButton: React.FC<CanvasToggleButtonProps> = ({
       className={cn(
         'w-full px-4 py-3 rounded-[16px] border app-border-inactive transition-all duration-200 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed text-left cursor-pointer',
         isActive
-          ? 'bg-[color:var(--tokens-color-surface-surface-conversation-canvas)] border border-[color:var(--tokens-color-text-text-brand)]'
-          : 'bg-gray-100 hover:bg-gray-200/80 border-2 border-transparent hover:border-gray-200 shadow-sm',
+          ? `${isDark ? '' : 'bg-[color:var(--tokens-color-surface-surface-conversation-canvas)]'} border border-[color:var(--tokens-color-text-text-brand)]`
+          : `${isDark ? '' : 'bg-gray-100 hover:bg-gray-200/80'} border-2 border-transparent hover:border-gray-200 shadow-sm`,
         className
       )}
+      style={isDark ? {
+        backgroundColor: 'var(--tokens-color-surface-surface-card-default)'
+      } : {}}
       aria-label={t('chat.viewInCanvas')}
       aria-expanded={isCanvasOpen && isActive}
     >
@@ -62,9 +69,11 @@ export const CanvasToggleButton: React.FC<CanvasToggleButtonProps> = ({
           {firstLine && (
             <div className={cn(
               ' truncate mb-[5px]  font-h02-heading02 font-[number:var(--h05-heading05-font-weight)] tracking-[var(--h05-heading05-letter-spacing)] leading-[var(--h05-heading05-line-height)] whitespace-nowrap [font-style:var(--h05-heading05-font-style)]',
-              isActive 
-                ? 'text-[color:var(--tokens-color-text-text-seconary)]' 
-                : 'text-[color:var(--tokens-color-text-text-seconary)]'
+              isDark 
+                ? 'text-white' 
+                : (isActive 
+                  ? 'text-[color:var(--tokens-color-text-text-seconary)]' 
+                  : 'text-[color:var(--tokens-color-text-text-seconary)]')
             )}>
               {firstLine}
             </div>
@@ -73,9 +82,11 @@ export const CanvasToggleButton: React.FC<CanvasToggleButtonProps> = ({
           {contentType && (
             <div className={cn(
               ' truncate font-h02-heading02 font-[number:var(--h02-heading02-font-weight)] text-[14px] tracking-[var(--text-small-letter-spacing)] leading-[var(--h01-heading-01-line-height)] whitespace-nowrap [font-style:var(--h02-heading02-font-style)]',
-              isActive
-                ? 'text-[color:var(--tokens-color-text-text-brand)]'
-                : 'text-[color:var(--tokens-color-text-text-brand)]'
+              isDark 
+                ? 'text-white' 
+                : (isActive
+                  ? 'text-[color:var(--tokens-color-text-text-brand)]'
+                  : 'text-[color:var(--tokens-color-text-text-brand)]')
             )}>
               {contentType}
             </div>
@@ -84,7 +95,7 @@ export const CanvasToggleButton: React.FC<CanvasToggleButtonProps> = ({
         {/* Expand icon - only show when not active */}
         {!isActive && (
           <div className="flex-shrink-0">
-            <Expand className="w-4 h-4 text-gray-500" />
+            <Expand className={`w-4 h-4 ${isDark ? 'text-white' : 'text-gray-500'}`} color={isDark ? 'currentColor' : undefined} />
           </div>
         )}
       </div>

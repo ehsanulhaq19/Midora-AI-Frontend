@@ -3,6 +3,7 @@
 import { t } from '@/i18n'
 import { Buttons, BackButton } from '../../ui'
 import { Paperclip, Lightbulb, Lightning, Grid, LogoOnly } from '@/icons'
+import { useTheme } from '@/hooks/use-theme'
 
 interface WelcomeStepProps {
   onNext: () => void
@@ -21,7 +22,8 @@ export const WelcomeStep = ({
     console.log("Privacy Policy clicked")
     // Add your privacy policy navigation logic here
   } 
-
+  const { theme } = useTheme()
+  const isDark = theme === 'dark'
   return (
     <div className={`flex flex-col w-full items-center justify-between bg-tokens-color-surface-surface-primary ${className}`}>
       <div className="flex flex-col w-full max-w-[475px] items-start gap-[36px]">
@@ -32,11 +34,19 @@ export const WelcomeStep = ({
                 href="/" 
                 className="flex flex-col w-[120px] sm:w-[140px] lg:w-[154px] items-start gap-2.5 cursor-pointer hover:opacity-80 transition-opacity duration-200"
               >
-                <img
-                  className="relative self-stretch w-full aspect-[5.19] object-cover"
-                  alt="Midora AI Logo"
-                  src="/img/logo.png"
-                />
+               {isDark ? (
+                  <img
+                    className="relative self-stretch w-full "
+                    alt="Midora AI Logo"
+                    src="/img/dark-logo-text.png"
+                  />
+                ) : (
+                  <img
+                    className="relative self-stretch w-full aspect-[5.19] object-cover"
+                    alt="Midora AI Logo"
+                    src="/img/logo.png"
+                  />
+                )}
               </a>
             </div>
 

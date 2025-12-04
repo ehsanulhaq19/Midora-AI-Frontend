@@ -3,6 +3,7 @@
 import React from 'react'
 import { cn } from '@/lib/utils'
 import { LogoOnly } from '@/icons/logo-only'
+import { useTheme } from '@/hooks/use-theme'
 
 interface ScreenLoaderProps {
   message?: string
@@ -21,6 +22,9 @@ export const ScreenLoader: React.FC<ScreenLoaderProps> = ({
   size = 'lg',
   fullScreen = true
 }) => {
+  const { theme } = useTheme()
+  const isDark = theme === 'dark'
+
   const sizeClasses = {
     sm: 'h-8 w-8',
     md: 'h-10 w-10',
@@ -41,12 +45,17 @@ export const ScreenLoader: React.FC<ScreenLoaderProps> = ({
       {/* Logo with circular animation */}
       <div className="relative">
         <div className="w-16 h-16 animate-spin" style={{ animation: 'spin 3s linear infinite' }}>
-          <LogoOnly className="w-full h-full" />
+          {isDark ? (
+            // <LogoDots className="w-full h-full" />
+            <img src="/img/dark_logo.svg" alt="Logo" className="w-full h-full" />
+          ) : (
+            <LogoOnly className="w-full h-full" />
+          )}
         </div>
       </div>
       
       {/* Loading message with elegant typography */}
-      <p className="text-sm font-medium text-gray-600 text-center max-w-xs leading-relaxed">
+      <p className={`text-sm font-medium text-center max-w-xs leading-relaxed ${isDark ? 'text-white' : 'text-gray-600'}`}>
         {message}
       </p>
     </div>
@@ -54,8 +63,8 @@ export const ScreenLoader: React.FC<ScreenLoaderProps> = ({
 
   if (fullScreen) {
     return (
-      <div className="fixed inset-0 bg-white z-50 flex items-center justify-center">
-        <div className="bg-white rounded-xl p-8">
+      <div className={`fixed inset-0 z-50 flex items-center justify-center ${isDark ? 'bg-[color:var(--tokens-color-surface-surface-card-hover)]' : 'bg-white'}`}>
+        <div className={`rounded-xl p-8 ${isDark ? 'bg-[color:var(--tokens-color-surface-surface-card-hover)]' : 'bg-white'}`}>
           {content}
         </div>
       </div>

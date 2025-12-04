@@ -2,8 +2,11 @@
 
 import React, { useState } from "react";
 import { PersonFace, ArrowRightSm, DownArrow } from "@/icons";
+import { useTheme } from "@/hooks/use-theme";
 
 export const ProfileSection: React.FC = () => {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const [formData, setFormData] = useState({
     fullName: "",
     displayName: "",
@@ -35,7 +38,8 @@ export const ProfileSection: React.FC = () => {
 
   return (
     <div className="flex-1 flex flex-col p-4 sm:p-9">
-      <div className="flex flex-col mt-9 bg-[color:var(--account-section-card-bg)] gap-6 p-6 sm:p-9 rounded-[16px] border">
+      <div className={`flex flex-col mt-9 bg-[color:var(--account-section-card-bg)] gap-6 p-6 sm:p-9 rounded-[16px] ${isDark ? 'bg-[color:var(--tokens-color-surface-surface-card-hover)]' : 'border'} `}
+      >
         <h1 className="text-emphasis !text-[20px] text-[var(--tokens-color-text-text-seconary)]">
           Profile
         </h1>
@@ -44,7 +48,7 @@ export const ProfileSection: React.FC = () => {
         <div className="flex flex-col gap-6 lg:flex-row">
           {/* Profile Picture */}
           <div className="flex-shrink-0 flex items-center justify-center">
-            <div className="w-24 h-24 rounded-xl bg-gray-200 flex items-center justify-center overflow-hidden">
+            <div className="w-24 h-24 rounded-xl bg-[color:var(--tokens-color-surface-surface-tertiary)] flex items-center justify-center overflow-hidden">
               <div className="w-full h-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white text-2xl font-semibold">
                 <PersonFace className="w-12 h-12" />
               </div>
@@ -54,7 +58,7 @@ export const ProfileSection: React.FC = () => {
           <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Full Name */}
             <div className="flex flex-col gap-2">
-              <label className="font-h02-heading02 font-[number:var(--h05-heading05-font-weight)] text-[color:var(--tokens-color-text-text-primary)] text-[length:var(--text-font-size)] tracking-[var(--h03-heading03-light-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
+              <label className="font-h02-heading02 font-[number:var(--h05-heading05-font-weight)] text-[color:var(--tokens-color-text-text-primary)] text-[length:var(--text-font-size)] tracking-[var(--text-large-letter-spacing)] leading-[var(--text-large-line-height)] [font-style:var(--text-large-font-style)]">
                 Full Name
               </label>
               <input
@@ -63,7 +67,14 @@ export const ProfileSection: React.FC = () => {
                 value={formData.fullName}
                 onChange={handleChange}
                 placeholder="Enter your personal or work email"
-                className="flex h-[54px] items-center gap-3 px-6 py-3 rounded-xl border border-[#dbdbdb] bg-transparent transition-all duration-200 focus:ring-2 focus:ring-[color:var(--tokens-color-text-text-seconary)] focus:ring-offset-2  outline-none font-SF-Pro font-normal text-black text-base tracking-[-0.48px] leading-[100%]"
+                className={`flex h-[54px] items-center gap-3 px-6 py-3 rounded-xl border transition-all duration-200 focus:ring-2 focus:ring-[color:var(--tokens-color-text-text-seconary)] focus:ring-offset-2 outline-none font-SF-Pro font-normal text-base tracking-[-0.48px] leading-[100%] ${
+                  isDark ? '' : 'border-[#dbdbdb] bg-transparent text-black'
+                }`}
+                style={isDark ? {
+                  borderColor: 'var(--tokens-color-border-border-inactive)',
+                  backgroundColor: 'var(--tokens-color-surface-surface-card-default)',
+                  color: 'var(--tokens-color-text-text-primary)'
+                } : {}}
               />
             </div>
 
@@ -78,7 +89,14 @@ export const ProfileSection: React.FC = () => {
                 value={formData.displayName}
                 onChange={handleChange}
                 placeholder="Enter your personal or work email"
-                className="flex h-[54px] items-center gap-3 px-6 py-3 rounded-xl border border-[#dbdbdb] bg-transparent transition-all duration-200 focus:ring-2 focus:ring-[color:var(--tokens-color-text-text-seconary)] focus:ring-offset-2 outline-none font-SF-Pro font-normal text-black text-base tracking-[-0.48px] leading-[100%]"
+                className={`flex h-[54px] items-center gap-3 px-6 py-3 rounded-xl border transition-all duration-200 focus:ring-2 focus:ring-[color:var(--tokens-color-text-text-seconary)] focus:ring-offset-2 outline-none font-SF-Pro font-normal text-base tracking-[-0.48px] leading-[100%] ${
+                  isDark ? '' : 'border-[#dbdbdb] bg-transparent text-black'
+                }`}
+                style={isDark ? {
+                  borderColor: 'var(--tokens-color-border-border-inactive)',
+                  backgroundColor: 'var(--tokens-color-surface-surface-card-default)',
+                  color: 'var(--tokens-color-text-text-primary)'
+                } : {}}
               />
             </div>
           </div>
@@ -95,7 +113,14 @@ export const ProfileSection: React.FC = () => {
             value={formData.workFunction}
             onChange={handleChange}
             placeholder="Enter your work function"
-            className="flex h-[54px] items-center gap-3 px-6 py-3 rounded-xl border border-[#dbdbdb] bg-transparent transition-all duration-200 focus:ring-2 focus:ring-[color:var(--tokens-color-text-text-seconary)] focus:ring-offset-2 outline-none font-SF-Pro font-normal text-black text-base tracking-[-0.48px] leading-[100%]"
+            className={`flex h-[54px] items-center gap-3 px-6 py-3 rounded-xl border transition-all duration-200 focus:ring-2 focus:ring-[color:var(--tokens-color-text-text-seconary)] focus:ring-offset-2 outline-none font-SF-Pro font-normal text-base tracking-[-0.48px] leading-[100%] ${
+              isDark ? '' : 'border-[#dbdbdb] bg-transparent text-black'
+            }`}
+            style={isDark ? {
+              borderColor: 'var(--tokens-color-border-border-inactive)',
+              backgroundColor: 'var(--tokens-color-surface-surface-card-default)',
+              color: 'var(--tokens-color-text-text-primary)'
+            } : {}}
           />
         </div>
 
@@ -112,9 +137,18 @@ export const ProfileSection: React.FC = () => {
                 onClick={() => togglePreference(index)}
                 className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
                   selectedPreferences.includes(index)
-                    ? "bg-[color:var(--tokens-color-surface-surface-button-pressed)] border-[color:var(--premitives-color-text-text-seconary)]"
-                    : "bg-[color:var(--account-section-card-bg)] border-gray-200 hover:border-purple-300"
+                    ? isDark 
+                      ? "border-[color:var(--premitives-color-brand-purple-1000)]"
+                      : "bg-[color:var(--tokens-color-surface-surface-button-pressed)] border-[color:var(--premitives-color-text-text-seconary)]"
+                    : isDark
+                      ? "border-[color:var(--tokens-color-border-border-inactive)]"
+                      : "bg-[color:var(--account-section-card-bg)] border-[color:var(--tokens-color-border-border-subtle)] hover:border-[color:var(--tokens-color-border-border-active)]"
                 }`}
+                style={isDark && !selectedPreferences.includes(index) ? {
+                  backgroundColor: 'var(--tokens-color-surface-surface-card-default)'
+                } : isDark && selectedPreferences.includes(index) ? {
+                  backgroundColor: 'var(--tokens-color-surface-surface-card-hover)'
+                } : {}}
               >
                 <div className="flex items-start justify-between mb-3">
                   <p
@@ -126,7 +160,15 @@ export const ProfileSection: React.FC = () => {
                   >
                     {pref.text}
                   </p>
-                  <button className="w-8 h-8 rounded-lg bg-[color:var(--tokens-color-text-text-brand)] flex items-center justify-center flex-shrink-0">
+                  <button 
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                      isDark ? '' : 'bg-[color:var(--tokens-color-text-text-brand)]'
+                    }`}
+                    style={isDark ? {
+                      backgroundColor: 'var(--tokens-color-surface-surface-card-hover)',
+                      border: '1px solid var(--tokens-color-border-border-subtle)'
+                    } : {}}
+                  >
                     <ArrowRightSm className="w-4 h-4 text-white rotate-[-90deg]" />
                   </button>
                 </div>
@@ -141,11 +183,18 @@ export const ProfileSection: React.FC = () => {
                     {pref.source}
                   </span>
                   <button
-                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg ${
-                      selectedPreferences.includes(index)
-                        ? "bg-white/20 text-white"
-                        : "bg-gray-200 text-gray-700"
-                    }`}
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg"
+                    style={isDark && selectedPreferences.includes(index) ? {
+                      backgroundColor: 'var(--tokens-color-surface-surface-card-default)',
+                      color: 'var(--tokens-color-text-text-primary)'
+                    } : {
+                      backgroundColor: selectedPreferences.includes(index) 
+                        ? 'rgba(255, 255, 255, 0.2)' 
+                        : 'var(--tokens-color-surface-surface-tertiary)',
+                      color: selectedPreferences.includes(index) 
+                        ? 'white' 
+                        : 'var(--tokens-color-text-text-primary)'
+                    }}
                   >
                     <span className="text-sm">Choose Style</span>
                     <DownArrow
@@ -162,9 +211,18 @@ export const ProfileSection: React.FC = () => {
             onClick={() => togglePreference(2)}
             className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
               selectedPreferences.includes(2)
-                ? "bg-[color:var(--tokens-color-surface-surface-button-pressed)] border-[color:var(--premitives-color-brand-purple-1000)]"
-                : "bg-[color:var(--account-section-card-bg)] border-gray-200 hover:border-purple-300"
+                ? isDark
+                  ? "border-[color:var(--premitives-color-brand-purple-1000)]"
+                  : "bg-[color:var(--tokens-color-surface-surface-button-pressed)] border-[color:var(--premitives-color-brand-purple-1000)]"
+                : isDark
+                  ? "border-[color:var(--tokens-color-border-border-inactive)]"
+                  : "bg-[color:var(--account-section-card-bg)] border-gray-200 hover:border-purple-300"
             }`}
+            style={isDark && !selectedPreferences.includes(2) ? {
+              backgroundColor: 'var(--tokens-color-surface-surface-card-default)'
+            } : isDark && selectedPreferences.includes(2) ? {
+              backgroundColor: 'var(--tokens-color-surface-surface-card-hover)'
+            } : {}}
           >
             <div className="flex items-start justify-between mb-3">
               <p
@@ -176,7 +234,15 @@ export const ProfileSection: React.FC = () => {
               >
                 {preferences[2].text}
               </p>
-              <button className="w-8 h-8 rounded-lg bg-[color:var(--tokens-color-text-text-brand)] flex items-center justify-center flex-shrink-0">
+              <button 
+                className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                  isDark ? '' : 'bg-[color:var(--tokens-color-text-text-brand)]'
+                }`}
+                style={isDark ? {
+                  backgroundColor: 'var(--tokens-color-surface-surface-card-hover)',
+                  border: '1px solid var(--tokens-color-border-border-subtle)'
+                } : {}}
+              >
                 <ArrowRightSm className="w-4 h-4 text-white rotate-[-90deg]" />
               </button>
             </div>
@@ -191,11 +257,18 @@ export const ProfileSection: React.FC = () => {
                 {preferences[2].source}
               </span>
               <button
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg ${
-                  selectedPreferences.includes(2)
-                    ? "bg-white/20 text-white"
-                    : "bg-gray-200 text-gray-700"
-                }`}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg"
+                style={isDark && selectedPreferences.includes(2) ? {
+                  backgroundColor: 'var(--tokens-color-surface-surface-card-default)',
+                  color: 'var(--tokens-color-text-text-primary)'
+                } : {
+                  backgroundColor: selectedPreferences.includes(2) 
+                    ? 'rgba(255, 255, 255, 0.2)' 
+                    : 'var(--tokens-color-surface-surface-tertiary)',
+                  color: selectedPreferences.includes(2) 
+                    ? 'white' 
+                    : 'var(--tokens-color-text-text-primary)'
+                }}
               >
                 <span className="text-sm">Choose Style</span>
                 <DownArrow

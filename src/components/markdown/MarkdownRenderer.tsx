@@ -4,7 +4,8 @@ import React from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
-import { oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism'
+import { oneLight, oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
+import { useTheme } from '@/hooks/use-theme'
 import type { MarkdownRendererProps } from './types'
 
 export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ 
@@ -12,6 +13,8 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
   className = '',
   onLinkClick
 }) => {
+  const { theme } = useTheme()
+  const isDark = theme === 'dark'
   return (
     <div className={`markdown-content ${className}`}>
       <ReactMarkdown
@@ -51,7 +54,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
 
           // Paragraphs
           p: ({ children }) => (
-            <p className="app-text-md app-text-primary mb-3 relative font-h02-heading02 font-[number:var(--text-font-weight)] text-[color:var(--light-mode-colors-dark-gray-900)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] break-words">
+            <p className={`app-text-md app-text-primary mb-3 relative font-h02-heading02 font-[number:var(--text-font-weight)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] break-words ${isDark ? 'text-white' : 'text-[color:var(--light-mode-colors-dark-gray-900)]'}`}>
               {children}
             </p>
           ),
@@ -133,30 +136,34 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
             </a>
           ),
 
-          // Code blocks with syntax highlighting - white background
-          code: ({ node, inline, className, children, ...props }) => {
+          // Code blocks with syntax highlighting - theme-aware
+          code: ({ node, className, children, ...props }: any) => {
             const match = /language-(\w+)/.exec(className || '')
             
-            if (!inline && match) {
+            if (match) {
+              const codeStyle: Record<string, string | number> = {
+                backgroundColor: isDark ? '#282c34' : '#ffffff',
+                margin: 0,
+                borderRadius: '0.5rem',
+                fontSize: '0.875rem',
+                lineHeight: '1.5',
+                padding: '1rem',
+              }
+              
+              const codeTagStyle: Record<string, string> = {
+                color: isDark ? '#ffffff' : '#1f2937',
+              }
+              
               return (
                 <div className="my-4 rounded-lg overflow-hidden border border-[color:var(--tokens-color-border-border-inactive)]">
                   <SyntaxHighlighter
-                    style={oneLight}
+                    style={isDark ? oneDark : oneLight}
                     language={match[1]}
                     PreTag="div"
-                    className="!bg-white !text-gray-800"
-                    customStyle={{
-                      backgroundColor: '#ffffff',
-                      margin: 0,
-                      borderRadius: '0.5rem',
-                      fontSize: '0.875rem',
-                      lineHeight: '1.5',
-                      padding: '1rem',
-                    }}
+                    className={isDark ? '!bg-[#282c34] !text-white' : '!bg-white !text-gray-800'}
+                    customStyle={codeStyle as any}
                     codeTagProps={{
-                      style: {
-                        color: '#1f2937',
-                      }
+                      style: codeTagStyle as any
                     }}
                     {...props}
                   >

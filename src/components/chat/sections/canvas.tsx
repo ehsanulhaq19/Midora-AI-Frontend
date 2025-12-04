@@ -10,6 +10,7 @@ import { markdownToTextSync, markdownToHtmlSync } from "@/lib/markdown-utils";
 import { cn } from "@/lib/utils";
 import { appConfig } from "@/config/app";
 import { baseApiClient } from "@/api/base";
+import { useTheme } from "@/hooks/use-theme";
 
 interface CanvasProps {
   isOpen: boolean;
@@ -33,6 +34,8 @@ export const Canvas: React.FC<CanvasProps> = ({
   onLinkClick,
   className = "",
 }) => {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const canvasRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const [isCopied, setIsCopied] = React.useState(false);
@@ -164,24 +167,32 @@ export const Canvas: React.FC<CanvasProps> = ({
     <div
       ref={canvasRef}
       className={cn(
-        "w-full bg-white border-l border-[color:var(--tokens-color-border-border-inactive)] flex flex-col transition-all duration-300 ease-in-out",
+        "w-full border-l border-[color:var(--tokens-color-border-border-inactive)] flex flex-col transition-all duration-300 ease-in-out",
         className
       )}
-      style={{ height: "100%" }}
+      style={{ 
+        height: "100%",
+        backgroundColor: isDark ? 'var(--tokens-color-surface-surface-card-hover)' : '#ffffff'
+      }}
       tabIndex={-1}
       role="region"
       aria-label={t("chat.canvasView")}
       aria-expanded={isOpen}
     >
       {/* Canvas Header */}
-      <div className="h-14 flex items-center justify-between px-6 border-b border-[color:var(--tokens-color-border-border-inactive)] bg-white flex-shrink-0">
+      <div 
+        className="h-14 flex items-center justify-between px-6 border-b border-[color:var(--tokens-color-border-border-inactive)] flex-shrink-0"
+        style={{
+          backgroundColor: isDark ? 'var(--tokens-color-surface-surface-card-hover)' : '#ffffff'
+        }}
+      >
         <div className="flex items-center gap-3">
           <button
             onClick={onClose}
             className="p-1 hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded transition-colors"
             aria-label={t("chat.closeCanvas")}
           >
-            <Close className="w-5 h-5" />
+            <Close className="w-5 h-5" color="currentColor" />
           </button>
         </div>
         <div className="flex items-center gap-2">
@@ -200,7 +211,7 @@ export const Canvas: React.FC<CanvasProps> = ({
                 <span className="font-h02-heading02 font-[number:var(--h02-heading02-font-weight)] text-[14px] tracking-[var(--text-small-letter-spacing)] leading-[var(--h01-heading-01-line-height)] whitespace-nowrap [font-style:var(--h02-heading02-font-style)] text-[color:var(--tokens-color-text-text-brand)]">
                   Copy
                 </span>
-                <Copy className="w-4 h-4" />
+                <Copy className="w-4 h-4" color="currentColor" />
               </>
             )}
           </button>
@@ -213,10 +224,11 @@ export const Canvas: React.FC<CanvasProps> = ({
       {/* Canvas Content */}
       <div
         ref={contentRef}
-        className="flex-1 overflow-y-auto p-6 bg-white"
+        className="flex-1 overflow-y-auto p-6"
         style={{
           scrollBehavior: "smooth",
           minHeight: 0,
+          backgroundColor: isDark ? 'var(--tokens-color-surface-surface-card-hover)' : '#ffffff'
         }}
       >
         <div className="max-w-3xl mx-auto">

@@ -35,14 +35,21 @@ export const ConversationMenu: React.FC<ConversationMenuProps> = ({
     >
       <button
         type="button"
-        className="flex items-center justify-center rounded transition-colors  p-1 "
+        className="flex items-center justify-center rounded transition-colors p-1"
         aria-label="More options"
+        style={{ color: 'var(--tokens-color-text-text-brand)' }}
       >
-        <MoreOptions className="w-4 h-4" />
+        <MoreOptions className="w-4 h-4" color="currentColor" />
       </button>
 
       {isOpen && (
-        <div className="absolute top-full right-0 z-50 bg-white rounded-lg border border-[color:var(--premitives-color-light-purple-200)] shadow-lg min-w-[180px]">
+        <div 
+          className="absolute top-full right-[-30px]  z-[99999999] rounded-lg border shadow-lg min-w-[170px]"
+          style={{
+            backgroundColor: 'var(--tokens-color-surface-surface-primary)',
+            borderColor: 'var(--tokens-color-border-border-subtle)'
+          }}
+        >
           <div className="py-1">
             {onShare && (
               <button
@@ -51,9 +58,10 @@ export const ConversationMenu: React.FC<ConversationMenuProps> = ({
                   e.stopPropagation();
                   handleAction(onShare);
                 }}
-                className="w-full flex items-center gap-3 px-4 py-2 text-left hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] transition-colors text-[color:var(--premitives-color-brand-purple-1000)]"
+                className="w-full flex items-center gap-3 px-4 py-2 text-left hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] transition-colors"
+                style={{ color: 'var(--tokens-color-text-text-brand)' }}
               >
-                <Share className="w-4 h-4" color="var(--premitives-color-brand-purple-1000)" />
+                <Share className="w-4 h-4" color="currentColor" />
                 <span className="font-h02-heading02 text-[14px] font-[number:var(--text-small-font-weight)]">
                   Share
                 </span>
@@ -67,9 +75,10 @@ export const ConversationMenu: React.FC<ConversationMenuProps> = ({
                   e.stopPropagation();
                   handleAction(onRemoveFromFolder);
                 }}
-                className="w-full flex items-center gap-3 px-4 py-2 text-left hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] transition-colors text-[color:var(--premitives-color-brand-purple-1000)]"
+                className="w-full flex items-center gap-3 px-4 py-2 text-left hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] transition-colors"
+                style={{ color: 'var(--tokens-color-text-text-brand)' }}
               >
-                <Pencil className="w-4 h-4" color="var(--premitives-color-brand-purple-1000)" />
+                <Pencil className="w-4 h-4" color="currentColor" />
                 <span className="font-h02-heading02 text-[14px] font-[number:var(--text-small-font-weight)]">
                   Remove
                 </span>
@@ -83,9 +92,10 @@ export const ConversationMenu: React.FC<ConversationMenuProps> = ({
                   e.stopPropagation();
                   handleAction(onArchive);
                 }}
-                className="w-full flex items-center gap-3 px-4 py-2 text-left hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] transition-colors text-[color:var(--premitives-color-brand-purple-1000)]"
+                className="w-full flex items-center gap-3 px-4 py-2 text-left hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] transition-colors"
+                style={{ color: 'var(--tokens-color-text-text-brand)' }}
               >
-                <Archive className="w-4 h-4" color="var(--premitives-color-brand-purple-1000)" />
+                <Archive className="w-4 h-4" color="currentColor" />
                 <span className="font-h02-heading02 text-[14px] font-[number:var(--text-small-font-weight)]">
                   Archive
                 </span>
@@ -99,9 +109,10 @@ export const ConversationMenu: React.FC<ConversationMenuProps> = ({
                   e.stopPropagation();
                   handleAction(onDelete);
                 }}
-                className="w-full flex items-center gap-3 px-4 py-2 text-left hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] transition-colors text-[color:var(--premitives-color-brand-purple-1000)]"
+                className="w-full flex items-center gap-3 px-4 py-2 text-left hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] transition-colors"
+                style={{ color: 'var(--tokens-color-text-text-brand)' }}
               >
-                <Trash className="w-4 h-4" color="var(--premitives-color-brand-purple-1000)" />
+                <Trash className="w-4 h-4" color="currentColor" />
                 <span className="font-h02-heading02 text-[14px] font-[number:var(--text-small-font-weight)]">
                   Delete
                 </span>

@@ -11,6 +11,7 @@ import { useToast } from "@/hooks";
 import { Conversation } from "@/api/conversation/types";
 import { ProjectScreen } from "./project-screen";
 import { useRouter } from "next/navigation";
+import { useTheme } from "@/hooks/use-theme";
 
 interface Project {
   id: string;
@@ -42,11 +43,13 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   conversations = [],
   selectConversation,
 }) => {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const { userName } = useAuthRedux();
   const [isDragOver, setIsDragOver] = useState(false);
   const { error: showErrorToast } = useToast();
   const messageInputRef = useRef<MessageInputHandle>(null);
-  const router = useRouter()
+  const router = useRouter();
   const handleProjectFilesSelect = useCallback(
     async (files: FileList | null) => {
       if (!files || files.length === 0) return;
@@ -188,7 +191,14 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         </div>
 
         <div className="flex items-center gap-2">
-          <button  onClick={() => router.push('/pricing')} className="hidden sm:inline-flex items-center justify-center gap-2 h-[40px] p-2 bg-[color:var(--premitives-color-brand-purple-1000)] rounded-[var(--premitives-corner-radius-corner-radius-2)] hover:bg-[color:var(--tokens-color-surface-surface-button-pressed)]  transition-colors">
+          <button
+            onClick={() => router.push("/pricing")}
+            className={`hidden sm:inline-flex items-center justify-center gap-2 h-[40px] p-2 ${
+              isDark
+                ? "bg-[color:var(--tokens-color-surface-surface-card-purple)]"
+                : "bg-[color:var(--premitives-color-brand-purple-1000)]"
+            } rounded-[var(--premitives-corner-radius-corner-radius-2)] hover:bg-[color:var(--tokens-color-surface-surface-button-pressed)]  transition-colors`}
+          >
             <div className="relative w-fit  font-h02-heading02 text-[14px]  text-white tracking-[var(--h05-heading05-letter-spacing)] leading-[var(--h05-heading05-line-height)] whitespace-nowrap [font-style:var(--h05-heading05-font-style)]">
               {t("chat.upgradeToPro")}
             </div>
@@ -200,7 +210,11 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       <div className="flex items-center flex-col w-full max-w-[695px] gap-6 relative flex-[0_0_auto] mx-auto">
         <div className="inline-flex items-center gap-[15px] relative flex-[0_0_auto]">
           <div className="flex flex-col items-start gap-2.5 relative aspect-[1.02]">
-            <LogoOnly className="relative h-9 w-9 self-stretch  aspect-[1.02] " />
+            {isDark ? (
+              <img src="/img/dark_logo.svg" alt="Logo" className="relative h-9 w-9 self-stretch aspect-[1.02]" />
+            ) : (
+              <LogoOnly className="relative h-9 w-9 self-stretch aspect-[1.02]" />
+            )}
           </div>
           <p className="relative flex items-center justify-center w-fit app-text-28 text-[color:var(--tokens-color-text-text-seconary)] font-h02-heading02 font-[number:var(--h02-heading02-font-weight)] text-center">
             {tWithParams("chat.welcomeBack", { name: userName })}
@@ -217,5 +231,3 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     </div>
   );
 };
-
-

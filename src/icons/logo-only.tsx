@@ -13,13 +13,14 @@ export const LogoOnly = ({
 }: LogoOnlyProps) => {
   return (
     <svg
-      className={className}
+      className={`midora-logo ${className || ''}`}
       width={width}
       height={height}
       viewBox="0 0 1440 1440"              
       preserveAspectRatio="xMidYMid meet"  
       xmlns="http://www.w3.org/2000/svg"
-      style={{ display: "block" }}         
+      style={{ display: "block" }}
+      data-logo="midora"
     >
       <g fill={color} stroke="none">
         <path d="M551 1428 c-54 -29 -48 -117 10 -137 37 -13 72 0 95 33 41 64 -36 140 -105 104z"/>
