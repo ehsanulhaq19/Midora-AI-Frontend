@@ -186,6 +186,7 @@ const LinkedFilePreview: React.FC<{ linkedFile: LinkedFile; isUser: boolean }> =
           ? 'hover:shadow-md  hover:border-[color:var(--tokens-color-border-border-active)]' 
           : ''
       }`}
+      
       onMouseEnter={() => canDownload && setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
