@@ -431,7 +431,11 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                       style={{ color: "var(--tokens-color-text-text-primary)" }}
                     />
                   ) : (
-                    <LogoOnly className="w-5 h-5 transition-transform group-hover:scale-105" />
+                    isDark ? (
+                      <img src="/img/dark_logo.svg" alt="Logo" className="h-5 w-auto transition-transform group-hover:scale-105" />
+                    ) : (
+                      <LogoOnly className="w-5 h-5 transition-transform group-hover:scale-105" />
+                    )
                   )}
                 </button>
               </Tooltip>
@@ -1024,7 +1028,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
           ref={dropdownRef}
         >
           {/* Dark Mode Toggle */}
-          {!isShrunk && (
+          {/* {!isShrunk && (
             <div
               className="w-full px-3 py-2 flex items-center justify-between border-t"
               style={{
@@ -1041,7 +1045,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
               </span>
               <ThemeToggle />
             </div>
-          )}
+          )} */}
 
           {isShrunk ? (
             <>
@@ -1058,7 +1062,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                   {userName?.charAt(0).toUpperCase() || "U"}
                 </div>
               </button>
-              <ThemeToggle />
+              {/* <ThemeToggle /> */}
             </>
           ) : (
             <button

@@ -1,13 +1,12 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { LinkedFile } from '@/api/conversation/types'
 import { FileTypeInfo } from '@/api/files/types'
 import { Spinner } from '@/components/ui/loaders'
 import { ArrowDownSm } from '@/icons'
 import { t } from '@/i18n'
-import { appConfig } from '@/config/app'
-import { baseApiClient } from '@/api/base'
+import { fileApi } from '@/api/files/api'
 
 interface LinkedFilesPreviewProps {
   linkedFiles: LinkedFile[]
@@ -99,11 +98,43 @@ const LinkedFilePreview: React.FC<{ linkedFile: LinkedFile; isUser: boolean }> =
   const isUploading = linkedFile.uuid?.startsWith('temp-') || false
   const [isDownloading, setIsDownloading] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null)
+  const blobUrlRef = useRef<string | null>(null)
   
   // Determine background color based on message type
   const backgroundColor = isUser 
     ? 'bg-[#6B4392]/10 border-[#6B4392]/20' 
     : 'bg-[color:var(--tokens-color-surface-surface-secondary)] border-[color:var(--tokens-color-border-border-subtle)]'
+
+  // Load image preview for images using authenticated API
+  // Direct URL won't work because endpoint requires authentication headers
+  useEffect(() => {
+    if (isImage && linkedFile.uuid && !isUploading) {
+      const loadImagePreview = async () => {
+        try {
+          const downloadResponse = await fileApi.downloadFile(linkedFile.uuid)
+          const blobUrl = window.URL.createObjectURL(downloadResponse.data)
+          blobUrlRef.current = blobUrl
+          setImagePreviewUrl(blobUrl)
+        } catch (error) {
+          console.error('Failed to load image preview:', error)
+          setImagePreviewUrl(null)
+        }
+      }
+      
+      loadImagePreview()
+    } else {
+      setImagePreviewUrl(null)
+    }
+    
+    // Cleanup blob URL on unmount or when dependencies change
+    return () => {
+      if (blobUrlRef.current) {
+        window.URL.revokeObjectURL(blobUrlRef.current)
+        blobUrlRef.current = null
+      }
+    }
+  }, [isImage, linkedFile.uuid, isUploading])
 
   // Handle file download for AI responses (not user messages)
   const handleFileDownload = async (event: React.MouseEvent) => {
@@ -123,9 +154,8 @@ const LinkedFilePreview: React.FC<{ linkedFile: LinkedFile; isUser: boolean }> =
     setIsDownloading(true)
 
     try {
-      // Construct download endpoint
-      const endpoint = `/api/v1/files/download/${linkedFile.uuid}`
-      const downloadResponse = await baseApiClient.downloadFile(endpoint)
+      // Download file using file API
+      const downloadResponse = await fileApi.downloadFile(linkedFile.uuid)
       const blobUrl = window.URL.createObjectURL(downloadResponse.data)
 
       // Get filename from response or use the linked file filename
@@ -194,10 +224,13 @@ const LinkedFilePreview: React.FC<{ linkedFile: LinkedFile; isUser: boolean }> =
       
       {/* File preview section - fixed height */}
       <div className="flex items-center justify-center h-16 mb-2">
-        {isImage ? (
-          <div className={`w-12 h-12 flex items-center justify-center text-2xl ${fileTypeInfo.color}`}>
-            {fileTypeInfo.icon}
-          </div>
+        {isImage && imagePreviewUrl ? (
+          <img
+            src={imagePreviewUrl}
+            alt={linkedFile.filename}
+            className="w-12 h-12 object-contain rounded-[var(--premitives-corner-radius-corner-radius-1)]"
+            onError={() => setImagePreviewUrl(null)}
+          />
         ) : (
           <div className={`w-12 h-12 flex items-center justify-center text-2xl ${fileTypeInfo.color}`}>
             {fileTypeInfo.icon}

@@ -216,7 +216,10 @@ export const Canvas: React.FC<CanvasProps> = ({
     >
       {/* Canvas Header */}
       <div 
-        className="h-14 flex items-center justify-between px-6 border-b border-[color:var(--tokens-color-border-border-inactive)] bg-white flex-shrink-0"
+        className="h-14 flex items-center justify-between px-6 border-b border-[color:var(--tokens-color-border-border-inactive)] flex-shrink-0"
+        style={{
+          backgroundColor: isDark ? 'var(--tokens-color-surface-surface-card-hover)' : '#ffffff'
+        }}
       >
         <div className="flex items-center gap-3">
           <button

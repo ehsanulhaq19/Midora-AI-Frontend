@@ -82,7 +82,7 @@ export const ModelSelection: React.FC<ModelSelectionProps> = ({
 
   return (
     <div
-      className={`inline-flex items-center justify-center gap-1 h-[40px] p-2 relative rounded-[var(--premitives-corner-radius-corner-radius-2)] ${className}`}
+      className={`inline-flex items-center justify-center gap-1 h-[40px] -z-10 p-2 relative rounded-[var(--premitives-corner-radius-corner-radius-2)] ${className}`}
       style={{ background: 'linear-gradient(109deg, #1F1740 3.33%, #503CA6 127.07%)' }}
     >
       <div className="inline-flex items-center gap-1.5 relative flex-[0_0_auto] rounded-[var(--premitives-corner-radius-corner-radius-2)]">

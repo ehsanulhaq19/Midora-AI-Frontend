@@ -134,7 +134,7 @@ export const FilePreview: React.FC<FilePreviewProps> = ({ file, onRemove, classN
           <img
             src={file.preview}
             alt={file.filename}
-            className="w-16 h-16 object-cover rounded-[var(--premitives-corner-radius-corner-radius-1)]"
+            className="w-12 h-12 object-cover rounded-[var(--premitives-corner-radius-corner-radius-1)]"
           />
         ) : (
           <div className={`w-12 h-12 flex items-center justify-center text-2xl ${fileTypeInfo.color}`}>

@@ -60,19 +60,38 @@ export const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>(({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if ((message.trim() || files.length > 0) && !isStreaming && !isUploading) {
+    // Require text message - if files are uploaded, text is still required
+    if (message.trim() && !isStreaming && !isUploading) {
       const modelUuid = isAutoMode ? undefined : selectedModel?.uuid
       const fileUuids = files.map(f => f.uuid)
       onSend(message, modelUuid, fileUuids, files)
       setMessage('')
       clearFiles() // Clear files after sending message
+    } else if (files.length > 0 && !message.trim()) {
+      // Show error toast when trying to send with files but no text
+      showErrorToast(
+        'Message Required',
+        'Please enter a message before sending files.'
+      )
     }
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey && !isStreaming && !isUploading) {
-      e.preventDefault()
-      handleSubmit(e)
+      // Prevent sending if files are uploaded but no text is entered
+      if (files.length > 0 && !message.trim()) {
+        e.preventDefault()
+        showErrorToast(
+          'Message Required',
+          'Please enter a message before sending files.'
+        )
+        return
+      }
+      // Only allow sending if there's text
+      if (message.trim()) {
+        e.preventDefault()
+        handleSubmit(e)
+      }
     }
   }
 
@@ -188,7 +207,7 @@ export const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>(({
               
               <IconButton
                 type="submit"
-                disabled={(!message.trim() && files.length === 0) || isStreaming || isUploading}
+                disabled={!message.trim() || isStreaming || isUploading}
                 variant="primary"
                 size="md"
                 icon={<ArrowUpSm className="w-6 h-6" color="white" />}

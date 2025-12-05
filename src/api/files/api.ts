@@ -3,7 +3,7 @@
  * Handles all file-related API calls including upload and management
  */
 
-import { baseApiClient, ApiResponse } from '../base'
+import { baseApiClient, ApiResponse, FileDownloadResponse } from '../base'
 import { appConfig } from '@/config/app'
 import { tokenManager } from '@/lib/token-manager'
 import { FileUploadResponse, FileUploadRequest } from './types'
@@ -134,6 +134,14 @@ class FileApiClient {
         }
       }
     }
+  }
+
+  /**
+   * Download a file from the backend
+   */
+  async downloadFile(fileUuid: string): Promise<FileDownloadResponse> {
+    const endpoint = `/api/v1/files/download/${fileUuid}`
+    return await this.baseClient.downloadFile(endpoint)
   }
 }
 
