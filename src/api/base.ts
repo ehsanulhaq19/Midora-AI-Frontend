@@ -65,27 +65,30 @@ class BaseApiClient {
   private processResponseData<T>(responseData: any, response: Response): ApiResponse<T> {
     // Handle new backend response format
     if (responseData && typeof responseData === 'object') {
-      if (responseData.success === true && responseData.data !== undefined) {
+      // Check if response has a detail wrapper (FastAPI validation errors)
+      const data = responseData.detail || responseData
+      
+      if (data.success === true && data.data !== undefined) {
         // Success response format: { success: true, data: {...} }
         return { 
-          data: responseData.data, 
+          data: data.data, 
           status: response.status,
           success: true
         }
-      } else if (responseData.success === false) {
+      } else if (data.success === false) {
         // Error response format: { success: false, error_type: "...", error_message: "...", error_id: "..." }
-        const errorMessage = handleApiError(responseData || response)
+        const errorMessage = handleApiError(data || response)
         return { 
           error: errorMessage, 
           status: response.status,
           success: false,
-          error_type: responseData.error_type,
-          error_message: responseData.error_message,
-          error_id: responseData.error_id,
+          error_type: data.error_type,
+          error_message: data.error_message,
+          error_id: data.error_id,
           processedError: {
-            error_type: responseData.error_type || 'UNKNOWN_ERROR',
-            error_message: responseData.error_message || errorMessage,
-            error_id: responseData.error_id,
+            error_type: data.error_type || 'UNKNOWN_ERROR',
+            error_message: data.error_message || errorMessage,
+            error_id: data.error_id,
             status: response.status
           }
         }

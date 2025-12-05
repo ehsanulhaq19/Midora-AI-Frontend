@@ -250,7 +250,7 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
             />
           </div>
 
-          <div className="flex flex-col items-start gap-4 relative self-stretch w-full flex-[0_0_auto]">
+          <div className="flex flex-col items-start relative self-stretch w-full flex-[0_0_auto]">
             {/* Email Field */}
             {!showPasswordField && (
               <div className={`transition-all duration-300 ease-in-out w-full ${
@@ -266,7 +266,19 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
                   disabled={isCheckingEmail || isTransitioning}
                   placeholder="Enter your personal or work email"
                 />
-                
+                <div className='flex justify-end w-full'>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (onShowOnboarding) {
+                      onShowOnboarding('forgotPassword')
+                    }
+                  }}
+                  className="text-sm text-[color:var(--tokens-color-text-text-inactive-2)]  mt-4 hover:text-[color:var(--tokens-color-text-text-primary)] block transition-colors duration-200 cursor-pointer text-right"
+                >
+                  forgot password ?
+                </button>
+                </div>
               </div>
             )}
 
@@ -293,6 +305,7 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
             }`}>
               <Buttons 
                 property1="pressed" 
+                className='mt-4'
                 onClick={showPasswordField ? handlePasswordSubmit : handleEmailSubmit}
                 text={
                   isProcessingSSO 

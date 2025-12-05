@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { WelcomeStep, FullNameStep, ProfessionStep, PasswordStep, OTPVerificationStep, SuccessStep } from './'
+import { WelcomeStep, FullNameStep, ProfessionStep, PasswordStep, ForgotPasswordStep, ResetPasswordStep, OTPVerificationStep, SuccessStep } from './'
 import { LogoOnly } from '@/icons/logo-only';
 import { useToast } from '@/hooks/use-toast'
 import { useAuth } from '@/hooks/use-auth'
@@ -20,10 +20,10 @@ interface MultiStepContainerProps {
   className?: string
 }
 
-type Step = 'email' | 'welcome' | 'fullName' | 'profession' | 'password' | 'otp' | 'success'
+type Step = 'email' | 'welcome' | 'fullName' | 'profession' | 'password' | 'forgotPassword' | 'resetPassword' | 'otp' | 'success'
 
 // Step order for determining navigation direction
-const STEP_ORDER: Step[] = ['welcome', 'fullName', 'profession', 'password', 'otp', 'success']
+const STEP_ORDER: Step[] = ['welcome', 'fullName', 'profession', 'password', 'forgotPassword', 'resetPassword', 'otp', 'success']
 
 const STORAGE_KEY = 'signupFormData'
 
@@ -45,7 +45,7 @@ export const MultiStepContainer: React.FC<MultiStepContainerProps> = ({
   // Get current step from query parameters, fallback to initialStep or default
   const getStepFromParams = (): Step => {
     const stepParam = searchParams.get('step')
-    if (stepParam && ['welcome', 'fullName', 'profession', 'password', 'otp', 'success'].includes(stepParam)) {
+    if (stepParam && ['welcome', 'fullName', 'profession', 'password', 'forgotPassword', 'resetPassword', 'otp', 'success'].includes(stepParam)) {
       return stepParam as Step
     }
     return initialStep || (isSSOOnboarding ? 'welcome' : 'welcome')
@@ -59,7 +59,7 @@ export const MultiStepContainer: React.FC<MultiStepContainerProps> = ({
   // Update currentStep when query parameters change (browser back/forward)
   useEffect(() => {
     const stepParam = searchParams.get('step')
-    const newStep: Step = stepParam && ['welcome', 'fullName', 'profession', 'password', 'otp', 'success'].includes(stepParam)
+    const newStep: Step = stepParam && ['welcome', 'fullName', 'profession', 'password', 'forgotPassword', 'resetPassword', 'otp', 'success'].includes(stepParam)
       ? (stepParam as Step)
       : (initialStep || (isSSOOnboarding ? 'welcome' : 'welcome'))
     
@@ -100,6 +100,7 @@ export const MultiStepContainer: React.FC<MultiStepContainerProps> = ({
   }
   
   const [formData, setFormData] = useState(initializeFormData)
+  const [resetPasswordEmail, setResetPasswordEmail] = useState('')
   const { success: showSuccessToast, error: showErrorToast } = useToast()
   const isOtpEmailSend = useRef(false)
   
@@ -233,6 +234,20 @@ export const MultiStepContainer: React.FC<MultiStepContainerProps> = ({
     navigateToStep('profession', 'left')
   }
 
+  const handleForgotPasswordBack = () => {
+    // Navigate back to the signup form (no step parameter)
+    router.push('/signup', { scroll: false })
+  }
+
+  const handleForgotPasswordNext = (email: string) => {
+    setResetPasswordEmail(email)
+    navigateToStep('resetPassword', 'right')
+  }
+
+  const handleResetPasswordBack = () => {
+    navigateToStep('forgotPassword', 'left')
+  }
+
   const handleOTPNext = async (otpCode: string) => {
     try {
       await verifyOTP({
@@ -345,6 +360,24 @@ export const MultiStepContainer: React.FC<MultiStepContainerProps> = ({
             <PasswordStep 
               onNext={handlePasswordNext} 
               onBack={handlePasswordBack}
+            />
+          </div>
+        )
+      case 'forgotPassword':
+        return (
+          <div key="forgotPassword" className={`${baseClasses} ${slideClasses}`}>
+            <ForgotPasswordStep 
+              onBack={handleForgotPasswordBack}
+              onNext={handleForgotPasswordNext}
+            />
+          </div>
+        )
+      case 'resetPassword':
+        return (
+          <div key="resetPassword" className={`${baseClasses} ${slideClasses}`}>
+            <ResetPasswordStep 
+              email={resetPasswordEmail}
+              onBack={handleResetPasswordBack}
             />
           </div>
         )

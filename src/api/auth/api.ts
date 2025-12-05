@@ -73,7 +73,12 @@ class AuthApiClient {
     return this.baseClient.get<UserResponse>('/api/v1/auth/me')
   }
 
-  // Forgot password method removed since forgot password functionality is removed
+  /**
+   * Forgot password - send reset code to email
+   */
+  async forgotPassword(data: ForgotPasswordRequest): Promise<ApiResponse<ForgotPasswordResponse>> {
+    return this.baseClient.post<ForgotPasswordResponse>('/api/v1/auth/forgot-password', data)
+  }
 
   /**
    * Reset password with OTP

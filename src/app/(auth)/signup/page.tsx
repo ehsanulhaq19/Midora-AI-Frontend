@@ -32,7 +32,7 @@ function SignupPageContent() {
   const { getCurrentUser, updateProfile, completeOnboarding } = useAuth()
   
   const stepParam = searchParams.get('step')
-  const isInOnboardingFlow = stepParam && ['welcome', 'fullName', 'profession', 'password', 'otp', 'success'].includes(stepParam)
+  const isInOnboardingFlow = stepParam && ['welcome', 'fullName', 'profession', 'password', 'forgotPassword', 'resetPassword', 'otp', 'success'].includes(stepParam)
   const { theme } = useTheme()
   const isDark = theme === 'dark'
   const [showOnboarding, setShowOnboarding] = useState(isInOnboardingFlow)
