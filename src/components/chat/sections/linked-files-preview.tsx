@@ -183,7 +183,7 @@ const LinkedFilePreview: React.FC<{ linkedFile: LinkedFile; isUser: boolean }> =
     <div 
       className={`relative ${backgroundColor} border rounded-[var(--premitives-corner-radius-corner-radius-2)] p-3 w-[200px] h-[120px] flex flex-col shadow-sm transition-shadow flex-shrink-0 ${
         canDownload && isHovered
-          ? 'hover:shadow-md hover:border-[color:var(--tokens-color-border-border-active)]' 
+          ? 'hover:shadow-md  hover:border-[color:var(--tokens-color-border-border-active)]' 
           : ''
       }`}
       onMouseEnter={() => canDownload && setIsHovered(true)}
@@ -203,13 +203,13 @@ const LinkedFilePreview: React.FC<{ linkedFile: LinkedFile; isUser: boolean }> =
       {canDownload && isHovered && !isDownloading && (
         <button
           onClick={handleFileDownload}
-          className="absolute top-2 right-2 z-10 p-1.5 rounded-full bg-[color:var(--tokens-color-surface-surface-card-default)] border border-[color:var(--tokens-color-border-border-subtle)] shadow-md hover:bg-[color:var(--tokens-color-surface-surface-card-hover)] transition-colors"
+          className="absolute top-2 right-2 z-10 p-1.5 rounded-full bg-[color:var(--tokens-color-surface-surface-card-default)] border border-[color:var(--tokens-color-border-border-subtle)] shadow-md  transition-colors"
           aria-label={`Download ${linkedFile.filename}`}
           type="button"
         >
           <ArrowDownSm 
             className="w-4 h-4" 
-            color='var(--tokens-color-text-text-primary)'
+            color=' var(--tokens-color-text-text-primary)'
           />
         </button>
       )}
