@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { useTheme } from '@/hooks/use-theme'
 
 interface ToggleProps {
   checked: boolean
@@ -17,6 +18,9 @@ export const Toggle: React.FC<ToggleProps> = ({
   disabled = false,
   className = ''
 }) => {
+  const { theme } = useTheme()
+  const isDark = theme === 'dark'
+  
   const handleToggle = () => {
     if (!disabled) {
       onChange(!checked)
@@ -38,12 +42,21 @@ export const Toggle: React.FC<ToggleProps> = ({
         disabled={disabled}
         className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[color:var(--tokens-color-text-text-brand)] focus:ring-offset-2 ${
           checked
-            ? 'bg-[color:var(--premitives-color-dropdown-icon)]'
-            : 'bg-gray-300'
+            ? isDark
+              ? ''
+              : 'bg-[color:var(--premitives-color-dropdown-icon)]'
+            : isDark
+              ? ''
+              : 'bg-gray-300'
         } ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+        style={isDark ? {
+          backgroundColor: checked 
+            ? 'rgba(40, 199, 162, 0.2)' 
+            : 'rgba(255, 255, 255, 0.2)'
+        } : {}}
       >
         <span
-          className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform shadow-sm ${
+          className={`inline-block h-5 w-5 transform rounded-full ${isDark ? 'bg-[#30D5C8]' : 'bg-white'} bg-white transition-transform shadow-sm ${
             checked ? 'translate-x-5' : 'translate-x-0.5'
           }`}
         />

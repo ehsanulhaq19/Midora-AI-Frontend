@@ -203,7 +203,7 @@ export const Canvas: React.FC<CanvasProps> = ({
     <div
       ref={canvasRef}
       className={cn(
-        "w-full bg-white border-l border-[color:var(--tokens-color-border-border-inactive)] flex flex-col transition-all duration-300 ease-in-out",
+        "w-full border-l border-[color:var(--tokens-color-border-border-inactive)] flex flex-col transition-all duration-300 ease-in-out",
         className
       )}
       style={{ 
@@ -216,7 +216,10 @@ export const Canvas: React.FC<CanvasProps> = ({
     >
       {/* Canvas Header */}
       <div 
-        className="h-14 flex items-center justify-between px-6 border-b border-[color:var(--tokens-color-border-border-inactive)] bg-white flex-shrink-0"
+        className="h-14 flex items-center justify-between px-6 border-b border-[color:var(--tokens-color-border-border-inactive)] flex-shrink-0"
+        style={{
+          backgroundColor: isDark ? 'var(--tokens-color-surface-surface-card-hover)' : '#ffffff'
+        }}
       >
         <div className="flex items-center gap-3">
           <button
@@ -224,7 +227,7 @@ export const Canvas: React.FC<CanvasProps> = ({
             className="p-1 hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded transition-colors"
             aria-label={t("chat.closeCanvas")}
           >
-            <Close className="w-5 h-5" />
+            <Close className="w-5 h-5" color="currentColor" />
           </button>
         </div>
         <div className="flex items-center gap-2">
@@ -243,7 +246,7 @@ export const Canvas: React.FC<CanvasProps> = ({
                 <span className="font-h02-heading02 font-[number:var(--h02-heading02-font-weight)] text-[14px] tracking-[var(--text-small-letter-spacing)] leading-[var(--h01-heading-01-line-height)] whitespace-nowrap [font-style:var(--h02-heading02-font-style)] text-[color:var(--tokens-color-text-text-brand)]">
                   Copy
                 </span>
-                <Copy className="w-4 h-4" />
+                <Copy className="w-4 h-4" color="currentColor" />
               </>
             )}
           </button>
@@ -261,6 +264,7 @@ export const Canvas: React.FC<CanvasProps> = ({
         style={{
           scrollBehavior: "smooth",
           minHeight: 0,
+          backgroundColor: isDark ? 'var(--tokens-color-surface-surface-card-hover)' : '#ffffff'
         }}
       >
         <div className="max-w-3xl mx-auto">

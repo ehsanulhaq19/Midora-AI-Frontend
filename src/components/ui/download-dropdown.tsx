@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react'
 import { ArrowDownSm } from '@/icons'
+import { useTheme } from '@/hooks/use-theme'
 
 interface DownloadOption {
   value: string
@@ -27,6 +28,8 @@ export const DownloadDropdown: React.FC<DownloadDropdownProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const { theme } = useTheme()
+  const isDark = theme === 'dark'
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -71,15 +74,30 @@ export const DownloadDropdown: React.FC<DownloadDropdownProps> = ({
 
       {isOpen && (
         <div
-          className={`absolute right-0 mt-2 w-48 rounded-lg shadow-lg z-50  bg-white border border-[color:var(--tokens-color-border-border-subtle)]`}
+          className={`absolute right-0 mt-2 w-48 rounded-lg shadow-lg z-50 border border-[color:var(--tokens-color-border-border-subtle)]`}
+          style={{
+            backgroundColor: isDark ? 'var(--tokens-color-surface-surface-card-default)' : '#ffffff'
+          }}
         >
           {downloadOptions.map((option) => (
             <button
               key={option.value}
               type="button"
               onClick={() => handleOptionClick(option.value)}
-              className={`w-full px-4 py-2.5 text-left flex items-center gap-2 transition-colors text-[color:var(--tokens-color-text-text-primary)] hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]
-              `}
+              className={`w-full px-4 py-2.5 text-left flex items-center gap-2 transition-colors text-[color:var(--tokens-color-text-text-primary)]`}
+              style={{
+                backgroundColor: 'transparent',
+              }}
+              onMouseEnter={(e) => {
+                if (isDark) {
+                  e.currentTarget.style.backgroundColor = 'var(--tokens-color-surface-surface-card-hover)'
+                } else {
+                  e.currentTarget.style.backgroundColor = 'var(--tokens-color-surface-surface-tertiary)'
+                }
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent'
+              }}
             >
               <span className="font-h02-heading02 font-[number:var(--text-small-font-weight)] text-sm tracking-[var(--text-small-letter-spacing)] leading-[var(--text-small-line-height)] [font-style:var(--text-small-font-style)]">
                 {option.label}

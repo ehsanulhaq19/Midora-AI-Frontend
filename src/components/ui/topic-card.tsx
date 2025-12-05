@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils'
+import { useTheme } from '@/hooks/use-theme'
 
 interface TopicCardProps {
   icon: React.ComponentType<{ className?: string; color?: string }>
@@ -15,13 +16,18 @@ export const TopicCard = ({
   onClick,
   className 
 }: TopicCardProps) => {
+  const { theme } = useTheme()
+  const isDark = theme === 'dark'
+
   return (
     <button
       onClick={onClick}
       className={cn(
         "inline-flex items-center gap-2 sm:gap-3 p-2 sm:p-3 relative flex-[0_0_auto] rounded-xl border border-solid transition-all duration-200 hover:scale-105 min-w-0",
         isSelected
-          ? "bg-tokens-color-surface-surface-button border-tokens-color-surface-surface-button text-white"
+          ? isDark 
+            ? "bg-[color:var(--tokens-color-surface-surface-card-purple)] border-[color:var(--tokens-color-surface-surface-card-purple)] text-white"
+            : "bg-tokens-color-surface-surface-button border-tokens-color-surface-surface-button text-white"
           : "bg-tokens-color-surface-surface-tertiary border-tokens-color-border-border-inactive hover:border-tokens-color-surface-surface-button",
         className
       )}

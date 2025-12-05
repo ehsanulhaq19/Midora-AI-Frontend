@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { useTheme } from '@/hooks/use-theme'
 
 interface PrimaryButtonProps {
   property1?: 'pressed' | 'active'
@@ -21,11 +22,14 @@ export const PrimaryButton: React.FC<PrimaryButtonProps> = ({
   divClassName,
   loading = false
 }) => {
+  const { theme } = useTheme()
+  const isDark = theme === 'dark'
+
   return (
     <button 
       type="button"
       disabled={disabled || loading}
-      className={`flex w-full h-[54px] items-center justify-center gap-2.5 px-[74px] py-[18px] relative bg-tokens-color-surface-surface-button-pressed rounded-xl hover:bg-opacity-90 transition-colors duration-200 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+      className={`flex w-full h-[54px] items-center justify-center gap-2.5 px-[74px] py-[18px] relative rounded-xl hover:bg-opacity-90 transition-colors duration-200  focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed ${isDark ? 'bg-[color:var(--tokens-color-surface-surface-card-purple)]' : 'bg-tokens-color-surface-surface-button-pressed'} ${className}`}
       onClick={onClick || (() => {})}
       aria-label={text || "Continue with email"}
     >

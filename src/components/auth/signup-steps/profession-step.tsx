@@ -4,6 +4,7 @@ import { Search, Star, Lightbulb, Stars, Scale, Code } from '@/icons'
 import { TopicCard, NameInput, Buttons, BackButton } from '../../ui'
 import { LogoOnly } from '@/icons'
 import { useToast } from '@/hooks/use-toast'
+import { useTheme } from '@/hooks/use-theme'
 
 interface ProfessionStepProps {
   onNext: (finalTopics: string[], rawSelectedTopics: string[], otherInput?: string) => void
@@ -56,7 +57,8 @@ export const ProfessionStep = ({
       return prev
     })
   }
-
+  const { theme } = useTheme()
+  const isDark = theme === 'dark'
   const handleContinue = () => {
     const hasOtherSelected = selectedTopics.includes(OTHER_TOPIC_ID)
     const trimmedOther = otherInput.trim()
@@ -87,11 +89,19 @@ export const ProfessionStep = ({
                 href="/" 
                 className="flex flex-col w-[120px] sm:w-[140px] lg:w-[154px] items-start gap-2.5 cursor-pointer hover:opacity-80 transition-opacity duration-200"
               >
-                <img
-                  className="relative self-stretch w-full aspect-[5.19] object-cover"
-                  alt="Midora AI Logo"
-                  src="/img/logo.png"
-                />
+               {isDark ? (
+                  <img
+                    className="relative self-stretch w-full "
+                    alt="Midora AI Logo"
+                    src="/img/dark-logo-text.png"
+                  />
+                ) : (
+                  <img
+                    className="relative self-stretch w-full aspect-[5.19] object-cover"
+                    alt="Midora AI Logo"
+                    src="/img/logo.png"
+                  />
+                )}
               </a>
             </div>    
         <div className="flex items-center gap-2.5 relative self-stretch w-full mb-2">

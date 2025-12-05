@@ -3,7 +3,7 @@ import { t } from '@/i18n'
 import { LogoOnly } from '@/icons'
 import { PasswordInput, PrimaryButton, BackButton } from '../../ui'
 import { handleApiError } from '@/lib/error-handler'
-
+import { useTheme } from '@/hooks/use-theme'
 interface PasswordStepProps {
   onNext: (password: string) => void
   onBack: () => void
@@ -45,7 +45,8 @@ export const PasswordStep = ({
     
     return errors
   }
-
+  const { theme } = useTheme()
+  const isDark = theme === 'dark'
   const handleSignUp = async () => {
     const passwordErrors = validatePassword(password)
     const newErrors: {password?: string, confirmPassword?: string} = {}
@@ -105,11 +106,19 @@ export const PasswordStep = ({
                 href="/" 
                 className="flex flex-col w-[120px] sm:w-[140px] lg:w-[154px] items-start gap-2.5 cursor-pointer hover:opacity-80 transition-opacity duration-200"
               >
-                <img
-                  className="relative self-stretch w-full aspect-[5.19] object-cover"
-                  alt="Midora AI Logo"
-                  src="/img/logo.png"
-                />
+               {isDark ? (
+                  <img
+                    className="relative self-stretch w-full "
+                    alt="Midora AI Logo"
+                    src="/img/dark-logo-text.png"
+                  />
+                ) : (
+                  <img
+                    className="relative self-stretch w-full aspect-[5.19] object-cover"
+                    alt="Midora AI Logo"
+                    src="/img/logo.png"
+                  />
+                )}
               </a>
             </div>    
         <div className="flex flex-col items-start gap-4 relative self-stretch w-full flex-[0_0_auto]">

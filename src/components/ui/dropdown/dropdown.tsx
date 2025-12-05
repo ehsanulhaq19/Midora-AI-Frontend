@@ -90,7 +90,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
         ? "bg-white"
         : "bg-[color:var(--tokens-color-surface-surface-button-pressed)]";
     const widthClass =
-      variant === "model-selector" ? "w-full" : "left-0 right-0";
+      variant === "model-selector" ? "w-full" : "left-0 ";
     const baseClasses = `absolute ${widthClass} mt-1 ${bgColor} border border-[color:var(--tokens-color-border-border-subtle)] rounded-[var(--premitives-corner-radius-corner-radius-2)] shadow-lg z-50 max-h-60 overflow-y-auto`;
 
     if (openUpward) {

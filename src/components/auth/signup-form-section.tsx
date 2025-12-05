@@ -17,6 +17,7 @@ import { loginSuccess, setLoading, setError } from '@/store/slices/authSlice'
 import { tokenManager } from '@/lib/token-manager'
 import { setTokens } from '@/lib/auth'
 import { useToast } from '@/hooks/use-toast'
+import { useTheme } from '@/hooks/use-theme'
 
 interface SignupFormSectionProps {
   className?: string
@@ -148,7 +149,8 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
     }
   }
 
-
+  const { theme } = useTheme()
+  const isDark = theme === 'dark'
 
   return (
     <div className={`flex flex-col w-full max-w-[408px] items-center gap-12 lg:gap-[197px] ${className}`}>
@@ -170,7 +172,9 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
             <div className="flex flex-row flex-wrap  sm:flex-nowrap justify-start items-center  gap-3 relative self-stretch w-full flex-[0_0_auto]">
              <button 
                 type="button"
-                className="inline-flex  items-center gap-2 p-3 relative flex-[0_0_auto] rounded-xl border border-solid border-[#dbdbdb] hover:border-[#bbb] hover:bg-gray-50 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                 className={`inline-flex items-center gap-2 p-3 relative flex-[0_0_auto] rounded-xl border border-solid border-[#dbdbdb] hover:border-[#bbb]  ${
+                  isDark ? 'dark:border-white/20 dark:hover:border-white/30' : ''
+                }  transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed`}
                 onClick={signInWithGitHub}
                 disabled={isProcessingSSO}
                 aria-label="Sign up with Github"
@@ -181,14 +185,16 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
                   src="/img/github.png"
                 />
 
-                <span className="relative hidden lg:block font-SF-Pro w-fit font-normal text-black text-base tracking-[-0.48px] leading-[100%] whitespace-nowrap">
+                <span className="relative hidden lg:block font-SF-Pro w-fit font-normal text-[color:var(--tokens-color-text-text-primary)] text-base tracking-[-0.48px] leading-[100%] whitespace-nowrap">
                   Github
                 </span>
               </button>
 
               <button 
                 type="button"
-                className="inline-flex items-center gap-2 p-3 relative flex-[0_0_auto] rounded-xl border border-solid border-[#dbdbdb] hover:border-[#bbb] hover:bg-gray-50 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                className={`inline-flex items-center gap-2 p-3 relative flex-[0_0_auto] rounded-xl border border-solid border-[#dbdbdb] hover:border-[#bbb]  ${
+                  isDark ? 'dark:border-white/20 dark:hover:border-white/30' : ''
+                }  transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed`}
                 onClick={signInWithMicrosoft}
                 disabled={isProcessingSSO}
                 aria-label="Sign up with Microsoft"
@@ -199,14 +205,16 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
                   src="/img/microsoft.png"
                 />
 
-                <span className="relative relative hidden lg:block font-SF-Pro w-fit font-normal text-black text-base tracking-[-0.48px] leading-[100%] whitespace-nowrap">
+                <span className="relative hidden lg:block font-SF-Pro w-fit font-normal text-[color:var(--tokens-color-text-text-primary)] text-base tracking-[-0.48px] leading-[100%] whitespace-nowrap">
                   Microsoft
                 </span>
               </button>
 
               <button 
                 type="button"
-                className="inline-flex items-center gap-2 p-3 relative flex-[0_0_auto] rounded-xl border border-solid border-[#dbdbdb] hover:border-[#bbb] hover:bg-gray-50 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                className={`inline-flex items-center gap-2 p-3 relative flex-[0_0_auto] rounded-xl border border-solid border-[#dbdbdb] hover:border-[#bbb]  ${
+                  isDark ? 'dark:border-white/20 dark:hover:border-white/30' : ''
+                }  transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed`}
                 onClick={signInWithGoogle}
                 disabled={isProcessingSSO}
                 aria-label="Sign up with Google"
@@ -217,7 +225,7 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
                   src="/img/image-6.png"
                 />
 
-                <span className="relative  hidden lg:block font-SF-Pro w-fit font-normal text-black text-base tracking-[-0.48px] leading-[100%] whitespace-nowrap">
+                <span className="relative  hidden lg:block font-SF-Pro w-fit font-normal text-[color:var(--tokens-color-text-text-primary)] text-base tracking-[-0.48px] leading-[100%] whitespace-nowrap">
                   Google
                 </span>
               </button>
@@ -231,7 +239,7 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
               src="/img/line-2.svg"
             />
 
-            <div className="relative w-fit font-SF-Pro font-normal text-[#dbdbdb] text-[16px] tracking-[0] leading-[100%] whitespace-nowrap">
+            <div className="relative w-fit font-SF-Pro font-normal text-[color:var(--tokens-color-text-text-inactive-2)] text-[16px] tracking-[0] leading-[100%] whitespace-nowrap">
               OR
             </div>
 
@@ -300,13 +308,13 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
 
           <div className="inline-flex items-center justify-center gap-2.5 relative flex-[0_0_auto]">
             <p className="relative w-fit font-SF-Pro font-normal text-transparent text-sm text-center tracking-[0] leading-[100%]">
-              <span className="text-[#A1A1A1]">
+              <span className="text-[color:var(--tokens-color-text-text-inactive-2)]">
                 By continuing, you acknowledge our{" "}
               </span>
 
               <a 
                 href="/privacy-policy" 
-                className="text-[#2C1D3D] underline leading-[100%] tracking-[0] text-center hover:text-[#1a0f2e] transition-colors duration-200 underline-offset-0 decoration-[0px] focus:outline-none focus:ring-2 focus:ring-[#1a0f2e] focus:ring-offset-2 rounded"
+                className="text-[color:var(--tokens-color-text-text-primary)] underline leading-[100%] tracking-[0] text-center hover:opacity-80 transition-colors duration-200 underline-offset-0 decoration-[0px] focus:outline-none focus:ring-2 focus:ring-[color:var(--tokens-color-text-text-primary)] focus:ring-offset-2 rounded"
                 aria-label="Read our Privacy Policy"
               >
                 Privacy Policy

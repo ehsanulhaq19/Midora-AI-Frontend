@@ -21,6 +21,7 @@ import { loginSuccess, setLoading, setError } from '@/store/slices/authSlice'
 import { tokenManager } from '@/lib/token-manager'
 import { setTokens } from '@/lib/auth'
 import { useRouter } from 'next/navigation'
+import { useTheme } from '@/hooks/use-theme'
 
 function SignupPageContent() {
   const router = useRouter()
@@ -32,7 +33,8 @@ function SignupPageContent() {
   
   const stepParam = searchParams.get('step')
   const isInOnboardingFlow = stepParam && ['welcome', 'fullName', 'profession', 'password', 'otp', 'success'].includes(stepParam)
-  
+  const { theme } = useTheme()
+  const isDark = theme === 'dark'
   const [showOnboarding, setShowOnboarding] = useState(isInOnboardingFlow)
   const [isSSOOnboarding, setIsSSOOnboarding] = useState(false)
   const [isProcessingSSO, setIsProcessingSSO] = useState(false)
@@ -201,11 +203,19 @@ function SignupPageContent() {
                 href="/" 
                 className="flex flex-col w-[120px] sm:w-[140px] lg:w-[154px] items-start gap-2.5 cursor-pointer hover:opacity-80 transition-opacity duration-200"
               >
-                <img
-                  className="relative self-stretch w-full aspect-[5.19] object-cover"
-                  alt="Midora AI Logo"
-                  src="/img/logo.png"
-                />
+                {isDark ? (
+                  <img
+                    className="relative self-stretch w-full "
+                    alt="Midora AI Logo"
+                    src="/img/dark-logo-text.png"
+                  />
+                ) : (
+                  <img
+                    className="relative self-stretch w-full aspect-[5.19] object-cover"
+                    alt="Midora AI Logo"
+                    src="/img/logo.png"
+                  />
+                )}
               </a>
             </div>
           </div>

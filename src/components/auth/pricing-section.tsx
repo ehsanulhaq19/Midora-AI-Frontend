@@ -8,6 +8,7 @@ import { PricingPlan } from "@/types/pricing";
 import { Slider } from "@/components/ui";
 import { useSubscriptionPlans } from "@/hooks/use-subscription-plans";
 import { SubscriptionPlan } from "@/api/subscription-plans/types";
+import { useTheme } from "@/hooks/use-theme";
 
 interface PricingSectionProps {
   className?: string;
@@ -22,15 +23,29 @@ interface PricingCardProps {
 
 const PricingCard: React.FC<PricingCardProps> = ({ plan, onClick }) => {
   const [isHovered, setIsHovered] = React.useState(false);
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   
   // Convert subscription plan to pricing plan format for display
   const displayPrice = plan.monthly_price;
   const displayPeriod = '/month';
 
   const baseClasses =
-    "flex flex-col items-start gap-[88px] p-12 relative rounded-[var(--premitives-corner-radius-corner-radius-5)] transition-all duration-300 ease-in-out cursor-pointer group max-h-[525px] w-full max-w-[383px] hover:scale-110 transform origin-center";
+    "flex flex-col items-start gap-[88px] p-12 relative rounded-[var(--premitives-corner-radius-corner-radius-5)] transition-all duration-300 ease-in-out cursor-pointer group h-full min-h-[525px] w-full max-w-[383px] hover:scale-110 transform origin-center";
 
-  const cardClasses = `${baseClasses} bg-premitives-color-light-gray-1000 hover:bg-[linear-gradient(150deg,#1F1740_0%,#6B4392_100%)] hover:bg-tokens-color-surface-surface-button`;
+  // Light mode: keep original classes
+  // Dark mode: use CSS variables for background colors
+  const cardClasses = isDark 
+    ? `${baseClasses}`
+    : `${baseClasses} bg-premitives-color-light-gray-1000 hover:bg-[linear-gradient(150deg,#1F1740_0%,#6B4392_100%)] hover:bg-tokens-color-surface-surface-button`;
+  
+  // Dark mode background styles
+  const darkModeStyles = isDark ? {
+    backgroundColor: isHovered 
+      ? 'var(--tokens-color-surface-surface-card-hover)' 
+      : 'var(--tokens-color-surface-surface-card-default)',
+    border: '1px solid var(--tokens-color-surface-surface-card-purple)',
+  } : undefined;
 
   const textColorClasses =
     "text-[color:var(--tokens-color-text-text-seconary)] group-hover:text-tokens-color-text-text-neutral transition-colors duration-300";
@@ -44,11 +59,12 @@ const PricingCard: React.FC<PricingCardProps> = ({ plan, onClick }) => {
   return (
     <div
       className={cardClasses}
+      style={darkModeStyles}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={onClick}
     >
-      <div className="flex flex-col items-start gap-12 relative self-stretch w-full flex-[0_0_auto]">
+      <div className="flex flex-col items-start gap-12 relative self-stretch w-full flex-1">
         <div className="flex flex-col items-start gap-[7px] relative self-stretch w-full flex-[0_0_auto]">
           <div
             className={`relative self-stretch mt-[-1.00px] font-h02-heading02 font-[number:var(--h02-heading02-font-weight)] ${textColorClasses} app-text-3xl tracking-[var(--h05-heading05-letter-spacing)] leading-[var(--h02-heading02-line-height)] [font-style:var(--h02-heading02-font-style)]`}
@@ -236,7 +252,7 @@ export const PricingSection: React.FC<PricingSectionProps> = ({
       </div>
 
       {/* Desktop Grid Layout */}
-      <div className="hidden lg:flex flex-wrap items-center justify-center gap-[48px_48px] relative self-stretch w-full flex-[0_0_auto]">
+      <div className="hidden lg:flex flex-wrap items-stretch justify-center gap-[48px_48px] relative self-stretch w-full flex-[0_0_auto]">
         {plans.map((plan) => (
           <PricingCard key={plan.uuid} plan={plan} onClick={() => handlePlanClick(plan)} />
         ))}

@@ -3,10 +3,13 @@
 import React, { useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { Copy } from '@/icons'
+import { useTheme } from '@/hooks/use-theme'
 
 export const AccountSection: React.FC = () => {
   const { logout } = useAuth()
   const [copied, setCopied] = useState(false)
+  const { theme } = useTheme()
+  const isDark = theme === 'dark'
 
   // Mock organization ID - should come from user data
   const organizationId = '682e0044-b25c-4af4-ad14-fef3b47c158d'
@@ -35,56 +38,81 @@ export const AccountSection: React.FC = () => {
   }
   return (
     <div className="flex-1 flex flex-col p-9">
-      <div className="flex flex-col mt-9 bg-[color:var(--account-section-card-bg)] gap-9 p-6 sm:p-9 rounded-xl border">
+      <div className={`flex flex-col mt-9  p-6 sm:p-9 rounded-xl ${isDark ? '' : 'border border-[color:var(--tokens-color-border-border-subtle)] bg-[color:var(--account-section-card-bg)]'}`}>
         <h1
-          className="text-[length:var(--text-large-font-size)] leading-[100%] tracking-[-1px] font-[number:var(--h05-heading05-font-weight)] font-[family-name:var(--h02-heading02-font-family)] text-[color:var(--tokens-color-text-text-seconary)]"
+          className="text-[length:var(--text-large-font-size)] leading-[100%] pb-9 tracking-[-1px] font-[number:var(--h05-heading05-font-weight)] font-[family-name:var(--h02-heading02-font-family)] text-[color:var(--tokens-color-text-text-seconary)]"
         >
           Account
         </h1>
         {/* Log out of all devices */}
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className={`flex flex-col gap-4 md:flex-row md:items-center md:justify-between border-b ${isDark ? 'border-white/90' : 'border-[color:var(--tokens-color-border-border-subtle)]'} pb-[18px] pt-[18px]`}>
           <h2 className="font-[family-name:var(--h05-heading05-font-family)] text-[length:var(--text-font-size)] font-[number:var(--h05-heading05-font-weight)] leading-[140%] tracking-[-0.8px] [font-style:var(--h05-heading05-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
             Log out of all devices
           </h2>
           <button
             onClick={handleLogoutAll}
-            className="py-[14px] h-12 bg-[rgba(107,67,146,0.1)] px-6 flex items-center justify-center text-[color:var(--tokens-color-text-text-brand)] rounded-lg hover:opacity-90 transition-opacity font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] w-full md:w-auto"
+            className={`py-[14px] h-12 px-6 flex items-center justify-center rounded-lg hover:opacity-90 transition-opacity font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] w-full md:w-auto ${
+              isDark ? '' : 'bg-[rgba(107,67,146,0.1)] text-[color:var(--tokens-color-text-text-brand)]'
+            }`}
+            style={isDark ? {
+              backgroundColor: 'var(--tokens-color-surface-surface-card-hover)',
+              color: 'var(--tokens-color-text-text-primary)',
+              border: '1px solid var(--tokens-color-border-border-subtle)'
+            } : {}}
           >
             Logout
           </button>
         </div>
 
         {/* Delete your account */}
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className={`flex flex-col gap-4 md:flex-row md:items-center md:justify-between border-b ${isDark ? 'border-white/90' : 'border-[color:var(--tokens-color-border-border-subtle)]'} pb-[18px] pt-[18px]`}>
           <h2 className="font-[family-name:var(--h05-heading05-font-family)] text-[length:var(--text-font-size)] font-[number:var(--h05-heading05-font-weight)] leading-[140%] tracking-[-0.8px] [font-style:var(--h05-heading05-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
             Delete your account
           </h2>
           <button
             onClick={handleDeleteAccount}
-            className="py-[14px] gap-[10px] flex items-center justify-center h-12 px-6 bg-[color:var(--tokens-color-surface-surface-button-pressed)] text-white rounded-[var(--premitives-corner-radius-corner-radius-2)] hover:opacity-90 transition-opacity font-[family-name:var(--text-font-family)] text-[length:var(--text-font-size)] font-[number:var(--text-font-weight)] leading-normal tracking-[-0.48px] [font-style:var(--text-font-style)] w-full md:w-auto"
+            className={`py-[14px] gap-[10px] flex items-center justify-center h-12 px-6 rounded-[var(--premitives-corner-radius-corner-radius-2)] hover:opacity-90 transition-opacity font-[family-name:var(--text-font-family)] text-[length:var(--text-font-size)] font-[number:var(--text-font-weight)] leading-normal tracking-[-0.48px] [font-style:var(--text-font-style)] w-full md:w-auto ${
+              isDark ? '' : 'bg-[color:var(--tokens-color-surface-surface-button-pressed)] text-white'
+            }`}
+            style={isDark ? {
+              backgroundColor: 'var(--tokens-color-surface-surface-card-hover)',
+              color: 'var(--tokens-color-text-text-primary)',
+              border: '1px solid var(--tokens-color-border-border-subtle)'
+            } : {}}
           >
             Delete account
           </button>
         </div>
 
         {/* Organization ID */}
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className={`flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between  ${isDark ? 'border-white/90' : ''} pt-[18px]`}>
           <h2 className="font-[family-name:var(--h05-heading05-font-family)] text-[length:var(--text-font-size)] font-[number:var(--h05-heading05-font-weight)] leading-[140%] tracking-[-0.8px] [font-style:var(--h05-heading05-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
             Organization ID
           </h2>
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <div className="px-4 py-3 bg-[rgba(107,67,146,0.10)] rounded-lg border border-gray-200 min-w-[260px]">
-              <span className=" font-[number:var(--text-font-weight)] text-[rgba(41,50,65,0.9)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] font-[family-name:var(--text-font-family)]">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center ">
+            <div 
+              className={`px-4 py-3 rounded-lg border min-w-[260px] ${
+                isDark ? '' : 'bg-[color:var(--tokens-color-surface-surface-tertiary)] border-[color:var(--tokens-color-border-border-subtle)]'
+              }`}
+              style={isDark ? {
+                backgroundColor: 'var(--tokens-color-surface-surface-card-hover)',
+                borderColor: 'var(--tokens-color-border-border-subtle)'
+              } : {}}
+            >
+              <span 
+                className="font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] font-[family-name:var(--text-font-family)]"
+                style={{ color: 'var(--tokens-color-text-text-primary)' }}
+              >
                 {organizationId}
               </span>
 
             </div>
             <button
               onClick={handleCopy}
-              className="p-2 rounded-lg hover:bg-[#EFEFF5] transition-colors flex-shrink-0 self-start sm:self-auto"
+              className="p-2 rounded-lg hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] transition-colors flex-shrink-0 self-start sm:self-auto"
               title="Copy Organization ID"
             >
-              <Copy className="w-5 h-5 text-[color:var(--tokens-color-text-text-seconary)]" />
+              <Copy className="w-5 h-5" style={{ color: 'var(--tokens-color-text-text-primary)' }} />
             </button>
           </div>
         </div>
