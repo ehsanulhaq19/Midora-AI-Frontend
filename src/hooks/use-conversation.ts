@@ -527,6 +527,8 @@ export const useConversation = () => {
 
   // Start new chat
   const startNewChat = useCallback(() => {
+    // Stop any ongoing streaming when starting a new chat
+    dispatch(stopStreaming())
     dispatch(setCurrentConversation(null))
     // Reset to auto mode when starting a new chat
     dispatch(setAutoMode(true))

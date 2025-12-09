@@ -173,7 +173,7 @@ export const BillingSection: React.FC = () => {
 
         {/* Billing History Section */}
         <div className="flex flex-col gap-6">
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div className="flex lg:flex-col gap-3 xl:flex-row items-center lg:items-start md:justify-between">
           <h1 className="text-[length:var(--text-large-font-size)] leading-[100%] tracking-[var(--h02-heading02-letter-spacing)] font-[number:var(--h05-heading05-font-weight)] font-[family-name:var(--h02-heading02-font-family)] text-[color:var(--tokens-color-text-text-seconary)]">
           Billing History
             </h1>
@@ -267,8 +267,30 @@ export const BillingSection: React.FC = () => {
                     <div
                       role="row"
                       key={item.id}
-                      className="grid grid-cols-1 gap-8 border-b border-[color:var(--tokens-color-border-border-subtle)] px-4 py-3 transition-colors last:border-b-0 hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] lg:grid-cols-[2fr_repeat(3,minmax(0,1fr))_auto] lg:px-6"
+                      className="flex flex-col md:grid md:grid-cols-[2fr_repeat(3,minmax(0,1fr))_auto] gap-3 md:gap-8 border-b border-[color:var(--tokens-color-border-border-subtle)] px-4 py-3 transition-colors last:border-b-0 hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] md:px-6"
                     >
+                      {/* Mobile Layout: Date + Invoice Name + Menu Icon */}
+                      <div className="flex items-start justify-between gap-4 md:hidden">
+                        <div className="flex flex-col gap-1 flex-1">
+                          {/* Date */}
+                          <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-inactive-2)]">
+                            {item.date}
+                          </span>
+                          {/* Invoice Name */}
+                          <div className="flex items-start gap-3">
+                            <InvoiceIcon className="w-5 h-5 text-[color:var(--premitives-color-brand-purple-1000)] flex-shrink-0" />
+                            <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-brand)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
+                              {item.invoice}
+                            </span>
+                          </div>
+                        </div>
+                        {/* Menu Icon */}
+                        <button className="inline-flex h-5 w-5 items-center justify-center rounded-lg border border-transparent transition-colors hover:border-[color:var(--tokens-color-border-border-subtle)] hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] flex-shrink-0" style={{ color: 'var(--tokens-color-text-text-primary)' }}>
+                          <MoreOptions className="w-5 h-5" />
+                        </button>
+                      </div>
+
+                      {/* Desktop Layout: All Columns */}
                       {billingColumns.map((column) => {
                         const content = column.render ? (
                           column.render(item)
@@ -287,13 +309,8 @@ export const BillingSection: React.FC = () => {
                           <div
                             key={column.key}
                             role="cell"
-                            className={cn('flex flex-col gap-2', column.className)}
+                            className={cn('hidden md:flex flex-col gap-2', column.className)}
                           >
-                            {!column.hideMobileLabel && (
-                              <span className="text-xs font-medium uppercase tracking-[0.08em] text-[color:var(--tokens-color-text-text-inactive-2)] lg:hidden">
-                                {column.label}
-                              </span>
-                            )}
                             {content}
                           </div>
                         )

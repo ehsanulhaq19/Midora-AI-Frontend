@@ -31,9 +31,9 @@ export const ProfileSection: React.FC = () => {
   };
 
   const preferences = [
-    { id: 1, text: "Describe a forest at sunrise", source: "Medora.ai" },
-    { id: 2, text: "Describe a forest at sunrise", source: "Medora.ai" },
-    { id: 3, text: "Describe a forest at sunrise", source: "Medora.ai" },
+    { id: 1, text: "Describe a forest at sunrise", source: "midoraai.ai" },
+    { id: 2, text: "Describe a forest at sunrise", source: "midoraai.ai" },
+    { id: 3, text: "Describe a forest at sunrise", source: "midoraai.ai" },
   ];
 
   return (

@@ -125,7 +125,8 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
   const [searchHovered, setSearchHovered] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [logoHovered, setLogoHovered] = useState(false);
-  const [isManuallyShrunk, setIsManuallyShrunk] = useState<boolean>(() => {
+  const [isManuallyShrunk, setIsManuallyShrunk] = useState<boolean>(false);
+  const [isMobile, setIsMobile] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
     return window.innerWidth < 1024;
   });
@@ -184,16 +185,40 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
     selectedProjectConversationUuid,
   ]);
 
+  // Auto-detect mobile/tablet screens and update state
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 1024);
+      // On mobile, always shrink; on desktop, respect manual preference
+      if (window.innerWidth >= 1024 && isManuallyShrunk) {
+        // Keep manual shrink state on desktop
+      }
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [isManuallyShrunk]);
+
   // Determine if sidebar should be shrunk
-  // Sidebar is shrunk if: canvas is open (!showFullSidebar) OR manually shrunk by user
-  const isShrunk = !showFullSidebar || isManuallyShrunk;
+  // Sidebar is shrunk if: 
+  // - On mobile/tablet (< 1024px) OR
+  // - Manually shrunk by user (on desktop)
+  // When canvas is open (!showFullSidebar), sidebar can still be manually expanded
+  // If user manually expanded it (isManuallyShrunk = false), respect that even when canvas is open
+  // If user manually shrunk it (isManuallyShrunk = true), respect that
+  // If canvas opens and user hasn't set a preference, auto-shrink (but allow manual expand)
+  const isShrunk = isMobile || isManuallyShrunk;
 
   // When canvas closes (showFullSidebar becomes true), don't reset manual shrink
   // User's manual preference is preserved
-  // When canvas opens (showFullSidebar becomes false), sidebar will shrink regardless of manual state
+  // When canvas opens (showFullSidebar becomes false), sidebar can still be manually expanded
 
   const handleToggleSidebar = () => {
-    setIsManuallyShrunk(!isManuallyShrunk);
+    // Only allow manual toggle on desktop (>= 1024px)
+    if (window.innerWidth >= 1024) {
+      setIsManuallyShrunk(!isManuallyShrunk);
+    }
   };
 
   const navigateToChat = useCallback(() => {
@@ -391,7 +416,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
         className={`
         fixed lg:relative top-0 left-0 z-[60] lg:z-auto transform transition-all duration-300 ease-in-out
         ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
-        ${isShrunk ? "w-[70px] lg:w-[70px]" : "w-[258px]"}
+        ${isShrunk ? "w-[70px]" : "w-[258px]"}
         ${
           isShrunk
             ? "bg-[color:var(--tokens-color-surface-surface-sidebar-shrunk)]"
@@ -427,8 +452,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                   {logoHovered ? (
                     <MinusSquare
                       className="w-5 h-5 transition-transform group-hover:scale-105"
-                      color="currentColor"
-                      style={{ color: "var(--tokens-color-text-text-primary)" }}
+                      color="var(--tokens-color-text-text-primary)"
                     />
                   ) : (
                     isDark ? (
@@ -455,8 +479,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                   >
                     <MinusSquare
                       className="w-5 h-5"
-                      color="currentColor"
-                      style={{ color: "var(--tokens-color-text-text-primary)" }}
+                      color="var(--tokens-color-text-text-primary)"
                     />
                   </button>
                 </Tooltip>
@@ -493,8 +516,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                 >
                   <Search02
                     className="w-5 h-5"
-                    color="currentColor"
-                    style={{ color: "var(--tokens-color-text-text-primary)" }}
+                    color="var(--tokens-color-text-text-primary)"
                   />
                 </button>
               </>
@@ -517,7 +539,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                   </div>
                   <div
                     className="relative flex items-center justify-center w-fit font-h02-heading02 font-[number:var(--h02-heading02-font-weight)] text-[14px] tracking-[var(--h05-heading05-letter-spacing)] leading-[var(--h05-heading05-line-height)] whitespace-nowrap [font-style:var(--h05-heading05-font-style)]"
-                    style={{ color: "var(--tokens-color-text-text-brand)" }}
+                    color="var(--tokens-color-text-text-brand)"
                   >
                     {t("chat.newChat")}
                   </div>
@@ -534,12 +556,11 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                 >
                   <Search02
                     className="w-5 h-5"
-                    color="currentColor"
-                    style={{ color: "var(--tokens-color-text-text-primary)" }}
+                    color="var(--tokens-color-text-text-primary)"
                   />
                   <div
                     className="font-h02-heading02 w-fit flex tracking-[var(--text-letter-spacing)] text-center text-[14px] relative [font-style:var(--text-font-style)]"
-                    style={{ color: "var(--tokens-color-text-text-primary)" }}
+                    color="var(--tokens-color-text-text-primary)"
                   >
                     {t("chat.searchChat")}
                   </div>
@@ -639,7 +660,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                 <div className="sidebar-separator w-full my-2" />
                 <div
                   className="relative flex items-center justify-center w-fit mb-[8px] font-h02-heading02 font-[number:var(--text-small-font-weight)] text-[14px] tracking-[var(--text-small-letter-spacing)] leading-[var(--text-small-line-height)] whitespace-nowrap [font-style:var(--text-small-font-style)] px-5"
-                  style={{ color: "var(--tokens-color-text-text-inactive-2)" }}
+                  color="var(--tokens-color-text-text-inactive-2)"
                 >
                   Projects
                 </div>
@@ -660,8 +681,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                 title={t("chat.newFolder")}
               >
                 <FoldersIcon
-                  color="currentColor"
-                  style={{ color: "var(--tokens-color-text-text-primary)" }}
+                  color="var(--tokens-color-text-text-primary)"
                 />
                 <div className="relative flex items-center justify-center w-fit font-h02-heading02 font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-primary)] text-[14px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] whitespace-nowrap [font-style:var(--text-font-style)]">
                   {t("chat.newFolder")}
@@ -739,10 +759,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                               className={`w-5 h-5 transition-transform ${
                                 isSelected ? "rotate-6" : ""
                               }`}
-                              color="currentColor"
-                              style={{
-                                color: "var(--tokens-color-text-text-primary)",
-                              }}
+                              color="var(--tokens-color-text-text-primary)"
                             />
                             <span
                               className={`font-h02-heading02 font-[number:var(--text-font-weight)] text-[14px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] whitespace-nowrap [font-style:var(--text-font-style)] truncate max-w-[160px] ${
@@ -1028,7 +1045,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
           ref={dropdownRef}
         >
           {/* Dark Mode Toggle */}
-          {/* {!isShrunk && (
+          {!isShrunk && (
             <div
               className="w-full px-3 py-2 flex items-center justify-between border-t"
               style={{
@@ -1045,7 +1062,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
               </span>
               <ThemeToggle />
             </div>
-          )} */}
+          )}
 
           {isShrunk ? (
             <>
@@ -1062,7 +1079,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                   {userName?.charAt(0).toUpperCase() || "U"}
                 </div>
               </button>
-              {/* <ThemeToggle /> */}
+              <ThemeToggle />
             </>
           ) : (
             <button
@@ -1085,7 +1102,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                 </div>
                 <div
                   className="font-h02-heading02 w-fit tracking-[var(--text-small-letter-spacing)] text-[14px] [font-style:var(--text-small-font-style)] font-[number:var(--text-small-font-weight)] text-center whitespace-nowrap leading-[var(--text-small-line-height)] relative"
-                  style={{ color: "var(--tokens-color-text-text-inactive-2)" }}
+                  color="var(--tokens-color-text-text-inactive-2)"
                 >
                   Plus Member
                 </div>
@@ -1094,8 +1111,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                 className={`transition-transform flex-shrink-0 ${
                   isDropdownOpen ? "rotate-180" : ""
                 }`}
-                color="currentColor"
-                style={{ color: "var(--tokens-color-text-text-primary)" }}
+                color="var(--tokens-color-text-text-primary)"
               />
             </button>
           )}
@@ -1120,7 +1136,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                 {!isShrunk && (
                   <span
                     className="font-text font-[number:var(--text-font-weight)] text-[14px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]"
-                    style={{ color: "var(--tokens-color-text-text-seconary)" }}
+                    color="var(--tokens-color-text-text-seconary)"
                   >
                     Logout
                   </span>

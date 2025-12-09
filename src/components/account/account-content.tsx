@@ -7,6 +7,7 @@ import { ProfileSection } from './sections/profile-section'
 import { LanguageSection } from './sections/language-section'
 import { BillingSection } from './sections/billing-section'
 import { NotificationsSection } from './sections/notifications-section'
+import { UsageSection } from './sections/usage-section'
 
 interface AccountContentProps {
   section: AccountSectionType
@@ -24,6 +25,8 @@ export const AccountContent: React.FC<AccountContentProps> = ({ section }) => {
       return <BillingSection />
     case 'notifications':
       return <NotificationsSection />
+    case 'usage':
+      return <UsageSection />
     default:
       return null
   }

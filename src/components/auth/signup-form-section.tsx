@@ -106,7 +106,7 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
     }
     
     setPasswordError('')
-    clearLoginError()
+    // clearLoginError()
     
     try {
       await login({ email, password })

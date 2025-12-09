@@ -385,7 +385,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
                 color="var(--tokens-color-text-text-primary)"
               />
             </button>
-            <button
+            {/* <button
               className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-[color:var(--tokens-color-surface-surface-secondary)] transition-colors"
               aria-label="Menu"
             >
@@ -393,7 +393,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
                 className="w-5 h-5"
                 color="var(--tokens-color-text-text-primary)"
               />
-            </button>
+            </button> */}
           </div>
 
           <div className="flex flex-col gap-6 mt-4">
