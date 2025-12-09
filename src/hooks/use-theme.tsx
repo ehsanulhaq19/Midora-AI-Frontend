@@ -43,7 +43,6 @@ export function ThemeProvider({ children, defaultTheme = 'light' }: ThemeProvide
     
     // Temporarily disable transitions for instant theme switching
     root.classList.add('theme-transitioning')
-    
     // Set data-theme attribute for CSS variables
     if (theme === 'dark') {
       root.setAttribute('data-theme', 'dark')
@@ -68,11 +67,8 @@ export function ThemeProvider({ children, defaultTheme = 'light' }: ThemeProvide
     setThemeState(prevTheme => prevTheme === 'light' ? 'dark' : 'light')
   }
 
-  // Prevent hydration mismatch by not rendering until mounted
-  if (!mounted) {
-    return <div className="app-bg-primary app-text-primary">{children}</div>
-  }
-
+  // Always provide the context, even before mounted, to prevent useTheme errors
+  // The mounted state can be used by consumers to know when theme is fully initialized
   return (
     <ThemeContext.Provider value={{ theme, setTheme, toggleTheme, mounted }}>
       {children}

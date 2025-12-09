@@ -37,7 +37,7 @@ export const AccountSection: React.FC = () => {
     console.log('Delete account clicked')
   }
   return (
-    <div className="flex-1 flex flex-col p-9">
+    <div className="flex-1 flex flex-col sm:p-9 p-4">
       <div className={`flex flex-col mt-9  p-6 sm:p-9 rounded-xl ${isDark ? '' : 'border border-[color:var(--tokens-color-border-border-subtle)] bg-[color:var(--account-section-card-bg)]'}`}>
         <h1
           className="text-[length:var(--text-large-font-size)] leading-[100%] pb-9 tracking-[-1px] font-[number:var(--h05-heading05-font-weight)] font-[family-name:var(--h02-heading02-font-family)] text-[color:var(--tokens-color-text-text-seconary)]"

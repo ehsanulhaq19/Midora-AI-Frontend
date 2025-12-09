@@ -213,6 +213,35 @@ export const ResetPasswordStep = ({
             />
           </div>
 
+          {/* Password Requirements - moved above fields */}
+          <div className="bg-tokens-color-surface-surface-secondary p-4 rounded-lg pt-0 pl-0">
+            <h3 className="text-sm font-medium text-tokens-color-text-text-secondary mb-2">
+              {t('auth.passwordRequirements')}
+            </h3>
+            <ul className="text-xs [color:var(--tokens-color-text-text-inactive-2)] space-y-1">
+              <li className={`flex items-center gap-2 ${password.length >= 8 ? 'text-green-500' : ''}`}>
+                <span>{password.length >= 8 ? '✓' : '○'}</span>
+                {t('auth.passwordRequirementLength')}
+              </li>
+              <li className={`flex items-center gap-2 ${/[A-Z]/.test(password) ? 'text-green-500' : ''}`}>
+                <span>{/[A-Z]/.test(password) ? '✓' : '○'}</span>
+                {t('auth.passwordRequirementUppercase')}
+              </li>
+              <li className={`flex items-center gap-2 ${/[a-z]/.test(password) ? 'text-green-500' : ''}`}>
+                <span>{/[a-z]/.test(password) ? '✓' : '○'}</span>
+                {t('auth.passwordRequirementLowercase')}
+              </li>
+              <li className={`flex items-center gap-2 ${/\d/.test(password) ? 'text-green-500' : ''}`}>
+                <span>{/\d/.test(password) ? '✓' : '○'}</span>
+                {t('auth.passwordRequirementDigit')}
+              </li>
+              <li className={`flex items-center gap-2 ${/[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]/.test(password) ? 'text-green-500' : ''}`}>
+                <span>{/[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]/.test(password) ? '✓' : '○'}</span>
+                {t('auth.passwordRequirementSpecial')}
+              </li>
+            </ul>
+          </div>
+
           {/* Password Input */}
           <PasswordInput
             placeholder={t('auth.enterNewPassword')}
