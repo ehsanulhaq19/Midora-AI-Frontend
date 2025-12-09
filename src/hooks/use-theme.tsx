@@ -43,7 +43,6 @@ export function ThemeProvider({ children, defaultTheme = 'light' }: ThemeProvide
     
     // Temporarily disable transitions for instant theme switching
     root.classList.add('theme-transitioning')
-    
     // Set data-theme attribute for CSS variables
     if (theme === 'dark') {
       root.setAttribute('data-theme', 'dark')
