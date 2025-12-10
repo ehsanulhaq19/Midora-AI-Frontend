@@ -165,7 +165,34 @@ export const MultiStepContainer: React.FC<MultiStepContainerProps> = ({
   }, [currentStep, previousStep])
 
   const handleEmailSubmit = (email: string) => {
-    setFormData(prev => ({ ...prev, email }))
+    // If email is different from stored email, reset all other fields (new signup attempt)
+    setFormData(prev => {
+      if (prev.email && prev.email !== email) {
+        // New email detected - reset all fields except email
+        const resetData = {
+          email: email,
+          fullName: '',
+          profession: '',
+          password: '',
+          selectedTopics: [],
+          otherTopicsInput: ''
+        }
+        // Clear sessionStorage, localStorage and update SignupDataContext
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem(STORAGE_KEY, JSON.stringify(resetData))
+          try {
+            localStorage.removeItem('midora_onboarding_data')
+            sessionStorage.removeItem('signupData')
+          } catch (error) {
+            console.error('Error clearing storage:', error)
+          }
+          updateSignupData(resetData)
+        }
+        return resetData
+      }
+      // Same email or first time - just update email
+      return { ...prev, email }
+    })
     navigateToStep('welcome', 'right')
   }
 

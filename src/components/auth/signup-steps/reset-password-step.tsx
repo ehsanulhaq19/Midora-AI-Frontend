@@ -27,8 +27,8 @@ export const ResetPasswordStep = ({
     confirmPassword?: string
   }>({})
   const [isLoading, setIsLoading] = useState(false)
-  const { theme } = useTheme()
-  const isDark = theme === 'dark'
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
   const { success: showSuccessToast, error: showErrorToast } = useToast()
   const router = useRouter()
 

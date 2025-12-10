@@ -2,10 +2,12 @@
 
 import { createContext, useContext, useEffect, useState } from 'react'
 
-export type Theme = 'light' | 'dark'
+export type Theme = 'light' | 'dark' | 'system'
+export type ResolvedTheme = 'light' | 'dark'
 
 interface ThemeContextType {
   theme: Theme
+  resolvedTheme: ResolvedTheme
   setTheme: (theme: Theme) => void
   toggleTheme: () => void
   mounted: boolean
@@ -20,31 +22,64 @@ interface ThemeProviderProps {
 
 const THEME_STORAGE_KEY = 'midora-theme'
 
-export function ThemeProvider({ children, defaultTheme = 'light' }: ThemeProviderProps) {
+// Get system theme preference
+const getSystemTheme = (): ResolvedTheme => {
+  if (typeof window === 'undefined') return 'light'
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+}
+
+// Get resolved theme (actual theme to apply)
+const getResolvedTheme = (theme: Theme): ResolvedTheme => {
+  if (theme === 'system') {
+    return getSystemTheme()
+  }
+  return theme
+}
+
+export function ThemeProvider({ children, defaultTheme = 'system' }: ThemeProviderProps) {
   const [theme, setThemeState] = useState<Theme>(defaultTheme)
   const [mounted, setMounted] = useState(false)
+  const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>(getResolvedTheme(defaultTheme))
 
   useEffect(() => {
     setMounted(true)
     
-    // Get theme from localStorage or default to light
+    // Get theme from localStorage or default to system
     const savedTheme = localStorage.getItem(THEME_STORAGE_KEY) as Theme
-    if (savedTheme && (savedTheme === 'light' || savedTheme === 'dark')) {
+    if (savedTheme && (savedTheme === 'light' || savedTheme === 'dark' || savedTheme === 'system')) {
       setThemeState(savedTheme)
+      setResolvedTheme(getResolvedTheme(savedTheme))
     } else {
       setThemeState(defaultTheme)
+      setResolvedTheme(getResolvedTheme(defaultTheme))
     }
   }, [defaultTheme])
 
+  // Listen for system theme changes when theme is 'system'
+  useEffect(() => {
+    if (!mounted || theme !== 'system') return
+
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+    const handleChange = () => {
+      setResolvedTheme(getSystemTheme())
+    }
+
+    mediaQuery.addEventListener('change', handleChange)
+    return () => mediaQuery.removeEventListener('change', handleChange)
+  }, [theme, mounted])
+
   useEffect(() => {
     if (!mounted) return
+
+    const resolved = getResolvedTheme(theme)
+    setResolvedTheme(resolved)
 
     const root = window.document.documentElement
     
     // Temporarily disable transitions for instant theme switching
     root.classList.add('theme-transitioning')
     // Set data-theme attribute for CSS variables
-    if (theme === 'dark') {
+    if (resolved === 'dark') {
       root.setAttribute('data-theme', 'dark')
     } else {
       root.removeAttribute('data-theme')
@@ -64,13 +99,17 @@ export function ThemeProvider({ children, defaultTheme = 'light' }: ThemeProvide
   }
 
   const toggleTheme = () => {
-    setThemeState(prevTheme => prevTheme === 'light' ? 'dark' : 'light')
+    setThemeState(prevTheme => {
+      if (prevTheme === 'light') return 'dark'
+      if (prevTheme === 'dark') return 'system'
+      return 'light'
+    })
   }
 
   // Always provide the context, even before mounted, to prevent useTheme errors
   // The mounted state can be used by consumers to know when theme is fully initialized
   return (
-    <ThemeContext.Provider value={{ theme, setTheme, toggleTheme, mounted }}>
+    <ThemeContext.Provider value={{ theme, resolvedTheme, setTheme, toggleTheme, mounted }}>
       {children}
     </ThemeContext.Provider>
   )
@@ -86,14 +125,14 @@ export function useTheme() {
 
 // Utility functions for theme management
 export const getCurrentTheme = (): Theme => {
-  if (typeof window === 'undefined') return 'light'
+  if (typeof window === 'undefined') return 'system'
   
   const stored = localStorage.getItem(THEME_STORAGE_KEY) as Theme
-  if (stored && (stored === 'light' || stored === 'dark')) {
+  if (stored && (stored === 'light' || stored === 'dark' || stored === 'system')) {
     return stored
   }
   
-  return 'light'
+  return 'system'
 }
 
 export const setTheme = (theme: Theme): void => {
@@ -101,8 +140,9 @@ export const setTheme = (theme: Theme): void => {
   
   localStorage.setItem(THEME_STORAGE_KEY, theme)
   
+  const resolved = getResolvedTheme(theme)
   const root = document.documentElement
-  if (theme === 'dark') {
+  if (resolved === 'dark') {
     root.setAttribute('data-theme', 'dark')
   } else {
     root.removeAttribute('data-theme')
@@ -111,7 +151,14 @@ export const setTheme = (theme: Theme): void => {
 
 export const toggleTheme = (): Theme => {
   const currentTheme = getCurrentTheme()
-  const newTheme = currentTheme === 'light' ? 'dark' : 'light'
+  let newTheme: Theme
+  if (currentTheme === 'light') {
+    newTheme = 'dark'
+  } else if (currentTheme === 'dark') {
+    newTheme = 'system'
+  } else {
+    newTheme = 'light'
+  }
   setTheme(newTheme)
   return newTheme
 }
@@ -121,6 +168,19 @@ export const initializeTheme = (): void => {
   
   const theme = getCurrentTheme()
   setTheme(theme)
+}
+
+// Reset theme to system (used on logout)
+export const resetThemeToSystem = (): void => {
+  if (typeof window === 'undefined') return
+  localStorage.setItem(THEME_STORAGE_KEY, 'system')
+  const resolved = getSystemTheme()
+  const root = document.documentElement
+  if (resolved === 'dark') {
+    root.setAttribute('data-theme', 'dark')
+  } else {
+    root.removeAttribute('data-theme')
+  }
 }
 
 

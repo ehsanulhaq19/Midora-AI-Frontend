@@ -5,8 +5,8 @@ import { PersonFace, ArrowRightSm, DownArrow } from "@/icons";
 import { useTheme } from "@/hooks/use-theme";
 
 export const ProfileSection: React.FC = () => {
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
   const [formData, setFormData] = useState({
     fullName: "",
     displayName: "",

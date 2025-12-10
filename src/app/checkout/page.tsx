@@ -187,8 +187,8 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
   const elements = useElements();
   const dispatch = useDispatch();
   const { success: showSuccessToast, error: showErrorToast } = useToast();
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     full_name: "",

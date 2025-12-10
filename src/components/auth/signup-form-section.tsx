@@ -28,7 +28,7 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
   const router = useRouter()
   const searchParams = useSearchParams()
   const dispatch = useAppDispatch()
-  const { updateData } = useSignupData()
+  const { data: currentSignupData, updateData } = useSignupData()
   const { 
     login, 
     isLoading: isLoggingIn, 
@@ -84,8 +84,33 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
         return
       }
       
-      // Store email using the custom hook
-      updateData({ email })
+      // Check if this is a new email (different from stored email)
+      // If so, clear all other signup data to start fresh
+      if (currentSignupData?.email && currentSignupData.email !== email) {
+        // New email detected - reset all fields except email
+        const resetData = {
+          email: email,
+          fullName: '',
+          profession: '',
+          password: '',
+          selectedTopics: [],
+          otherTopicsInput: ''
+        }
+        updateData(resetData)
+        // Also clear localStorage and sessionStorage to prevent stale data
+        if (typeof window !== 'undefined') {
+          try {
+            localStorage.removeItem('midora_onboarding_data')
+            sessionStorage.removeItem('signupFormData')
+            sessionStorage.removeItem('signupData')
+          } catch (error) {
+            console.error('Error clearing storage:', error)
+          }
+        }
+      } else {
+        // Same email or first time - just update email
+        updateData({ email })
+      }
       
       // Show onboarding flow via callback
       if (onShowOnboarding) {
@@ -149,8 +174,8 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
     }
   }
 
-  const { theme } = useTheme()
-  const isDark = theme === 'dark'
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
 
   return (
     <div className={`flex flex-col w-full max-w-[408px] items-center gap-12 lg:gap-[197px] ${className}`}>

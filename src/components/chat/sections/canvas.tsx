@@ -42,8 +42,8 @@ export const Canvas: React.FC<CanvasProps> = ({
   onLinkClick,
   className = "",
 }) => {
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
   const canvasRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const [isCopied, setIsCopied] = React.useState(false);

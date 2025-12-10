@@ -45,8 +45,8 @@ export const PasswordStep = ({
     
     return errors
   }
-  const { theme } = useTheme()
-  const isDark = theme === 'dark'
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
   const handleSignUp = async () => {
     const passwordErrors = validatePassword(password)
     const newErrors: {password?: string, confirmPassword?: string} = {}

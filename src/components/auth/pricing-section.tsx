@@ -23,8 +23,8 @@ interface PricingCardProps {
 
 const PricingCard: React.FC<PricingCardProps> = ({ plan, onClick }) => {
   const [isHovered, setIsHovered] = React.useState(false);
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
   
   // Convert subscription plan to pricing plan format for display
   const displayPrice = plan.monthly_price;

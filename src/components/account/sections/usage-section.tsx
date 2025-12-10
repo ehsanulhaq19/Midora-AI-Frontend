@@ -257,8 +257,8 @@ const ModelUsageChart: React.FC<{ isDark: boolean }> = ({ isDark }) => {
 }
 
 export const UsageSection: React.FC = () => {
-  const { theme } = useTheme()
-  const isDark = theme === 'dark'
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
   const { userEmail } = useAuthRedux()
   const { logout } = useAuth()
   const [activeTab, setActiveTab] = useState<UsageTab>('subscription')

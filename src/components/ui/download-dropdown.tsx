@@ -28,8 +28,8 @@ export const DownloadDropdown: React.FC<DownloadDropdownProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
-  const { theme } = useTheme()
-  const isDark = theme === 'dark'
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

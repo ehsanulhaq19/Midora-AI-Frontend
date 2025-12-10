@@ -22,8 +22,8 @@ export const EmailInput: React.FC<EmailInputProps> = ({
   placeholder = "Enter your personal or work email",
   className = ""
 }) => {
-  const { theme } = useTheme()
-  const isDark = theme === 'dark'
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
 
   return (
     <div className={`flex h-[54px] items-center gap-3 relative self-stretch w-full rounded-xl border border-solid transition-all duration-200 focus-within:ring-offset-2 ${

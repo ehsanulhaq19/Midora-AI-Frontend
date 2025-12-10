@@ -33,8 +33,8 @@ export const InputWithButton = ({
   variant = 'light'
 }: InputWithButtonProps) => {
   const [internalValue, setInternalValue] = useState("")
-  const { theme } = useTheme()
-  const isDarkMode = theme === 'dark'
+  const { resolvedTheme } = useTheme()
+  const isDarkMode = resolvedTheme === 'dark'
   
   const value = controlledValue !== undefined ? controlledValue : internalValue
   const setValue = onChange || setInternalValue

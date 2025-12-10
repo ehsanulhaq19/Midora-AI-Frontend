@@ -22,8 +22,8 @@ export const ScreenLoader: React.FC<ScreenLoaderProps> = ({
   size = 'lg',
   fullScreen = true
 }) => {
-  const { theme } = useTheme()
-  const isDark = theme === 'dark'
+  const { resolvedTheme, mounted } = useTheme()
+  const isDark = resolvedTheme === 'dark'
 
   const sizeClasses = {
     sm: 'h-8 w-8',
@@ -45,8 +45,10 @@ export const ScreenLoader: React.FC<ScreenLoaderProps> = ({
       {/* Logo with circular animation */}
       <div className="relative">
         <div className="w-16 h-16 animate-spin" style={{ animation: 'spin 3s linear infinite' }}>
-          {isDark ? (
-            // <LogoDots className="w-full h-full" />
+          {!mounted ? (
+            // Show default logo during SSR/hydration to prevent mismatch
+            <LogoOnly className="w-full h-full" />
+          ) : isDark ? (
             <img src="/img/dark_logo.svg" alt="Logo" className="w-full h-full" />
           ) : (
             <LogoOnly className="w-full h-full" />

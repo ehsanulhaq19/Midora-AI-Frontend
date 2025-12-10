@@ -43,8 +43,8 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   conversations = [],
   selectConversation,
 }) => {
-  const { theme } = useTheme();
-  const isDark = theme === "dark";
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
   const { userName } = useAuthRedux();
   const [isDragOver, setIsDragOver] = useState(false);
   const { error: showErrorToast } = useToast();
