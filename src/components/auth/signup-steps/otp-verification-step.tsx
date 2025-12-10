@@ -26,8 +26,8 @@ export const OTPVerificationStep = ({
   const [isRegenerating, setIsRegenerating] = useState(false)
   const [isVerifying, setIsVerifying] = useState(false)
   const [regenerateCooldown, setRegenerateCooldown] = useState(0)
-  const { theme } = useTheme()
-  const isDark = theme === 'dark'
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
   useEffect(() => {
     setRegenerateCooldown(60)
     const timer = setInterval(() => {

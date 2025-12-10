@@ -7,8 +7,8 @@ import { useTheme } from "@/hooks/use-theme";
 export const LanguageSection: React.FC = () => {
   const [selectedLanguage, setSelectedLanguage] = useState("auto-detect");
   const [isOpen, setIsOpen] = useState(false);
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
 
   const languages = [
     { value: "auto-detect", label: "Auto Detect" },

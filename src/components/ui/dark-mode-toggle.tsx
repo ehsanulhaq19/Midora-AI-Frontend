@@ -4,8 +4,8 @@ import React from 'react'
 import { useTheme } from '@/hooks/use-theme'
 
 export const DarkModeToggle: React.FC = () => {
-  const { theme, toggleTheme } = useTheme()
-  const isDark = theme === 'dark'
+  const { resolvedTheme, toggleTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
 
   return (
     <button

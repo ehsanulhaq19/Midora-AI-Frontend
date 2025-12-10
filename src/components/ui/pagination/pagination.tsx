@@ -26,8 +26,8 @@ export const Pagination: React.FC<PaginationProps> = ({
   ariaLabel = 'Pagination Navigation',
   isLoading = false
 }) => {
-  const { theme } = useTheme()
-  const isDark = theme === 'dark'
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
   const paginationRange = useMemo(() => {
     if (totalPages <= 1) {
       return []

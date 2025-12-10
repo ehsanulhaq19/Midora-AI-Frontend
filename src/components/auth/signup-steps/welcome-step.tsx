@@ -22,8 +22,8 @@ export const WelcomeStep = ({
     console.log("Privacy Policy clicked")
     // Add your privacy policy navigation logic here
   } 
-  const { theme } = useTheme()
-  const isDark = theme === 'dark'
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
   return (
     <div className={`flex flex-col w-full items-center justify-between bg-tokens-color-surface-surface-primary ${className}`}>
       <div className="flex flex-col w-full max-w-[475px] items-start gap-[36px]">

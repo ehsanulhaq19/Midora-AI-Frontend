@@ -22,6 +22,7 @@ import {
 import { setTokens, clearAuthCookies } from '@/lib/auth'
 import { tokenManager } from '@/lib/token-manager'
 import { handleApiError } from '@/lib/error-handler'
+import { resetThemeToSystem } from '@/hooks/use-theme'
 
 type UseAuthReturn = AuthContextType
 
@@ -134,6 +135,10 @@ export const useAuth = (): UseAuthReturn => {
       clearAuthCookies()
       tokenManager.clearTokens()
       dispatch(logoutAction())
+      // Reset theme to system on logout
+      if (typeof window !== 'undefined') {
+        resetThemeToSystem()
+      }
       router.push('/')
     }
   }, [router, dispatch])

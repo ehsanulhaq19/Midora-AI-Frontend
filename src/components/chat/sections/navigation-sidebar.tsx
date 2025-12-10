@@ -16,7 +16,6 @@ import {
   Logout,
 } from "@/icons";
 import { Tooltip, ConversationMenu } from "@/components/ui";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { NewProjectModal } from "./new-project-modal";
 import Image from "next/image";
 import { t } from "@/i18n";
@@ -152,8 +151,8 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
   } = useSelector((state: RootState) => state.projects);
   const userFolders = Object.keys(projects).map((key) => projects[key]);
   const { loadProjects, loadProjectConversations } = useProjects();
-  const { theme } = useTheme()
-  const isDark = theme === 'dark'
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
   const brandNameLabel = translateWithFallback("chat.brandName", "Midora");
   const expandSidebarLabel = translateWithFallback(
     "chat.expandSidebar",
@@ -1044,43 +1043,21 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
           }`}
           ref={dropdownRef}
         >
-          {/* Dark Mode Toggle */}
-          {!isShrunk && (
-            <div
-              className="w-full px-3 py-2 flex items-center justify-between border-t"
-              style={{
-                borderColor: "var(--tokens-color-border-border-subtle)",
-              }}
-            >
-              <span
-                className="font-h02-heading02 text-[14px]"
-                style={{
-                  color: "var(--tokens-color-text-text-section-header)",
-                }}
-              >
-                Theme
-              </span>
-              <ThemeToggle />
-            </div>
-          )}
 
           {isShrunk ? (
-            <>
-              <button
-                onClick={handleAccountClick}
-                className="w-10 h-10 rounded-lg flex items-center justify-center transition-colors hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]"
-                style={{
-                  backgroundColor:
-                    "var(--tokens-color-surface-surface-primary)",
-                }}
-                title={userName || "User"}
-              >
-                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white text-xs font-semibold">
-                  {userName?.charAt(0).toUpperCase() || "U"}
-                </div>
-              </button>
-              <ThemeToggle />
-            </>
+            <button
+              onClick={handleAccountClick}
+              className="w-10 h-10 rounded-lg flex items-center justify-center transition-colors hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]"
+              style={{
+                backgroundColor:
+                  "var(--tokens-color-surface-surface-primary)",
+              }}
+              title={userName || "User"}
+            >
+              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white text-xs font-semibold">
+                {userName?.charAt(0).toUpperCase() || "U"}
+              </div>
+            </button>
           ) : (
             <button
               onClick={handleAccountClick}

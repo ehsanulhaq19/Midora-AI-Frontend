@@ -4,12 +4,13 @@ import React, { useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { Copy } from '@/icons'
 import { useTheme } from '@/hooks/use-theme'
+import { ThemeSelector } from '@/components/ui/theme-selector'
 
 export const AccountSection: React.FC = () => {
   const { logout } = useAuth()
   const [copied, setCopied] = useState(false)
-  const { theme } = useTheme()
-  const isDark = theme === 'dark'
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
 
   // Mock organization ID - should come from user data
   const organizationId = '682e0044-b25c-4af4-ad14-fef3b47c158d'
@@ -82,6 +83,14 @@ export const AccountSection: React.FC = () => {
           >
             Delete account
           </button>
+        </div>
+
+        {/* Theme Selection */}
+        <div className={`flex flex-col gap-4 md:flex-row md:items-center md:justify-between border-b ${isDark ? 'border-white/90' : 'border-[color:var(--tokens-color-border-border-subtle)]'} pb-[18px] pt-[18px]`}>
+          <h2 className="font-[family-name:var(--h05-heading05-font-family)] text-[length:var(--text-font-size)] font-[number:var(--h05-heading05-font-weight)] leading-[140%] tracking-[-0.8px] [font-style:var(--h05-heading05-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
+            Theme
+          </h2>
+          <ThemeSelector className="w-full md:w-auto md:min-w-[200px]" />
         </div>
 
         {/* Organization ID */}

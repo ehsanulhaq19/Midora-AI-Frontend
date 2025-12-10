@@ -76,7 +76,7 @@ const menuItems: Array<{
   },
   {
     id: "usage",
-    label: "Usage",
+    label: "Analytics",
     icon: (isActive) => (
       <UsageIcon
         color={
@@ -94,8 +94,8 @@ export const AccountSidebar: React.FC<AccountSidebarProps> = ({
   onSectionChange,
   onClose,
 }) => {
-  const { theme } = useTheme()
-  const isDark = theme === 'dark'
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
   
   return (
     <div className="p-2 lg:p-4 h-auto backdrop-blur-[2.91px] border-[color:var(--tokens-color-border-border-subtle)] mt-6">

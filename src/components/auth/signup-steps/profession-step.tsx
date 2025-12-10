@@ -57,8 +57,8 @@ export const ProfessionStep = ({
       return prev
     })
   }
-  const { theme } = useTheme()
-  const isDark = theme === 'dark'
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
   const handleContinue = () => {
     const hasOtherSelected = selectedTopics.includes(OTHER_TOPIC_ID)
     const trimmedOther = otherInput.trim()

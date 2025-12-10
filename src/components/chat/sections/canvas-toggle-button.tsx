@@ -24,8 +24,8 @@ export const CanvasToggleButton: React.FC<CanvasToggleButtonProps> = ({
   className = '',
   content = ''
 }) => {
-  const { theme } = useTheme()
-  const isDark = theme === 'dark'
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
   
   // Get first line of content for preview
   const firstLine = content ? getFirstLine(content, 60) : ''

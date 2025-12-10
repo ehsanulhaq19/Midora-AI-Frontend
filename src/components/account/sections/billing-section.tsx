@@ -77,8 +77,8 @@ const billingColumns: Array<{
 ]
 
 export const BillingSection: React.FC = () => {
-  const { theme } = useTheme()
-  const isDark = theme === 'dark'
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
   const [searchQuery, setSearchQuery] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
 
@@ -263,31 +263,33 @@ export const BillingSection: React.FC = () => {
                     </p>
                   </div>
                 ) : (
-                  paginatedHistory.map((item) => (
+                  paginatedHistory.map((item, index) => (
                     <div
                       role="row"
                       key={item.id}
-                      className="flex flex-col md:grid md:grid-cols-[2fr_repeat(3,minmax(0,1fr))_auto] gap-3 md:gap-8 border-b border-[color:var(--tokens-color-border-border-subtle)] px-4 py-3 transition-colors last:border-b-0 hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] md:px-6"
+                      className={`flex flex-col md:grid md:grid-cols-[2fr_repeat(3,minmax(0,1fr))_auto] gap-3 md:gap-8 border-b border-[color:var(--tokens-color-border-border-subtle)] px-4 py-3 transition-colors last:border-b-0 hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] md:px-6 ${index > 0 ? 'mt-4' : ''}`}
                     >
-                      {/* Mobile Layout: Date + Invoice Name + Menu Icon */}
-                      <div className="flex items-start justify-between gap-4 md:hidden">
-                        <div className="flex flex-col gap-1 flex-1">
-                          {/* Date */}
-                          <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-inactive-2)]">
-                            {item.date}
-                          </span>
-                          {/* Invoice Name */}
-                          <div className="flex items-start gap-3">
+                      {/* Mobile Layout: Invoice Name + Action Button, Date on bottom */}
+                      <div className="flex flex-col gap-3 md:hidden">
+                        {/* Invoice Name + Action Button Row */}
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="flex items-center gap-3 flex-1">
                             <InvoiceIcon className="w-5 h-5 text-[color:var(--premitives-color-brand-purple-1000)] flex-shrink-0" />
                             <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-brand)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
                               {item.invoice}
                             </span>
                           </div>
+                          {/* Action Button */}
+                          <button className="inline-flex h-5 w-5 items-center justify-center rounded-lg border border-transparent transition-colors hover:border-[color:var(--tokens-color-border-border-subtle)] hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] flex-shrink-0" style={{ color: 'var(--tokens-color-text-text-primary)' }}>
+                            <MoreOptions className="w-5 h-5" />
+                          </button>
                         </div>
-                        {/* Menu Icon */}
-                        <button className="inline-flex h-5 w-5 items-center justify-center rounded-lg border border-transparent transition-colors hover:border-[color:var(--tokens-color-border-border-subtle)] hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] flex-shrink-0" style={{ color: 'var(--tokens-color-text-text-primary)' }}>
-                          <MoreOptions className="w-5 h-5" />
-                        </button>
+                        {/* Date on bottom left */}
+                        <div className="flex items-start">
+                          <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-inactive-2)]">
+                            {item.date}
+                          </span>
+                        </div>
                       </div>
 
                       {/* Desktop Layout: All Columns */}

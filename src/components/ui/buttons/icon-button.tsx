@@ -30,8 +30,8 @@ export const IconButton: React.FC<IconButtonProps> = ({
   className,
   ...props
 }) => {
-  const { theme } = useTheme()
-  const isDark = theme === 'dark'
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
   
   // Get background color for primary variant based on theme
   const getPrimaryBgColor = () => {

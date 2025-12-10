@@ -21,8 +21,8 @@ export const ForgotPasswordStep = ({
   const [email, setEmail] = useState('')
   const [emailError, setEmailError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const { theme } = useTheme()
-  const isDark = theme === 'dark'
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
   const { success: showSuccessToast, error: showErrorToast } = useToast()
 
   const validateEmail = (emailValue: string) => {

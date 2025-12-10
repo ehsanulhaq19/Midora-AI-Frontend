@@ -26,8 +26,8 @@ export const EnhancedPricingCard: React.FC<EnhancedPricingCardProps> = ({
   showCancelButton = false,
   renewalDate = null
 }) => {
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
   const [isHovered, setIsHovered] = React.useState(false);
   
   const baseClasses = "flex flex-col items-start gap-6 p-6 sm:p-9 relative rounded-3xl w-full max-w-[383px] min-h-[500px] sm:min-h-[616px] box-border cursor-pointer transition-all duration-300";

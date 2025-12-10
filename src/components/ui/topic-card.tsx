@@ -16,8 +16,8 @@ export const TopicCard = ({
   onClick,
   className 
 }: TopicCardProps) => {
-  const { theme } = useTheme()
-  const isDark = theme === 'dark'
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
 
   return (
     <button
