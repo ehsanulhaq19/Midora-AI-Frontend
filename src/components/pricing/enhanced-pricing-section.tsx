@@ -106,6 +106,33 @@ export const EnhancedPricingSection: React.FC = () => {
   
 
 
+  // Filter and order plans: free, light, core, power, power plus
+  const filteredAndOrderedPlans = React.useMemo(() => {
+    const allowedPlanNames = ['free', 'light', 'core', 'power', 'power plus']
+    const planOrder = ['free', 'light', 'core', 'power', 'power plus']
+    
+    // Filter plans by name (case-insensitive)
+    const filtered = plans.filter(plan => {
+      const planName = (plan.name || plan.slug || '').toLowerCase()
+      return allowedPlanNames.some(allowed => planName.includes(allowed))
+    })
+    
+    // Sort plans according to the specified order
+    return filtered.sort((a, b) => {
+      const nameA = (a.name || a.slug || '').toLowerCase()
+      const nameB = (b.name || b.slug || '').toLowerCase()
+      
+      const indexA = planOrder.findIndex(order => nameA.includes(order))
+      const indexB = planOrder.findIndex(order => nameB.includes(order))
+      
+      // If not found in order, put at end
+      if (indexA === -1) return 1
+      if (indexB === -1) return -1
+      
+      return indexA - indexB
+    })
+  }, [plans])
+
   const handleButtonClick = (plan: SubscriptionPlan) => {
     // Check if user has an active subscription (non-Free plan)
     if (activeSubscription && activeSubscription.plan) {
@@ -219,7 +246,7 @@ export const EnhancedPricingSection: React.FC = () => {
       <div className="w-full max-w-[1400px] mx-auto px-4">
       {/* Desktop: 3 cards in one line */}
       <div className="hidden lg:flex flex-wrap items-center justify-center gap-[48px_48px] relative self-stretch w-full flex-[0_0_auto]">
-        {plans.map((plan) => {
+        {filteredAndOrderedPlans.map((plan) => {
           const displayPlan = mapPlanToPricingPlan(plan)
           const isCurrent = plan.uuid === currentPlanId
           const renewalDate = isCurrent && activeSubscription?.current_period_end 
@@ -242,7 +269,7 @@ export const EnhancedPricingSection: React.FC = () => {
 
       {/* Mobile & Tablet: Stacked vertically */}
       <div className="flex lg:hidden flex-col items-center justify-center gap-6 relative self-stretch w-full">
-        {plans.map((plan) => {
+        {filteredAndOrderedPlans.map((plan) => {
           const displayPlan = mapPlanToPricingPlan(plan)
           const isCurrent = plan.uuid === currentPlanId
           const renewalDate = isCurrent && activeSubscription?.current_period_end 

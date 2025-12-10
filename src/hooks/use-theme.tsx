@@ -59,9 +59,38 @@ export function ThemeProvider({ children, defaultTheme = 'system' }: ThemeProvid
   useEffect(() => {
     if (!mounted || theme !== 'system') return
 
+    // Immediately detect and apply system theme when switching to 'system'
+    const systemTheme = getSystemTheme()
+    setResolvedTheme(systemTheme)
+    
+    // Apply to DOM immediately
+    const root = window.document.documentElement
+    if (systemTheme === 'dark') {
+      root.setAttribute('data-theme', 'dark')
+    } else {
+      root.removeAttribute('data-theme')
+    }
+
+    // Set up listener for system theme changes
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
     const handleChange = () => {
-      setResolvedTheme(getSystemTheme())
+      const newSystemTheme = getSystemTheme()
+      console.log('[Theme] System theme changed, updating to:', newSystemTheme)
+      setResolvedTheme(newSystemTheme)
+      
+      // Apply to DOM immediately when system theme changes
+      const root = window.document.documentElement
+      root.classList.add('theme-transitioning')
+      
+      if (newSystemTheme === 'dark') {
+        root.setAttribute('data-theme', 'dark')
+      } else {
+        root.removeAttribute('data-theme')
+      }
+      
+      requestAnimationFrame(() => {
+        root.classList.remove('theme-transitioning')
+      })
     }
 
     mediaQuery.addEventListener('change', handleChange)
