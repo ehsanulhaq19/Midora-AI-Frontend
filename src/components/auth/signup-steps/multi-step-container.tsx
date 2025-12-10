@@ -46,6 +46,8 @@ export const MultiStepContainer: React.FC<MultiStepContainerProps> = ({
   const getStepFromParams = (): Step => {
     const stepParam = searchParams.get('step')
     if (stepParam && ['welcome', 'fullName', 'profession', 'password', 'forgotPassword', 'resetPassword', 'otp', 'success'].includes(stepParam)) {
+      // If step is 'otp' and we have email, return 'otp'
+      // If step is 'otp' but no email, we still return 'otp' to show the step (email will be loaded)
       return stepParam as Step
     }
     return initialStep || (isSSOOnboarding ? 'welcome' : 'welcome')
@@ -69,23 +71,63 @@ export const MultiStepContainer: React.FC<MultiStepContainerProps> = ({
     }
   }, [searchParams, initialStep, isSSOOnboarding, currentStep])
   
-  // Initialize formData from localStorage or initial values
+  // Initialize formData: first check state (SignupDataContext), then localStorage (midora_onboarding_data), then sessionStorage
   const initializeFormData = () => {
     if (typeof window !== 'undefined') {
-      const stored = sessionStorage.getItem(STORAGE_KEY)
-      if (stored) {
+      // First check SignupDataContext state (sessionStorage with key 'signupData')
+      const stateStored = sessionStorage.getItem('signupData')
+      let parsedData: Partial<{
+        email: string
+        fullName: string
+        profession: string
+        password: string
+        selectedTopics: string[]
+        otherTopicsInput: string
+      }> | null = null
+      
+      if (stateStored) {
         try {
-          const parsedData = JSON.parse(stored)
-          return {
-            email: parsedData.email || initialEmail,
-            fullName: parsedData.fullName || initialFullName,
-            profession: parsedData.profession || '',
-            password: parsedData.password || initialPassword,
-            selectedTopics: parsedData.selectedTopics || [],
-            otherTopicsInput: parsedData.otherTopicsInput || ''
-          }
+          parsedData = JSON.parse(stateStored)
+          console.log('[MultiStep] Loaded from state (signupData):', parsedData)
         } catch (error) {
-          console.error('Error parsing stored form data:', error)
+          console.error('Error parsing state data:', error)
+        }
+      }
+      
+      // If no data in state, check localStorage (midora_onboarding_data)
+      if (!parsedData || (!parsedData.email && !parsedData.fullName && !parsedData.profession)) {
+        const localStorageStored = localStorage.getItem('midora_onboarding_data')
+        if (localStorageStored) {
+          try {
+            parsedData = JSON.parse(localStorageStored)
+            console.log('[MultiStep] Loaded from localStorage (midora_onboarding_data):', parsedData)
+          } catch (error) {
+            console.error('Error parsing localStorage data:', error)
+          }
+        }
+      }
+      
+      // If still no data, check sessionStorage (signupFormData)
+      if (!parsedData || (!parsedData.email && !parsedData.fullName && !parsedData.profession)) {
+        const sessionStored = sessionStorage.getItem(STORAGE_KEY)
+        if (sessionStored) {
+          try {
+            parsedData = JSON.parse(sessionStored)
+            console.log('[MultiStep] Loaded from sessionStorage (signupFormData):', parsedData)
+          } catch (error) {
+            console.error('Error parsing sessionStorage data:', error)
+          }
+        }
+      }
+      
+      if (parsedData) {
+        return {
+          email: parsedData.email || initialEmail,
+          fullName: parsedData.fullName || initialFullName,
+          profession: parsedData.profession || '',
+          password: parsedData.password || initialPassword,
+          selectedTopics: parsedData.selectedTopics || [],
+          otherTopicsInput: parsedData.otherTopicsInput || ''
         }
       }
     }
@@ -409,13 +451,33 @@ export const MultiStepContainer: React.FC<MultiStepContainerProps> = ({
           </div>
         )
       case 'otp':
+        // Ensure email is available for OTP step
+        const otpEmail = formData.email || initialEmail || ''
+        if (!otpEmail) {
+          // If no email, try to load from storage
+          if (typeof window !== 'undefined') {
+            const storedData = sessionStorage.getItem('signupData') || localStorage.getItem('midora_onboarding_data')
+            if (storedData) {
+              try {
+                const parsed = JSON.parse(storedData)
+                if (parsed.email) {
+                  // Update formData with email
+                  setFormData(prev => ({ ...prev, email: parsed.email }))
+                  updateSignupData({ email: parsed.email })
+                }
+              } catch (error) {
+                console.error('Error parsing stored data for OTP:', error)
+              }
+            }
+          }
+        }
         return (
           <div key="otp" className={`${baseClasses} ${slideClasses}`}>
             <OTPVerificationStep 
               onNext={handleOTPNext} 
               onBack={handleOTPBack}
               onRegenerateOTP={handleOTPRegenerate}
-              email={formData.email}
+              email={formData.email || initialEmail || ''}
             />
           </div>
         )

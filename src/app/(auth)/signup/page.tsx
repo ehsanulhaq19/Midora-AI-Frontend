@@ -45,6 +45,24 @@ function SignupPageContent() {
     if (isInOnboardingFlow) {
       setShowOnboarding(true)
       setInitialOnboardingStep(stepParam || undefined)
+      
+      // If navigating to OTP step, ensure email is loaded from localStorage/sessionStorage
+      if (stepParam === 'otp' && !data.email) {
+        // Try to load email from localStorage or sessionStorage
+        if (typeof window !== 'undefined') {
+          const storedData = sessionStorage.getItem('signupData') || localStorage.getItem('midora_onboarding_data')
+          if (storedData) {
+            try {
+              const parsed = JSON.parse(storedData)
+              if (parsed.email) {
+                updateData({ email: parsed.email })
+              }
+            } catch (error) {
+              console.error('Error parsing stored data:', error)
+            }
+          }
+        }
+      }
     } else {
       setShowOnboarding(false)
       setInitialOnboardingStep(undefined)
@@ -144,6 +162,45 @@ function SignupPageContent() {
 
   // Show onboarding flow in full screen blank layout if needed
   if (showOnboarding) {
+    // Don't show loader for OTP step - show it immediately
+    if (stepParam === 'otp') {
+      return (
+        <div className="fixed inset-0 w-full h-full bg-[color:var(--tokens-color-surface-surface-primary)] flex flex-col justify-between">
+          {/* Main content area */}
+          <div className="flex-1 flex justify-center px-4 py-24">
+            <div className="w-full">
+              <MultiStepContainer 
+                onComplete={handleOnboardingComplete}
+                initialEmail={data.email}
+                initialFullName={data.fullName}
+                initialPassword={data.password}
+                isSSOOnboarding={isSSOOnboarding}
+                initialStep={initialOnboardingStep as any}
+              />
+            </div>
+          </div>
+          
+          {/* Footer */}
+          <div className="flex justify-center px-4 pb-8">
+            <p className="font-h02-heading02 font-[number:var(--text-font-weight)] [color:var(--tokens-color-text-text-inactive-2)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-center  max-w-full">
+              <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[color:var(--light-mode-colors-dark-gray-900)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
+                All rights reserved@ 2025, midora.ai, You can view our{" "}
+              </span>
+              <button 
+            className="underline underline-offset-0 decoration-0 [text-decoration-skip-ink:auto] [color:var(--tokens-color-text-text-inactive-2)] hover:text-gray-700 transition-colors cursor-pointer"
+          >
+            Privacy Policy
+            </button>
+          
+              <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[color:var(--light-mode-colors-dark-gray-900)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
+                {" "}here
+              </span>
+            </p>
+          </div>
+        </div>
+      )
+    }
+    
     return (
       <LoadingWrapper 
         message="Setting up your account..."
