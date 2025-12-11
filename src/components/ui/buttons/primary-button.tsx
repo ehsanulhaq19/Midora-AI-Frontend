@@ -35,13 +35,13 @@ export const PrimaryButton: React.FC<PrimaryButtonProps> = ({
     >
       {loading ? (
         <div className="flex items-center gap-2">
-          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-          <span className="relative w-fit font-SF-Pro font-normal text-[#FFFEFE] text-base tracking-[-0.48px] leading-[100%] whitespace-nowrap">
+          <div className={`w-4 h-4 border-2 border-t-transparent rounded-full animate-spin ${isDark ? 'border-[color:var(--tokens-color-surface-surface-dark)]' : 'border-white'}`}></div>
+          <span className={`relative w-fit font-SF-Pro font-normal ${isDark ? 'text-[color:var(--tokens-color-surface-surface-dark)]' : 'text-[#FFFEFE]'} text-base tracking-[-0.48px] leading-[100%] whitespace-nowrap`}>
             Loading...
           </span>
         </div>
       ) : (
-        <span className={`relative w-fit font-SF-Pro font-normal text-[#FFFEFE] text-base tracking-[-0.48px] leading-[100%] whitespace-nowrap ${divClassName}`}>
+        <span className={`relative w-fit font-SF-Pro font-normal ${isDark ? 'text-[color:var(--tokens-color-surface-surface-dark)]' : 'text-[#FFFEFE]'} text-base tracking-[-0.48px] leading-[100%] whitespace-nowrap ${divClassName}`}>
           {text || "Continue with email"}
         </span>
       )}

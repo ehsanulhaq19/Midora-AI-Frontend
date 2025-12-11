@@ -248,6 +248,21 @@
   --tokens-color-surface-surface-card-purple: #D1ADF9;
 }
 
+/* Dark mode: When background is surface-card-purple, use surface-dark for text */
+[data-theme="dark"] [style*="background-color: var(--tokens-color-surface-surface-card-purple)"],
+[data-theme="dark"] [style*="background: var(--tokens-color-surface-surface-card-purple)"],
+[data-theme="dark"] [class*="bg-[color:var(--tokens-color-surface-surface-card-purple)]"] {
+  color: var(--tokens-color-surface-surface-dark) !important;
+}
+
+/* Dark mode: Override SVG icon stroke color for elements with purple background */
+[data-theme="dark"] [style*="background-color: var(--tokens-color-surface-surface-card-purple)"] svg path,
+[data-theme="dark"] [style*="background: var(--tokens-color-surface-surface-card-purple)"] svg path,
+[data-theme="dark"] [class*="bg-[color:var(--tokens-color-surface-surface-card-purple)]"] svg path,
+[data-theme="dark"] .purple-bg-icon-container svg path {
+  stroke: var(--tokens-color-surface-surface-dark) !important;
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
@@ -647,6 +662,12 @@
   [data-theme="dark"] svg path {
     stroke: #ffffff;
     fill: none;
+  }
+
+  /* Override icon color for elements with purple background in dark mode */
+  [data-theme="dark"] [class*="bg-[color:var(--tokens-color-surface-surface-card-purple)]"] svg path,
+  [data-theme="dark"] .purple-bg-icon-container svg path {
+    stroke: var(--tokens-color-surface-surface-dark) !important;
   }
 
   /* Midora logo icons - keep original purple color in both light and dark mode */

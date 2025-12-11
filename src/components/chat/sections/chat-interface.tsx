@@ -199,7 +199,11 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 : "bg-[color:var(--premitives-color-brand-purple-1000)]"
             } rounded-[var(--premitives-corner-radius-corner-radius-2)] hover:bg-[color:var(--tokens-color-surface-surface-button-pressed)]  transition-colors`}
           >
-            <div className="relative w-fit  font-h02-heading02 text-[14px]  text-white tracking-[var(--h05-heading05-letter-spacing)] leading-[var(--h05-heading05-line-height)] whitespace-nowrap [font-style:var(--h05-heading05-font-style)]">
+            <div className={`relative w-fit  font-h02-heading02 text-[14px] ${
+              isDark
+                ? "text-[color:var(--tokens-color-surface-surface-dark)]"
+                : "text-white"
+            } tracking-[var(--h05-heading05-letter-spacing)] leading-[var(--h05-heading05-line-height)] whitespace-nowrap [font-style:var(--h05-heading05-font-style)]`}>
               {t("chat.upgradeToPro")}
             </div>
           </button>

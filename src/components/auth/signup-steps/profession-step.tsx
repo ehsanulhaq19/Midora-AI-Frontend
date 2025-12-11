@@ -151,7 +151,7 @@ export const ProfessionStep = ({
           {selectedTopics.length}/3 topics selected
         </div>
         <Buttons
-          className={`w-full sm:w-36 mt-2 ${!isFormValid ? '!bg-tokens-color-surface-surface-button opacity-50' : '!bg-tokens-color-surface-surface-button-pressed'}`}
+          className={`w-full sm:w-36 mt-2 ${!isFormValid ? 'opacity-50' : ''}`}
           divClassName="!mr-0 !ml-0 sm:!mr-[-48.00px] sm:!ml-[-48.00px]"
           property1="active"
           text={t('auth.letsGoNext')}
