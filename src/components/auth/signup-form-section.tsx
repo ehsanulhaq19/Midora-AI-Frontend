@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useAppDispatch } from '@/store/hooks'
 import { ButtonGroup } from './button-group'
 import { Buttons } from '../ui'
-import { CaretDown } from '@/icons'
+import { CaretDown, GitHub, GitHubColorful } from '@/icons'
 import { t } from '@/i18n'
 import { useSignupData } from '@/contexts/SignupDataContext'
 import { EmailInput } from '@/components/ui/inputs/email-input'
@@ -147,10 +147,10 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
         return
       } else {
         const errorMessage = handleApiError(errorObject)
-        showErrorToast('Login Failed', errorMessage)
+        setPasswordError(errorMessage)
       }
     }
-  }, [password, email, login, clearLoginError, updateData, showErrorToast])
+  }, [password, email, login, updateData, onShowOnboarding, t])
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value)
@@ -204,11 +204,15 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
                 disabled={isProcessingSSO}
                 aria-label="Sign up with Github"
               >
-                <img
-                  className="relative w-6 h-6 aspect-[1]"
-                  alt="Github"
-                  src="/img/github.png"
-                />
+                {isDark ? (
+                  <GitHubColorful className="relative w-6 h-6 aspect-[1]" />
+                ) : (
+                  <img
+                    className="relative w-6 h-6 aspect-[1]"
+                    alt="Github"
+                    src="/img/github.png"
+                  />
+                )}
 
                 <span className="relative hidden lg:block font-SF-Pro w-fit font-normal text-[color:var(--tokens-color-text-text-primary)] text-base tracking-[-0.48px] leading-[100%] whitespace-nowrap">
                   Github
@@ -301,7 +305,7 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
                   }}
                   className="text-sm text-[color:var(--tokens-color-text-text-inactive-2)]  mt-4 hover:text-[color:var(--tokens-color-text-text-primary)] block transition-colors duration-200 cursor-pointer text-right"
                 >
-                  forgot password ?
+                  forgot password?
                 </button>
                 </div>
               </div>
@@ -321,7 +325,11 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
                 disabled={isLoggingIn}
                 placeholder="Enter your password"
               />
-              
+              {passwordError && (
+                <p className="mt-2 text-sm text-red-500 font-SF-Pro">
+                  {passwordError}
+                </p>
+              )}
             </div>
 
             {/* Submit Button */}

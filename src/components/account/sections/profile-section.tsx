@@ -66,7 +66,7 @@ export const ProfileSection: React.FC = () => {
                 name="fullName"
                 value={formData.fullName}
                 onChange={handleChange}
-                placeholder="Enter your personal or work email"
+                placeholder="Enter your full name"
                 className={`flex h-[54px] items-center gap-3 px-6 py-3 rounded-xl border transition-all duration-200 focus:ring-2 focus:ring-[color:var(--tokens-color-text-text-seconary)] focus:ring-offset-2 outline-none font-SF-Pro font-normal text-base tracking-[-0.48px] leading-[100%] ${
                   isDark ? '' : 'border-[#dbdbdb] bg-transparent text-black'
                 }`}
@@ -88,7 +88,7 @@ export const ProfileSection: React.FC = () => {
                 name="displayName"
                 value={formData.displayName}
                 onChange={handleChange}
-                placeholder="Enter your personal or work email"
+                placeholder="Enter what midora call you"
                 className={`flex h-[54px] items-center gap-3 px-6 py-3 rounded-xl border transition-all duration-200 focus:ring-2 focus:ring-[color:var(--tokens-color-text-text-seconary)] focus:ring-offset-2 outline-none font-SF-Pro font-normal text-base tracking-[-0.48px] leading-[100%] ${
                   isDark ? '' : 'border-[#dbdbdb] bg-transparent text-black'
                 }`}

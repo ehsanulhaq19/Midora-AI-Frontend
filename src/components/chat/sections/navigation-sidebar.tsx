@@ -499,14 +499,14 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                   title={t("chat.newChat")}
                 >
                   <div
-                    className={`first-letter:w-6 h-6 flex items-center justify-center gap-2.5 rounded-[4px] text-white ${
+                    className={`first-letter:w-6 h-6 flex items-center justify-center gap-2.5 rounded-[4px] text-white purple-bg-icon-container ${
                       isDark
                         ? "bg-[color:var(--tokens-color-surface-surface-card-purple)]"
                         : " bg-[color:var(--tokens-color-surface-surface-brand)]"
                     }`}
                     // style={{ backgroundColor: '#6B4392' }}
                   >
-                    <Plus01_5 className="w-5 h-5" color="#ffffff" />
+                    <Plus01_5 className="w-5 h-5" color={isDark ? "var(--tokens-color-surface-surface-dark)" : "#ffffff"} />
                   </div>
                 </button>
                 <button
@@ -527,14 +527,14 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                   title={t("chat.newChat")}
                 >
                   <div
-                    className={`w-6 h-6 flex items-center justify-center gap-2.5 rounded-[4px] text-white ${
+                    className={`w-6 h-6 flex items-center justify-center gap-2.5 rounded-[4px] text-white purple-bg-icon-container ${
                       isDark
                         ? "bg-[color:var(--tokens-color-surface-surface-card-purple)]"
                         : " bg-[color:var(--tokens-color-surface-surface-brand)]"
                     }`}
                     // style={{ backgroundColor: '#6B4392' }}
                   >
-                    <Plus01_5 className="w-5 h-5" color="#ffffff" />
+                    <Plus01_5 className="w-5 h-5" color={isDark ? "var(--tokens-color-surface-surface-dark)" : "#ffffff"} />
                   </div>
                   <div
                     className="relative flex items-center justify-center w-fit font-h02-heading02 font-[number:var(--h02-heading02-font-weight)] text-[14px] tracking-[var(--h05-heading05-letter-spacing)] leading-[var(--h05-heading05-line-height)] whitespace-nowrap [font-style:var(--h05-heading05-font-style)]"
