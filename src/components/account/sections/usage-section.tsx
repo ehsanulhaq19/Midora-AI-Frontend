@@ -6,6 +6,7 @@ import { Toggle } from '@/components/ui'
 import { useTheme } from '@/hooks/use-theme'
 import { useAuthRedux } from '@/hooks/use-auth-redux'
 import { useAuth } from '@/contexts/AuthContext'
+import { useUserCredits } from '@/hooks/use-user-credits'
 
 type UsageTab = 'subscription' | 'team' | 'analytics'
 type DateRange = '7' | '30' | '60' | 'billing'
@@ -264,16 +265,28 @@ export const UsageSection: React.FC = () => {
   const [activeTab, setActiveTab] = useState<UsageTab>('subscription')
   const [autoTopUp, setAutoTopUp] = useState(false)
   const [dateRange, setDateRange] = useState<DateRange>('60')
+  const { data: creditsData, loading: creditsLoading, error: creditsError } = useUserCredits()
 
-  // Mock data
-  const availableCredits = 177956
-  const monthlyRenewal = 96000
-  const usedCredits = 14044
-  const totalCredits = 192000
-  const nextBillingDate = 'December 21, 2025'
-  const billingAmount = '$50.00'
+  // Extract data from API response
+  const availableCredits = creditsData?.available_credits ?? 0
+  const usedCredits = creditsData?.used_credits ?? 0
+  const planName = creditsData?.plan_name ?? 'No Plan'
+  const nextBillingDate = creditsData?.next_billing_date 
+    ? new Date(creditsData.next_billing_date).toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      })
+    : null
+  
+  const planDetails = creditsData?.plan_details
+  const monthlyRenewal = planDetails?.credits_per_month ?? 0
+  const totalCredits = monthlyRenewal
+  const billingAmount = planDetails 
+    ? `$${planDetails.monthly_price.toFixed(2)}` 
+    : '$0.00'
 
-  const usagePercentage = (usedCredits / totalCredits) * 100
+  const usagePercentage = totalCredits > 0 ? (usedCredits / totalCredits) * 100 : 0
 
   const handleLogout = async () => {
     try {
@@ -410,9 +423,15 @@ export const UsageSection: React.FC = () => {
                   </div>
 
                   {/* Monthly Renewal Info */}
-                  <div className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-inactive-2)]">
-                    {monthlyRenewal.toLocaleString()} renew monthly on Legacy Developer Plan
-                  </div>
+                  {creditsLoading ? (
+                    <div className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-inactive-2)]">
+                      Loading...
+                    </div>
+                  ) : (
+                    <div className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-inactive-2)]">
+                      {monthlyRenewal.toLocaleString()} renew monthly on {planName}
+                    </div>
+                  )}
 
                   {/* Usage Progress Bar */}
                   <div className="flex flex-col gap-2">
@@ -480,7 +499,7 @@ export const UsageSection: React.FC = () => {
                         Next Billing Date
                       </span>
                       <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
-                        {nextBillingDate}
+                        {creditsLoading ? 'Loading...' : (nextBillingDate ?? 'N/A')}
                       </span>
                     </div>
                   </div>
@@ -568,18 +587,20 @@ export const UsageSection: React.FC = () => {
               }
             >
               <h2 className="text-[length:var(--text-large-font-size)] leading-[100%] tracking-[var(--h02-heading02-letter-spacing)] font-[number:var(--h05-heading05-font-weight)] font-[family-name:var(--h02-heading02-font-family)] text-[color:var(--tokens-color-text-text-seconary)] mb-6">
-                Current Plan: Legacy Developer Plan
+                Current Plan: {creditsLoading ? 'Loading...' : planName}
               </h2>
 
               <div className="flex flex-col gap-6">
                 {/* Features List */}
                 <div className="flex flex-col gap-3">
-                  <div className="flex items-center gap-3">
-                    <TickIcon className="w-5 h-5" color="var(--premitives-color-brand-purple-1000)" />
-                    <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
-                      96,000 credits per month
-                    </span>
-                  </div>
+                  {planDetails && (
+                    <div className="flex items-center gap-3">
+                      <TickIcon className="w-5 h-5" color="var(--premitives-color-brand-purple-1000)" />
+                      <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
+                        {planDetails.credits_per_month.toLocaleString()} credits per month
+                      </span>
+                    </div>
+                  )}
                   <div className="flex items-center gap-3">
                     <TickIcon className="w-5 h-5" color="var(--premitives-color-brand-purple-1000)" />
                     <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
@@ -599,12 +620,20 @@ export const UsageSection: React.FC = () => {
 
                 {/* Pricing */}
                 <div className="flex flex-col gap-2 pt-4 border-t border-[color:var(--tokens-color-border-border-subtle)]">
-                  <div className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
-                    $50.00/user/mo • 1 seat purchased
-                  </div>
-                  <div className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
-                    Monthly total: $50.00
-                  </div>
+                  {planDetails ? (
+                    <>
+                      <div className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
+                        ${planDetails.monthly_price.toFixed(2)}/user/mo • 1 seat purchased
+                      </div>
+                      <div className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
+                        Monthly total: ${planDetails.monthly_price.toFixed(2)}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-inactive-2)]">
+                      {creditsLoading ? 'Loading pricing information...' : 'No pricing information available'}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
