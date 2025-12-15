@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { ArrowDownSm, ArrowUpSm } from "@/icons";
+import { useTheme } from "@/hooks/use-theme";
 
 interface DropdownOption {
   value: string;
@@ -37,6 +38,8 @@ export const Dropdown: React.FC<DropdownProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
 
   const selectedOption = options.find((option) => option.value === value);
 
@@ -87,10 +90,9 @@ export const Dropdown: React.FC<DropdownProps> = ({
   const getDropdownClasses = () => {
     const bgColor =
       variant === "model-selector"
-        ? "bg-white"
+        ? `${!isDark ? "bg-white" : "bg-tokens-color-surface-surface-dark" } `
         : "bg-[color:var(--tokens-color-surface-surface-button-pressed)]";
-    const widthClass =
-      variant === "model-selector" ? "w-full" : "left-0 ";
+    const widthClass = variant === "model-selector" ? "w-full" : "left-0 ";
     const baseClasses = `absolute ${widthClass} mt-1 ${bgColor} border border-[color:var(--tokens-color-border-border-subtle)] rounded-[var(--premitives-corner-radius-corner-radius-2)] shadow-lg z-50 max-h-60 overflow-y-auto`;
 
     if (openUpward) {

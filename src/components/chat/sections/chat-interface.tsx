@@ -193,7 +193,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         <div className="flex items-center gap-2">
           <button
             onClick={() => router.push("/pricing")}
-            className={`hidden sm:inline-flex items-center justify-center gap-2 h-[40px] p-2 ${
+            className={`group hidden sm:inline-flex items-center justify-center gap-2 h-[40px] p-2 ${
               isDark
                 ? "bg-[color:var(--tokens-color-surface-surface-card-purple)]"
                 : "bg-[color:var(--premitives-color-brand-purple-1000)]"
@@ -201,7 +201,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
           >
             <div className={`relative w-fit  font-h02-heading02 text-[14px] ${
               isDark
-                ? "text-[color:var(--tokens-color-surface-surface-dark)]"
+                ? "text-[color:var(--tokens-color-surface-surface-dark)] group-hover:text-white"
                 : "text-white"
             } tracking-[var(--h05-heading05-letter-spacing)] leading-[var(--h05-heading05-line-height)] whitespace-nowrap [font-style:var(--h05-heading05-font-style)]`}>
               {t("chat.upgradeToPro")}

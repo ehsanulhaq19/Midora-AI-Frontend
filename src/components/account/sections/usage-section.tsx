@@ -178,8 +178,8 @@ const DailyCreditChart: React.FC<{ isDark: boolean }> = ({ isDark }) => {
 // Model Usage Distribution Chart Component
 const ModelUsageChart: React.FC<{ isDark: boolean }> = ({ isDark }) => {
   const modelData = [
-    { name: 'Claude Sonnet', percentage: 99.8, color: '#FF6B35' },
-    { name: 'Claude Sonnet 4', percentage: 0.2, color: '#4A90E2' }
+    { name: 'Claude Sonnet', percentage: 90.8, color: '#FF6B35' },
+    { name: 'Claude Sonnet 4', percentage: 10.2, color: '#4A90E2' }
   ]
 
   const size = 200
@@ -214,7 +214,7 @@ const ModelUsageChart: React.FC<{ isDark: boolean }> = ({ isDark }) => {
   return (
     <div className="flex flex-col lg:flex-row items-center gap-8">
       <div className="flex-shrink-0">
-        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="chart-svg">
           {modelData.map((item, index) => {
             const startAngle = currentAngle
             const endAngle = currentAngle + (item.percentage / total) * 360
@@ -228,6 +228,7 @@ const ModelUsageChart: React.FC<{ isDark: boolean }> = ({ isDark }) => {
                 fill={item.color}
                 stroke={isDark ? '#1a1a1a' : '#ffffff'}
                 strokeWidth="2"
+                style={{ fill: item.color }}
               />
             )
           })}
