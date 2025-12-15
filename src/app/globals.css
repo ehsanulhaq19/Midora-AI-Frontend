@@ -287,7 +287,11 @@
     line-height: 1.4; /* Consistent line height with app text classes */
   }
 
-  /* Ensure dark mode body background is #212121 */
+  /* Ensure dark mode html and body background is #212121 */
+  [data-theme="dark"] {
+    background-color: #212121;
+  }
+  
   [data-theme="dark"] body {
     background-color: #212121;
   }
@@ -658,8 +662,8 @@
     color: #ffffff;
   }
 
-  /* Apply white stroke only, remove fill */
-  [data-theme="dark"] svg path {
+  /* Apply white stroke only, remove fill (exclude chart SVGs) */
+  [data-theme="dark"] svg:not(.chart-svg) path {
     stroke: #ffffff;
     fill: none;
   }
@@ -676,6 +680,7 @@
     fill: #6B4392 !important;
     stroke: none !important;
   }
+
 
   /* Textarea dark mode background - preserve border-radius from light mode */
   [data-theme="dark"] textarea {

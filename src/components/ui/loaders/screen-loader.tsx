@@ -23,7 +23,10 @@ export const ScreenLoader: React.FC<ScreenLoaderProps> = ({
   fullScreen = true
 }) => {
   const { resolvedTheme, mounted } = useTheme()
-  const isDark = resolvedTheme === 'dark'
+  // Check data-theme attribute directly if not mounted yet (for SSR/hydration)
+  const isDark = mounted 
+    ? resolvedTheme === 'dark' 
+    : (typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'dark')
 
   const sizeClasses = {
     sm: 'h-8 w-8',

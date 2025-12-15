@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next'
+import Script from 'next/script'
 import { Inter } from 'next/font/google'
 import '@/app/globals.css'
 import { AuthProvider } from '@/contexts/AuthContext'
@@ -56,6 +57,43 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
+        <Script
+          id="theme-init"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  const theme = localStorage.getItem('midora-theme');
+                  const getSystemTheme = () => {
+                    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                  };
+                  const getResolvedTheme = (t) => {
+                    if (t === 'system' || !t) return getSystemTheme();
+                    return t;
+                  };
+                  const resolvedTheme = getResolvedTheme(theme);
+                  const root = document.documentElement;
+                  if (resolvedTheme === 'dark') {
+                    root.setAttribute('data-theme', 'dark');
+                    root.style.backgroundColor = '#212121';
+                    if (document.body) {
+                      document.body.style.backgroundColor = '#212121';
+                    }
+                  } else {
+                    root.removeAttribute('data-theme');
+                    root.style.backgroundColor = '';
+                    if (document.body) {
+                      document.body.style.backgroundColor = '';
+                    }
+                  }
+                } catch (e) {
+                  console.error('Theme initialization error:', e);
+                }
+              })();
+            `,
+          }}
+        />
         <ThemeProvider>
           <ThemeInitializer />
           <ReduxProvider>

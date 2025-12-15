@@ -86,7 +86,23 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
       
       // Check if this is a new email (different from stored email)
       // If so, clear all other signup data to start fresh
-      if (currentSignupData?.email && currentSignupData.email !== email) {
+      let storedEmail: string | undefined
+      if (typeof window !== 'undefined') {
+        try {
+          const fromSignupForm = sessionStorage.getItem('signupFormData')
+          const fromSignupData = sessionStorage.getItem('signupData')
+          const fromOnboarding = localStorage.getItem('midora_onboarding_data')
+          storedEmail =
+            (fromSignupForm && JSON.parse(fromSignupForm)?.email) ||
+            (fromSignupData && JSON.parse(fromSignupData)?.email) ||
+            (fromOnboarding && JSON.parse(fromOnboarding)?.email) ||
+            undefined
+        } catch (error) {
+          console.error('Error reading stored signup email:', error)
+        }
+      }
+
+      if ((currentSignupData?.email && currentSignupData.email !== email) || (storedEmail && storedEmail !== email)) {
         // New email detected - reset all fields except email
         const resetData = {
           email: email,
