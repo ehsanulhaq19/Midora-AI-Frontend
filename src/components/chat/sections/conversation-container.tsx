@@ -357,6 +357,8 @@ const StreamingMessage: React.FC<StreamingMessageProps> = ({
   onCanvasToggle,
   messageUuid
 }) => {
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
   const [isCopied, setIsCopied] = useState(false)
   const [isHidingInitialContent, setIsHidingInitialContent] = useState(false)
   const hasContent = content.length > 0
@@ -447,8 +449,16 @@ const StreamingMessage: React.FC<StreamingMessageProps> = ({
           {!hasContent && !hasInitialContent ? (
             // Show loading animation before content arrives
             <div className="flex items-center gap-3">
-              <div className="animate-spin" style={{ animation: 'spin 2s linear infinite' }}>
-                <LogoOnly className="w-6 h-6" />
+              <div className="w-6 h-6 animate-spin" style={{ animation: 'spin 2s linear infinite' }}>
+                {!isDark ? (
+                  <LogoOnly className="w-6 h-6" />
+                ) : (
+                  <img
+                    src="/img/dark_logo.svg"
+                    alt="Logo"
+                    className="w-6 h-6"
+                  />
+                )}
               </div>
             </div>
           ) : (

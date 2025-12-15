@@ -169,8 +169,12 @@ export const GroupWrapper: React.FC<GroupWrapperProps> = ({ className }) => {
                               minHeight: '4px',
                               borderRadius: '4.68px 4.68px 0 0',
                               width: '100%',
-                              animation: showSection3 ? 'barGrow 0.8s ease-out forwards' : 'none',
-                              animationDelay: `${2.1 + index * 0.1}s`,
+                              // Use longhand animation properties to avoid React warning
+                              animationName: showSection3 ? 'barGrow' : 'none',
+                              animationDuration: showSection3 ? '0.8s' : undefined,
+                              animationTimingFunction: showSection3 ? 'ease-out' : undefined,
+                              animationFillMode: showSection3 ? 'forwards' : undefined,
+                              animationDelay: showSection3 ? `${2.1 + index * 0.1}s` : undefined,
                             }}
                           />
                         </div>

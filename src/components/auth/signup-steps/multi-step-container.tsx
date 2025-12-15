@@ -472,7 +472,7 @@ export const MultiStepContainer: React.FC<MultiStepContainerProps> = ({
           }
         }
         return (
-          <div key="otp" className={`${baseClasses} ${slideClasses}`}>
+          <div key="otp" className={`${baseClasses} transform translate-x-0 opacity-100`}>
             <OTPVerificationStep 
               onNext={handleOTPNext} 
               onBack={handleOTPBack}

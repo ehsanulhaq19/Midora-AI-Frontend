@@ -183,7 +183,7 @@ function SignupPageContent() {
           {/* Footer */}
           <div className="flex justify-center px-4 pb-8">
             <p className="font-h02-heading02 font-[number:var(--text-font-weight)] [color:var(--tokens-color-text-text-inactive-2)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-center  max-w-full">
-              <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[color:var(--light-mode-colors-dark-gray-900)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
+              <span className={`font-h02-heading02 font-[number:var(--text-font-weight)] text-[color:var(--light-mode-colors-dark-gray-900)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] ${isDark && 'text-white'} `}>
                 All rights reserved@ 2025, midora.ai, You can view our{" "}
               </span>
               <button 
@@ -192,7 +192,7 @@ function SignupPageContent() {
             Privacy Policy
             </button>
           
-              <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[color:var(--light-mode-colors-dark-gray-900)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
+              <span className={`font-h02-heading02 font-[number:var(--text-font-weight)] text-[color:var(--light-mode-colors-dark-gray-900)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] ${isDark && 'text-white'} `}>
                 {" "}here
               </span>
             </p>
@@ -225,7 +225,7 @@ function SignupPageContent() {
           {/* Footer */}
           <div className="flex justify-center px-4 pb-8">
             <p className="font-h02-heading02 font-[number:var(--text-font-weight)] [color:var(--tokens-color-text-text-inactive-2)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-center  max-w-full">
-              <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[color:var(--light-mode-colors-dark-gray-900)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
+              <span className={`font-h02-heading02 font-[number:var(--text-font-weight)] text-[color:var(--light-mode-colors-dark-gray-900)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] ${isDark && 'text-white'} `}>
                 All rights reserved@ 2025, midora.ai, You can view our{" "}
               </span>
               <button 
@@ -234,7 +234,7 @@ function SignupPageContent() {
             Privacy Policy
             </button>
           
-              <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[color:var(--light-mode-colors-dark-gray-900)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
+              <span className={`font-h02-heading02 font-[number:var(--text-font-weight)] text-[color:var(--light-mode-colors-dark-gray-900)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] ${isDark && 'text-white'} `}>
                 {" "}here
               </span>
             </p>
