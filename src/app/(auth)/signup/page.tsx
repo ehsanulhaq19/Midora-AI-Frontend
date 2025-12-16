@@ -165,7 +165,7 @@ function SignupPageContent() {
     // Don't show loader for OTP step - show it immediately
     if (stepParam === 'otp') {
       return (
-        <div className="fixed inset-0 w-full h-full bg-[color:var(--tokens-color-surface-surface-primary)] flex flex-col justify-between">
+        <div className="fixed inset-0 w-full h-full bg-[color:var(--tokens-color-surface-surface-primary)] overflow-y-auto flex flex-col justify-between">
           {/* Main content area */}
           <div className="flex-1 flex justify-center px-4 py-24">
             <div className="w-full">
@@ -207,7 +207,7 @@ function SignupPageContent() {
         minLoadingTime={300}
         showInitially={true}
       >
-        <div className="fixed inset-0 w-full h-full bg-[color:var(--tokens-color-surface-surface-primary)] flex flex-col justify-between">
+        <div className="fixed inset-0 w-full h-full bg-[color:var(--tokens-color-surface-surface-primary)] overflow-y-auto flex flex-col justify-between">
           {/* Main content area */}
           <div className="flex-1 flex justify-center px-4 py-24">
             <div className="w-full">

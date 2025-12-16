@@ -210,30 +210,15 @@ export const PricingSection: React.FC<PricingSectionProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onSignupPage]); // Include onSignupPage in dependencies
 
-  // Filter and order plans: free, light, core, power, power plus
-  const filteredAndOrderedPlans = React.useMemo(() => {
+  // Filter plans: free, light, core, power, power plus
+  // Note: Ordering is handled by the backend API
+  const filteredPlans = React.useMemo(() => {
     const allowedPlanNames = ['free', 'light', 'core', 'power', 'power plus']
-    const planOrder = ['free', 'light', 'core', 'power', 'power plus']
     
     // Filter plans by name (case-insensitive)
-    const filtered = plans.filter(plan => {
+    return plans.filter(plan => {
       const planName = (plan.name || plan.slug || '').toLowerCase()
       return allowedPlanNames.some(allowed => planName.includes(allowed))
-    })
-    
-    // Sort plans according to the specified order
-    return filtered.sort((a, b) => {
-      const nameA = (a.name || a.slug || '').toLowerCase()
-      const nameB = (b.name || b.slug || '').toLowerCase()
-      
-      const indexA = planOrder.findIndex(order => nameA.includes(order))
-      const indexB = planOrder.findIndex(order => nameB.includes(order))
-      
-      // If not found in order, put at end
-      if (indexA === -1) return 1
-      if (indexB === -1) return -1
-      
-      return indexA - indexB
     })
   }, [plans])
 
@@ -280,7 +265,7 @@ export const PricingSection: React.FC<PricingSectionProps> = ({
 
       {/* Desktop Grid Layout */}
       <div className="hidden lg:flex flex-wrap items-stretch justify-center gap-[48px_48px] relative self-stretch w-full flex-[0_0_auto]">
-        {filteredAndOrderedPlans.map((plan) => (
+        {filteredPlans.map((plan) => (
           <PricingCard key={plan.uuid} plan={plan} onClick={() => handlePlanClick(plan)} />
         ))}
       </div>
@@ -296,7 +281,7 @@ export const PricingSection: React.FC<PricingSectionProps> = ({
           centerPadding="60px"
           className="px-4"
         >
-          {filteredAndOrderedPlans.map((plan) => (
+          {filteredPlans.map((plan) => (
             <PricingCard key={plan.uuid} plan={plan} onClick={() => handlePlanClick(plan)} />
           ))}
         </Slider>
@@ -311,7 +296,7 @@ export const PricingSection: React.FC<PricingSectionProps> = ({
           infinite={true}
           className="px-4"
         >
-          {filteredAndOrderedPlans.map((plan) => (
+          {filteredPlans.map((plan) => (
             <PricingCard key={plan.uuid} plan={plan} onClick={() => handlePlanClick(plan)} />
           ))}
         </Slider>

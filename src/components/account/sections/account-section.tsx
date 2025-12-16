@@ -100,7 +100,7 @@ export const AccountSection: React.FC = () => {
           </h2>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center ">
             <div 
-              className={`px-4 py-3 rounded-lg border min-w-[260px] ${
+              className={`px-4 py-3 rounded-lg border ${
                 isDark ? '' : 'bg-[color:var(--tokens-color-surface-surface-tertiary)] border-[color:var(--tokens-color-border-border-subtle)]'
               }`}
               style={isDark ? {
