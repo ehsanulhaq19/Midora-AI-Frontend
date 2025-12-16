@@ -335,10 +335,9 @@ export const UsageSection: React.FC = () => {
   return (
     <div className="flex-1 flex flex-col h-full">
       {/* Header with Email and Logout */}
-      <div className="flex items-center justify-between p-4 sm:p-6 border-b border-[color:var(--tokens-color-border-border-subtle)]">
-        <div className="flex-1" />
-        <div className="flex items-center gap-2 sm:flex-row flex-col ">
-          <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
+      <div className="flex text-start  w-full items-center justify-start sm:justify-end p-4 sm:p-6 border-b border-[color:var(--tokens-color-border-border-subtle)]">
+        <div className="flex items-center gap-2 ">
+          <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-primary)] max-w-[100px] sm:max-w-full truncate sm:whitespace-normal before:sm:text-clip">
             {userEmail || 'user@example.com'}
           </span>
           <button
@@ -350,13 +349,13 @@ export const UsageSection: React.FC = () => {
             }`}
           >
             <Logout className="w-4 h-4" />
-            Logout
+            <span className="hidden lg:block">Logout</span>
           </button>
         </div>
       </div>
 
       {/* Tabs Navigation */}
-      <div className="flex items-center gap-8 px-4 sm:px-6 border-b border-[color:var(--tokens-color-border-border-subtle)]">
+      <div className="flex items-center gap-0 lg:gap-8 px-4 sm:px-6 border-b border-[color:var(--tokens-color-border-border-subtle)]">
         {(['subscription', 'team', 'analytics'] as UsageTab[]).map((tab) => (
           <button
             key={tab}

@@ -26,7 +26,7 @@ export interface MessageInputHandle {
 export const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>(({ onSend, isStreaming = false, className = '', textAreaClassName = '', onFilesChange, placeholder }, ref) => {
   const [message, setMessage] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const { error: showErrorToast } = useToast()
+  const { error: showErrorToast, info: showInfoToast } = useToast()
   
   // Using t function from i18n
   const {
@@ -69,7 +69,7 @@ export const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>(({
       clearFiles() // Clear files after sending message
     } else if (files.length > 0 && !message.trim()) {
       // Show error toast when trying to send with files but no text
-      showErrorToast(
+      showInfoToast(
         'Message Required',
         'Please enter a message explaining what you want to do with the attached file(s).'
       )
@@ -81,7 +81,7 @@ export const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>(({
       // Prevent sending if files are uploaded but no text is entered
       if (files.length > 0 && !message.trim()) {
         e.preventDefault()
-        showErrorToast(
+        showInfoToast(
           'Message Required',
           'Please enter a message explaining what you want to do with the attached file(s).'
         )

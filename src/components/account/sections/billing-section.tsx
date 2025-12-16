@@ -173,7 +173,7 @@ export const BillingSection: React.FC = () => {
 
         {/* Billing History Section */}
         <div className="flex flex-col gap-6">
-          <div className="flex lg:flex-col gap-3 xl:flex-row items-center lg:items-start md:justify-between">
+          <div className="flex flex-col sm:flex-row gap-3 xl:flex-row items-center lg:items-start md:justify-between">
           <h1 className="text-[length:var(--text-large-font-size)] leading-[100%] tracking-[var(--h02-heading02-letter-spacing)] font-[number:var(--h05-heading05-font-weight)] font-[family-name:var(--h02-heading02-font-family)] text-[color:var(--tokens-color-text-text-seconary)]">
           Billing History
             </h1>

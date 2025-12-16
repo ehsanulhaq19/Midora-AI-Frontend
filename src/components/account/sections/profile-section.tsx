@@ -196,7 +196,7 @@ export const ProfileSection: React.FC = () => {
                         : 'var(--tokens-color-text-text-primary)'
                     }}
                   >
-                    <span className="text-sm">Choose Style</span>
+                    <span className="text-sm  hidden lg:block">Choose Style</span>
                     <DownArrow
                       className={` transition-transform flex-shrink-0 rotate-180`}
                     />
@@ -270,7 +270,7 @@ export const ProfileSection: React.FC = () => {
                     : 'var(--tokens-color-text-text-primary)'
                 }}
               >
-                <span className="text-sm">Choose Style</span>
+                <span className="text-sm hidden lg:block">Choose Style</span>
                 <DownArrow
                   className={` transition-transform flex-shrink-0 rotate-180`}
                 />
