@@ -71,7 +71,7 @@ export const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>(({
       // Show error toast when trying to send with files but no text
       showErrorToast(
         'Message Required',
-        'Please enter a message before sending files.'
+        'Please enter a message explaining what you want to do with the attached file(s).'
       )
     }
   }
@@ -83,7 +83,7 @@ export const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>(({
         e.preventDefault()
         showErrorToast(
           'Message Required',
-          'Please enter a message before sending files.'
+          'Please enter a message explaining what you want to do with the attached file(s).'
         )
         return
       }
