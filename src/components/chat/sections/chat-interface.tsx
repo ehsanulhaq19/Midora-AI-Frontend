@@ -185,7 +185,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       <DragDropOverlay isVisible={isDragOver} />
 
       {/* Header */}
-      <div className="flex items-start justify-between relative w-full px-[24px]">
+      <div className="flex items-start justify-between relative w-full px-[24px] lg:px-[24px] pl-[64px]">
         <div className="flex items-center gap-4">
           <ModelSelection />
         </div>

@@ -337,7 +337,7 @@ export const UsageSection: React.FC = () => {
       {/* Header with Email and Logout */}
       <div className="flex text-start  w-full items-center justify-start sm:justify-end p-4 sm:p-6 border-b border-[color:var(--tokens-color-border-border-subtle)]">
         <div className="flex items-center gap-2 ">
-          <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-primary)] max-w-[100px] sm:max-w-full truncate sm:whitespace-normal before:sm:text-clip">
+          <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-primary)] max-w-[170px] sm:max-w-full truncate sm:whitespace-normal before:sm:text-clip">
             {userEmail || 'user@example.com'}
           </span>
           <button
@@ -416,7 +416,7 @@ export const UsageSection: React.FC = () => {
                 <div className="flex flex-col gap-6">
                   {/* Available Credits */}
                   <div className="flex items-center gap-3">
-                    <span className="font-h02-heading02 font-[number:var(--h01-heading-01-font-weight)] text-[length:var(--h01-heading-01-font-size)] tracking-[var(--h01-heading-01-letter-spacing)] leading-[var(--h01-heading-01-line-height)] [font-style:var(--h01-heading-01-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
+                    <span className="font-h02-heading02 font-[number:var(--h01-heading-01-font-weight)] text-[length:var(--text-large-font-size)] tracking-[var(--h01-heading-01-letter-spacing)] leading-[var(--h01-heading-01-line-height)] [font-style:var(--h01-heading-01-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
                       {availableCredits.toLocaleString()} available
                     </span>
                     <EyeIcon className="w-5 h-5" color="var(--tokens-color-text-text-inactive-2)" />

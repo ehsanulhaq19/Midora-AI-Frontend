@@ -14,6 +14,7 @@ import {
   FoldersIcon,
   FolderOpen01,
   Logout,
+  Menu,
 } from "@/icons";
 import { Tooltip, ConversationMenu } from "@/components/ui";
 import { NewProjectModal } from "./new-project-modal";
@@ -124,11 +125,17 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
   const [searchHovered, setSearchHovered] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [logoHovered, setLogoHovered] = useState(false);
-  const [isManuallyShrunk, setIsManuallyShrunk] = useState<boolean>(false);
+  // Start shrunk on small screens (< 1024px), expanded on desktop
+  const [isManuallyShrunk, setIsManuallyShrunk] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return window.innerWidth < 1024;
+  });
   const [isMobile, setIsMobile] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
     return window.innerWidth < 1024;
   });
+  // Track if sidebar is open on mobile (< 1024px)
+  const [isMobileOpen, setIsMobileOpen] = useState<boolean>(false);
   const [isNewFolderModalOpen, setIsNewFolderModalOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const projectsListRef = useRef<HTMLDivElement>(null);
@@ -187,37 +194,48 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
   // Auto-detect mobile/tablet screens and update state
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 1024);
-      // On mobile, always shrink; on desktop, respect manual preference
-      if (window.innerWidth >= 1024 && isManuallyShrunk) {
-        // Keep manual shrink state on desktop
+      const wasMobile = isMobile;
+      const nowMobile = window.innerWidth < 1024;
+      setIsMobile(nowMobile);
+      
+      // If switching from mobile to desktop, close mobile sidebar
+      if (wasMobile && !nowMobile) {
+        setIsMobileOpen(false);
+      }
+      // If switching from desktop to mobile, close sidebar
+      if (!wasMobile && nowMobile) {
+        setIsMobileOpen(false);
+        setIsManuallyShrunk(true);
       }
     };
 
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [isManuallyShrunk]);
+  }, [isMobile]);
 
   // Determine if sidebar should be shrunk
-  // Sidebar is shrunk if: 
-  // - On mobile/tablet (< 1024px) OR
-  // - Manually shrunk by user (on desktop)
-  // When canvas is open (!showFullSidebar), sidebar can still be manually expanded
-  // If user manually expanded it (isManuallyShrunk = false), respect that even when canvas is open
-  // If user manually shrunk it (isManuallyShrunk = true), respect that
-  // If canvas opens and user hasn't set a preference, auto-shrink (but allow manual expand)
-  const isShrunk = isMobile || isManuallyShrunk;
-
-  // When canvas closes (showFullSidebar becomes true), don't reset manual shrink
-  // User's manual preference is preserved
-  // When canvas opens (showFullSidebar becomes false), sidebar can still be manually expanded
+  // Shrunk state is fully controlled by manual toggle, but initial
+  // value is based on screen size (set above)
+  const isShrunk = isManuallyShrunk;
 
   const handleToggleSidebar = () => {
-    // Only allow manual toggle on desktop (>= 1024px)
-    if (window.innerWidth >= 1024) {
+    // On mobile, toggle both open state and expanded state
+    if (isMobile) {
+      const willBeOpen = !isMobileOpen;
+      setIsMobileOpen(willBeOpen);
+      // Expand when opening, shrink when closing
+      setIsManuallyShrunk(!willBeOpen);
+    } else {
+      // On desktop, just toggle shrink state
       setIsManuallyShrunk(!isManuallyShrunk);
     }
+  };
+
+  const handleMobileClose = () => {
+    setIsMobileOpen(false);
+    setIsManuallyShrunk(true);
+    onClose();
   };
 
   const navigateToChat = useCallback(() => {
@@ -340,6 +358,9 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
 
   const handleNewChat = () => {
     setIsManuallyShrunk(false);
+    if (isMobile) {
+      setIsMobileOpen(false);
+    }
     startNewChat();
     onNewChat?.();
     onNavigate?.();
@@ -356,6 +377,10 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
     setSelectedChat(
       conversations.findIndex((conv) => conv.uuid === conversationUuid)
     );
+    // Close mobile sidebar after selection
+    if (isMobile) {
+      setIsMobileOpen(false);
+    }
     onNavigate?.();
     navigateToChat();
   };
@@ -397,34 +422,51 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
     };
   }, [isDropdownOpen]);
 
+  // Determine effective open state: on mobile, use isMobileOpen; otherwise use isOpen prop
+  const effectiveIsOpen = isMobile ? isMobileOpen : isOpen;
+
   return (
     <>
+      {/* Mobile toggle button - absolutely positioned, visible on screens < 1024px when sidebar is closed */}
+      {isMobile && !isMobileOpen && (
+        <button
+          type="button"
+          onClick={handleToggleSidebar}
+          className="fixed top-4 left-4 z-[70] lg:hidden flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-200 hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--tokens-color-text-text-brand)] bg-[color:var(--tokens-color-surface-surface-primary)] border border-[color:var(--tokens-color-border-border-subtle)] shadow-lg"
+          style={{ color: "var(--tokens-color-text-text-primary)" }}
+          aria-label="Open sidebar"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
+      )}
+
+      {/* Desktop overlay backdrop - removed on desktop to allow interaction with main content */}
+
       {/* Mobile overlay */}
-      {isOpen && !isShrunk && (
+      {effectiveIsOpen && !isShrunk && isMobile && (
         <div
-          className="fixed inset-0 z-50 lg:hidden "
-          onClick={() => {
-            setIsManuallyShrunk(true);
-            onClose();
-          }}
+          className="fixed inset-0 z-50 lg:hidden bg-black/50 backdrop-blur-sm"
+          onClick={handleMobileClose}
         />
       )}
 
-      {/* Sidebar */}
-      <div
-        className={`
-        fixed lg:relative top-0 left-0 z-[60] lg:z-auto transform transition-all duration-300 ease-in-out
-        ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
-        ${isShrunk ? "w-[70px]" : "w-[258px]"}
-        ${
-          isShrunk
-            ? "bg-[color:var(--tokens-color-surface-surface-sidebar-shrunk)]"
-            : "bg-[color:var(--tokens-color-surface-surface-neutral)]"
-        }
-        flex flex-col h-[100vh] relative pointer-events-auto
-        border-r border-[color:var(--tokens-color-border-border-subtle)]
-      `}
-      >
+      {/* Sidebar - only render when open on mobile or always on desktop */}
+      {(!isMobile || effectiveIsOpen) && (
+        <div
+          className={`
+          top-0 left-0 transform transition-all duration-300 ease-in-out
+          ${effectiveIsOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
+          ${isShrunk ? "w-[70px]" : "w-[258px]"}
+          ${
+            isShrunk
+              ? "bg-[color:var(--tokens-color-surface-surface-sidebar-shrunk)]"
+              : "bg-[color:var(--tokens-color-surface-surface-neutral)]"
+          }
+          flex flex-col h-[100vh] pointer-events-auto
+          border-r border-[color:var(--tokens-color-border-border-subtle)]
+          ${isShrunk ? "fixed lg:relative z-[60] lg:z-auto" : "fixed lg:relative z-[60] lg:z-auto"}
+        `}
+        >
         {/* Header */}
         <div
           className={`flex flex-col items-start flex-shrink-0 pb-6 ${
@@ -745,6 +787,10 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                                   false
                                 );
                               }
+                              // Close mobile sidebar after selection
+                              if (isMobile) {
+                                setIsMobileOpen(false);
+                              }
                               onNavigate?.();
                               navigateToChat();
                             }}
@@ -815,6 +861,10 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                                       );
                                       // Select the conversation
                                       selectConversation(convUuid);
+                                      // Close mobile sidebar after selection
+                                      if (isMobile) {
+                                        setIsMobileOpen(false);
+                                      }
                                       onNavigate?.();
                                       navigateToChat();
                                     }}
@@ -1123,6 +1173,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
           )}
         </div>
       </div>
+      )}
 
       {/* New Project Modal */}
       <NewProjectModal

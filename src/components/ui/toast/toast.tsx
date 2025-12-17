@@ -54,7 +54,7 @@ const Toast: React.FC<ToastProps> = ({ toast }) => {
       case 'warning':
         return 'bg-yellow-50 border-yellow-200'
       case 'info':
-        return isDark ? 'bg-blue-900/30 border-blue-700/50' : 'bg-blue-50 border-blue-200'
+        return isDark ? 'bg-blue-900 border-blue-700/50' : 'bg-blue-50 border-blue-200'
       default:
         return 'bg-gray-50 border-gray-200'
     }
