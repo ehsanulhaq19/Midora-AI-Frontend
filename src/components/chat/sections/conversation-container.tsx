@@ -189,7 +189,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-6 px-4 message-blub`}>
       <div className={`max-w-[75%] ${isUser ? 'order-2' : 'order-1'}`}>
         <div
-        className={`p-[12px] rounded-lg break-words whitespace-pre-wrap ${textClassName} ${
+        className={`p-[6px] sm:p-[12px] rounded-lg break-words whitespace-pre-wrap ${textClassName} ${
             isUser
               ? `${isDark ? '' : 'bg-[#6B4392]/10'} ${isDark ? 'text-white' : 'text-[color:var(--tokens-color-text-text-primary)]'} ${isDark ? '' : 'border border-[#6B4392]/20'}`
               : `${isDark ? 'text-white' : 'text-[color:var(--tokens-color-text-text-primary)]'} rounded-bl-sm`
@@ -285,7 +285,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
               />
             )}
 
-            <div>
+            <div className='flex items-center gap-2'>
               {/* Copy Button */}
               <Tooltip content={isCopied ? t('chat.copied') : t('chat.copyMessage')}>
                 <IconButton

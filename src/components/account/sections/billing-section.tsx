@@ -179,7 +179,7 @@ export const BillingSection: React.FC = () => {
             </h1>
             
             {/* Controls */}
-            <div className="flex flex-col lg:flex-row items-stretch sm:items-stat gap-3 w-full md:w-auto">
+            <div className="flex flex-col lg:flex-row items-stretch gap-3 w-full md:w-auto">
               <button
                 onClick={handleFilter}
                 className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
@@ -195,14 +195,15 @@ export const BillingSection: React.FC = () => {
                   Filter
                 </span>
               </button>
-              <div className="relative flex-1 sm:flex-none">
-                <Search02 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: 'var(--tokens-color-text-text-inactive-2)' }} />
+              
+              <div className="relative flex-1 w-full">
+                <Search02 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search"
-                  className={`pl-10 pr-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-[color:var(--premitives-color-brand-purple-1000)] focus:border-[color:var(--premitives-color-brand-purple-1000)] font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] ${
+                  className={`pl-10 pr-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-[color:var(--premitives-color-brand-purple-1000)] focus:border-[color:var(--premitives-color-brand-purple-1000)] font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] w-full ${
                     isDark ? '' : ''
                   }`}
                   style={isDark ? {

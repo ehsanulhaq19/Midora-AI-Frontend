@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { AccountIcon, ProfileIcon, LanguageIcon, BillingIcon, NotificationsIcon, UsageIcon } from '@/icons'
 import { useTheme } from '@/hooks/use-theme'
 
@@ -96,9 +96,23 @@ export const AccountSidebar: React.FC<AccountSidebarProps> = ({
 }) => {
   const { resolvedTheme } = useTheme()
   const isDark = resolvedTheme === 'dark'
+  const [isMobile, setIsMobile] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return window.innerWidth < 1024;
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   
   return (
-    <div className="p-2 lg:p-4 h-auto backdrop-blur-[2.91px] border-[color:var(--tokens-color-border-border-subtle)] mt-6">
+    <div className={`p-2 lg:p-4 h-auto backdrop-blur-[2.91px] border-[color:var(--tokens-color-border-border-subtle)] ${isMobile ? 'mt-16' : 'mt-6'}`}>
       <div className={`flex flex-col p-2 lg:p-5 ${isDark ? 'bg-[color:var(--tokens-color-surface-surface-card-default)] rounded-[12px]' : ''}`}>
         <div className="">
           {menuItems.map((item) => {
