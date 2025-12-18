@@ -27,7 +27,7 @@ interface DropdownProps {
 export const Dropdown: React.FC<DropdownProps> = ({
   options,
   value,
-  placeholder = "Select an option",
+  placeholder,
   onChange,
   className = "",
   disabled = false,

@@ -19,7 +19,7 @@ interface InputWithButtonProps {
 }
 
 export const InputWithButton = ({
-  placeholder = "Enter your personal or work email",
+  placeholder,
   onSubmit,
   className,
   value: controlledValue,

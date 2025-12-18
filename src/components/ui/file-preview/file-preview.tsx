@@ -5,6 +5,7 @@ import { Close } from '@/icons'
 import { FilePreview as FilePreviewType, FileTypeInfo } from '@/api/files/types'
 import { Spinner } from '@/components/ui/loaders'
 import { t } from '@/i18n'
+import { useTheme } from '@/hooks/use-theme'
 
 interface FilePreviewProps {
   file: FilePreviewType
@@ -94,6 +95,8 @@ export const FilePreview: React.FC<FilePreviewProps> = ({ file, onRemove, classN
   const isImage = fileTypeInfo.category === 'image'
   const isUploading = file.uuid.startsWith('temp-')
   const isPending = showPendingStatus && (file as any).status === 'pending'
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
   
   // Get file extension without dot
   const fileExtension = file.file_extension.replace('.', '').toUpperCase()
@@ -122,7 +125,7 @@ export const FilePreview: React.FC<FilePreviewProps> = ({ file, onRemove, classN
         type="button"
         onClick={() => onRemove(file.uuid)}
         aria-label="Remove file"
-        className="absolute top-2 right-2 p-1 hover:bg-red-100 rounded-full transition-colors z-10"
+        className={`absolute top-2 right-2 p-1 rounded-full transition-colors z-10 ${!isDark ? 'hover:bg-red-100' : 'hover:bg-[color:var(--tokens-color-surface-surface-dark)]'}`}
         disabled={isUploading}
       >
         <Close className="w-3 h-3 text-red-500 hover:text-red-700" />
@@ -151,7 +154,7 @@ export const FilePreview: React.FC<FilePreviewProps> = ({ file, onRemove, classN
         </p>
         
         {/* File details row - fixed position at bottom */}
-        <div className="flex items-center justify-between h-6">
+        <div className="flex items-center sm:justify-between gap-2 h-6">
           {/* File type badge */}
           <span className="px-2 py-1 bg-[color:var(--tokens-color-surface-surface-tertiary)] text-[color:var(--tokens-color-text-text-tertiary)] app-text-xs rounded-[var(--premitives-corner-radius-corner-radius-1)] font-medium border border-[color:var(--tokens-color-border-border-subtle)]">
             {fileExtension}

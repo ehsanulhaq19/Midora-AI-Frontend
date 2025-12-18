@@ -78,8 +78,17 @@ export const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>(({
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey && !isStreaming && !isUploading) {
+      const hasMessage = !!message.trim()
+      const hasFiles = files.length > 0
+
+      // When there is no message and no files, do nothing (no new line, no send)
+      if (!hasMessage && !hasFiles) {
+        e.preventDefault()
+        return
+      }
+
       // Prevent sending if files are uploaded but no text is entered
-      if (files.length > 0 && !message.trim()) {
+      if (hasFiles && !hasMessage) {
         e.preventDefault()
         showInfoToast(
           'Message Required',
@@ -87,8 +96,9 @@ export const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>(({
         )
         return
       }
+
       // Only allow sending if there's text
-      if (message.trim()) {
+      if (hasMessage) {
         e.preventDefault()
         handleSubmit(e)
       }

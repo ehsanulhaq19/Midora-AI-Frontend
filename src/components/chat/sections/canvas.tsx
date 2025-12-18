@@ -239,11 +239,11 @@ export const Canvas: React.FC<CanvasProps> = ({
           >
             {isCopied ? (
               <span className="font-h02-heading02 font-[number:var(--h02-heading02-font-weight)] text-[14px] tracking-[var(--text-small-letter-spacing)] leading-[var(--h01-heading-01-line-height)] whitespace-nowrap [font-style:var(--h02-heading02-font-style)] text-green-500">
-                ✓ Copied
+                ✓ <span className="hidden lg:inline">Copied</span>
               </span>
             ) : (
               <>
-                <span className="font-h02-heading02 font-[number:var(--h02-heading02-font-weight)] text-[14px] tracking-[var(--text-small-letter-spacing)] leading-[var(--h01-heading-01-line-height)] whitespace-nowrap [font-style:var(--h02-heading02-font-style)] text-[color:var(--tokens-color-text-text-brand)]">
+                <span className="font-h02-heading02 font-[number:var(--h02-heading02-font-weight)] text-[14px] tracking-[var(--text-small-letter-spacing)] leading-[var(--h01-heading-01-line-height)] whitespace-nowrap [font-style:var(--h02-heading02-font-style)] text-[color:var(--tokens-color-text-text-brand)] hidden lg:inline">
                   Copy
                 </span>
                 <Copy className="w-4 h-4" color="currentColor" />
@@ -251,9 +251,9 @@ export const Canvas: React.FC<CanvasProps> = ({
             )}
           </button>
           <DownloadDropdown onDownload={handleDownload} />
-          <button className="px-4 py-1.5 bg-[color:var(--tokens-color-surface-surface-button-pressed)] text-white text-sm font-medium rounded-full hover:bg-opacity-90 transition-colors">
+          {/* <button className="px-4 py-1.5 bg-[color:var(--tokens-color-surface-surface-button-pressed)] text-white text-sm font-medium rounded-full hover:bg-opacity-90 transition-colors">
             Publish
-          </button>
+          </button> */}
         </div>
       </div>
 
