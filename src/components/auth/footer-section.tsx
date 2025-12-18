@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Twitter, Facebook, GitHub, Instagram } from '@/icons'
 import { InputWithButton } from '@/components/ui'
+import { t } from '@/i18n'
 
 interface FooterSectionProps {
   className?: string
@@ -27,12 +28,12 @@ export const FooterSection: React.FC<FooterSectionProps> = ({ className }) => {
 
         <div className="flex flex-col gap-6 w-full xl:w-auto">
           <p className="relative w-full xl:w-fit font-h02-heading02 font-[number:var(--text-font-weight)] text-premitives-color-light-gray-700 text-sm sm:text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
-            Sign up to our newsletter today
+            {t('footer.newsletter.title')}
           </p>
 
           <InputWithButton
             className="!self-stretch !w-full md:!w-[350px] xl:w-auto"
-            placeholder="Enter your personal or work email"
+            placeholder={t('footer.newsletter.placeholder')}
             // onSubmit={handleNewsletterSubmit}
             value={email}
             onChange={setEmail}
@@ -47,44 +48,44 @@ export const FooterSection: React.FC<FooterSectionProps> = ({ className }) => {
         {/* Column 2: Use Cases */}
         <div className="flex flex-col gap-4 lg:gap-6">
           <h3 className="font-h02-heading02 font-normal text-base leading-[1.4] tracking-normal text-white">
-            Use Cases
+            {t('footer.useCases.title')}
           </h3>
           <div className="flex flex-col gap-1">
             <button
               onClick={() => handleLinkClick('Product')}
               className="text-left font-h02-heading02 font-normal text-sm leading-[1.4] tracking-normal text-premitives-color-light-gray-700 hover:text-white transition-colors duration-200 px-1"
             >
-              Product
+              {t('footer.useCases.product')}
             </button>
             <button
               onClick={() => handleLinkClick('Research')}
               className="text-left font-h02-heading02 font-normal text-sm leading-[1.4] tracking-normal text-premitives-color-light-gray-700 hover:text-white transition-colors duration-200 px-1"
             >
-              Research
+              {t('footer.useCases.research')}
             </button>
             <button
               onClick={() => handleLinkClick('Careers')}
               className="text-left font-h02-heading02 font-normal text-sm leading-[1.4] tracking-normal text-premitives-color-light-gray-700 hover:text-white transition-colors duration-200 px-1"
             >
-              Careers
+              {t('footer.useCases.careers')}
             </button>
             <button
               onClick={() => handleLinkClick('Company')}
               className="text-left font-h02-heading02 font-normal text-sm leading-[1.4] tracking-normal text-premitives-color-light-gray-700 hover:text-white transition-colors duration-200 px-1"
             >
-              Company
+              {t('footer.useCases.company')}
             </button>
             <button
               onClick={() => handleLinkClick('News')}
               className="text-left font-h02-heading02 font-normal text-sm leading-[1.4] tracking-normal text-premitives-color-light-gray-700 hover:text-white transition-colors duration-200 px-1"
             >
-              News
+              {t('footer.useCases.news')}
             </button>
             <button
               onClick={() => handleLinkClick('Catalog')}
               className="text-left font-h02-heading02 font-normal text-sm leading-[1.4] tracking-normal text-premitives-color-light-gray-700 hover:text-white transition-colors duration-200 px-1"
             >
-              Catalog
+              {t('footer.useCases.catalog')}
             </button>
           </div>
         </div>
@@ -92,32 +93,32 @@ export const FooterSection: React.FC<FooterSectionProps> = ({ className }) => {
         {/* Column 3: Company */}
         <div className="flex flex-col gap-4 lg:gap-6">
           <h3 className="font-h02-heading02 font-normal text-base leading-[1.4] tracking-normal text-white">
-            Company
+            {t('footer.company.title')}
           </h3>
           <div className="flex flex-col gap-1">
             <button
               onClick={() => handleLinkClick('Terms of Services')}
               className="text-left font-h02-heading02 font-normal text-sm leading-[1.4] tracking-normal text-premitives-color-light-gray-700 hover:text-white transition-colors duration-200 px-1"
             >
-              Terms of Services
+              {t('footer.company.termsOfService')}
             </button>
             <button
               onClick={() => handleLinkClick('Privacy Policy')}
               className="text-left font-h02-heading02 font-normal text-sm leading-[1.4] tracking-normal text-premitives-color-light-gray-700 hover:text-white transition-colors duration-200 px-1"
             >
-              Privacy Policy
+              {t('footer.company.privacyPolicy')}
             </button>
             <button
               onClick={() => handleLinkClick('Your Privacy Choices')}
               className="text-left font-h02-heading02 font-normal text-sm leading-[1.4] tracking-normal text-premitives-color-light-gray-700 hover:text-white transition-colors duration-200 px-1"
             >
-              Your Privacy Choices
+              {t('footer.company.privacyChoices')}
             </button>
             <button
               onClick={() => handleLinkClick('Compliance')}
               className="text-left font-h02-heading02 font-normal text-sm leading-[1.4] tracking-normal text-premitives-color-light-gray-700 hover:text-white transition-colors duration-200 px-1"
             >
-              Compliance
+              {t('footer.company.compliance')}
             </button>
           </div>
         </div>
@@ -125,20 +126,20 @@ export const FooterSection: React.FC<FooterSectionProps> = ({ className }) => {
         {/* Column 4: Contact */}
         <div className="flex flex-col gap-4 lg:gap-6">
         <h3 className="font-h02-heading02 font-normal text-base leading-[1.4] tracking-normal text-white">
-          Contact
+          {t('footer.contact.title')}
         </h3>
         <div className="flex flex-col gap-4">
           <a
-            href="mailto:contact@midora.com"
+            href={`mailto:${t('footer.contact.email')}`}
             className="font-h02-heading02 font-[number:var(--text-font-weight)] text-premitives-color-light-gray-700 hover:text-white text-sm sm:text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] transition-colors duration-200"
           >
-            contact@midora.com
+            {t('footer.contact.email')}
           </a>
           <a
-            href="tel:+1234758498743746"
+            href={`tel:${t('footer.contact.phone').replace(/\s/g, '')}`}
             className="font-h02-heading02 font-[number:var(--text-font-weight)] text-premitives-color-light-gray-700 hover:text-white text-sm sm:text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] transition-colors duration-200"
           >
-            +1 234 7584 9874 3746
+            {t('footer.contact.phone')}
           </a>
           <div className="flex flex-row gap-4 mt-2">
             <a

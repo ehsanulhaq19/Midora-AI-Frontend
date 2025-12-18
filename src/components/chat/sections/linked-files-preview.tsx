@@ -247,7 +247,7 @@ const LinkedFilePreview: React.FC<{ linkedFile: LinkedFile; isUser: boolean }> =
         </p>
         
         {/* File details row - fixed position at bottom */}
-        <div className="flex items-center justify-between h-6">
+        <div className="flex items-center sm:justify-between gap-2 h-6">
           {/* File type badge */}
           <span className="px-2 py-1 bg-[color:var(--tokens-color-surface-surface-tertiary)] text-[color:var(--tokens-color-text-text-tertiary)] app-text-xs rounded-[var(--premitives-corner-radius-corner-radius-1)] font-medium border border-[color:var(--tokens-color-border-border-subtle)]">
             {fileExtension}

@@ -11,7 +11,7 @@ interface NameInputProps {
 export const NameInput = ({ 
   value, 
   onChange, 
-  placeholder = "Enter your name",
+  placeholder,
   className,
   error
 }: NameInputProps) => {

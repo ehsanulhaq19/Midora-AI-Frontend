@@ -19,7 +19,7 @@ export const LoginPasswordInput: React.FC<LoginPasswordInputProps> = ({
   onKeyDown,
   error,
   disabled = false,
-  placeholder = "Enter your password",
+  placeholder,
   className = "",
 }) => {
   const [showPassword, setShowPassword] = useState(false);

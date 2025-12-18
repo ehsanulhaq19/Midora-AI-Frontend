@@ -19,7 +19,7 @@ export const EmailInput: React.FC<EmailInputProps> = ({
   onKeyDown,
   error,
   disabled = false,
-  placeholder = "Enter your personal or work email",
+  placeholder,
   className = ""
 }) => {
   const { resolvedTheme } = useTheme()

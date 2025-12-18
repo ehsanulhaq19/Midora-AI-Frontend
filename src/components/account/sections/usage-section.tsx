@@ -7,6 +7,7 @@ import { useTheme } from '@/hooks/use-theme'
 import { useAuthRedux } from '@/hooks/use-auth-redux'
 import { useAuth } from '@/contexts/AuthContext'
 import { useUserCredits } from '@/hooks/use-user-credits'
+import { t, tWithParams } from '@/i18n'
 
 type UsageTab = 'subscription' | 'team' | 'analytics'
 type DateRange = '7' | '30' | '60' | 'billing'
@@ -349,7 +350,7 @@ export const UsageSection: React.FC = () => {
             }`}
           >
             <Logout className="w-4 h-4" />
-            <span className="hidden lg:block">Logout</span>
+            <span className="hidden lg:block">{t('account.usage.logout')}</span>
           </button>
         </div>
       </div>
@@ -366,7 +367,7 @@ export const UsageSection: React.FC = () => {
                 : 'text-[color:var(--tokens-color-text-text-inactive-2)] hover:text-[color:var(--tokens-color-text-text-primary)]'
             }`}
           >
-            {tab}
+            {t(`account.usage.${tab}`)}
             {activeTab === tab && (
               <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[color:var(--tokens-color-text-text-brand)]" />
             )}
@@ -380,7 +381,7 @@ export const UsageSection: React.FC = () => {
           <div className="flex flex-col gap-12">
             {/* Page Title */}
             <h1 className="text-[length:var(--text-large-font-size)] leading-[100%] tracking-[var(--h02-heading02-letter-spacing)] font-[number:var(--h05-heading05-font-weight)] font-[family-name:var(--h02-heading02-font-family)] text-[color:var(--tokens-color-text-text-seconary)]">
-              Subscription
+              {t('account.usage.subscriptionTitle')}
             </h1>
 
             {/* Credits and Billing Row */}
@@ -403,13 +404,13 @@ export const UsageSection: React.FC = () => {
               >
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-[length:var(--text-large-font-size)] leading-[100%] tracking-[var(--h02-heading02-letter-spacing)] font-[number:var(--h05-heading05-font-weight)] font-[family-name:var(--h02-heading02-font-family)] text-[color:var(--tokens-color-text-text-seconary)]">
-                    Credits
+                    {t('account.usage.credits')}
                   </h2>
                   <button
                     onClick={handleViewUsage}
                     className="flex items-center gap-2 text-[color:var(--tokens-color-text-text-brand)] hover:opacity-80 transition-opacity font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]"
                   >
-                    View usage
+                    {t('account.usage.viewUsage')}
                   </button>
                 </div>
 
@@ -417,7 +418,7 @@ export const UsageSection: React.FC = () => {
                   {/* Available Credits */}
                   <div className="flex items-center gap-3">
                     <span className="font-h02-heading02 font-[number:var(--h01-heading-01-font-weight)] text-[length:var(--text-large-font-size)] tracking-[var(--h01-heading-01-letter-spacing)] leading-[var(--h01-heading-01-line-height)] [font-style:var(--h01-heading-01-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
-                      {availableCredits.toLocaleString()} available
+                      {availableCredits.toLocaleString()} {t('account.usage.available')}
                     </span>
                     <EyeIcon className="w-5 h-5" color="var(--tokens-color-text-text-inactive-2)" />
                   </div>
@@ -425,18 +426,18 @@ export const UsageSection: React.FC = () => {
                   {/* Monthly Renewal Info */}
                   {creditsLoading ? (
                     <div className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-inactive-2)]">
-                      Loading...
+                      {t('account.usage.loading')}
                     </div>
                   ) : (
                     <div className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-inactive-2)]">
-                      {monthlyRenewal.toLocaleString()} renew monthly on {planName}
+                      {monthlyRenewal.toLocaleString()} {t('account.usage.renewMonthly')} {planName}
                     </div>
                   )}
 
                   {/* Usage Progress Bar */}
                   <div className="flex flex-col gap-2">
                     <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
-                      Used {usedCredits.toLocaleString()} of {totalCredits.toLocaleString()} this month
+                      {tWithParams('account.usage.usedThisMonth', { used: usedCredits.toLocaleString(), total: totalCredits.toLocaleString() })}
                     </span>
                     <div
                       className={`h-3 rounded-full overflow-hidden ${
@@ -455,7 +456,7 @@ export const UsageSection: React.FC = () => {
                     <Toggle
                       checked={autoTopUp}
                       onChange={setAutoTopUp}
-                      label="Automatically top-up credits"
+                      label={t('account.usage.autoTopUp')}
                     />
                   </div>
                 </div>
@@ -479,13 +480,13 @@ export const UsageSection: React.FC = () => {
               >
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-[length:var(--text-large-font-size)] leading-[100%] tracking-[var(--h02-heading02-letter-spacing)] font-[number:var(--h05-heading05-font-weight)] font-[family-name:var(--h02-heading02-font-family)] text-[color:var(--tokens-color-text-text-seconary)]">
-                    Billing
+                    {t('account.usage.billing')}
                   </h2>
                   <button
                     onClick={handlePaymentHistory}
                     className="flex items-center gap-2 text-[color:var(--tokens-color-text-text-brand)] hover:opacity-80 transition-opacity font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]"
                   >
-                    Payment history
+                    {t('account.usage.paymentHistory')}
                     <ExternalLinkIcon className="w-4 h-4" />
                   </button>
                 </div>
@@ -496,17 +497,17 @@ export const UsageSection: React.FC = () => {
                     <CalendarIcon className="w-5 h-5" color="var(--tokens-color-text-text-primary)" />
                     <div className="flex flex-col gap-1">
                       <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-inactive-2)]">
-                        Next Billing Date
+                        {t('account.usage.nextBillingDate')}
                       </span>
                       <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
-                        {creditsLoading ? 'Loading...' : (nextBillingDate ?? 'N/A')}
+                        {creditsLoading ? t('account.usage.loading') : (nextBillingDate ?? 'N/A')}
                       </span>
                     </div>
                   </div>
 
                   {/* Billing Amount */}
                   <div className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
-                    Your card will be charged {billingAmount}
+                    {tWithParams('account.usage.cardCharged', { amount: billingAmount })}
                   </div>
 
                   {/* Update Payment Button */}
@@ -518,7 +519,7 @@ export const UsageSection: React.FC = () => {
                         : 'bg-[color:var(--premitives-color-brand-purple-1000)]'
                     } text-white`}
                   >
-                    Update Payment Method & Billing Info
+                    {t('account.usage.updatePayment')}
                   </button>
                 </div>
               </div>
@@ -543,10 +544,10 @@ export const UsageSection: React.FC = () => {
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div className="flex flex-col gap-2">
                   <h2 className="text-[length:var(--text-large-font-size)] leading-[100%] tracking-[var(--h02-heading02-letter-spacing)] font-[number:var(--h05-heading05-font-weight)] font-[family-name:var(--h02-heading02-font-family)] text-[color:var(--tokens-color-text-text-seconary)]">
-                    Manage Your Subscription
+                    {t('account.usage.manageSubscription')}
                   </h2>
                   <p className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-inactive-2)]">
-                    Switch plans, cancel your subscription, or contact sales about Enterprise options
+                    {t('account.usage.manageSubscriptionDescription')}
                   </p>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-3">
@@ -554,7 +555,7 @@ export const UsageSection: React.FC = () => {
                     onClick={handleCancelSubscription}
                     className="px-4 py-2 rounded-lg hover:opacity-90 transition-opacity font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] bg-red-600 text-white"
                   >
-                    Cancel subscription
+                    {t('account.usage.cancelSubscription')}
                   </button>
                   <button
                     onClick={handleChangePlan}
@@ -564,7 +565,7 @@ export const UsageSection: React.FC = () => {
                         : 'bg-[color:var(--premitives-color-brand-purple-1000)]'
                     } text-white`}
                   >
-                    Change plan
+                    {t('account.usage.changePlan')}
                   </button>
                 </div>
               </div>
@@ -587,7 +588,7 @@ export const UsageSection: React.FC = () => {
               }
             >
               <h2 className="text-[length:var(--text-large-font-size)] leading-[100%] tracking-[var(--h02-heading02-letter-spacing)] font-[number:var(--h05-heading05-font-weight)] font-[family-name:var(--h02-heading02-font-family)] text-[color:var(--tokens-color-text-text-seconary)] mb-6">
-                Current Plan: {creditsLoading ? 'Loading...' : planName}
+                {t('account.usage.currentPlan')}: {creditsLoading ? t('account.usage.loading') : planName}
               </h2>
 
               <div className="flex flex-col gap-6">
@@ -597,24 +598,24 @@ export const UsageSection: React.FC = () => {
                     <div className="flex items-center gap-3">
                       <TickIcon className="w-5 h-5" color="var(--premitives-color-brand-purple-1000)" />
                       <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
-                        {planDetails.credits_per_month.toLocaleString()} credits per month
+                        {planDetails.credits_per_month.toLocaleString()} {t('account.usage.creditsPerMonth')}
                       </span>
                     </div>
                   )}
                   <div className="flex items-center gap-3">
                     <TickIcon className="w-5 h-5" color="var(--premitives-color-brand-purple-1000)" />
                     <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
-                      Context Engine
+                      {t('account.usage.contextEngine')}
                     </span>
                   </div>
                   <div className="flex items-center gap-3">
                     <TickIcon className="w-5 h-5" color="var(--premitives-color-brand-purple-1000)" />
                     <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
-                      MCP & Native Tools
+                      {t('account.usage.mcpTools')}
                     </span>
                   </div>
                   <button className="text-left text-[color:var(--tokens-color-text-text-brand)] hover:opacity-80 transition-opacity font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] mt-2">
-                    Show more
+                    {t('account.usage.showMore')}
                   </button>
                 </div>
 
@@ -655,7 +656,7 @@ export const UsageSection: React.FC = () => {
               }
             >
               <h2 className="text-[length:var(--text-large-font-size)] leading-[100%] tracking-[var(--h02-heading02-letter-spacing)] font-[number:var(--h05-heading05-font-weight)] font-[family-name:var(--h02-heading02-font-family)] text-[color:var(--tokens-color-text-text-primary)] mb-6">
-                Danger Zone
+                {t('account.usage.dangerZone')}
               </h2>
 
               <div className="flex flex-col">
@@ -663,10 +664,10 @@ export const UsageSection: React.FC = () => {
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 py-4 border-b border-[color:var(--tokens-color-border-border-subtle)]">
                   <div className="flex flex-col gap-1">
                     <h3 className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-red-600">
-                      Delete Indexed Code
+                      {t('account.usage.deleteIndexedCode')}
                     </h3>
                     <p className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-inactive-2)]">
-                      Permanently delete your indexed code
+                      {t('account.usage.deleteIndexedCodeDescription')}
                     </p>
                   </div>
                   <button
@@ -682,7 +683,7 @@ export const UsageSection: React.FC = () => {
                         : {}
                     }
                   >
-                    Delete Indexed Code
+                    {t('account.usage.deleteIndexedCode')}
                   </button>
                 </div>
 
@@ -690,10 +691,10 @@ export const UsageSection: React.FC = () => {
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 py-4">
                   <div className="flex flex-col gap-1">
                     <h3 className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-red-600">
-                      Delete Account
+                      {t('account.usage.deleteAccount')}
                     </h3>
                     <p className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-inactive-2)]">
-                      Permanently delete your account
+                      {t('account.usage.deleteAccountDescription')}
                     </p>
                   </div>
                   <button
@@ -709,7 +710,7 @@ export const UsageSection: React.FC = () => {
                         : {}
                     }
                   >
-                    Delete Account
+                    {t('account.usage.deleteAccount')}
                   </button>
                 </div>
               </div>
@@ -719,7 +720,7 @@ export const UsageSection: React.FC = () => {
 
         {activeTab === 'team' && (
           <div className="flex items-center justify-center h-full">
-            <p className="text-[color:var(--tokens-color-text-text-inactive-2)]">Team section coming soon...</p>
+            <p className="text-[color:var(--tokens-color-text-text-inactive-2)]">{t('account.usage.teamComingSoon')}</p>
           </div>
         )}
 
@@ -729,18 +730,18 @@ export const UsageSection: React.FC = () => {
             <div className="flex flex-col gap-4">
               <div className="flex items-center gap-3">
                 <h1 className="text-[length:var(--text-large-font-size)] leading-[100%] tracking-[var(--h02-heading02-letter-spacing)] font-[number:var(--h05-heading05-font-weight)] font-[family-name:var(--h02-heading02-font-family)] text-[color:var(--tokens-color-text-text-seconary)]">
-                  Analytics
+                  {t('account.usage.analyticsTitle')}
                 </h1>
                 <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                   isDark
                     ? 'bg-[color:var(--tokens-color-surface-surface-card-hover)] text-[color:var(--tokens-color-text-text-primary)]'
                     : 'bg-[rgba(107,67,146,0.1)] text-[color:var(--tokens-color-text-text-brand)]'
                 }`}>
-                  Last {dateRange === 'billing' ? 'Billing Cycle' : `${dateRange} Days`}
+                  {t('account.usage.last')} {dateRange === 'billing' ? t('account.usage.billingCycle') : `${dateRange} ${t('account.usage.days')}`}
                 </span>
               </div>
               <p className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-inactive-2)]">
-                Monitor your credit usage and model consumption patterns. Data in UTC
+                {t('account.usage.analyticsDescription')}
               </p>
             </div>
 
