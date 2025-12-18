@@ -38,6 +38,5 @@ export const common = {
     dropHere: 'Drop here',
     uploading: 'Uploading...',
     selectFile: 'Select file',
-    removeFile: 'Remove file',
-  },
+    removeFile: 'Remove file',},
 }
