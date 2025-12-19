@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { MoreOptions, Share, Pencil, Archive, Trash } from "@/icons";
+import { ActionButton } from "../buttons/action-button";
 
 interface ConversationMenuProps {
   onShare?: () => void;
@@ -33,14 +34,16 @@ export const ConversationMenu: React.FC<ConversationMenuProps> = ({
       onMouseEnter={() => setIsOpen(true)}
       onMouseLeave={() => setIsOpen(false)}
     >
-      <button
+      <ActionButton
         type="button"
-        className="flex items-center justify-center rounded transition-colors p-1"
+        variant="ghost"
+        size="sm"
+        className="!p-1 !min-w-0 !h-auto !rounded transition-colors !text-[color:var(--tokens-color-text-text-brand)]"
         aria-label="More options"
-        style={{ color: 'var(--tokens-color-text-text-brand)' }}
+        leftIcon={<MoreOptions className="w-4 h-4" color="var(--tokens-color-text-text-brand)" />}
       >
-        <MoreOptions className="w-4 h-4" color="currentColor" />
-      </button>
+        <span className="sr-only">More options</span>
+      </ActionButton>
 
       {isOpen && (
         <div 
@@ -52,71 +55,75 @@ export const ConversationMenu: React.FC<ConversationMenuProps> = ({
         >
           <div className="py-1">
             {onShare && (
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleAction(onShare);
-                }}
-                className="w-full flex items-center gap-3 px-4 py-2 text-left hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] transition-colors"
-                style={{ color: 'var(--tokens-color-text-text-brand)' }}
-              >
-                <Share className="w-4 h-4" color="currentColor" />
-                <span className="font-h02-heading02 text-[14px] font-[number:var(--text-small-font-weight)]">
-                  Share
-                </span>
-              </button>
+              <div onClick={(e) => e.stopPropagation()}>
+                <ActionButton
+                  type="button"
+                  onClick={() => handleAction(onShare)}
+                  variant="ghost"
+                  size="sm"
+                  className="!w-full !justify-start !gap-3 !px-4 !py-2 !text-left hover:!bg-[color:var(--tokens-color-surface-surface-tertiary)] !text-[color:var(--tokens-color-text-text-brand)]"
+                  leftIcon={<Share className="w-4 h-4" color="var(--tokens-color-text-text-brand)" />}
+                  fullWidth
+                >
+                  <span className="font-h02-heading02 text-[14px] font-[number:var(--text-small-font-weight)]">
+                    Share
+                  </span>
+                </ActionButton>
+              </div>
             )}
 
             {onRemoveFromFolder && (
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleAction(onRemoveFromFolder);
-                }}
-                className="w-full flex items-center gap-3 px-4 py-2 text-left hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] transition-colors"
-                style={{ color: 'var(--tokens-color-text-text-brand)' }}
-              >
-                <Pencil className="w-4 h-4" color="currentColor" />
-                <span className="font-h02-heading02 text-[14px] font-[number:var(--text-small-font-weight)]">
-                  Remove
-                </span>
-              </button>
+              <div onClick={(e) => e.stopPropagation()}>
+                <ActionButton
+                  type="button"
+                  onClick={() => handleAction(onRemoveFromFolder)}
+                  variant="ghost"
+                  size="sm"
+                  className="!w-full !justify-start !gap-3 !px-4 !py-2 !text-left hover:!bg-[color:var(--tokens-color-surface-surface-tertiary)] !text-[color:var(--tokens-color-text-text-brand)]"
+                  leftIcon={<Pencil className="w-4 h-4" color="var(--tokens-color-text-text-brand)" />}
+                  fullWidth
+                >
+                  <span className="font-h02-heading02 text-[14px] font-[number:var(--text-small-font-weight)]">
+                    Remove
+                  </span>
+                </ActionButton>
+              </div>
             )}
 
             {onArchive && (
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleAction(onArchive);
-                }}
-                className="w-full flex items-center gap-3 px-4 py-2 text-left hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] transition-colors"
-                style={{ color: 'var(--tokens-color-text-text-brand)' }}
-              >
-                <Archive className="w-4 h-4" color="currentColor" />
-                <span className="font-h02-heading02 text-[14px] font-[number:var(--text-small-font-weight)]">
-                  Archive
-                </span>
-              </button>
+              <div onClick={(e) => e.stopPropagation()}>
+                <ActionButton
+                  type="button"
+                  onClick={() => handleAction(onArchive)}
+                  variant="ghost"
+                  size="sm"
+                  className="!w-full !justify-start !gap-3 !px-4 !py-2 !text-left hover:!bg-[color:var(--tokens-color-surface-surface-tertiary)] !text-[color:var(--tokens-color-text-text-brand)]"
+                  leftIcon={<Archive className="w-4 h-4" color="var(--tokens-color-text-text-brand)" />}
+                  fullWidth
+                >
+                  <span className="font-h02-heading02 text-[14px] font-[number:var(--text-small-font-weight)]">
+                    Archive
+                  </span>
+                </ActionButton>
+              </div>
             )}
 
             {onDelete && (
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleAction(onDelete);
-                }}
-                className="w-full flex items-center gap-3 px-4 py-2 text-left hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] transition-colors"
-                style={{ color: 'var(--tokens-color-text-text-brand)' }}
-              >
-                <Trash className="w-4 h-4" color="currentColor" />
-                <span className="font-h02-heading02 text-[14px] font-[number:var(--text-small-font-weight)]">
-                  Delete
-                </span>
-              </button>
+              <div onClick={(e) => e.stopPropagation()}>
+                <ActionButton
+                  type="button"
+                  onClick={() => handleAction(onDelete)}
+                  variant="ghost"
+                  size="sm"
+                  className="!w-full !justify-start !gap-3 !px-4 !py-2 !text-left hover:!bg-[color:var(--tokens-color-surface-surface-tertiary)] !text-[color:var(--tokens-color-text-text-brand)]"
+                  leftIcon={<Trash className="w-4 h-4" color="var(--tokens-color-text-text-brand)" />}
+                  fullWidth
+                >
+                  <span className="font-h02-heading02 text-[14px] font-[number:var(--text-small-font-weight)]">
+                    Delete
+                  </span>
+                </ActionButton>
+              </div>
             )}
           </div>
         </div>

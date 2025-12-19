@@ -404,33 +404,34 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
               </h1>
 
               <div className="flex flex-col md:flex-row gap-6 w-full">
-                <button
+                <ActionButton
                   type="button"
                   onClick={() => onBillingCycleChange("monthly")}
-                  className={`flex-1 flex flex-col items-start gap-3 p-4 rounded-xl border transition-all relative ${
+                  variant={billingCycle === "monthly" ? "primary" : "outline"}
+                  fullWidth
+                  className={`flex-1 flex flex-col items-start gap-3 p-4 !h-auto !justify-start ${
                     isDark 
-                      ? 'text-white' 
+                      ? billingCycle === "monthly"
+                        ? "!bg-[#181818] !border-transparent"
+                        : "!bg-[#303030] !border-[color:var(--tokens-color-border-border-subtle)]"
                       : billingCycle === "monthly"
                         ? "bg-[#1F1740] border-0 text-white shadow-lg"
                         : "bg-[#F8F8FC] border border-gray-300"
                   }`}
-                  style={isDark ? {
-                    backgroundColor: billingCycle === "monthly" ? '#181818' : '#303030',
-                    borderColor: billingCycle === "monthly" ? 'transparent' : 'var(--tokens-color-border-border-subtle)',
-                  } : {}}
                 >
-                  <div
-                    className={`flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center mt-0.5 ${
-                      billingCycle === "monthly"
-                        ? "bg-[#6B3EFF] border-[#6B3EFF]"
-                        : "bg-transparent border-gray-400"
-                    }`}
-                  >
-                    {billingCycle === "monthly" && (
-                      <TickIcon className="w-3 h-3" color="white" />
-                    )}
-                  </div>
-                  <div className="flex flex-col gap-1 flex-1 relative">
+                  <div className="flex items-start gap-3 w-full">
+                    <div
+                      className={`flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center mt-0.5 ${
+                        billingCycle === "monthly"
+                          ? "bg-[#6B3EFF] border-[#6B3EFF]"
+                          : "bg-transparent border-gray-400"
+                      }`}
+                    >
+                      {billingCycle === "monthly" && (
+                        <TickIcon className="w-3 h-3" color="white" />
+                      )}
+                    </div>
+                    <div className="flex flex-col gap-1 flex-1 relative">
                       <div className={`checkout-emphasis text-start ${
                         isDark 
                           ? 'text-white' 
@@ -450,65 +451,67 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
                         ${plan.monthly_price.toFixed(2)}/month + Tax
                       </span>
                     </div>
-                  
-                </button>
+                  </div>
+                </ActionButton>
 
-                <button
+                <ActionButton
                   type="button"
                   onClick={() => onBillingCycleChange("annual")}
-                  className={`flex-1 flex flex-col items-start gap-3 p-4 rounded-xl border transition-all relative ${
+                  variant={billingCycle === "annual" ? "primary" : "outline"}
+                  fullWidth
+                  className={`flex-1 flex flex-col items-start gap-3 p-4 !h-auto !justify-start relative ${
                     isDark 
-                      ? 'text-white' 
+                      ? billingCycle === "annual"
+                        ? "!bg-[#181818] !border-transparent"
+                        : "!bg-[#303030] !border-[color:var(--tokens-color-border-border-subtle)]"
                       : billingCycle === "annual"
                         ? "bg-[#1F1740] border-0 text-white shadow-lg"
                         : "bg-[#F8F8FC] border border-gray-300"
                   }`}
-                  style={isDark ? {
-                    backgroundColor: billingCycle === "annual" ? '#181818' : '#303030',
-                    borderColor: billingCycle === "annual" ? 'transparent' : 'var(--tokens-color-border-border-subtle)',
-                  } : {}}
                 >
-                  <div
-                    className={`flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center mt-0.5 ${
-                      billingCycle === "annual"
-                        ? "bg-[#6B3EFF] border-[#6B3EFF]"
-                        : "bg-transparent border-gray-400"
-                    }`}
-                  >
-                    {billingCycle === "annual" && (
-                      <TickIcon className="w-3 h-3" color="white" />
-                    )}
-                  </div>
-                  <div className="flex flex-col gap-1 flex-1 relative">
-                    <div className="flex items-center justify-between">
-                      <span className={`checkout-emphasis ${
-                        isDark 
-                          ? 'text-white' 
-                          : billingCycle === "annual"
-                            ? "text-white"
-                            : "text-[color:var(--tokens-color-text-text-brand)]"
-                      }`}>
-                        Yearly
-                      </span>
-                      {savingsPercent > 0 && billingCycle === "annual" && (
-                        <div className="absolute -top-[2rem] -right-[7rem] px-2 py-1 rounded-md bg-[#FF6B6B] flex items-center justify-center shadow-md z-10">
-                          <span className="text-white text-xs font-bold">
-                            Save {savingsPercent}%
-                          </span>
-                        </div>
+                  <div className="flex items-start gap-3 w-full">
+                    <div
+                      className={`flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center mt-0.5 ${
+                        billingCycle === "annual"
+                          ? "bg-[#6B3EFF] border-[#6B3EFF]"
+                          : "bg-transparent border-gray-400"
+                      }`}
+                    >
+                      {billingCycle === "annual" && (
+                        <TickIcon className="w-3 h-3" color="white" />
                       )}
                     </div>
-                    <span className={
-                      isDark 
-                        ? 'text-white/90' 
-                        : billingCycle === "annual"
-                          ? "text-white/90"
-                          : "text-[color:var(--tokens-color-text-text-inactive-2)]"
-                    }>
-                      ${effectiveMonthlyPrice.toFixed(2)}/month + Tax
-                    </span>
+                    <div className="flex flex-col gap-1 flex-1 relative">
+                      <div className="flex items-center justify-between">
+                        <span className={`checkout-emphasis ${
+                          isDark 
+                            ? 'text-white' 
+                            : billingCycle === "annual"
+                              ? "text-white"
+                              : "text-[color:var(--tokens-color-text-text-brand)]"
+                        }`}>
+                          Yearly
+                        </span>
+                        {savingsPercent > 0 && billingCycle === "annual" && (
+                          <div className="absolute -top-[2rem] -right-[7rem] px-2 py-1 rounded-md bg-[#FF6B6B] flex items-center justify-center shadow-md z-10">
+                            <span className="text-white text-xs font-bold">
+                              Save {savingsPercent}%
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                      <span className={
+                        isDark 
+                          ? 'text-white/90' 
+                          : billingCycle === "annual"
+                            ? "text-white/90"
+                            : "text-[color:var(--tokens-color-text-text-inactive-2)]"
+                      }>
+                        ${effectiveMonthlyPrice.toFixed(2)}/month + Tax
+                      </span>
+                    </div>
                   </div>
-                </button>
+                </ActionButton>
               </div>
             </div>
 

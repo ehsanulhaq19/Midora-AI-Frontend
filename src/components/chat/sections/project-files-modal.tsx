@@ -7,6 +7,7 @@ import { t } from "@/i18n";
 import { FilePreview } from "@/components/ui/file-preview";
 import { FilePreview as FilePreviewType } from "@/api/files/types";
 import { projectApi } from "@/api/project/api";
+import { ActionButton } from "@/components/ui/buttons";
 
 interface ProjectFile {
   uuid: string;
@@ -207,22 +208,27 @@ export const ProjectFilesModal: React.FC<ProjectFilesModalProps> = ({
             Project files
           </div>
           <div className="flex items-center gap-3">
-            <button
-              className="px-4 py-2 text-sm font-medium text-[color:var(--tokens-color-text-text-primary)] bg-[color:var(--tokens-color-surface-surface-tertiary)] hover:text-white rounded-full hover:bg-[color:var(--tokens-color-surface-surface-button)] transition-colors"
+            <ActionButton
+              variant="secondary"
+              size="sm"
+              className="!px-4 !py-2 !text-sm !font-medium !rounded-full hover:!text-white hover:!bg-[color:var(--tokens-color-surface-surface-button)]"
               onClick={() => projectFileInputRef.current?.click()}
             >
               Add files
-            </button>
-            <button
-              aria-label="Close files modal"
-              className="p-1 rounded-full hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] transition-colors"
+            </ActionButton>
+            <ActionButton
+              variant="ghost"
+              size="sm"
+              className="!p-1 !min-w-0 !rounded-full hover:!bg-[color:var(--tokens-color-surface-surface-tertiary)]"
               onClick={() => {
                 onClose();
                 clearFiles();
               }}
+              aria-label="Close files modal"
+              leftIcon={<Close className="w-4 h-4" color="currentColor" />}
             >
-              <Close className="w-4 h-4" color="currentColor" />
-            </button>
+              <span className="sr-only">Close files modal</span>
+            </ActionButton>
           </div>
         </div>
 
@@ -307,12 +313,14 @@ export const ProjectFilesModal: React.FC<ProjectFilesModalProps> = ({
         {/* Footer with Save button */}
         {uploadedFilesWithStatus.length > 0 && (
           <div className="border-t border-[color:var(--tokens-color-border-border-subtle)] px-6 py-4 flex-shrink-0 flex justify-end">
-            <button
-              className="px-6 py-2 text-sm font-medium text-white bg-[color:var(--premitives-color-brand-purple-1000)] rounded-full hover:bg-[color:var(--tokens-color-surface-surface-button-pressed)] transition-colors"
+            <ActionButton
+              variant="primary"
+              size="sm"
+              className="!px-6 !py-2 !text-sm !font-medium !rounded-full"
               onClick={handleSaveFiles}
             >
               Save
-            </button>
+            </ActionButton>
           </div>
         )}
 
