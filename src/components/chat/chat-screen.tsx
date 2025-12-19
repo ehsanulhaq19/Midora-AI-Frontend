@@ -103,7 +103,7 @@ export const ChatScreen: React.FC = () => {
         onNavigate={() => setIsAccountOpen(false)}
       />
 
-      <div className="flex-1 flex flex-col h-screen overflow-hidden relative z-0 min-w-0">
+      <div className="flex-1 flex flex-col h-screen overflow-y-auto relative z-0 min-w-0">
         {isAccountOpen ? (
           <div className="w-full h-full relative z-0">
             <AccountScreen onClose={() => setIsAccountOpen(false)} />

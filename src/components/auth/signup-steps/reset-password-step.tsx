@@ -192,8 +192,16 @@ export const ResetPasswordStep = ({
             <label className="text-sm font-medium text-[color:var(--tokens-color-text-text-secondary)]">
               Email
             </label>
-            <div className="flex h-[54px] items-center gap-3 relative self-stretch w-full rounded-xl border border-solid border-[#dbdbdb] bg-gray-50 px-6 py-3">
-              <span className="relative w-full font-SF-Pro font-normal app-text tracking-[-0.48px] leading-[100%] text-[color:var(--tokens-color-text-text-inactive-2)]">
+            <div className={`flex h-[54px] items-center gap-3 relative self-stretch w-full rounded-xl border border-solid px-6 py-3 ${
+              isDark 
+                ? 'border-[color:var(--tokens-color-border-border-inactive)] bg-[color:var(--tokens-color-surface-surface-secondary)]' 
+                : 'border-[#dbdbdb] bg-gray-50'
+            }`}>
+              <span className={`relative w-full font-SF-Pro font-normal app-text tracking-[-0.48px] leading-[100%] ${
+                isDark 
+                  ? 'text-white' 
+                  : 'text-[color:var(--tokens-color-text-text-inactive-2)]'
+              }`}>
                 {email}
               </span>
             </div>
