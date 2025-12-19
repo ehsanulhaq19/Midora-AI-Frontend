@@ -12,6 +12,7 @@ import { pricing } from './pricing'
 import { hero } from './hero'
 import { chat } from './chat'
 import { documentation } from './documentation'
+import { account } from './account'
 
 export const enTranslations = {
   common,
@@ -23,4 +24,5 @@ export const enTranslations = {
   hero,
   chat,
   documentation,
+  account,
 }

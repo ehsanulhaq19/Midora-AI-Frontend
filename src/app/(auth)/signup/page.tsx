@@ -70,6 +70,28 @@ function SignupPageContent() {
   }, [stepParam, isInOnboardingFlow])
 
   useEffect(() => {
+    // Check for error query params from SSO callbacks
+    const errorParam = searchParams.get('error')
+    const errorType = searchParams.get('error_type')
+    const errorMessage = searchParams.get('error_message')
+    
+    if (errorParam === 'sso_error' && errorMessage) {
+      // Show error toast
+      const errorObj = errorType && errorMessage ? {
+        error_type: errorType,
+        error_message: errorMessage
+      } : { error_message: errorMessage }
+      showErrorToast('SSO Authentication Failed', handleApiError(errorObj))
+      
+      // Remove error query params
+      const params = new URLSearchParams(searchParams.toString())
+      params.delete('error')
+      params.delete('error_type')
+      params.delete('error_message')
+      router.replace(`/signup?${params.toString()}`, { scroll: false })
+      return
+    }
+    
     const checkSSOOnboarding = async () => {
       tokenManager.debugTokenState()
       const tokens = tokenManager.getTokens()
@@ -106,7 +128,7 @@ function SignupPageContent() {
       console.log('Stored tokens from query params')
       checkSSOOnboarding()
     }
-  }, [dispatch, router, isProcessingSSO, searchParams])
+  }, [dispatch, router, isProcessingSSO, searchParams, showErrorToast])
 
   const handleOnboardingComplete = async (onboardingData: { email: string; fullName: string; profession: string }) => {
     try {

@@ -5,10 +5,14 @@ import { useAuth } from '@/contexts/AuthContext'
 import { Copy } from '@/icons'
 import { useTheme } from '@/hooks/use-theme'
 import { ThemeSelector } from '@/components/ui/theme-selector'
+import { DeleteAccountModal } from './delete-account-modal'
+import { authApi } from '@/api/auth/api'
+import { t } from '@/i18n'
 
 export const AccountSection: React.FC = () => {
   const { logout } = useAuth()
   const [copied, setCopied] = useState(false)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const { resolvedTheme } = useTheme()
   const isDark = resolvedTheme === 'dark'
 
@@ -34,8 +38,20 @@ export const AccountSection: React.FC = () => {
   }
 
   const handleDeleteAccount = () => {
-    // TODO: Implement delete account functionality
-    console.log('Delete account clicked')
+    setIsDeleteModalOpen(true)
+  }
+
+  const handleConfirmDelete = async () => {
+    try {
+      const response = await authApi.deleteAccount()
+      if (response.error) {
+        throw new Error(response.error)
+      }
+      await logout()
+    } catch (error) {
+      console.error('Delete account error:', error)
+      throw error
+    }
   }
   return (
     <div className="flex-1 flex flex-col sm:p-9 p-4">
@@ -43,12 +59,12 @@ export const AccountSection: React.FC = () => {
         <h1
           className="text-[length:var(--text-large-font-size)] leading-[100%] pb-9 tracking-[-1px] font-[number:var(--h05-heading05-font-weight)] font-[family-name:var(--h02-heading02-font-family)] text-[color:var(--tokens-color-text-text-seconary)]"
         >
-          Account
+          {t('account.account')}
         </h1>
         {/* Log out of all devices */}
         <div className={`flex flex-col gap-4 md:flex-row md:items-center md:justify-between border-b ${isDark ? 'border-white/90' : 'border-[color:var(--tokens-color-border-border-subtle)]'} pb-[18px] pt-[18px]`}>
           <h2 className="font-[family-name:var(--h05-heading05-font-family)] text-[length:var(--text-font-size)] font-[number:var(--h05-heading05-font-weight)] leading-[140%] tracking-[-0.8px] [font-style:var(--h05-heading05-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
-            Log out of all devices
+            {t('account.logOutOfAllDevices')}
           </h2>
           <button
             onClick={handleLogoutAll}
@@ -61,14 +77,14 @@ export const AccountSection: React.FC = () => {
               border: '1px solid var(--tokens-color-border-border-subtle)'
             } : {}}
           >
-            Logout
+            {t('account.logout')}
           </button>
         </div>
 
         {/* Delete your account */}
         <div className={`flex flex-col gap-4 md:flex-row md:items-center md:justify-between border-b ${isDark ? 'border-white/90' : 'border-[color:var(--tokens-color-border-border-subtle)]'} pb-[18px] pt-[18px]`}>
           <h2 className="font-[family-name:var(--h05-heading05-font-family)] text-[length:var(--text-font-size)] font-[number:var(--h05-heading05-font-weight)] leading-[140%] tracking-[-0.8px] [font-style:var(--h05-heading05-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
-            Delete your account
+            {t('account.deleteYourAccount')}
           </h2>
           <button
             onClick={handleDeleteAccount}
@@ -81,22 +97,22 @@ export const AccountSection: React.FC = () => {
               border: '1px solid var(--tokens-color-border-border-subtle)'
             } : {}}
           >
-            Delete account
+            {t('account.deleteAccount')}
           </button>
         </div>
 
         {/* Theme Selection */}
         <div className={`flex flex-col gap-4 md:flex-row md:items-center md:justify-between border-b ${isDark ? 'border-white/90' : 'border-[color:var(--tokens-color-border-border-subtle)]'} pb-[18px] pt-[18px]`}>
           <h2 className="font-[family-name:var(--h05-heading05-font-family)] text-[length:var(--text-font-size)] font-[number:var(--h05-heading05-font-weight)] leading-[140%] tracking-[-0.8px] [font-style:var(--h05-heading05-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
-            Theme
+            {t('account.theme')}
           </h2>
           <ThemeSelector className="w-full md:w-auto md:min-w-[200px]" />
         </div>
 
         {/* Organization ID */}
-        <div className={`flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between  ${isDark ? 'border-white/90' : ''} pt-[18px]`}>
+        {/* <div className={`flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between  ${isDark ? 'border-white/90' : ''} pt-[18px]`}>
           <h2 className="font-[family-name:var(--h05-heading05-font-family)] text-[length:var(--text-font-size)] font-[number:var(--h05-heading05-font-weight)] leading-[140%] tracking-[-0.8px] [font-style:var(--h05-heading05-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
-            Organization ID
+            {t('account.organizationId')}
           </h2>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center ">
             <div 
@@ -119,16 +135,21 @@ export const AccountSection: React.FC = () => {
             <button
               onClick={handleCopy}
               className="p-2 rounded-lg hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] transition-colors flex-shrink-0 self-start sm:self-auto"
-              title="Copy Organization ID"
+              title={t('account.copyOrganizationId')}
             >
               <Copy className="w-5 h-5" style={{ color: 'var(--tokens-color-text-text-primary)' }} />
             </button>
           </div>
-        </div>
-        {copied && (
-          <div className="text-sm text-green-600 text-right">Copied!</div>
-        )}
+        </div> */}
+        {/* {copied && (
+          <div className="text-sm text-green-600 text-right">{t('account.copied')}</div>
+        )} */}
       </div>
+      <DeleteAccountModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   )
 }

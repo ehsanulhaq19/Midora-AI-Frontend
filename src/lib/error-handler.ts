@@ -39,6 +39,7 @@ export const getErrorMessage = (error: ApiError | Error | string | object): stri
       'TOKEN_EXPIRED': 'errors.TOKEN_EXPIRED',
       'INVALID_CREDENTIALS': 'errors.INVALID_CREDENTIALS',
       'ACCOUNT_DISABLED': 'errors.ACCOUNT_DISABLED',
+      'ACCOUNT_DELETED': 'errors.ACCOUNT_DELETED',
       'ACCOUNT_LOCKED': 'errors.ACCOUNT_LOCKED',
       'INSUFFICIENT_PERMISSIONS': 'errors.INSUFFICIENT_PERMISSIONS',
       
