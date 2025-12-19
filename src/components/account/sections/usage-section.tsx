@@ -624,15 +624,15 @@ export const UsageSection: React.FC = () => {
                   {planDetails ? (
                     <>
                       <div className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
-                        ${planDetails.monthly_price.toFixed(2)}/user/mo • 1 seat purchased
+                        {tWithParams('account.usage.pricePerUserMo', { price: planDetails.monthly_price.toFixed(2) })}
                       </div>
                       <div className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
-                        Monthly total: ${planDetails.monthly_price.toFixed(2)}
+                        {t('account.usage.monthlyTotalLabel')}: ${planDetails.monthly_price.toFixed(2)}
                       </div>
                     </>
                   ) : (
                     <div className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-inactive-2)]">
-                      {creditsLoading ? 'Loading pricing information...' : 'No pricing information available'}
+                      {creditsLoading ? t('account.usage.loadingPricing') : t('account.usage.noPricing')}
                     </div>
                   )}
                 </div>
@@ -761,7 +761,7 @@ export const UsageSection: React.FC = () => {
                         : 'bg-[color:var(--tokens-color-surface-surface-primary)] text-[color:var(--tokens-color-text-text-primary)] border border-[color:var(--tokens-color-border-border-subtle)] hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]'
                   }`}
                 >
-                  {range === 'billing' ? 'Current Billing Cycle' : `Last ${range} Days`}
+                  {range === 'billing' ? t('account.usage.currentBillingCycle') : tWithParams('account.usage.lastDays', { days: range })}
                 </button>
               ))}
               <button
@@ -772,7 +772,7 @@ export const UsageSection: React.FC = () => {
                 }`}
               >
                 <CalendarIcon className="w-4 h-4" />
-                Select custom range
+                {t('account.usage.selectCustomRange')}
                 <ChevronDown className="w-4 h-4" />
               </button>
             </div>
@@ -796,7 +796,7 @@ export const UsageSection: React.FC = () => {
                 }
               >
                 <h3 className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-inactive-2)] mb-4">
-                  Total credits used
+                  {t('account.usage.totalCreditsUsed')}
                 </h3>
                 <div className="font-h02-heading02 font-[number:var(--h01-heading-01-font-weight)] text-[length:var(--h01-heading-01-font-size)] tracking-[var(--h01-heading-01-letter-spacing)] leading-[var(--h01-heading-01-line-height)] [font-style:var(--h01-heading-01-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
                   141,257
@@ -820,7 +820,7 @@ export const UsageSection: React.FC = () => {
                 }
               >
                 <h3 className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-inactive-2)] mb-4">
-                  Active users
+                  {t('account.usage.activeUsers')}
                 </h3>
                 <div className="font-h02-heading02 font-[number:var(--h01-heading-01-font-weight)] text-[length:var(--h01-heading-01-font-size)] tracking-[var(--h01-heading-01-letter-spacing)] leading-[var(--h01-heading-01-line-height)] [font-style:var(--h01-heading-01-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
                   1
@@ -847,7 +847,7 @@ export const UsageSection: React.FC = () => {
                 }
               >
                 <h3 className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-primary)] mb-6">
-                  Daily Credit Consumption
+                  {t('account.usage.dailyCreditConsumption')}
                 </h3>
                 <DailyCreditChart isDark={isDark} />
               </div>
@@ -869,7 +869,7 @@ export const UsageSection: React.FC = () => {
                 }
               >
                 <h3 className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-primary)] mb-6">
-                  Model Usage Distribution
+                  {t('account.usage.modelUsageDistribution')}
                 </h3>
                 <ModelUsageChart isDark={isDark} />
               </div>
