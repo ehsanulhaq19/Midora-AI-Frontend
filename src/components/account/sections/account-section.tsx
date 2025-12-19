@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { Copy } from '@/icons'
 import { useTheme } from '@/hooks/use-theme'
 import { ThemeSelector } from '@/components/ui/theme-selector'
+import { AccountActionButton } from '@/components/ui/buttons'
 
 export const AccountSection: React.FC = () => {
   const { logout } = useAuth()
@@ -50,19 +51,9 @@ export const AccountSection: React.FC = () => {
           <h2 className="font-[family-name:var(--h05-heading05-font-family)] text-[length:var(--text-font-size)] font-[number:var(--h05-heading05-font-weight)] leading-[140%] tracking-[-0.8px] [font-style:var(--h05-heading05-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
             Log out of all devices
           </h2>
-          <button
-            onClick={handleLogoutAll}
-            className={`py-[14px] h-12 px-6 flex items-center justify-center rounded-lg hover:opacity-90 transition-opacity font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] w-full md:w-auto ${
-              isDark ? '' : 'bg-[rgba(107,67,146,0.1)] text-[color:var(--tokens-color-text-text-brand)]'
-            }`}
-            style={isDark ? {
-              backgroundColor: 'var(--tokens-color-surface-surface-card-hover)',
-              color: 'var(--tokens-color-text-text-primary)',
-              border: '1px solid var(--tokens-color-border-border-subtle)'
-            } : {}}
-          >
+          <AccountActionButton onClick={handleLogoutAll} variant="secondary">
             Logout
-          </button>
+          </AccountActionButton>
         </div>
 
         {/* Delete your account */}
@@ -70,19 +61,9 @@ export const AccountSection: React.FC = () => {
           <h2 className="font-[family-name:var(--h05-heading05-font-family)] text-[length:var(--text-font-size)] font-[number:var(--h05-heading05-font-weight)] leading-[140%] tracking-[-0.8px] [font-style:var(--h05-heading05-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
             Delete your account
           </h2>
-          <button
-            onClick={handleDeleteAccount}
-            className={`py-[14px] gap-[10px] flex items-center justify-center h-12 px-6 rounded-[var(--premitives-corner-radius-corner-radius-2)] hover:opacity-90 transition-opacity font-[family-name:var(--text-font-family)] text-[length:var(--text-font-size)] font-[number:var(--text-font-weight)] leading-normal tracking-[-0.48px] [font-style:var(--text-font-style)] w-full md:w-auto ${
-              isDark ? '' : 'bg-[color:var(--tokens-color-surface-surface-button-pressed)] text-white'
-            }`}
-            style={isDark ? {
-              backgroundColor: 'var(--tokens-color-surface-surface-card-hover)',
-              color: 'var(--tokens-color-text-text-primary)',
-              border: '1px solid var(--tokens-color-border-border-subtle)'
-            } : {}}
-          >
+          <AccountActionButton onClick={handleDeleteAccount} variant="primary">
             Delete account
-          </button>
+          </AccountActionButton>
         </div>
 
         {/* Theme Selection */}

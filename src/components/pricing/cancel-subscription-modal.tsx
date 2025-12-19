@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { Close } from '@/icons'
+import { t, tWithParams } from '@/i18n'
 
 interface CancelSubscriptionModalProps {
   isOpen: boolean
@@ -40,7 +41,7 @@ export const CancelSubscriptionModal: React.FC<CancelSubscriptionModalProps> = (
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-lg font-semibold text-[color:var(--tokens-color-text-text-primary)]">
-            Cancel Subscription
+            {t('pricing.cancelSubscriptionTitle')}
           </h2>
           <button
             onClick={onClose}
@@ -58,18 +59,18 @@ export const CancelSubscriptionModal: React.FC<CancelSubscriptionModalProps> = (
         {/* Content */}
         <div className="px-6 py-6 space-y-4">
           <p className="text-[color:var(--tokens-color-text-text-primary)]">
-            We're sorry to see you go! Your <strong>{planName}</strong> subscription has been incredibly valuable, providing you with:
+            {tWithParams('pricing.cancelSubscriptionMessage', { planName })}
           </p>
           
           <ul className="list-disc list-inside space-y-2 text-[color:var(--tokens-color-text-text-seconary)] ml-2">
-            <li>Access to premium AI models and features</li>
-            <li>Enhanced productivity tools</li>
-            <li>Priority support</li>
-            <li>Advanced capabilities for your projects</li>
+            <li>{t('pricing.cancelSubscriptionFeatures.premiumAccess')}</li>
+            <li>{t('pricing.cancelSubscriptionFeatures.productivityTools')}</li>
+            <li>{t('pricing.cancelSubscriptionFeatures.prioritySupport')}</li>
+            <li>{t('pricing.cancelSubscriptionFeatures.advancedCapabilities')}</li>
           </ul>
 
           <p className="text-[color:var(--tokens-color-text-text-primary)]">
-            Are you sure you'd like to proceed with canceling? We'd love to keep you as a valued member of our community.
+            {t('pricing.cancelSubscriptionConfirm')}
           </p>
         </div>
 
@@ -80,14 +81,14 @@ export const CancelSubscriptionModal: React.FC<CancelSubscriptionModalProps> = (
             disabled={isLoading}
             className="px-4 py-2 rounded-md font-medium text-sm transition-all bg-[color:var(--tokens-color-surface-surface-secondary)] text-[color:var(--tokens-color-text-text-primary)] hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Keep Subscription
+            {t('pricing.keepSubscription')}
           </button>
           <button
             onClick={onConfirm}
             disabled={isLoading}
             className="px-4 py-2 rounded-md font-medium text-sm transition-all bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading ? 'Canceling...' : 'Yes, Cancel Subscription'}
+            {isLoading ? t('pricing.canceling') : t('pricing.yesCancelSubscription')}
           </button>
         </div>
       </div>

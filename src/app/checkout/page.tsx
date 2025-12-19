@@ -18,6 +18,7 @@ import {
 } from "@stripe/react-stripe-js";
 import { ArrowRightSm, MoreOptions, TickIcon } from "@/icons";
 import { useTheme } from "@/hooks/use-theme";
+import { IconButton, ActionButton } from "@/components/ui/buttons";
 
 // Initialize Stripe
 const stripePromise = loadStripe(
@@ -375,16 +376,14 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
         <div className="max-w-[640px] mx-auto w-full px-4 py-6 lg:py-12">
           {/* Header */}
           <div className="flex items-center justify-between w-full">
-            <button
+            <IconButton
               onClick={() => router.back()}
-              className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-[color:var(--tokens-color-surface-surface-secondary)] transition-colors"
+              icon={<ArrowRightSm className="w-5 h-5 rotate-180" color="var(--tokens-color-text-text-primary)" />}
               aria-label="Go back"
-            >
-              <ArrowRightSm
-                className="w-5 h-5 rotate-180"
-                color="var(--tokens-color-text-text-primary)"
-              />
-            </button>
+              variant="ghost"
+              size="md"
+              className="rounded-full"
+            />
             {/* <button
               className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-[color:var(--tokens-color-surface-surface-secondary)] transition-colors"
               aria-label="Menu"
@@ -727,20 +726,16 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
                   <p className="text-sm text-red-400">{errors.terms}</p>
                 )}
 
-                <button
+                <ActionButton
                   type="submit"
                   disabled={loading || !stripe || !elements}
-                  className={`w-full flex items-center justify-center gap-2 h-[54px] p-4 rounded-xl text-white text-base font-semibold transition-all ${
-                    loading || !stripe || !elements
-                      ? "cursor-not-allowed opacity-70"
-                      : "hover:opacity-90"
-                  }`}
-                  style={{
-                    backgroundColor: primaryActionColor,
-                  }}
+                  loading={loading}
+                  variant="primary"
+                  fullWidth
+                  className="rounded-xl text-base font-semibold"
                 >
                   {loading ? "Processing..." : "Check Out"}
-                </button>
+                </ActionButton>
               </form>
             </div>
           </div>
