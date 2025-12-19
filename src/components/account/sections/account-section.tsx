@@ -76,7 +76,7 @@ export const AccountSection: React.FC = () => {
         </div>
 
         {/* Organization ID */}
-        <div className={`flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between  ${isDark ? 'border-white/90' : ''} pt-[18px]`}>
+        <div className={`flex flex-col gap-4 md:flex-row md:items-center md:justify-between  ${isDark ? 'border-white/90' : ''} pt-[18px]`}>
           <h2 className="font-[family-name:var(--h05-heading05-font-family)] text-[length:var(--text-font-size)] font-[number:var(--h05-heading05-font-weight)] leading-[140%] tracking-[-0.8px] [font-style:var(--h05-heading05-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
             {t('account.account.organizationId')}
           </h2>
