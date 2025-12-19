@@ -9,6 +9,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { MessageInput, MessageInputHandle } from "./message-input";
 import { ProjectFilesModal } from "./project-files-modal";
+import { ActionButton } from "@/components/ui/buttons";
 
 interface Project {
   id: string;
@@ -185,12 +186,14 @@ export const ProjectScreen: React.FC<ProjectScreenProps> = ({
                 {project.name}
               </p>
             </div>
-            <button
+            <ActionButton
               onClick={() => setIsFilesModalOpen(true)}
-              className="px-4 py-2 text-sm font-medium text-[color:var(--tokens-color-text-text-primary)] bg-[color:var(--tokens-color-surface-surface-tertiary)] hover:text-white rounded-full transition-colors hover:bg-[color:var(--tokens-color-surface-surface-button)]"
+              variant="secondary"
+              size="sm"
+              className="!px-4 !py-2 !text-sm !font-medium !rounded-full hover:!text-white hover:!bg-[color:var(--tokens-color-surface-surface-button)]"
             >
               Add files
-            </button>
+            </ActionButton>
           </div>
 
           <MessageInput
@@ -213,14 +216,17 @@ export const ProjectScreen: React.FC<ProjectScreenProps> = ({
                 const dateStr = formatConversationDate(conversation.created_at);
 
                 return (
-                  <button
+                  <ActionButton
                     key={conversation.uuid}
                     onClick={() => {
                       if (onSelectConversation) {
                         onSelectConversation(conversation.uuid);
                       }
                     }}
-                    className="flex items-center justify-between p-4 rounded-lg bg-[color:var(--tokens-color-surface-surface-tertiary)] transition-colors text-left group hover:bg-[color:var(--tokens-color-surface-surface-secondary)]"
+                    variant="ghost"
+                    size="sm"
+                    className="!flex !items-center !justify-between !p-4 !rounded-lg !bg-[color:var(--tokens-color-surface-surface-tertiary)] !text-left group hover:!bg-[color:var(--tokens-color-surface-surface-secondary)] !h-auto"
+                    fullWidth
                   >
                     <div className="flex flex-col gap-1 flex-1 min-w-0">
                       <div className="font-h02-heading02 text-[color:var(--tokens-color-text-text-seconary)] font-semibold leading-[var(--text-line-height)] truncate">
@@ -233,7 +239,7 @@ export const ProjectScreen: React.FC<ProjectScreenProps> = ({
                     <div className="font-h02-heading02 text-[color:var(--tokens-color-text-text-inactive-2)] text-[13px] font-[number:var(--text-small-font-weight)] leading-[var(--text-small-line-height)] ml-4 whitespace-nowrap">
                       {dateStr}
                     </div>
-                  </button>
+                  </ActionButton>
                 );
               })}
               

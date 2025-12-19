@@ -6,6 +6,7 @@ import { Pagination } from '@/components/ui'
 import { cn } from '@/lib/utils'
 import { useTheme } from '@/hooks/use-theme'
 import { t } from '@/i18n'
+import { ActionButton } from '@/components/ui/buttons'
 
 type BillingHistoryItem = {
   id: number
@@ -70,9 +71,13 @@ const getBillingColumns = (): Array<{
     label: t('account.billing.actions'),
     className: 'lg:flex-row lg:items-center lg:justify-end',
     render: () => (
-      <button className="inline-flex h-5 w-5 items-center justify-center rounded-lg border border-transparent transition-colors hover:border-[color:var(--tokens-color-border-border-subtle)] hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]" style={{ color: 'var(--tokens-color-text-text-primary)' }}>
-        <MoreOptions className="w-5 h-5" />
-      </button>
+      <ActionButton
+        variant="ghost"
+        size="sm"
+        className="!h-5 !w-5 !p-0 !min-w-0 !rounded-lg !border !border-transparent hover:!border-[color:var(--tokens-color-border-border-subtle)] hover:!bg-[color:var(--tokens-color-surface-surface-tertiary)]"
+      >
+        <MoreOptions className="w-5 h-5" color="var(--tokens-color-text-text-primary)" />
+      </ActionButton>
     )
   }
 ];
@@ -182,21 +187,21 @@ export const BillingSection: React.FC = () => {
             
             {/* Controls */}
             <div className="flex flex-col lg:flex-row items-stretch gap-3 w-full md:w-auto">
-              <button
+              <ActionButton
                 onClick={handleFilter}
-                className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
-                  isDark ? '' : 'border-[color:var(--tokens-color-border-border-subtle)] bg-[color:var(--tokens-color-surface-surface-primary)] hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]'
+                variant="outline"
+                size="sm"
+                className={`!h-9 gap-2 px-4 py-2 !rounded-lg ${
+                  isDark 
+                    ? '!border-[color:var(--tokens-color-border-border-subtle)] !bg-[color:var(--tokens-color-surface-surface-card-default)]' 
+                    : '!border-[color:var(--tokens-color-border-border-subtle)] !bg-[color:var(--tokens-color-surface-surface-primary)] hover:!bg-[color:var(--tokens-color-surface-surface-tertiary)]'
                 }`}
-                style={isDark ? {
-                  borderColor: 'var(--tokens-color-border-border-subtle)',
-                  backgroundColor: 'var(--tokens-color-surface-surface-card-default)'
-                } : {}}
+                leftIcon={<Filters className="w-5 h-5 text-[color:var(--tokens-color-text-text-seconary)]" />}
               >
-                <Filters className="w-5 h-5 text-[color:var(--tokens-color-text-text-seconary)]" />
                 <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-primary)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
                   {t('account.billing.filter')}
                 </span>
-              </button>
+              </ActionButton>
               
               <div className="relative flex-1 w-full">
                 <Search02 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5" />
@@ -205,7 +210,7 @@ export const BillingSection: React.FC = () => {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder={t('account.billing.search')}
-                  className={`pl-10 pr-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-[color:var(--premitives-color-brand-purple-1000)] focus:border-[color:var(--premitives-color-brand-purple-1000)] font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] w-full ${
+                  className={`h-9 pl-10 pr-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-[color:var(--premitives-color-brand-purple-1000)] focus:border-[color:var(--premitives-color-brand-purple-1000)] font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] w-full ${
                     isDark ? '' : ''
                   }`}
                   style={isDark ? {
@@ -220,12 +225,18 @@ export const BillingSection: React.FC = () => {
                 />
               </div>
               
-              <button
+              <ActionButton
                 onClick={handleDownload}
-                className={`px-4 py-2 ${isDark ? 'bg-[color:var(--tokens-color-surface-surface-card-purple)]' : 'bg-[color:var(--premitives-color-brand-purple-1000)]'} text-white rounded-lg hover:opacity-90 transition-opacity font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] w-full sm:w-auto`}
+                variant="primary"
+                size="sm"
+                className={`!h-9 px-4 py-2 !rounded-lg font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] w-full sm:w-auto ${
+                  isDark 
+                    ? '!bg-[color:var(--tokens-color-surface-surface-card-purple)] !text-white' 
+                    : '!bg-[color:var(--premitives-color-brand-purple-1000)] !text-white'
+                }`}
               >
                 {t('account.billing.download')}
-              </button>
+              </ActionButton>
             </div>
           </div>
 
@@ -282,9 +293,13 @@ export const BillingSection: React.FC = () => {
                             </span>
                           </div>
                           {/* Action Button */}
-                          <button className="inline-flex h-5 w-5 items-center justify-center rounded-lg border border-transparent transition-colors hover:border-[color:var(--tokens-color-border-border-subtle)] hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] flex-shrink-0" style={{ color: 'var(--tokens-color-text-text-primary)' }}>
-                            <MoreOptions className="w-5 h-5" />
-                          </button>
+                          <ActionButton
+                            variant="ghost"
+                            size="sm"
+                            className="!h-5 !w-5 !p-0 !min-w-0 !rounded-lg !border !border-transparent hover:!border-[color:var(--tokens-color-border-border-subtle)] hover:!bg-[color:var(--tokens-color-surface-surface-tertiary)] flex-shrink-0"
+                          >
+                            <MoreOptions className="w-5 h-5" color="var(--tokens-color-text-text-primary)" />
+                          </ActionButton>
                         </div>
                         {/* Date on bottom left */}
                         <div className="flex items-start">

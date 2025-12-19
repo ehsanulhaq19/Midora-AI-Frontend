@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { ArrowDownSm } from '@/icons'
 import { useTheme } from '@/hooks/use-theme'
+import { ActionButton } from './buttons/action-button'
 
 interface DownloadOption {
   value: string
@@ -57,20 +58,24 @@ export const DownloadDropdown: React.FC<DownloadDropdownProps> = ({
 
   return (
     <div className={`relative ${className}`} ref={dropdownRef}>
-      <button
+      <ActionButton
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center gap-2 px-3 py-1.5 text-sm rounded-full transition-colors bg-[color:var(--tokens-color-surface-surface-tertiary)] text-[color:var(--tokens-color-text-text-primary)] hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]`}
+        variant="secondary"
+        size="sm"
+        className={`!px-3 !py-1.5 !text-sm !rounded-full !bg-[color:var(--tokens-color-surface-surface-tertiary)] hover:!bg-[color:var(--tokens-color-surface-surface-tertiary)]`}
         aria-label="Download options"
+        rightIcon={
+          <ArrowDownSm
+            className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+            color="currentColor"
+          />
+        }
       >
         <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[14px] tracking-[var(--text-small-letter-spacing)] leading-[var(--h01-heading-01-line-height)] whitespace-nowrap [font-style:var(--text-small-font-style)] hidden lg:block">
           Download
         </span>
-        <ArrowDownSm
-          className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-          color="currentColor"
-        />
-      </button>
+      </ActionButton>
 
       {isOpen && (
         <div
@@ -80,14 +85,8 @@ export const DownloadDropdown: React.FC<DownloadDropdownProps> = ({
           }}
         >
           {downloadOptions.map((option) => (
-            <button
+            <div
               key={option.value}
-              type="button"
-              onClick={() => handleOptionClick(option.value)}
-              className={`w-full px-4 py-2.5 text-left flex items-center gap-2 transition-colors text-[color:var(--tokens-color-text-text-primary)]`}
-              style={{
-                backgroundColor: 'transparent',
-              }}
               onMouseEnter={(e) => {
                 if (isDark) {
                   e.currentTarget.style.backgroundColor = 'var(--tokens-color-surface-surface-card-hover)'
@@ -98,11 +97,23 @@ export const DownloadDropdown: React.FC<DownloadDropdownProps> = ({
               onMouseLeave={(e) => {
                 e.currentTarget.style.backgroundColor = 'transparent'
               }}
+              style={{
+                backgroundColor: 'transparent',
+              }}
             >
-              <span className="font-h02-heading02 font-[number:var(--text-small-font-weight)] text-sm tracking-[var(--text-small-letter-spacing)] leading-[var(--text-small-line-height)] [font-style:var(--text-small-font-style)]">
-                {option.label}
-              </span>
-            </button>
+              <ActionButton
+                type="button"
+                onClick={() => handleOptionClick(option.value)}
+                variant="ghost"
+                size="sm"
+                className="!w-full !px-4 !py-2.5 !text-left !justify-start !bg-transparent hover:!bg-transparent"
+                fullWidth
+              >
+                <span className="font-h02-heading02 font-[number:var(--text-small-font-weight)] text-sm tracking-[var(--text-small-letter-spacing)] leading-[var(--text-small-line-height)] [font-style:var(--text-small-font-style)]">
+                  {option.label}
+                </span>
+              </ActionButton>
+            </div>
           ))}
         </div>
       )}
