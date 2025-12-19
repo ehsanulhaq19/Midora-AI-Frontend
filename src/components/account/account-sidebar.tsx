@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { AccountIcon, ProfileIcon, LanguageIcon, BillingIcon, NotificationsIcon, UsageIcon } from '@/icons'
 import { useTheme } from '@/hooks/use-theme'
 import { t } from '@/i18n'
+import { ActionButton } from '@/components/ui/buttons'
 
 export type AccountSection = 'account' | 'profile' | 'language' | 'subscription' | 'notifications' | 'usage'
 
@@ -60,7 +61,7 @@ const getMenuItems = (): Array<{
   {
     id: 'subscription',
     label: t("account.sidebar.subscription"),
-    icon: (isActive) => <BillingIcon color={isActive ? "var(--tokens-color-text-text-brand)" : "#000000"} />
+    icon: (isActive) => <BillingIcon color={isActive ? "var(--tokens-color-text-text-brand)" : "var(--tokens-color-text-text-primary)"} />
   },
   {
     id: "notifications",
@@ -121,26 +122,27 @@ export const AccountSidebar: React.FC<AccountSidebarProps> = ({
           {menuItems.map((item) => {
             const isActive = activeSection === item.id;
             return (
-              <button
+              <ActionButton
                 key={item.id}
                 onClick={() => onSectionChange(item.id)}
-                className={`flex items-center justify-center lg:justify-start gap-2 lg:gap-5 px-2 lg:px-3 py-3 mb-1 rounded-[var(--premitives-corner-radius-corner-radius)] transition-colors text-left w-full ${
+                variant="ghost"
+                fullWidth
+                size="sm"
+                className={`!justify-center lg:!justify-start gap-2 lg:gap-5 px-2 lg:px-3 py-3 mb-1 rounded-[var(--premitives-corner-radius-corner-radius)] text-left !h-auto ${
                   isDark 
                     ? isActive
-                      ? " "
-                      : "hover:bg-[color:var(--tokens-color-surface-surface-card-hover)]"
-                    : "hover:bg-[color:var(--tokens-color-surface-surface-hover)]"
+                      ? "!bg-[color:var(--tokens-color-surface-surface-card-hover)]"
+                      : "hover:!bg-[color:var(--tokens-color-surface-surface-card-hover)]"
+                    : isActive
+                      ? "!bg-[color:var(--tokens-color-surface-surface-tertiary)]"
+                      : "hover:!bg-[color:var(--tokens-color-surface-surface-hover)]"
                 }`}
-                style={isDark && isActive ? {
-                  backgroundColor: 'var(--tokens-color-surface-surface-card-hover)'
-                } : !isDark && isActive ? {
-                  backgroundColor: 'var(--tokens-color-surface-surface-tertiary)'
-                } : {}}
-                title={item.label}
+                leftIcon={
+                  <div className="flex-shrink-0 w-5 h-5">
+                    {item.icon(isActive)}
+                  </div>
+                }
               >
-                <div className="flex-shrink-0 w-5 h-5">
-                  {item.icon(isActive)}
-                </div>
                 <span
                   className="hidden lg:inline font-h02-heading02 font-[number:var(--text-font-weight)] text-[16px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]"
                   style={{
@@ -151,7 +153,7 @@ export const AccountSidebar: React.FC<AccountSidebarProps> = ({
                 >
                   {item.label}
                 </span>
-              </button>
+              </ActionButton>
             );
           })}
         </div>

@@ -3,6 +3,7 @@
 import React from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowRightSm } from '@/icons'
+import { ActionButton } from './buttons/action-button'
 
 interface BackButtonProps {
   className?: string
@@ -25,18 +26,22 @@ export const BackButton: React.FC<BackButtonProps> = ({
   }
 
   return (
-    <button
+    <ActionButton
       onClick={handleClick}
-      className={`flex items-center justify-center w-10 h-10 rounded-lg hover:bg-tokens-color-surface-surface-tertiary transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tokens-color-text-text-brand ${className}`}
+      variant="ghost"
+      size="sm"
+      className={`!w-10 !h-10 !p-0 !min-w-0 !rounded-lg hover:!bg-tokens-color-surface-surface-tertiary focus-visible:!outline-none focus-visible:!ring-2 focus-visible:!ring-tokens-color-text-text-brand ${className}`}
       aria-label="Go back"
       type="button"
+      leftIcon={
+        <ArrowRightSm 
+          className="relative w-5 h-5 rotate-180" 
+          color="var(--tokens-color-text-text-primary)" 
+        />
+      }
     >
-      <ArrowRightSm 
-        className="relative w-5 h-5 rotate-180" 
-        color="var(--tokens-color-text-text-primary)" 
-      />
-      
-    </button>
+      <span className="sr-only">Go back</span>
+    </ActionButton>
   )
 }
 

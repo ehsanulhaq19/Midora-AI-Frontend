@@ -8,6 +8,7 @@ import { useAuthRedux } from '@/hooks/use-auth-redux'
 import { useAuth } from '@/contexts/AuthContext'
 import { useUserCredits } from '@/hooks/use-user-credits'
 import { t, tWithParams } from '@/i18n'
+import { ActionButton } from '@/components/ui/buttons'
 
 type UsageTab = 'subscription' | 'team' | 'analytics'
 type DateRange = '7' | '30' | '60' | 'billing'
@@ -341,37 +342,41 @@ export const UsageSection: React.FC = () => {
           <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-primary)] max-w-[170px] sm:max-w-full truncate sm:whitespace-normal before:sm:text-clip">
             {userEmail || 'user@example.com'}
           </span>
-          <button
+          <ActionButton
             onClick={handleLogout}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg hover:opacity-90 transition-opacity font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] ${
+            variant="ghost"
+            size="sm"
+            className={`!px-4 !py-2 !rounded-lg ${
               isDark
-                ? 'bg-[color:var(--tokens-color-surface-surface-card-hover)] text-[color:var(--tokens-color-text-text-primary)]'
-                : 'bg-[rgba(107,67,146,0.1)] text-[color:var(--tokens-color-text-text-brand)]'
+                ? '!bg-[color:var(--tokens-color-surface-surface-card-hover)] !text-[color:var(--tokens-color-text-text-primary)]'
+                : '!bg-[rgba(107,67,146,0.1)] !text-[color:var(--tokens-color-text-text-brand)]'
             }`}
+            leftIcon={<Logout className="w-4 h-4" />}
           >
-            <Logout className="w-4 h-4" />
             <span className="hidden lg:block">{t('account.usage.logout')}</span>
-          </button>
+          </ActionButton>
         </div>
       </div>
 
       {/* Tabs Navigation */}
       <div className="flex items-center gap-0 lg:gap-8 px-4 sm:px-6 border-b border-[color:var(--tokens-color-border-border-subtle)]">
         {(['subscription', 'team', 'analytics'] as UsageTab[]).map((tab) => (
-          <button
+          <ActionButton
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`relative py-4 px-2 font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] transition-colors capitalize ${
+            variant="ghost"
+            size="sm"
+            className={`relative !py-4 !px-2 !h-auto !rounded-none capitalize font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] ${
               activeTab === tab
-                ? 'text-[color:var(--tokens-color-text-text-brand)] font-semibold'
-                : 'text-[color:var(--tokens-color-text-text-inactive-2)] hover:text-[color:var(--tokens-color-text-text-primary)]'
+                ? '!text-[color:var(--tokens-color-text-text-brand)] font-semibold'
+                : '!text-[color:var(--tokens-color-text-text-inactive-2)] hover:!text-[color:var(--tokens-color-text-text-primary)]'
             }`}
           >
             {t(`account.usage.${tab}`)}
             {activeTab === tab && (
               <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[color:var(--tokens-color-text-text-brand)]" />
             )}
-          </button>
+          </ActionButton>
         ))}
       </div>
 
@@ -406,12 +411,14 @@ export const UsageSection: React.FC = () => {
                   <h2 className="text-[length:var(--text-large-font-size)] leading-[100%] tracking-[var(--h02-heading02-letter-spacing)] font-[number:var(--h05-heading05-font-weight)] font-[family-name:var(--h02-heading02-font-family)] text-[color:var(--tokens-color-text-text-seconary)]">
                     {t('account.usage.credits')}
                   </h2>
-                  <button
+                  <ActionButton
                     onClick={handleViewUsage}
-                    className="flex items-center gap-2 text-[color:var(--tokens-color-text-text-brand)] hover:opacity-80 transition-opacity font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]"
+                    variant="ghost"
+                    size="sm"
+                    className="!p-0 !h-auto !text-[color:var(--tokens-color-text-text-brand)] hover:!opacity-80 font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]"
                   >
                     {t('account.usage.viewUsage')}
-                  </button>
+                  </ActionButton>
                 </div>
 
                 <div className="flex flex-col gap-6">
@@ -482,13 +489,15 @@ export const UsageSection: React.FC = () => {
                   <h2 className="text-[length:var(--text-large-font-size)] leading-[100%] tracking-[var(--h02-heading02-letter-spacing)] font-[number:var(--h05-heading05-font-weight)] font-[family-name:var(--h02-heading02-font-family)] text-[color:var(--tokens-color-text-text-seconary)]">
                     {t('account.usage.billing')}
                   </h2>
-                  <button
+                  <ActionButton
                     onClick={handlePaymentHistory}
-                    className="flex items-center gap-2 text-[color:var(--tokens-color-text-text-brand)] hover:opacity-80 transition-opacity font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]"
+                    variant="ghost"
+                    size="sm"
+                    className="!p-0 !h-auto !text-[color:var(--tokens-color-text-text-brand)] hover:!opacity-80 font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]"
+                    rightIcon={<ExternalLinkIcon className="w-4 h-4" />}
                   >
                     {t('account.usage.paymentHistory')}
-                    <ExternalLinkIcon className="w-4 h-4" />
-                  </button>
+                  </ActionButton>
                 </div>
 
                 <div className="flex flex-col gap-6">
@@ -511,16 +520,14 @@ export const UsageSection: React.FC = () => {
                   </div>
 
                   {/* Update Payment Button */}
-                  <button
+                  <ActionButton
                     onClick={handleUpdatePayment}
-                    className={`px-4 py-2 rounded-lg hover:opacity-90 transition-opacity font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] w-full sm:w-auto ${
-                      isDark
-                        ? 'bg-[color:var(--tokens-color-surface-surface-card-purple)]'
-                        : 'bg-[color:var(--premitives-color-brand-purple-1000)]'
-                    } text-white`}
+                    variant="primary"
+                    size="sm"
+                    className="w-full sm:w-auto"
                   >
                     {t('account.usage.updatePayment')}
-                  </button>
+                  </ActionButton>
                 </div>
               </div>
             </div>
@@ -551,22 +558,20 @@ export const UsageSection: React.FC = () => {
                   </p>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <button
+                  <ActionButton
                     onClick={handleCancelSubscription}
-                    className="px-4 py-2 rounded-lg hover:opacity-90 transition-opacity font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] bg-red-600 text-white"
+                    variant="danger"
+                    size="sm"
                   >
                     {t('account.usage.cancelSubscription')}
-                  </button>
-                  <button
+                  </ActionButton>
+                  <ActionButton
                     onClick={handleChangePlan}
-                    className={`px-4 py-2 rounded-lg hover:opacity-90 transition-opacity font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] ${
-                      isDark
-                        ? 'bg-[color:var(--tokens-color-surface-surface-card-purple)]'
-                        : 'bg-[color:var(--premitives-color-brand-purple-1000)]'
-                    } text-white`}
+                    variant="primary"
+                    size="sm"
                   >
                     {t('account.usage.changePlan')}
-                  </button>
+                  </ActionButton>
                 </div>
               </div>
             </div>
@@ -614,9 +619,13 @@ export const UsageSection: React.FC = () => {
                       {t('account.usage.mcpTools')}
                     </span>
                   </div>
-                  <button className="text-left text-[color:var(--tokens-color-text-text-brand)] hover:opacity-80 transition-opacity font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] mt-2">
+                  <ActionButton
+                    variant="ghost"
+                    size="sm"
+                    className="!p-0 !h-auto !text-left !text-[color:var(--tokens-color-text-text-brand)] hover:!opacity-80 mt-2 font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]"
+                  >
                     {t('account.usage.showMore')}
-                  </button>
+                  </ActionButton>
                 </div>
 
                 {/* Pricing */}
@@ -670,21 +679,18 @@ export const UsageSection: React.FC = () => {
                       {t('account.usage.deleteIndexedCodeDescription')}
                     </p>
                   </div>
-                  <button
+                  <ActionButton
                     onClick={handleDeleteIndexedCode}
-                    className="px-4 py-2 rounded-lg hover:opacity-90 transition-opacity font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] bg-red-50 text-red-600 border border-red-200 w-full md:w-auto"
-                    style={
+                    variant="outline"
+                    size="sm"
+                    className={`w-full md:w-auto ${
                       isDark
-                        ? {
-                            backgroundColor: 'rgba(220, 38, 38, 0.1)',
-                            color: '#ef4444',
-                            borderColor: 'rgba(220, 38, 38, 0.3)'
-                          }
-                        : {}
-                    }
+                        ? '!bg-[rgba(220,38,38,0.1)] !text-[#ef4444] !border-[rgba(220,38,38,0.3)]'
+                        : '!bg-red-50 !text-red-600 !border-red-200'
+                    }`}
                   >
                     {t('account.usage.deleteIndexedCode')}
-                  </button>
+                  </ActionButton>
                 </div>
 
                 {/* Delete Account Section */}
@@ -697,21 +703,18 @@ export const UsageSection: React.FC = () => {
                       {t('account.usage.deleteAccountDescription')}
                     </p>
                   </div>
-                  <button
+                  <ActionButton
                     onClick={handleDeleteAccount}
-                    className="px-4 py-2 rounded-lg hover:opacity-90 transition-opacity font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] bg-red-50 text-red-600 border border-red-200 w-full md:w-auto"
-                    style={
+                    variant="outline"
+                    size="sm"
+                    className={`w-full md:w-auto ${
                       isDark
-                        ? {
-                            backgroundColor: 'rgba(220, 38, 38, 0.1)',
-                            color: '#ef4444',
-                            borderColor: 'rgba(220, 38, 38, 0.3)'
-                          }
-                        : {}
-                    }
+                        ? '!bg-[rgba(220,38,38,0.1)] !text-[#ef4444] !border-[rgba(220,38,38,0.3)]'
+                        : '!bg-red-50 !text-red-600 !border-red-200'
+                    }`}
                   >
                     {t('account.usage.deleteAccount')}
-                  </button>
+                  </ActionButton>
                 </div>
               </div>
             </div>
@@ -748,33 +751,35 @@ export const UsageSection: React.FC = () => {
             {/* Date Range Selection */}
             <div className="flex flex-wrap items-center gap-3">
               {(['7', '30', '60', 'billing'] as DateRange[]).map((range) => (
-                <button
+                <ActionButton
                   key={range}
                   onClick={() => setDateRange(range)}
-                  className={`px-4 py-2 rounded-lg transition-colors font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] ${
+                  variant={dateRange === range ? 'primary' : 'outline'}
+                  size="sm"
+                  className={
                     dateRange === range
-                      ? isDark
-                        ? 'bg-[color:var(--tokens-color-surface-surface-card-purple)] text-white'
-                        : 'bg-[color:var(--premitives-color-brand-purple-1000)] text-white'
+                      ? ''
                       : isDark
-                        ? 'bg-[color:var(--tokens-color-surface-surface-card-hover)] text-[color:var(--tokens-color-text-text-primary)] hover:bg-[color:var(--tokens-color-surface-surface-card-default)]'
-                        : 'bg-[color:var(--tokens-color-surface-surface-primary)] text-[color:var(--tokens-color-text-text-primary)] border border-[color:var(--tokens-color-border-border-subtle)] hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]'
-                  }`}
+                        ? '!bg-[color:var(--tokens-color-surface-surface-card-hover)] hover:!bg-[color:var(--tokens-color-surface-surface-card-default)]'
+                        : '!bg-[color:var(--tokens-color-surface-surface-primary)] hover:!bg-[color:var(--tokens-color-surface-surface-tertiary)]'
+                  }
                 >
                   {range === 'billing' ? t('account.usage.currentBillingCycle') : tWithParams('account.usage.lastDays', { days: range })}
-                </button>
+                </ActionButton>
               ))}
-              <button
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] ${
+              <ActionButton
+                variant="outline"
+                size="sm"
+                className={
                   isDark
-                    ? 'bg-[color:var(--tokens-color-surface-surface-card-hover)] text-[color:var(--tokens-color-text-text-primary)] hover:bg-[color:var(--tokens-color-surface-surface-card-default)]'
-                    : 'bg-[color:var(--tokens-color-surface-surface-primary)] text-[color:var(--tokens-color-text-text-primary)] border border-[color:var(--tokens-color-border-border-subtle)] hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]'
-                }`}
+                    ? '!bg-[color:var(--tokens-color-surface-surface-card-hover)] hover:!bg-[color:var(--tokens-color-surface-surface-card-default)]'
+                    : '!bg-[color:var(--tokens-color-surface-surface-primary)] hover:!bg-[color:var(--tokens-color-surface-surface-tertiary)]'
+                }
+                leftIcon={<CalendarIcon className="w-4 h-4" />}
+                rightIcon={<ChevronDown className="w-4 h-4" />}
               >
-                <CalendarIcon className="w-4 h-4" />
                 {t('account.usage.selectCustomRange')}
-                <ChevronDown className="w-4 h-4" />
-              </button>
+              </ActionButton>
             </div>
 
             {/* Metrics Cards */}

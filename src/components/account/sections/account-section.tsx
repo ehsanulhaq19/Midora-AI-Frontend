@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { Copy } from '@/icons'
 import { useTheme } from '@/hooks/use-theme'
 import { ThemeSelector } from '@/components/ui/theme-selector'
-import { AccountActionButton } from '@/components/ui/buttons'
+import { AccountActionButton, ActionButton } from '@/components/ui/buttons'
 import { t } from '@/i18n'
 
 export const AccountSection: React.FC = () => {
@@ -98,13 +98,14 @@ export const AccountSection: React.FC = () => {
               </span>
 
             </div>
-            <button
+            <ActionButton
               onClick={handleCopy}
-              className="p-2 rounded-lg hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] transition-colors flex-shrink-0 self-start sm:self-auto"
-              title={t('account.account.copyOrganizationId')}
+              variant="ghost"
+              size="sm"
+              className="flex-shrink-0 self-start sm:self-auto"
             >
               <Copy className="w-5 h-5" />
-            </button>
+            </ActionButton>
           </div>
         </div>
         {copied && (

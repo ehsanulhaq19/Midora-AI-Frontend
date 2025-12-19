@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { PersonFace, ArrowRightSm, DownArrow } from "@/icons";
 import { useTheme } from "@/hooks/use-theme";
 import { t } from "@/i18n";
+import { ActionButton } from "@/components/ui/buttons";
 
 export const ProfileSection: React.FC = () => {
   const { resolvedTheme } = useTheme();
@@ -161,17 +162,13 @@ export const ProfileSection: React.FC = () => {
                   >
                     {pref.text}
                   </p>
-                  <button 
-                    className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                      isDark ? '' : 'bg-[color:var(--tokens-color-text-text-brand)]'
-                    }`}
-                    style={isDark ? {
-                      backgroundColor: 'var(--tokens-color-surface-surface-card-hover)',
-                      border: '1px solid var(--tokens-color-border-border-subtle)'
-                    } : {}}
+                  <ActionButton
+                    variant="ghost"
+                    size="sm"
+                    className="!w-8 !h-8 !p-0 !min-w-0 !rounded-lg flex-shrink-0"
                   >
                     <ArrowRightSm className="w-4 h-4 text-white rotate-[-90deg]" />
-                  </button>
+                  </ActionButton>
                 </div>
                 <div className="flex items-center justify-between">
                   <span
@@ -183,25 +180,16 @@ export const ProfileSection: React.FC = () => {
                   >
                     {pref.source}
                   </span>
-                  <button
-                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg"
-                    style={isDark && selectedPreferences.includes(index) ? {
-                      backgroundColor: 'var(--tokens-color-surface-surface-card-default)',
-                      color: 'var(--tokens-color-text-text-primary)'
-                    } : {
-                      backgroundColor: selectedPreferences.includes(index) 
-                        ? 'rgba(255, 255, 255, 0.2)' 
-                        : 'var(--tokens-color-surface-surface-tertiary)',
-                      color: selectedPreferences.includes(index) 
-                        ? 'white' 
-                        : 'var(--tokens-color-text-text-primary)'
-                    }}
+                  <ActionButton
+                    variant="ghost"
+                    size="sm"
+                    className="!px-3 !py-1.5 !rounded-lg"
                   >
-                    <span className="text-sm  hidden lg:block">{t('account.profile.chooseStyle')}</span>
+                    <span className="text-sm hidden lg:block">{t('account.profile.chooseStyle')}</span>
                     <DownArrow
-                      className={` transition-transform flex-shrink-0 rotate-180`}
+                      className="transition-transform flex-shrink-0 rotate-180"
                     />
-                  </button>
+                  </ActionButton>
                 </div>
               </div>
             ))}
@@ -235,17 +223,13 @@ export const ProfileSection: React.FC = () => {
               >
                 {preferences[2].text}
               </p>
-              <button 
-                className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                  isDark ? '' : 'bg-[color:var(--tokens-color-text-text-brand)]'
-                }`}
-                style={isDark ? {
-                  backgroundColor: 'var(--tokens-color-surface-surface-card-hover)',
-                  border: '1px solid var(--tokens-color-border-border-subtle)'
-                } : {}}
+              <ActionButton
+                variant="ghost"
+                size="sm"
+                className="!w-8 !h-8 !p-0 !min-w-0 !rounded-lg flex-shrink-0"
               >
                 <ArrowRightSm className="w-4 h-4 text-white rotate-[-90deg]" />
-              </button>
+              </ActionButton>
             </div>
             <div className="flex items-center justify-between">
               <span
@@ -257,25 +241,16 @@ export const ProfileSection: React.FC = () => {
               >
                 {preferences[2].source}
               </span>
-              <button
-                className="flex items-center gap-2 px-3 py-1.5 rounded-lg"
-                style={isDark && selectedPreferences.includes(2) ? {
-                  backgroundColor: 'var(--tokens-color-surface-surface-card-default)',
-                  color: 'var(--tokens-color-text-text-primary)'
-                } : {
-                  backgroundColor: selectedPreferences.includes(2) 
-                    ? 'rgba(255, 255, 255, 0.2)' 
-                    : 'var(--tokens-color-surface-surface-tertiary)',
-                  color: selectedPreferences.includes(2) 
-                    ? 'white' 
-                    : 'var(--tokens-color-text-text-primary)'
-                }}
+              <ActionButton
+                variant="ghost"
+                size="sm"
+                className="!px-3 !py-1.5 !rounded-lg"
               >
                 <span className="text-sm hidden lg:block">{t('account.profile.chooseStyle')}</span>
                 <DownArrow
-                  className={` transition-transform flex-shrink-0 rotate-180`}
+                  className="transition-transform flex-shrink-0 rotate-180"
                 />
-              </button>
+              </ActionButton>
             </div>
           </div>
         </div>

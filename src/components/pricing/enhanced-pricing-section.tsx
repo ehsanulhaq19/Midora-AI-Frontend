@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast'
 import { CancelSubscriptionModal } from './cancel-subscription-modal'
 import { CancelSuccessModal } from './cancel-success-modal'
 import { SubscriptionSwitchModal } from './subscription-switch-modal'
+import { ActionButton } from '@/components/ui/buttons'
 
 const currencySymbols: Record<string, string> = {
   USD: '$',
@@ -186,7 +187,7 @@ export const EnhancedPricingSection: React.FC = () => {
         <p className="text-lg text-[color:var(--tokens-color-text-text-seconary)]">
           Subscription plans are unavailable right now.
         </p>
-        <button
+        <ActionButton
           onClick={() => {
             if (!isLoading) {
               loadPlans(true).catch(() => {
@@ -194,10 +195,12 @@ export const EnhancedPricingSection: React.FC = () => {
               })
             }
           }}
-          className="px-4 py-2 rounded-md bg-[color:var(--premitives-color-brand-purple-1000)] text-white"
+          variant="primary"
+          size="sm"
+          className="!px-4 !py-2 !rounded-md"
         >
           Retry
-        </button>
+        </ActionButton>
       </div>
     )
   }
