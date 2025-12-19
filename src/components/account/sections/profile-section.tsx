@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { PersonFace, ArrowRightSm, DownArrow } from "@/icons";
 import { useTheme } from "@/hooks/use-theme";
+import { t } from "@/i18n";
 
 export const ProfileSection: React.FC = () => {
   const { resolvedTheme } = useTheme();
@@ -31,9 +32,9 @@ export const ProfileSection: React.FC = () => {
   };
 
   const preferences = [
-    { id: 1, text: "Describe a forest at sunrise", source: "Midora AI" },
-    { id: 2, text: "Describe a forest at sunrise", source: "Midora AI" },
-    { id: 3, text: "Describe a forest at sunrise", source: "Midora AI" },
+    { id: 1, text: t("account.profile.preferenceText"), source: t("account.profile.preferenceSource") },
+    { id: 2, text: t("account.profile.preferenceText"), source: t("account.profile.preferenceSource") },
+    { id: 3, text: t("account.profile.preferenceText"), source: t("account.profile.preferenceSource") },
   ];
 
   return (
@@ -41,7 +42,7 @@ export const ProfileSection: React.FC = () => {
       <div className={`flex flex-col mt-9 bg-[color:var(--account-section-card-bg)] gap-6 p-6 sm:p-9 rounded-[16px] ${isDark ? 'bg-[color:var(--tokens-color-surface-surface-card-hover)]' : 'border'} `}
       >
         <h1 className="text-emphasis !text-[20px] text-[var(--tokens-color-text-text-seconary)]">
-          Profile
+          {t('account.profile.title')}
         </h1>
 
         {/* Profile Picture and Name Fields */}
@@ -59,14 +60,14 @@ export const ProfileSection: React.FC = () => {
             {/* Full Name */}
             <div className="flex flex-col gap-2">
               <label className="font-h02-heading02 font-[number:var(--h05-heading05-font-weight)] text-[color:var(--tokens-color-text-text-primary)] text-[length:var(--text-font-size)] tracking-[var(--text-large-letter-spacing)] leading-[var(--text-large-line-height)] [font-style:var(--text-large-font-style)]">
-                Full Name
+                {t('account.profile.fullName')}
               </label>
               <input
                 type="text"
                 name="fullName"
                 value={formData.fullName}
                 onChange={handleChange}
-                placeholder="Enter your full name"
+                placeholder={t('account.profile.fullNamePlaceholder')}
                 className={`flex h-[54px] items-center gap-3 px-6 py-3 rounded-xl border transition-all duration-200 focus:ring-2 focus:ring-[color:var(--tokens-color-text-text-seconary)] focus:ring-offset-2 outline-none font-SF-Pro font-normal text-base tracking-[-0.48px] leading-[100%] ${
                   isDark ? '' : 'border-[#dbdbdb] bg-transparent text-black'
                 }`}
@@ -81,14 +82,14 @@ export const ProfileSection: React.FC = () => {
             {/* What midora call you */}
             <div className="flex flex-col gap-2">
               <label className="font-h02-heading02 font-[number:var(--h05-heading05-font-weight)] text-[color:var(--tokens-color-text-text-primary)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
-                What midora call you
+                {t('account.profile.displayName')}
               </label>
               <input
                 type="text"
                 name="displayName"
                 value={formData.displayName}
                 onChange={handleChange}
-                placeholder="Enter what midora call you"
+                placeholder={t('account.profile.displayNamePlaceholder')}
                 className={`flex h-[54px] items-center gap-3 px-6 py-3 rounded-xl border transition-all duration-200 focus:ring-2 focus:ring-[color:var(--tokens-color-text-text-seconary)] focus:ring-offset-2 outline-none font-SF-Pro font-normal text-base tracking-[-0.48px] leading-[100%] ${
                   isDark ? '' : 'border-[#dbdbdb] bg-transparent text-black'
                 }`}
@@ -105,14 +106,14 @@ export const ProfileSection: React.FC = () => {
         {/* Your work function */}
         <div className="flex flex-col gap-2">
           <label className="font-h02-heading02 font-[number:var(--h05-heading05-font-weight)] text-[color:var(--tokens-color-text-text-primary)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
-            Your work function
+            {t('account.profile.workFunction')}
           </label>
           <input
             type="text"
             name="workFunction"
             value={formData.workFunction}
             onChange={handleChange}
-            placeholder="Enter your work function"
+            placeholder={t('account.profile.workFunctionPlaceholder')}
             className={`flex h-[54px] items-center gap-3 px-6 py-3 rounded-xl border transition-all duration-200 focus:ring-2 focus:ring-[color:var(--tokens-color-text-text-seconary)] focus:ring-offset-2 outline-none font-SF-Pro font-normal text-base tracking-[-0.48px] leading-[100%] ${
               isDark ? '' : 'border-[#dbdbdb] bg-transparent text-black'
             }`}
@@ -127,7 +128,7 @@ export const ProfileSection: React.FC = () => {
         {/* Choose your preference */}
         <div className="flex flex-col gap-4">
           <h2 className="font-h02-heading02 font-[number:var(--h05-heading05-font-weight)] text-[color:var(--tokens-color-text-text-primary)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
-            Choose your preference
+            {t('account.profile.choosePreference')}
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -196,7 +197,7 @@ export const ProfileSection: React.FC = () => {
                         : 'var(--tokens-color-text-text-primary)'
                     }}
                   >
-                    <span className="text-sm  hidden lg:block">Choose Style</span>
+                    <span className="text-sm  hidden lg:block">{t('account.profile.chooseStyle')}</span>
                     <DownArrow
                       className={` transition-transform flex-shrink-0 rotate-180`}
                     />
@@ -270,7 +271,7 @@ export const ProfileSection: React.FC = () => {
                     : 'var(--tokens-color-text-text-primary)'
                 }}
               >
-                <span className="text-sm hidden lg:block">Choose Style</span>
+                <span className="text-sm hidden lg:block">{t('account.profile.chooseStyle')}</span>
                 <DownArrow
                   className={` transition-transform flex-shrink-0 rotate-180`}
                 />

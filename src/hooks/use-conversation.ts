@@ -58,11 +58,11 @@ export const useConversation = () => {
   const loadingConversationsRef = useRef<Set<string>>(new Set())
 
   // Load conversations
-  const loadConversations = useCallback(async () => {
+  const loadConversations = useCallback(async (messageSearch?: string) => {
     try {
       dispatch(clearError())
       
-      const response = await conversationApi.getConversations(1, 20)
+      const response = await conversationApi.getConversations(1, 20, "-created_at", messageSearch)
       console.log("response = ", response)
       if (response.error) {
         const errorObject = response.processedError || {
@@ -81,7 +81,7 @@ export const useConversation = () => {
     } finally {
       dispatch(setLoading(false))
     }
-  }, [dispatch])
+  }, [dispatch, showErrorToast])
 
   // Create a new conversation
   const createConversation = useCallback(async (name: string) => {
@@ -492,7 +492,7 @@ export const useConversation = () => {
   }, [dispatch, pagination])
 
   // Load more conversations (for pagination)
-  const loadMoreConversations = useCallback(async () => {
+  const loadMoreConversations = useCallback(async (messageSearch?: string) => {
     try {
       if (!conversationPagination || conversationPagination.page >= conversationPagination.total_pages) {
         return // No more pages to load
@@ -502,7 +502,7 @@ export const useConversation = () => {
       dispatch(clearError())
       
       const nextPage = conversationPagination.page + 1
-      const response = await conversationApi.getConversations(nextPage, conversationPagination.per_page)
+      const response = await conversationApi.getConversations(nextPage, conversationPagination.per_page, "-created_at", messageSearch)
       
       if (response.error) {
         const errorObject = response.processedError || {
@@ -523,7 +523,7 @@ export const useConversation = () => {
     } finally {
       dispatch(setLoadingMoreConversations(false))
     }
-  }, [dispatch, conversationPagination])
+  }, [dispatch, conversationPagination, showErrorToast])
 
   // Start new chat
   const startNewChat = useCallback(() => {

@@ -86,8 +86,23 @@ class ConversationApiClient {
   /**
    * Get all conversations
    */
-  async getConversations(page: number = 1, perPage: number = 20, orderBy: string = "-created_at"): Promise<ApiResponse<{ conversations: Conversation[], pagination: { page: number, per_page: number, total: number, total_pages: number } }>> {
-    const response = await this.baseClient.get<GetConversationsResponse>(`/api/v1/conversations?page=${page}&per_page=${perPage}&order_by=${orderBy}`)
+  async getConversations(
+    page: number = 1, 
+    perPage: number = 20, 
+    orderBy: string = "-created_at",
+    messageSearch?: string
+  ): Promise<ApiResponse<{ conversations: Conversation[], pagination: { page: number, per_page: number, total: number, total_pages: number } }>> {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      per_page: perPage.toString(),
+      order_by: orderBy
+    })
+    
+    if (messageSearch && messageSearch.trim()) {
+      params.append('message_search', messageSearch.trim())
+    }
+    
+    const response = await this.baseClient.get<GetConversationsResponse>(`/api/v1/conversations?${params.toString()}`)
     if (response.error) {
       return { error: response.error, status: response.status }
     }

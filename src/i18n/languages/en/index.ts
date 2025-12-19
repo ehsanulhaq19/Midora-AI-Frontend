@@ -12,7 +12,9 @@ import { pricing } from './pricing'
 import { hero } from './hero'
 import { chat } from './chat'
 import { documentation } from './documentation'
+import { footer } from './footer'
 import { account } from './account'
+import { checkout } from './checkout'
 
 export const enTranslations = {
   common,
@@ -24,5 +26,7 @@ export const enTranslations = {
   hero,
   chat,
   documentation,
+  footer,
   account,
+  checkout,
 }

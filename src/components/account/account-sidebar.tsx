@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { AccountIcon, ProfileIcon, LanguageIcon, BillingIcon, NotificationsIcon, UsageIcon } from '@/icons'
 import { useTheme } from '@/hooks/use-theme'
+import { t } from '@/i18n'
 
 export type AccountSection = 'account' | 'profile' | 'language' | 'subscription' | 'notifications' | 'usage'
 
@@ -12,14 +13,14 @@ interface AccountSidebarProps {
   onClose?: () => void;
 }
 
-const menuItems: Array<{
+const getMenuItems = (): Array<{
   id: AccountSection;
   label: string;
   icon: (isActive: boolean) => React.ReactNode;
-}> = [
+}> => [
   {
     id: "account",
-    label: "Account",
+    label: t("account.sidebar.account"),
     icon: (isActive) => (
       <AccountIcon
         color={
@@ -32,7 +33,7 @@ const menuItems: Array<{
   },
   {
     id: "profile",
-    label: "Profile",
+    label: t("account.sidebar.profile"),
     icon: (isActive) => (
       <ProfileIcon
         color={
@@ -45,7 +46,7 @@ const menuItems: Array<{
   },
   {
     id: "language",
-    label: "Language",
+    label: t("account.sidebar.language"),
     icon: (isActive) => (
       <LanguageIcon
         color={
@@ -58,12 +59,12 @@ const menuItems: Array<{
   },
   {
     id: 'subscription',
-    label: 'Subscription',
+    label: t("account.sidebar.subscription"),
     icon: (isActive) => <BillingIcon color={isActive ? "var(--tokens-color-text-text-brand)" : "#000000"} />
   },
   {
     id: "notifications",
-    label: "Notifications",
+    label: t("account.sidebar.notifications"),
     icon: (isActive) => (
       <NotificationsIcon
         color={
@@ -76,7 +77,7 @@ const menuItems: Array<{
   },
   {
     id: "usage",
-    label: "Analytics",
+    label: t("account.sidebar.analytics"),
     icon: (isActive) => (
       <UsageIcon
         color={
@@ -110,6 +111,8 @@ export const AccountSidebar: React.FC<AccountSidebarProps> = ({
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+  
+  const menuItems = getMenuItems();
   
   return (
     <div className={`p-2 lg:p-4 h-auto backdrop-blur-[2.91px] border-[color:var(--tokens-color-border-border-subtle)] ${isMobile ? 'mt-16' : 'mt-6'}`}>

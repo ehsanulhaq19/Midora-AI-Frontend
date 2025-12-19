@@ -2,14 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import Script from 'next/script'
 import { Inter } from 'next/font/google'
 import '@/app/globals.css'
-import { AuthProvider } from '@/contexts/AuthContext'
-import { ReduxProvider } from '@/components/providers/ReduxProvider'
-import { AuthInitializer } from '@/components/auth/AuthInitializer'
-import { initializeI18n } from '@/i18n'
-import { initializeInterceptors } from '@/api/interceptors'
-import { ThemeInitializer } from '@/components/ui/theme-initializer'
-import { ThemeProvider } from '@/hooks/use-theme'
-import { ToastContainer } from '@/components/ui/toast'
+import { AppProviders } from '@/components/providers/AppProviders'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -48,12 +41,6 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  // Initialize i18n and interceptors
-  if (typeof window !== 'undefined') {
-    initializeI18n()
-    initializeInterceptors()
-  }
-
   return (
     <html lang="en">
       <body className={inter.className}>
@@ -76,16 +63,8 @@ export default function RootLayout({
                   const root = document.documentElement;
                   if (resolvedTheme === 'dark') {
                     root.setAttribute('data-theme', 'dark');
-                    root.style.backgroundColor = '#212121';
-                    if (document.body) {
-                      document.body.style.backgroundColor = '#212121';
-                    }
                   } else {
                     root.removeAttribute('data-theme');
-                    root.style.backgroundColor = '';
-                    if (document.body) {
-                      document.body.style.backgroundColor = '';
-                    }
                   }
                 } catch (e) {
                   console.error('Theme initialization error:', e);
@@ -94,18 +73,9 @@ export default function RootLayout({
             `,
           }}
         />
-        <ThemeProvider>
-          <ThemeInitializer />
-          <ReduxProvider>
-            <AuthInitializer />
-            <AuthProvider>
-              <div className="min-h-screen app-bg-primary">
-                {children}
-                <ToastContainer />
-              </div>
-            </AuthProvider>
-          </ReduxProvider>
-        </ThemeProvider>
+        <AppProviders>
+          {children}
+        </AppProviders>
       </body>
     </html>
   )

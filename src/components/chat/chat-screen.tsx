@@ -5,6 +5,7 @@ import { NavigationSidebar } from "./sections/navigation-sidebar";
 import { ChatInterface } from "./sections/chat-interface";
 import { ConversationContainer } from "./sections/conversation-container";
 import { ChatHeader } from "./sections/chat-header";
+import { ConversationHistoryScreen } from "./sections/conversation-history-screen";
 import { useConversation } from "@/hooks/use-conversation";
 import { AccountScreen } from "../account/account-screen";
 import { useAIModels, useProjects } from "@/hooks";
@@ -16,6 +17,7 @@ export const ChatScreen: React.FC = () => {
   const [hasFiles, setHasFiles] = useState(false);
   const [isCanvasOpen, setIsCanvasOpen] = useState(false);
   const [isAccountOpen, setIsAccountOpen] = useState(false);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const hasInitialized = useRef(false);
   const dispatch = useDispatch();
   const { selectedProjectId, projects } = useSelector(
@@ -92,21 +94,43 @@ export const ChatScreen: React.FC = () => {
           startNewChat();
           setIsCanvasOpen(false);
           setIsAccountOpen(false);
+          setIsHistoryOpen(false);
         }}
         showFullSidebar={!isCanvasOpen}
         selectedProjectId={selectedProjectId || undefined}
         onProjectSelect={(project) => {
           handleProjectSelect(project);
           setIsAccountOpen(false);
+          setIsHistoryOpen(false);
         }}
-        onAccountClick={() => setIsAccountOpen(true)}
-        onNavigate={() => setIsAccountOpen(false)}
+        onAccountClick={() => {
+          setIsAccountOpen(true);
+          setIsHistoryOpen(false);
+        }}
+        onNavigate={() => {
+          setIsAccountOpen(false);
+          setIsHistoryOpen(false);
+        }}
+        onSearchClick={() => {
+          setIsHistoryOpen(true);
+          setIsAccountOpen(false);
+        }}
       />
 
-      <div className="flex-1 flex flex-col h-screen overflow-hidden relative z-0 min-w-0">
+      <div className="flex-1 flex flex-col h-screen overflow-y-auto relative z-0 min-w-0">
         {isAccountOpen ? (
           <div className="w-full h-full relative z-0">
             <AccountScreen onClose={() => setIsAccountOpen(false)} />
+          </div>
+        ) : isHistoryOpen ? (
+          <div className="w-full h-full relative z-0">
+            <ConversationHistoryScreen
+              onClose={() => setIsHistoryOpen(false)}
+              onSelectConversation={(uuid) => {
+                selectConversation(uuid);
+                setIsHistoryOpen(false);
+              }}
+            />
           </div>
         ) : currentConversation ? (
           <>

@@ -41,6 +41,8 @@ export interface Message {
   // Versioning support for regeneration
   versions?: Message[]
   currentVersionIndex?: number
+  // Relevance score for message search results
+  relevance_score?: number
 }
 
 // Message group types for new response structure
@@ -59,6 +61,7 @@ export interface Conversation {
   created_at: string
   updated_at: string
   messages?: Message[]
+  related_messages?: Message[]
 }
 
 // Request types

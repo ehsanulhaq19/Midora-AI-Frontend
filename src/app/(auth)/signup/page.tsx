@@ -282,19 +282,16 @@ function SignupPageContent() {
                 href="/" 
                 className="flex flex-col w-[120px] sm:w-[140px] lg:w-[154px] items-start gap-2.5 cursor-pointer hover:opacity-80 transition-opacity duration-200"
               >
-                {isDark ? (
-                  <img
-                    className="relative self-stretch w-full "
-                    alt="Midora AI Logo"
-                    src="/img/dark-logo-text.png"
-                  />
-                ) : (
-                  <img
-                    className="relative self-stretch w-full aspect-[5.19] object-cover"
-                    alt="Midora AI Logo"
-                    src="/img/logo.png"
-                  />
-                )}
+                <img
+                  className="relative self-stretch w-full aspect-[5.19] object-cover dark:hidden"
+                  alt="Midora AI Logo"
+                  src="/img/logo.png"
+                />
+                <img
+                  className="relative self-stretch w-full hidden dark:block"
+                  alt="Midora AI Logo"
+                  src="/img/dark-logo-text.png"
+                />
               </a>
             </div>
           </div>

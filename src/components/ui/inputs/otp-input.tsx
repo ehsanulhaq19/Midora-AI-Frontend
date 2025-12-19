@@ -1,7 +1,8 @@
 'use client'
-
+ 
 import React, { useState, useRef, useEffect } from 'react'
 import { cn } from '@/lib/utils'
+import { useTheme } from '@/hooks/use-theme'
 
 interface OTPInputProps {
   length?: number
@@ -22,6 +23,8 @@ export const OTPInput: React.FC<OTPInputProps> = ({
   error,
   disabled = false
 }) => {
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
   const [otp, setOtp] = useState<string[]>(new Array(length).fill(''))
   const inputRefs = useRef<(HTMLInputElement | null)[]>([])
 
@@ -102,8 +105,12 @@ export const OTPInput: React.FC<OTPInputProps> = ({
             className={cn(
               "w-12 h-12 text-center text-lg font-semibold border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors",
               error 
-                ? "border-red-500 bg-red-50" 
-                : "border-tokens-color-border-border-inactive bg-white",
+                ? isDark
+                  ? "border-red-500 bg-red-900/30 text-white"
+                  : "border-red-500 bg-red-50 text-black"
+                : isDark
+                  ? "border-[color:var(--tokens-color-border-border-inactive)] bg-[color:var(--tokens-color-surface-surface-secondary)] text-white"
+                  : "border-tokens-color-border-border-inactive bg-white text-black",
               disabled && "opacity-50 cursor-not-allowed"
             )}
           />

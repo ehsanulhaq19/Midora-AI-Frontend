@@ -16,7 +16,7 @@ interface PasswordInputProps {
 }
 
 export const PasswordInput: React.FC<PasswordInputProps> = ({
-  placeholder = "Enter your password",
+  placeholder,
   value = "",
   onChange,
   onKeyDown,

@@ -5,6 +5,7 @@ import { Filters, Search02, MoreOptions, InvoiceIcon } from '@/icons'
 import { Pagination } from '@/components/ui'
 import { cn } from '@/lib/utils'
 import { useTheme } from '@/hooks/use-theme'
+import { t } from '@/i18n'
 
 type BillingHistoryItem = {
   id: number
@@ -24,17 +25,17 @@ const MOCK_BILLING_HISTORY: BillingHistoryItem[] = Array.from({ length: 24 }, (_
   users: `${8 + (i % 4)} Users`
 }))
 
-const billingColumns: Array<{
+const getBillingColumns = (): Array<{
   key: keyof BillingHistoryItem | 'actions'
   label: string
   className?: string
   valueClassName?: string
   hideMobileLabel?: boolean
   render?: (item: BillingHistoryItem) => React.ReactNode
-}> = [
+}> => [
   {
     key: 'invoice',
-    label: 'Invoice',
+    label: t('account.billing.invoice'),
     className: 'lg:items-start',
     hideMobileLabel: true,
     render: (item) => (
@@ -48,25 +49,25 @@ const billingColumns: Array<{
   },
   {
     key: 'date',
-    label: 'Date',
+    label: t('account.billing.date'),
     valueClassName:
       'text-[color:var(--tokens-color-text-text-inactive-2)]'
   },
   {
     key: 'plan',
-    label: 'Plan',
+    label: t('account.billing.plan'),
     valueClassName:
       'text-[color:var(--tokens-color-text-text-inactive-2)]'
   },
   {
     key: 'users',
-    label: 'Users',
+    label: t('account.billing.users'),
     valueClassName:
       'text-[color:var(--tokens-color-text-text-inactive-2)]'
   },
   {
     key: 'actions',
-    label: 'Actions',
+    label: t('account.billing.actions'),
     className: 'lg:flex-row lg:items-center lg:justify-end',
     render: () => (
       <button className="inline-flex h-5 w-5 items-center justify-center rounded-lg border border-transparent transition-colors hover:border-[color:var(--tokens-color-border-border-subtle)] hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]" style={{ color: 'var(--tokens-color-text-text-primary)' }}>
@@ -74,13 +75,14 @@ const billingColumns: Array<{
       </button>
     )
   }
-]
+];
 
 export const BillingSection: React.FC = () => {
   const { resolvedTheme } = useTheme()
   const isDark = resolvedTheme === 'dark'
   const [searchQuery, setSearchQuery] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
+  const billingColumns = getBillingColumns()
 
   const filteredBillingHistory = useMemo(() => {
     if (!searchQuery.trim()) {
@@ -128,7 +130,7 @@ export const BillingSection: React.FC = () => {
     <div className="flex-1 flex flex-col p-4 sm:p-9">
       <div className="flex flex-col mt-9 gap-12">
         <h1 className="text-[length:var(--text-large-font-size)] leading-[100%] tracking-[var(--h02-heading02-letter-spacing)] font-[number:var(--h05-heading05-font-weight)] font-[family-name:var(--h02-heading02-font-family)] text-[color:var(--tokens-color-text-text-seconary)]">
-        Current Plan
+        {t('account.billing.title')}
         </h1>
 
         {/* Current Plan Section */}
@@ -147,7 +149,7 @@ export const BillingSection: React.FC = () => {
               <div className="flex flex-col gap-6">
               {/* Plan Name */}
               <div className="checkout-plan-name text-[color:var(--tokens-color-text-text-seconary)] ">
-                Lite
+                {t('account.billing.planName')}
               </div>
               
               {/* Price */}
@@ -158,13 +160,13 @@ export const BillingSection: React.FC = () => {
                  15
                 </span>
                 <span className="font-h02-heading02 text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] font-[number:var(--text-font-weight)]">
-                  /month
+                  {t('account.billing.perMonth')}
                 </span>
               </div>
               
               {/* Description */}
               <div className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
-                Intelligence for everyday tasks
+                {t('account.billing.planDescription')}
               </div>
             </div>
             </div>
@@ -175,7 +177,7 @@ export const BillingSection: React.FC = () => {
         <div className="flex flex-col gap-6">
           <div className="flex flex-col sm:flex-row gap-3 xl:flex-row items-center lg:items-start md:justify-between">
           <h1 className="text-[length:var(--text-large-font-size)] leading-[100%] tracking-[var(--h02-heading02-letter-spacing)] font-[number:var(--h05-heading05-font-weight)] font-[family-name:var(--h02-heading02-font-family)] text-[color:var(--tokens-color-text-text-seconary)]">
-          Billing History
+          {t('account.billing.billingHistory')}
             </h1>
             
             {/* Controls */}
@@ -192,7 +194,7 @@ export const BillingSection: React.FC = () => {
               >
                 <Filters className="w-5 h-5 text-[color:var(--tokens-color-text-text-seconary)]" />
                 <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-primary)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
-                  Filter
+                  {t('account.billing.filter')}
                 </span>
               </button>
               
@@ -202,7 +204,7 @@ export const BillingSection: React.FC = () => {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search"
+                  placeholder={t('account.billing.search')}
                   className={`pl-10 pr-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-[color:var(--premitives-color-brand-purple-1000)] focus:border-[color:var(--premitives-color-brand-purple-1000)] font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] w-full ${
                     isDark ? '' : ''
                   }`}
@@ -222,7 +224,7 @@ export const BillingSection: React.FC = () => {
                 onClick={handleDownload}
                 className={`px-4 py-2 ${isDark ? 'bg-[color:var(--tokens-color-surface-surface-card-purple)]' : 'bg-[color:var(--premitives-color-brand-purple-1000)]'} text-white rounded-lg hover:opacity-90 transition-opacity font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] w-full sm:w-auto`}
               >
-                Download
+                {t('account.billing.download')}
               </button>
             </div>
           </div>
@@ -256,10 +258,10 @@ export const BillingSection: React.FC = () => {
                 {!hasResults ? (
                   <div className="flex flex-col items-center justify-center gap-3 px-6 py-12 text-center">
                     <p className="font-h02-heading02 text-[length:var(--text-font-size)] font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-primary)]">
-                      No invoices found
+                      {t('account.billing.noInvoices')}
                     </p>
                     <p className="text-sm text-[color:var(--tokens-color-text-text-inactive-2)]">
-                      Try adjusting your search or filters to see more results.
+                      {t('account.billing.noInvoicesDescription')}
                     </p>
                   </div>
                 ) : (

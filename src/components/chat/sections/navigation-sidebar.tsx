@@ -107,6 +107,7 @@ interface NavigationSidebarProps {
   onProjectSelect?: (project: Project | null) => void;
   onAccountClick?: () => void;
   onNavigate?: () => void;
+  onSearchClick?: () => void;
 }
 
 export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
@@ -118,6 +119,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
   onProjectSelect,
   onAccountClick,
   onNavigate,
+  onSearchClick,
 }) => {
   const [selectedChat, setSelectedChat] = useState<number | null>(null);
   const [selectedProjectConversationUuid, setSelectedProjectConversationUuid] =
@@ -432,7 +434,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
         <button
           type="button"
           onClick={handleToggleSidebar}
-          className="fixed top-4 left-4 z-[70] lg:hidden flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-200 hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--tokens-color-text-text-brand)] bg-[color:var(--tokens-color-surface-surface-primary)] border border-[color:var(--tokens-color-border-border-subtle)] shadow-lg"
+          className="fixed top-2 left-2 z-[70] lg:hidden flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-200 hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--tokens-color-text-text-brand)] bg-[color:var(--tokens-color-surface-surface-primary)] border border-[color:var(--tokens-color-border-border-subtle)] shadow-lg"
           style={{ color: "var(--tokens-color-text-text-primary)" }}
           aria-label="Open sidebar"
         >
@@ -552,6 +554,12 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                   </div>
                 </button>
                 <button
+                  onClick={() => {
+                    onSearchClick?.();
+                    if (isMobile) {
+                      setIsMobileOpen(false);
+                    }
+                  }}
                   className="w-10 h-10 rounded-lg flex items-center justify-center transition-colors hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]"
                   title={t("chat.searchChat")}
                 >
@@ -586,6 +594,12 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                   </div>
                 </button>
                 <button
+                  onClick={() => {
+                    onSearchClick?.();
+                    if (isMobile) {
+                      setIsMobileOpen(false);
+                    }
+                  }}
                   className={`sidebar-menu-item w-full flex items-center rounded-[var(--premitives-corner-radius-corner-radius)] transition-colors px-5 py-2 gap-2 ${
                     searchHovered
                       ? "bg-[color:var(--tokens-color-surface-surface-tertiary)] dark:bg-white/10"

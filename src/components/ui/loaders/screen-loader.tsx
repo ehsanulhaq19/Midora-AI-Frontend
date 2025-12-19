@@ -22,11 +22,11 @@ export const ScreenLoader: React.FC<ScreenLoaderProps> = ({
   size = 'lg',
   fullScreen = true
 }) => {
-  const { resolvedTheme, mounted } = useTheme()
-  // Check data-theme attribute directly if not mounted yet (for SSR/hydration)
-  const isDark = mounted 
-    ? resolvedTheme === 'dark' 
-    : (typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'dark')
+  const { resolvedTheme } = useTheme()
+  // To avoid SSR/client hydration mismatches, derive theme purely from React state.
+  // The initial value will match the server-rendered markup, and client-side theme
+  // changes are handled by the ThemeProvider effects.
+  const isDark = resolvedTheme === 'dark'
 
   const sizeClasses = {
     sm: 'h-8 w-8',
@@ -48,10 +48,7 @@ export const ScreenLoader: React.FC<ScreenLoaderProps> = ({
       {/* Logo with circular animation */}
       <div className="relative">
         <div className="w-16 h-16 animate-spin" style={{ animation: 'spin 3s linear infinite' }}>
-          {!mounted ? (
-            // Show default logo during SSR/hydration to prevent mismatch
-            <LogoOnly className="w-full h-full" />
-          ) : isDark ? (
+          {isDark ? (
             <img src="/img/dark_logo.svg" alt="Logo" className="w-full h-full" />
           ) : (
             <LogoOnly className="w-full h-full" />

@@ -4,6 +4,8 @@ import React from 'react'
 import { CheckBroken4 } from '@/icons'
 import { PricingPlan } from '@/types/pricing'
 import { useTheme } from '@/hooks/use-theme'
+import { ActionButton } from '@/components/ui/buttons'
+import { t, tWithParams } from '@/i18n'
 
 interface EnhancedPricingCardProps {
   plan: PricingPlan
@@ -64,16 +66,17 @@ export const EnhancedPricingCard: React.FC<EnhancedPricingCardProps> = ({
 
   // Format renewal date
   const formatRenewalDate = (dateString: string | null): string => {
-    if (!dateString) return 'Renews soon'
+    if (!dateString) return t('pricing.renewsSoon')
     try {
       const date = new Date(dateString)
-      return `Renews on ${date.toLocaleDateString('en-US', { 
+      const formattedDate = date.toLocaleDateString('en-US', { 
         year: 'numeric', 
         month: 'short', 
         day: 'numeric' 
-      })}`
+      })
+      return `${t('pricing.renewsOn')} ${formattedDate}`
     } catch (error) {
-      return 'Renews soon'
+      return t('pricing.renewsSoon')
     }
   }
 
@@ -81,30 +84,23 @@ export const EnhancedPricingCard: React.FC<EnhancedPricingCardProps> = ({
   const getButtonText = () => {
     if (isCurrentPlan) {
       if (plan.name === 'Free') {
-        return 'Current plan'
+        return t('pricing.currentPlan')
       }
       return formatRenewalDate(renewalDate)
     }
-    return `Get ${plan.name} Plan`
+    return tWithParams('pricing.getPlan', { planName: plan.name })
   }
 
-  // Button styling
-  const getButtonClasses = () => {
+  // Button variant determination
+  const getButtonVariant = () => {
     if (isCurrentPlan || plan.name === 'Free') {
-      // Disabled state for current plan
-      return 'w-full flex items-center justify-center gap-2 h-[40px] p-2 bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded-[var(--premitives-corner-radius-corner-radius-2)] opacity-60 cursor-not-allowed'
+      return 'secondary' // Disabled state
     }
     if (isHovered) {
-      return 'w-full flex items-center justify-center gap-2 h-[40px] p-2 bg-[color:var(--premitives-color-brand-purple-1000)] rounded-[var(--premitives-corner-radius-corner-radius-2)] hover:opacity-90 transition-all'
+      return 'primary'
     }
-    return `w-full flex items-center justify-center gap-2 h-[40px] p-2 bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded-[var(--premitives-corner-radius-corner-radius-2)] transition-colors ${
-      isDark 
-        ? 'hover:bg-[color:var(--tokens-color-surface-surface-card-purple)]'
-        : 'hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]'
-    }`
+    return 'secondary'
   }
-  
-  const buttonClasses = getButtonClasses()
 
   const buttonTextClasses = isHovered 
     ? 'text-white' 
@@ -171,11 +167,13 @@ export const EnhancedPricingCard: React.FC<EnhancedPricingCardProps> = ({
 
         {/* Button */}
         <div className="flex flex-col gap-2 w-full">
-          <button 
-            className={buttonClasses}
+          <ActionButton
+            variant={getButtonVariant()}
+            size="sm"
+            fullWidth
             disabled={isCurrentPlan || plan.name === 'Free'}
-            onClick={(e) => {
-              e.stopPropagation()
+            className={`h-[40px] rounded-[var(--premitives-corner-radius-corner-radius-2)] ${isCurrentPlan || plan.name === 'Free' ? 'opacity-60' : ''}`}
+            onClick={() => {
               if (!isCurrentPlan && onButtonClick) {
                 onButtonClick()
               }
@@ -184,21 +182,23 @@ export const EnhancedPricingCard: React.FC<EnhancedPricingCardProps> = ({
             <div className={`relative w-fit font-SF-Pro text-[16px] tracking-[var(--text-extra-large-letter-spacing)] leading-[var(--h02-heading02-line-height)] whitespace-nowrap [font-style:var(--h05-heading05-font-style)] ${buttonTextClasses}`}>
               {getButtonText()}
             </div>
-          </button>
+          </ActionButton>
           {showCancelButton && isCurrentPlan && plan.name !== 'Free' && (
-            <button
-              className="w-full flex items-center justify-center gap-2 h-[40px] p-2 bg-red-600 hover:bg-red-700 rounded-[var(--premitives-corner-radius-corner-radius-2)] transition-all text-white"
-              onClick={(e) => {
-                e.stopPropagation()
+            <ActionButton
+              variant="danger"
+              size="sm"
+              fullWidth
+              className="h-[40px] rounded-[var(--premitives-corner-radius-corner-radius-2)]"
+              onClick={() => {
                 if (onCancelClick) {
                   onCancelClick()
                 }
               }}
             >
               <div className="relative w-fit font-SF-Pro text-[16px] tracking-[var(--text-extra-large-letter-spacing)] leading-[var(--h02-heading02-line-height)] whitespace-nowrap">
-                Cancel Subscription
+                {t('pricing.cancelSubscription')}
               </div>
-            </button>
+            </ActionButton>
           )}
         </div>
 

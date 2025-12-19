@@ -7,6 +7,7 @@ import { useTheme } from '@/hooks/use-theme'
 import { ThemeSelector } from '@/components/ui/theme-selector'
 import { DeleteAccountModal } from './delete-account-modal'
 import { authApi } from '@/api/auth/api'
+import { AccountActionButton } from '@/components/ui/buttons'
 import { t } from '@/i18n'
 
 export const AccountSection: React.FC = () => {
@@ -59,12 +60,12 @@ export const AccountSection: React.FC = () => {
         <h1
           className="text-[length:var(--text-large-font-size)] leading-[100%] pb-9 tracking-[-1px] font-[number:var(--h05-heading05-font-weight)] font-[family-name:var(--h02-heading02-font-family)] text-[color:var(--tokens-color-text-text-seconary)]"
         >
-          {t('account.account')}
+          {t('account.account.title')}
         </h1>
         {/* Log out of all devices */}
         <div className={`flex flex-col gap-4 md:flex-row md:items-center md:justify-between border-b ${isDark ? 'border-white/90' : 'border-[color:var(--tokens-color-border-border-subtle)]'} pb-[18px] pt-[18px]`}>
           <h2 className="font-[family-name:var(--h05-heading05-font-family)] text-[length:var(--text-font-size)] font-[number:var(--h05-heading05-font-weight)] leading-[140%] tracking-[-0.8px] [font-style:var(--h05-heading05-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
-            {t('account.logOutOfAllDevices')}
+            {t('account.account.logOutOfAllDevices')}
           </h2>
           <button
             onClick={handleLogoutAll}
@@ -77,14 +78,14 @@ export const AccountSection: React.FC = () => {
               border: '1px solid var(--tokens-color-border-border-subtle)'
             } : {}}
           >
-            {t('account.logout')}
+            {t('account.account.logout')}
           </button>
         </div>
 
         {/* Delete your account */}
         <div className={`flex flex-col gap-4 md:flex-row md:items-center md:justify-between border-b ${isDark ? 'border-white/90' : 'border-[color:var(--tokens-color-border-border-subtle)]'} pb-[18px] pt-[18px]`}>
           <h2 className="font-[family-name:var(--h05-heading05-font-family)] text-[length:var(--text-font-size)] font-[number:var(--h05-heading05-font-weight)] leading-[140%] tracking-[-0.8px] [font-style:var(--h05-heading05-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
-            {t('account.deleteYourAccount')}
+            {t('account.account.deleteYourAccount')}
           </h2>
           <button
             onClick={handleDeleteAccount}
@@ -97,14 +98,14 @@ export const AccountSection: React.FC = () => {
               border: '1px solid var(--tokens-color-border-border-subtle)'
             } : {}}
           >
-            {t('account.deleteAccount')}
+            {t('account.account.deleteAccount')}
           </button>
         </div>
 
         {/* Theme Selection */}
         <div className={`flex flex-col gap-4 md:flex-row md:items-center md:justify-between border-b ${isDark ? 'border-white/90' : 'border-[color:var(--tokens-color-border-border-subtle)]'} pb-[18px] pt-[18px]`}>
           <h2 className="font-[family-name:var(--h05-heading05-font-family)] text-[length:var(--text-font-size)] font-[number:var(--h05-heading05-font-weight)] leading-[140%] tracking-[-0.8px] [font-style:var(--h05-heading05-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
-            {t('account.theme')}
+            {t('account.account.theme')}
           </h2>
           <ThemeSelector className="w-full md:w-auto md:min-w-[200px]" />
         </div>
@@ -112,7 +113,7 @@ export const AccountSection: React.FC = () => {
         {/* Organization ID */}
         {/* <div className={`flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between  ${isDark ? 'border-white/90' : ''} pt-[18px]`}>
           <h2 className="font-[family-name:var(--h05-heading05-font-family)] text-[length:var(--text-font-size)] font-[number:var(--h05-heading05-font-weight)] leading-[140%] tracking-[-0.8px] [font-style:var(--h05-heading05-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
-            {t('account.organizationId')}
+            {t('account.account.organizationId')}
           </h2>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center ">
             <div 
@@ -135,9 +136,9 @@ export const AccountSection: React.FC = () => {
             <button
               onClick={handleCopy}
               className="p-2 rounded-lg hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] transition-colors flex-shrink-0 self-start sm:self-auto"
-              title={t('account.copyOrganizationId')}
+              title={t('account.account.copyOrganizationId')}
             >
-              <Copy className="w-5 h-5" style={{ color: 'var(--tokens-color-text-text-primary)' }} />
+              <Copy className="w-5 h-5" />
             </button>
           </div>
         </div> */}

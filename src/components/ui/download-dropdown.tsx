@@ -63,7 +63,7 @@ export const DownloadDropdown: React.FC<DownloadDropdownProps> = ({
         className={`flex items-center gap-2 px-3 py-1.5 text-sm rounded-full transition-colors bg-[color:var(--tokens-color-surface-surface-tertiary)] text-[color:var(--tokens-color-text-text-primary)] hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]`}
         aria-label="Download options"
       >
-        <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[14px] tracking-[var(--text-small-letter-spacing)] leading-[var(--h01-heading-01-line-height)] whitespace-nowrap [font-style:var(--text-small-font-style)]">
+        <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[14px] tracking-[var(--text-small-letter-spacing)] leading-[var(--h01-heading-01-line-height)] whitespace-nowrap [font-style:var(--text-small-font-style)] hidden lg:block">
           Download
         </span>
         <ArrowDownSm

@@ -23,6 +23,12 @@ export const common = {
   refresh: 'Refresh',
   retry: 'Retry',
   theme: 'Theme',
+  inputs: {
+    emailPlaceholder: 'Enter your personal or work email',
+    passwordPlaceholder: 'Enter your password',
+    namePlaceholder: 'Enter your name',
+    selectOption: 'Select an option',
+  },
   fileUpload: {
     fileTooLarge: 'File size must be less than {maxSize}',
     videoNotAllowed: 'Video files are not allowed',
@@ -32,6 +38,5 @@ export const common = {
     dropHere: 'Drop here',
     uploading: 'Uploading...',
     selectFile: 'Select file',
-    removeFile: 'Remove file',
-  },
+    removeFile: 'Remove file',},
 }

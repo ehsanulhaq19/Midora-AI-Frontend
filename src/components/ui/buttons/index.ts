@@ -1,4 +1,7 @@
-export { Button } from './button'
+export { Button, buttonVariants } from './button'
 export { IconButton } from './icon-button'
 export { LogoutButton } from './logout-button'
 export { PrimaryButton } from './primary-button'
+export { SocialButton } from './social-button'
+export { ActionButton } from './action-button'
+export { AccountActionButton } from './account-action-button'

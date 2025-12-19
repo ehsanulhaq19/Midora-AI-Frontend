@@ -18,6 +18,8 @@ import {
 } from "@stripe/react-stripe-js";
 import { ArrowRightSm, MoreOptions, TickIcon } from "@/icons";
 import { useTheme } from "@/hooks/use-theme";
+import { IconButton, ActionButton } from "@/components/ui/buttons";
+import { t, tWithParams } from "@/i18n";
 
 // Initialize Stripe
 const stripePromise = loadStripe(
@@ -375,16 +377,14 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
         <div className="max-w-[640px] mx-auto w-full px-4 py-6 lg:py-12">
           {/* Header */}
           <div className="flex items-center justify-between w-full">
-            <button
+            <IconButton
               onClick={() => router.back()}
-              className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-[color:var(--tokens-color-surface-surface-secondary)] transition-colors"
+              icon={<ArrowRightSm className="w-5 h-5 rotate-180" color="var(--tokens-color-text-text-primary)" />}
               aria-label="Go back"
-            >
-              <ArrowRightSm
-                className="w-5 h-5 rotate-180"
-                color="var(--tokens-color-text-text-primary)"
-              />
-            </button>
+              variant="ghost"
+              size="md"
+              className="rounded-full"
+            />
             {/* <button
               className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-[color:var(--tokens-color-surface-surface-secondary)] transition-colors"
               aria-label="Menu"
@@ -519,7 +519,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
                   className={`text-[20px] font-semibold ${isDark ? 'text-white' : 'text-[color:var(--premitives-color-brand-purple-1000)]'}`}
                   style={{ fontFamily: "Poppins, Helvetica" }}
                 >
-                  Order Details
+                  {t('checkout.orderDetails')}
                 </h2>
                 <div className="flex flex-col w-full gap-4">
                   <div className={`flex items-center justify-between pb-4 border-b ${isDark ? '' : 'border-gray-200'}`} style={isDark ? { borderColor: 'rgba(255, 255, 255, 0.1)' } : {}}>
@@ -532,7 +532,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
                   </div>
                   <div className={`flex items-center justify-between pb-4 border-b ${isDark ? '' : 'border-gray-200'}`} style={isDark ? { borderColor: 'rgba(255, 255, 255, 0.1)' } : {}}>
                     <span className={`checkout-emphasis ${isDark ? 'text-white' : 'text-gray-700'}`}>
-                      Subtotal
+                      {t('checkout.subtotal')}
                     </span>
                     <span className={`checkout-emphasis ${isDark ? 'text-white' : 'text-gray-700'}`}>
                       ${price.toFixed(2)}
@@ -540,7 +540,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
                   </div>
                   <div className="flex items-center justify-between">
                     <span className={`checkout-emphasis font-semibold ${isDark ? 'text-white' : 'text-gray-700'}`}>
-                      Total due today
+                      {t('checkout.totalDueToday')}
                     </span>
                     <span className={`checkout-emphasis font-semibold ${isDark ? 'text-white' : 'text-gray-700'}`}>
                       ${price.toFixed(2)}
@@ -718,29 +718,25 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
                     htmlFor="terms"
                     className={`checkout-emphasis ${isDark ? 'text-white' : 'text-black'}`}
                   >
-                    You agree that midora will charge your card{" "}
-                    {billingCycle === "annual" ? "annually" : "monthly"} in the
-                    services it is providing.
+                    {tWithParams('checkout.termsAgreement', { 
+                      frequency: billingCycle === "annual" ? t('checkout.annually') : t('checkout.monthly')
+                    })}
                   </label>
                 </div>
                 {errors.terms && (
                   <p className="text-sm text-red-400">{errors.terms}</p>
                 )}
 
-                <button
+                <ActionButton
                   type="submit"
                   disabled={loading || !stripe || !elements}
-                  className={`w-full flex items-center justify-center gap-2 h-[54px] p-4 rounded-xl text-white text-base font-semibold transition-all ${
-                    loading || !stripe || !elements
-                      ? "cursor-not-allowed opacity-70"
-                      : "hover:opacity-90"
-                  }`}
-                  style={{
-                    backgroundColor: primaryActionColor,
-                  }}
+                  loading={loading}
+                  variant="primary"
+                  fullWidth
+                  className="rounded-xl text-base font-semibold"
                 >
-                  {loading ? "Processing..." : "Check Out"}
-                </button>
+                  {loading ? t('checkout.processing') : t('checkout.checkOut')}
+                </ActionButton>
               </form>
             </div>
           </div>
@@ -813,7 +809,7 @@ export default function CheckoutPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading plan details...</p>
+          <p className="text-gray-600">{t('checkout.loadingPlanDetails')}</p>
         </div>
       </div>
     );
