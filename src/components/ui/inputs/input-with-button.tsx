@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { ArrowRightSm } from '@/icons'
 import { cn } from '@/lib/utils'
-import { useTheme } from '@/hooks/use-theme'
 
 interface InputWithButtonProps {
   placeholder?: string
@@ -33,8 +32,6 @@ export const InputWithButton = ({
   variant = 'light'
 }: InputWithButtonProps) => {
   const [internalValue, setInternalValue] = useState("")
-  const { resolvedTheme } = useTheme()
-  const isDarkMode = resolvedTheme === 'dark'
   
   const value = controlledValue !== undefined ? controlledValue : internalValue
   const setValue = onChange || setInternalValue
@@ -81,7 +78,7 @@ export const InputWithButton = ({
         <button
           onClick={handleSubmit}
           disabled={disabled || !value.trim()}
-          className={`flex w-[46px] h-[46px] items-center justify-center gap-2.5 px-3 py-[18px] relative mt-[-8.00px] mb-[-8.00px] rounded-xl hover:opacity-80 transition-opacity cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${isDarkMode ? 'bg-[color:var(--tokens-color-surface-surface-card-purple)]' : 'bg-tokens-color-surface-surface-button'}`}
+          className="flex w-[46px] h-[46px] items-center justify-center gap-2.5 px-3 py-[18px] relative mt-[-8.00px] mb-[-8.00px] rounded-xl hover:opacity-80 transition-opacity cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed bg-tokens-color-surface-surface-button dark:bg-[color:var(--tokens-color-surface-surface-card-purple)]"
         >
           <ArrowRightSm className="text-white !mr-[-1.00px] !mt-[-7.00px] !ml-[-1.00px] !mb-[-7.00px] !relative !left-[unset] !top-[unset]" />
         </button>

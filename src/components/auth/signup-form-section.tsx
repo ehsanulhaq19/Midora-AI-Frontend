@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useAppDispatch } from '@/store/hooks'
 import { ButtonGroup } from './button-group'
 import { Buttons } from '../ui'
+import { SocialButton } from '@/components/ui/buttons'
 import { CaretDown, GitHub, GitHubColorful } from '@/icons'
 import { t } from '@/i18n'
 import { useSignupData } from '@/contexts/SignupDataContext'
@@ -17,7 +18,6 @@ import { loginSuccess, setLoading, setError } from '@/store/slices/authSlice'
 import { tokenManager } from '@/lib/token-manager'
 import { setTokens } from '@/lib/auth'
 import { useToast } from '@/hooks/use-toast'
-import { useTheme } from '@/hooks/use-theme'
 
 interface SignupFormSectionProps {
   className?: string
@@ -190,9 +190,6 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
     }
   }
 
-  const { resolvedTheme } = useTheme()
-  const isDark = resolvedTheme === 'dark'
-
   return (
     <div className={`flex flex-col w-full max-w-[408px] items-center gap-12 lg:gap-[197px] ${className}`}>
       <div className="flex flex-col items-center gap-9 relative self-stretch w-full flex-[0_0_auto]">
@@ -211,69 +208,23 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
         <div className="flex flex-col items-center gap-4 p-6 relative self-stretch w-full flex-[0_0_auto] bg-[color:var(--tokens-color-surface-surface-primary)] rounded-3xl shadow-purple-soft">
           <div className="inline-flex flex-col items-start gap-4 relative flex-[0_0_auto]">
             <div className="flex flex-row flex-wrap  sm:flex-nowrap justify-start items-center  gap-3 relative self-stretch w-full flex-[0_0_auto]">
-             <button 
-                type="button"
-                 className={`inline-flex items-center gap-2 p-3 relative flex-[0_0_auto] rounded-xl border border-solid border-[#dbdbdb] hover:border-[#bbb]  ${
-                  isDark ? 'dark:border-white/20 dark:hover:border-white/30' : ''
-                }  transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed`}
+              <SocialButton
+                provider="github"
                 onClick={signInWithGitHub}
                 disabled={isProcessingSSO}
-                aria-label="Sign up with Github"
-              >
-                {isDark ? (
-                  <GitHubColorful className="relative w-6 h-6 aspect-[1]" />
-                ) : (
-                  <img
-                    className="relative w-6 h-6 aspect-[1]"
-                    alt="Github"
-                    src="/img/github.png"
-                  />
-                )}
+              />
 
-                <span className="relative hidden lg:block font-SF-Pro w-fit font-normal text-[color:var(--tokens-color-text-text-primary)] text-base tracking-[-0.48px] leading-[100%] whitespace-nowrap">
-                  Github
-                </span>
-              </button>
-
-              <button 
-                type="button"
-                className={`inline-flex items-center gap-2 p-3 relative flex-[0_0_auto] rounded-xl border border-solid border-[#dbdbdb] hover:border-[#bbb]  ${
-                  isDark ? 'dark:border-white/20 dark:hover:border-white/30' : ''
-                }  transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed`}
+              <SocialButton
+                provider="microsoft"
                 onClick={signInWithMicrosoft}
                 disabled={isProcessingSSO}
-                aria-label="Sign up with Microsoft"
-              >
-                <img
-                  className="relative w-6 h-6 aspect-[1]"
-                  alt="Microsoft"
-                  src="/img/microsoft.png"
-                />
+              />
 
-                <span className="relative hidden lg:block font-SF-Pro w-fit font-normal text-[color:var(--tokens-color-text-text-primary)] text-base tracking-[-0.48px] leading-[100%] whitespace-nowrap">
-                  Microsoft
-                </span>
-              </button>
-
-              <button 
-                type="button"
-                className={`inline-flex items-center gap-2 p-3 relative flex-[0_0_auto] rounded-xl border border-solid border-[#dbdbdb] hover:border-[#bbb]  ${
-                  isDark ? 'dark:border-white/20 dark:hover:border-white/30' : ''
-                }  transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed`}
+              <SocialButton
+                provider="google"
                 onClick={signInWithGoogle}
                 disabled={isProcessingSSO}
-                aria-label="Sign up with Google"
-              >
-                <img
-                  className="relative w-6 h-6 aspect-[1] object-cover"
-                  alt="Google"
-                  src="/img/image-6.png"
-                />
-
-                <span className="relative  hidden lg:block font-SF-Pro w-fit font-normal text-[color:var(--tokens-color-text-text-primary)] text-base tracking-[-0.48px] leading-[100%] whitespace-nowrap">
-                  Google
-                </span>
-              </button>
+              />
             </div>
           </div>
 
@@ -339,7 +290,7 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
                 onKeyDown={handleKeyDown}
                 error={passwordError}
                 disabled={isLoggingIn}
-                placeholder="Enter your password"
+                placeholder={t('common.inputs.passwordPlaceholder')}
               />
               {passwordError && (
                 <p className="mt-2 text-sm text-red-500 font-SF-Pro">
@@ -361,7 +312,7 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
                     ? t('auth.ssoSigningIn').replace('{provider}', 'SSO')
                     : showPasswordField 
                       ? (isLoggingIn ? t('auth.loggingIn') : t('auth.loginWithPassword'))
-                      : (isCheckingEmail ? "Checking..." : "Continue with email")
+                      : (isCheckingEmail ? t('auth.checking') : t('auth.continueWithEmail'))
                 }
                 disabled={isCheckingEmail || isLoggingIn || isTransitioning || isProcessingSSO}
               />

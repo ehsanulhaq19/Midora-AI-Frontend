@@ -14,6 +14,7 @@ import { chat } from './chat'
 import { documentation } from './documentation'
 import { footer } from './footer'
 import { account } from './account'
+import { checkout } from './checkout'
 
 export const enTranslations = {
   common,
@@ -27,4 +28,5 @@ export const enTranslations = {
   documentation,
   footer,
   account,
+  checkout,
 }

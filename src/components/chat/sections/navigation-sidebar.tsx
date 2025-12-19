@@ -432,7 +432,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
         <button
           type="button"
           onClick={handleToggleSidebar}
-          className="fixed top-4 left-4 z-[70] lg:hidden flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-200 hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--tokens-color-text-text-brand)] bg-[color:var(--tokens-color-surface-surface-primary)] border border-[color:var(--tokens-color-border-border-subtle)] shadow-lg"
+          className="fixed top-2 left-2 z-[70] lg:hidden flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-200 hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--tokens-color-text-text-brand)] bg-[color:var(--tokens-color-surface-surface-primary)] border border-[color:var(--tokens-color-border-border-subtle)] shadow-lg"
           style={{ color: "var(--tokens-color-text-text-primary)" }}
           aria-label="Open sidebar"
         >

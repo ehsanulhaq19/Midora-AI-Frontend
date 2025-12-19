@@ -4,6 +4,7 @@ import { LogoOnly } from '@/icons'
 import { OTPInput, PrimaryButton, BackButton } from '../../ui'
 import { handleApiError } from '@/lib/error-handler'
 import { useTheme } from '@/hooks/use-theme'
+import { ActionButton } from '@/components/ui/buttons'
 interface OTPVerificationStepProps {
   onNext: (otpCode: string) => Promise<void>
   onBack: () => void
@@ -183,15 +184,13 @@ export const OTPVerificationStep = ({
             <p className="text-sm [color:var(--tokens-color-text-text-inactive-2)] text-center">
               {t('auth.didntReceiveCode')}
             </p>
-            <button
+            <ActionButton
               type="button"
               onClick={handleRegenerateOTP}
               disabled={regenerateCooldown > 0 || isRegenerating}
-              className={`text-sm font-medium transition-colors ${
-                regenerateCooldown > 0 || isRegenerating
-                  ? '[color:var(--tokens-color-text-text-inactive-2)] cursor-not-allowed'
-                  : 'text-tokens-color-text-text-secondary hover:text-tokens-color-text-text-primary cursor-pointer'
-              }`}
+              variant="ghost"
+              size="sm"
+              className="text-sm font-medium justify-center"
             >
               {isRegenerating 
                 ? t('auth.resendingCode')
@@ -199,7 +198,7 @@ export const OTPVerificationStep = ({
                   ? `${t('auth.resendIn')} ${regenerateCooldown}${t('auth.seconds')}` 
                   : t('auth.resendCode')
               }
-            </button>
+            </ActionButton>
           </div>
         </div>
       </div>

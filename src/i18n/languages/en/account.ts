@@ -11,6 +11,16 @@ export const account = {
     notifications: 'Notifications',
     analytics: 'Analytics',
   },
+  account: {
+    title: 'Account',
+    logOutOfAllDevices: 'Log out of all devices',
+    logout: 'Logout',
+    deleteYourAccount: 'Delete your account',
+    deleteAccount: 'Delete account',
+    organizationId: 'Organization ID',
+    copyOrganizationId: 'Copy Organization ID',
+    copied: 'Copied!',
+  },
   profile: {
     title: 'Profile',
     fullName: 'Full Name',
@@ -87,12 +97,15 @@ export const account = {
     last30Days: 'Last 30 Days',
     last60Days: 'Last 60 Days',
     currentBillingCycle: 'Current Billing Cycle',
+    lastDays: 'Last {days} Days',
     selectCustomRange: 'Select custom range',
     totalCreditsUsed: 'Total credits used',
     activeUsers: 'Active users',
     dailyCreditConsumption: 'Daily Credit Consumption',
     modelUsageDistribution: 'Model Usage Distribution',
     creditsPerMonth: 'credits per month',
+    pricePerUserMo: '${price}/user/mo • 1 seat purchased',
+    monthlyTotalLabel: 'Monthly total',
   },
 }
 

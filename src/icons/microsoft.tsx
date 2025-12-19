@@ -1,0 +1,18 @@
+export const Microsoft = ({ className }: { className?: string }) => {
+  return (
+    <svg
+      className={className}
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect x="2" y="2" width="9.6" height="9.6" fill="#F25022"/>
+      <rect x="12.4" y="2" width="9.6" height="9.6" fill="#7FBA00"/>
+      <rect x="2" y="12.4" width="9.6" height="9.6" fill="#00A4EF"/>
+      <rect x="12.4" y="12.4" width="9.6" height="9.6" fill="#FFB900"/>
+    </svg>
+  )
+}
+
