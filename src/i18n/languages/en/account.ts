@@ -1,8 +1,15 @@
 /**
- * English translations - Account Section
+ * English translations - Account settings
  */
 
 export const account = {
+  // Delete Account Modal
+  deleteAccountTitle: 'Delete Account',
+  deleteAccountConfirmation: 'Are you sure you want to delete your account? This action cannot be undone.',
+  deleteAccountWarning: 'All your data, including conversations, files, and subscriptions will be permanently deleted.',
+  cancel: 'Cancel',
+  deleting: 'Deleting...',
+
   sidebar: {
     account: 'Account',
     profile: 'Profile',
@@ -23,10 +30,14 @@ export const account = {
   },
   profile: {
     title: 'Profile',
-    fullName: 'Full Name',
-    fullNamePlaceholder: 'Enter your full name',
-    displayName: 'What midora call you',
-    displayNamePlaceholder: 'Enter what midora call you',
+    fullName: 'First Name',
+    fullNamePlaceholder: 'Enter your first name',
+    displayName: 'Last Name',
+    displayNamePlaceholder: 'Enter your last name',
+    password: 'Password',
+    passwordPlaceholder: 'Enter new password',
+    confirmPassword: 'Confirm Password',
+    confirmPasswordPlaceholder: 'Confirm your new password',
     workFunction: 'Your work function',
     workFunctionPlaceholder: 'Enter your work function',
     choosePreference: 'Choose your preference',
@@ -50,6 +61,7 @@ export const account = {
     planName: 'Lite',
     planDescription: 'Intelligence for everyday tasks',
     perMonth: '/month',
+    noActiveSubscription: 'No active subscription',
   },
   usage: {
     logout: 'Logout',
@@ -106,6 +118,11 @@ export const account = {
     creditsPerMonth: 'credits per month',
     pricePerUserMo: '${price}/user/mo • 1 seat purchased',
     monthlyTotalLabel: 'Monthly total',
+    fileStorageGB: 'File storage (GB)',
+    vectorStorageEntries: 'Vector storage entries',
+    messageHistoryDays: 'Message history days',
+    prioritySupport: 'Priority support',
+    apiAccess: 'API access'
   },
 }
 

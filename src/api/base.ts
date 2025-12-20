@@ -398,7 +398,7 @@ class BaseApiClient {
       resetReloadCount();
 
       const responseData = await response.json();
-      return { data: responseData, status: response.status };
+      return this.processResponseData<T>(responseData, response);
     } catch (error) {
       if (error instanceof Error && error.name === "AbortError") {
         const errorMessage = handleApiError(error);

@@ -58,11 +58,11 @@ export const useConversation = () => {
   const loadingConversationsRef = useRef<Set<string>>(new Set())
 
   // Load conversations
-  const loadConversations = useCallback(async () => {
+  const loadConversations = useCallback(async (messageSearch?: string) => {
     try {
       dispatch(clearError())
       
-      const response = await conversationApi.getConversations(1, 20)
+      const response = await conversationApi.getConversations(1, 20, "-created_at", messageSearch)
       console.log("response = ", response)
       if (response.error) {
         const errorObject = response.processedError || {
@@ -81,7 +81,7 @@ export const useConversation = () => {
     } finally {
       dispatch(setLoading(false))
     }
-  }, [dispatch])
+  }, [dispatch, showErrorToast])
 
   // Create a new conversation
   const createConversation = useCallback(async (name: string) => {
@@ -492,7 +492,7 @@ export const useConversation = () => {
   }, [dispatch, pagination])
 
   // Load more conversations (for pagination)
-  const loadMoreConversations = useCallback(async () => {
+  const loadMoreConversations = useCallback(async (messageSearch?: string) => {
     try {
       if (!conversationPagination || conversationPagination.page >= conversationPagination.total_pages) {
         return // No more pages to load
@@ -502,7 +502,7 @@ export const useConversation = () => {
       dispatch(clearError())
       
       const nextPage = conversationPagination.page + 1
-      const response = await conversationApi.getConversations(nextPage, conversationPagination.per_page)
+      const response = await conversationApi.getConversations(nextPage, conversationPagination.per_page, "-created_at", messageSearch)
       
       if (response.error) {
         const errorObject = response.processedError || {
@@ -523,7 +523,7 @@ export const useConversation = () => {
     } finally {
       dispatch(setLoadingMoreConversations(false))
     }
-  }, [dispatch, conversationPagination])
+  }, [dispatch, conversationPagination, showErrorToast])
 
   // Start new chat
   const startNewChat = useCallback(() => {
@@ -533,6 +533,72 @@ export const useConversation = () => {
     // Reset to auto mode when starting a new chat
     dispatch(setAutoMode(true))
   }, [dispatch])
+
+  // Delete a conversation
+  const deleteConversation = useCallback(async (conversationUuid: string) => {
+    try {
+      dispatch(clearError())
+      
+      const response = await conversationApi.deleteConversation(conversationUuid)
+      if (response.error) {
+        const errorObject = response.processedError || {
+          error_type: 'CONVERSATION_DELETION_FAILED',
+          error_message: response.error,
+          error_id: response.error_id,
+          status: response.status
+        }
+        throw new Error(JSON.stringify(errorObject))
+      }
+      
+      // Remove conversation from store
+      dispatch(removeConversation(conversationUuid))
+      
+      // If it was the current conversation, clear it
+      if (currentConversation?.uuid === conversationUuid) {
+        dispatch(setCurrentConversation(null))
+      }
+      
+      return true
+    } catch (err) {
+      const errorMessage = handleApiError(err)
+      dispatch(setError(errorMessage))
+      showErrorToast('Failed to Delete Conversation', errorMessage)
+      return false
+    }
+  }, [dispatch, currentConversation, showErrorToast])
+
+  // Archive a conversation
+  const archiveConversation = useCallback(async (conversationUuid: string) => {
+    try {
+      dispatch(clearError())
+      
+      const response = await conversationApi.archiveConversation(conversationUuid)
+      if (response.error) {
+        const errorObject = response.processedError || {
+          error_type: 'CONVERSATION_ARCHIVE_FAILED',
+          error_message: response.error,
+          error_id: response.error_id,
+          status: response.status
+        }
+        throw new Error(JSON.stringify(errorObject))
+      }
+      
+      // Remove conversation from store (archived conversations are filtered out)
+      dispatch(removeConversation(conversationUuid))
+      
+      // If it was the current conversation, clear it
+      if (currentConversation?.uuid === conversationUuid) {
+        dispatch(setCurrentConversation(null))
+      }
+      
+      return true
+    } catch (err) {
+      const errorMessage = handleApiError(err)
+      dispatch(setError(errorMessage))
+      showErrorToast('Failed to Archive Conversation', errorMessage)
+      return false
+    }
+  }, [dispatch, currentConversation, showErrorToast])
 
   // Convert conversations object to array for components that expect array format
   const conversationsArray = Object.keys(conversations).map(key => conversations[key])
@@ -562,6 +628,8 @@ export const useConversation = () => {
     loadMoreMessages,
     loadMoreConversations,
     startNewChat,
+    deleteConversation,
+    archiveConversation,
     clearError: () => dispatch(clearError()),
   }
 }

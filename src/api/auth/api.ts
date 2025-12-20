@@ -168,6 +168,13 @@ class AuthApiClient {
     return this.baseClient.put<UserResponse>('/api/v1/auth/profile', data)
   }
 
+  /**
+   * Delete user account (soft delete)
+   */
+  async deleteAccount(): Promise<ApiResponse<{ message: string }>> {
+    return this.baseClient.delete<{ message: string }>('/api/v1/auth/delete-account')
+  }
+
 }
 
 // Export singleton instance

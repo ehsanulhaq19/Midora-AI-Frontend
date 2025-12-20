@@ -135,5 +135,21 @@ export const chat = {
   openInCanvas: 'Open in Canvas',
   hideCanvas: 'Hide Canvas',
   closeCanvas: 'Close Canvas',
-  canvasExpanded: 'Content expanded to canvas'
+  canvasExpanded: 'Content expanded to canvas',
+  
+  // Conversation History translations
+  history: {
+    title: 'Your Chat History',
+    searchPlaceholder: 'Explore your message archive',
+    conversationsCount: '{count} conversations with {brandName}',
+    choose: 'Choose',
+    mostRecentMessage: 'Most recent message {daysAgo}',
+    today: 'today',
+    yesterday: 'yesterday',
+    daysAgo: '{days} days ago',
+    noConversations: 'No conversations yet. Start a new chat to begin!',
+    noResults: 'No conversations found matching your search.',
+    noResultsWithMessageSearch: 'No conversations found matching your message search.',
+    relatedMessages: 'Related messages'
+  }
 }

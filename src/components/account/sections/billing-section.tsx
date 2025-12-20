@@ -1,32 +1,45 @@
 'use client'
 
-import React, { useEffect, useMemo, useState } from 'react'
-import { Filters, Search02, MoreOptions, InvoiceIcon } from '@/icons'
+import React, { useEffect, useMemo, useState, useRef } from 'react'
+import { Filters, Search02, MoreOptions, InvoiceIcon, FileUpload } from '@/icons'
 import { Pagination } from '@/components/ui'
 import { cn } from '@/lib/utils'
 import { useTheme } from '@/hooks/use-theme'
 import { t } from '@/i18n'
 import { ActionButton } from '@/components/ui/buttons'
+import { useInvoices } from '@/hooks/use-invoices'
+import { Invoice } from '@/api/invoices/types'
+import { useSubscriptionPlans } from '@/hooks/use-subscription-plans'
 
 type BillingHistoryItem = {
-  id: number
+  id: string
   invoice: string
   date: string
   plan: string
   users: string
+  invoiceSubscriptionUuid?: string
 }
 
 const PAGE_SIZE = 6
 
-const MOCK_BILLING_HISTORY: BillingHistoryItem[] = Array.from({ length: 24 }, (_, i) => ({
-  id: i + 1,
-  invoice: `Invoice_March_${2025 - Math.floor(i / 6)}`,
-  date: `March ${14 - (i % 5)}, 2025`,
-  plan: i % 2 === 0 ? 'Lite Plan' : 'Pro Plan',
-  users: `${8 + (i % 4)} Users`
-}))
+const formatDate = (dateString: string): string => {
+  try {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })
+  } catch {
+    return dateString
+  }
+}
 
-const getBillingColumns = (): Array<{
+const getBillingColumns = (
+  onDownload: (invoiceSubscriptionUuid: string) => void,
+  openDropdownId: string | null,
+  setOpenDropdownId: (id: string | null) => void
+): Array<{
   key: keyof BillingHistoryItem | 'actions'
   label: string
   className?: string
@@ -70,39 +83,206 @@ const getBillingColumns = (): Array<{
     key: 'actions',
     label: t('account.billing.actions'),
     className: 'lg:flex-row lg:items-center lg:justify-end',
-    render: () => (
+    render: (item) => (
+      <InvoiceActionsDropdown
+        invoiceSubscriptionUuid={item.invoiceSubscriptionUuid || ''}
+        onDownload={onDownload}
+        isOpen={openDropdownId === item.id}
+        onToggle={() => setOpenDropdownId(openDropdownId === item.id ? null : item.id)}
+      />
+    )
+  }
+]
+
+interface InvoiceActionsDropdownProps {
+  invoiceSubscriptionUuid: string
+  onDownload: (invoiceSubscriptionUuid: string) => void
+  isOpen: boolean
+  onToggle: () => void
+}
+
+const InvoiceActionsDropdown: React.FC<InvoiceActionsDropdownProps> = ({
+  invoiceSubscriptionUuid,
+  onDownload,
+  isOpen,
+  onToggle
+}: InvoiceActionsDropdownProps) => {
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
+  const dropdownRef = useRef<HTMLDivElement>(null)
+  const dropdownMenuRef = useRef<HTMLDivElement>(null)
+  const downloadButtonRef = useRef<HTMLButtonElement>(null)
+  const isDownloadingRef = useRef(false)
+  const [openUpward, setOpenUpward] = useState(false)
+
+  useEffect(() => {
+    if (isOpen) {
+      // Check if dropdown should open upward
+      if (dropdownRef.current && dropdownMenuRef.current) {
+        const rect = dropdownRef.current.getBoundingClientRect()
+        const menuHeight = 60 // Approximate dropdown menu height
+        const spaceBelow = window.innerHeight - rect.bottom
+        const spaceAbove = rect.top
+        
+        // Open upward if there's not enough space below but enough space above
+        setOpenUpward(spaceBelow < menuHeight && spaceAbove > menuHeight)
+      }
+    }
+  }, [isOpen])
+
+  useEffect(() => {
+    if (!isOpen) return
+
+    const handleClickOutside = (event: MouseEvent) => {
+      // Don't close if download is in progress
+      if (isDownloadingRef.current) {
+        return
+      }
+      
+      const target = event.target as Node
+      // Check if click is outside both the button container and the dropdown menu
+      if (
+        dropdownRef.current && 
+        !dropdownRef.current.contains(target) &&
+        dropdownMenuRef.current &&
+        !dropdownMenuRef.current.contains(target)
+      ) {
+        onToggle()
+      }
+    }
+
+    // Use click event instead of mousedown to ensure download button click fires first
+    // Add listener with a small delay to allow download button click to register
+    const timeoutId = setTimeout(() => {
+      document.addEventListener('click', handleClickOutside)
+    }, 0)
+
+    return () => {
+      clearTimeout(timeoutId)
+      document.removeEventListener('click', handleClickOutside)
+    }
+  }, [isOpen, onToggle])
+
+  const handleDownload = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    
+    if (invoiceSubscriptionUuid) {
+      // Set flag to prevent dropdown from closing during download
+      isDownloadingRef.current = true
+      
+      // Trigger download first
+      try {
+        await onDownload(invoiceSubscriptionUuid)
+      } catch (error) {
+        // Error is already handled in the hook
+        console.error('Download error:', error)
+      } finally {
+        // Reset flag and close dropdown after download completes
+        setTimeout(() => {
+          isDownloadingRef.current = false
+          onToggle()
+        }, 100)
+      }
+    }
+  }
+
+  const handleDownloadMouseDown = (e: React.MouseEvent<HTMLButtonElement>) => {
+    // Stop propagation to prevent click outside handler from firing
+    e.stopPropagation()
+  }
+
+  const handleToggle = () => {
+    onToggle()
+  }
+
+  return (
+    <div className="relative" ref={dropdownRef}>
       <ActionButton
         variant="ghost"
         size="sm"
+        onClick={handleToggle}
         className="!h-5 !w-5 !p-0 !min-w-0 !rounded-lg !border !border-transparent hover:!border-[color:var(--tokens-color-border-border-subtle)] hover:!bg-[color:var(--tokens-color-surface-surface-tertiary)]"
       >
         <MoreOptions className="w-5 h-5" color="var(--tokens-color-text-text-primary)" />
       </ActionButton>
-    )
-  }
-];
+
+      {isOpen && (
+        <div
+          ref={dropdownMenuRef}
+          className={cn(
+            'absolute right-0 z-50 min-w-[160px] rounded-lg border shadow-lg',
+            openUpward ? 'bottom-full mb-1' : 'top-full mt-1',
+            isDark
+              ? 'bg-[color:var(--tokens-color-surface-surface-card-default)] border-[color:var(--tokens-color-border-border-subtle)]'
+              : 'bg-[color:var(--tokens-color-surface-surface-primary)] border-[color:var(--tokens-color-border-border-subtle)]'
+          )}
+        >
+          <button
+            ref={downloadButtonRef}
+            type="button"
+            onClick={handleDownload}
+            onMouseDown={handleDownloadMouseDown}
+            className={cn(
+              'w-full px-4 py-2 text-left flex items-center gap-2 hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] transition-colors duration-200 rounded-lg',
+              isDark
+                ? 'text-[color:var(--tokens-color-text-text-primary)]'
+                : 'text-[color:var(--tokens-color-text-text-primary)]'
+            )}
+          >
+            <FileUpload className="w-4 h-4" />
+            <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
+              {t('account.billing.download')}
+            </span>
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
 
 export const BillingSection: React.FC = () => {
   const { resolvedTheme } = useTheme()
   const isDark = resolvedTheme === 'dark'
   const [searchQuery, setSearchQuery] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
-  const billingColumns = getBillingColumns()
+  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null)
+  const { invoices, isLoading, loadInvoices, downloadInvoice } = useInvoices()
+  const { activeSubscription, isSubscriptionLoading, loadActiveSubscription } = useSubscriptionPlans()
+
+  useEffect(() => {
+    loadInvoices()
+    loadActiveSubscription()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // Only load invoices and subscription once on mount
+
+  const billingHistoryItems: BillingHistoryItem[] = useMemo(() => {
+    return invoices.map((invoice: Invoice) => ({
+      id: invoice.uuid,
+      invoice: invoice.file_name.replace('.pdf', '') || 'Invoice',
+      date: formatDate(invoice.created_at),
+      plan: invoice.plan_name || 'N/A',
+      users: '1 User', // Placeholder since user count is not available in invoice data
+      invoiceSubscriptionUuid: invoice.invoice_subscription_uuid
+    }))
+  }, [invoices])
+
+  const billingColumns = getBillingColumns(downloadInvoice, openDropdownId, setOpenDropdownId)
 
   const filteredBillingHistory = useMemo(() => {
     if (!searchQuery.trim()) {
-      return MOCK_BILLING_HISTORY
+      return billingHistoryItems
     }
 
     const normalizedQuery = searchQuery.trim().toLowerCase()
 
-    return MOCK_BILLING_HISTORY.filter((item) =>
+    return billingHistoryItems.filter((item) =>
       [item.invoice, item.date, item.plan, item.users]
         .join(' ')
         .toLowerCase()
         .includes(normalizedQuery)
     )
-  }, [searchQuery])
+  }, [searchQuery, billingHistoryItems])
 
   const totalPages = Math.max(1, Math.ceil(filteredBillingHistory.length / PAGE_SIZE))
 
@@ -111,7 +291,7 @@ export const BillingSection: React.FC = () => {
   }, [searchQuery])
 
   useEffect(() => {
-    setCurrentPage((prev) => Math.min(prev, totalPages))
+    setCurrentPage((prev: number) => Math.min(prev, totalPages))
   }, [totalPages])
 
   const paginatedHistory = useMemo(() => {
@@ -121,14 +301,26 @@ export const BillingSection: React.FC = () => {
 
   const hasResults = paginatedHistory.length > 0
 
-  const handleDownload = () => {
-    // TODO: Implement download functionality
-    console.log('Download clicked')
-  }
-
   const handleFilter = () => {
     // TODO: Implement filter functionality
     console.log('Filter clicked')
+  }
+
+  const handleDownloadAll = () => {
+    // TODO: Implement download all functionality
+    console.log('Download all clicked')
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex-1 flex flex-col p-4 sm:p-9">
+        <div className="flex items-center justify-center py-12">
+          <p className="font-h02-heading02 text-[length:var(--text-font-size)] font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-primary)]">
+            Loading...
+          </p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -151,29 +343,49 @@ export const BillingSection: React.FC = () => {
                 borderColor: 'var(--tokens-color-border-border-subtle)'
               } : {}}
             >
-              <div className="flex flex-col gap-6">
-              {/* Plan Name */}
-              <div className="checkout-plan-name text-[color:var(--tokens-color-text-text-seconary)] ">
-                {t('account.billing.planName')}
-              </div>
-              
-              {/* Price */}
-              <div className="flex items-baseline ">
-                 
-                 <span className='relative w-fit font-h02-heading02 font-[number:var(--text-large-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-[length:var(--text-large-font-size)] tracking-[var(--text-large-letter-spacing)] leading-[var(--text-large-line-height)] whitespace-nowrap [font-style:var(--text-large-font-style)]'>$ </span>
-                 <span className="tracking-[var(--h05-heading05-letter-spacing)] font-h02-heading02 [font-style:var(--h02-heading02-font-style)] font-[number:var(--h01-heading-01-font-weight)] leading-[var(--h05-heading05-line-height)] text-[length:var(--h01-heading-01-font-size)]">
-                 15
-                </span>
-                <span className="font-h02-heading02 text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] font-[number:var(--text-font-weight)]">
-                  {t('account.billing.perMonth')}
-                </span>
-              </div>
-              
-              {/* Description */}
-              <div className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
-                {t('account.billing.planDescription')}
-              </div>
-            </div>
+              {isSubscriptionLoading ? (
+                <div className="flex flex-col gap-6">
+                  <div className="checkout-plan-name text-[color:var(--tokens-color-text-text-seconary)]">
+                    {t('account.usage.loading')}
+                  </div>
+                </div>
+              ) : activeSubscription?.plan ? (
+                <div className="flex flex-col gap-6">
+                  {/* Plan Name */}
+                  <div className="checkout-plan-name text-[color:var(--tokens-color-text-text-seconary)]">
+                    {activeSubscription.plan.name}
+                  </div>
+                  
+                  {/* Price */}
+                  <div className="flex items-baseline">
+                    <span className='relative w-fit font-h02-heading02 font-[number:var(--text-large-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-[length:var(--text-large-font-size)] tracking-[var(--text-large-letter-spacing)] leading-[var(--text-large-line-height)] whitespace-nowrap [font-style:var(--text-large-font-style)]'>
+                      {activeSubscription.plan.currency || '$'} 
+                    </span>
+                    <span className="tracking-[var(--h05-heading05-letter-spacing)] font-h02-heading02 [font-style:var(--h02-heading02-font-style)] font-[number:var(--h01-heading-01-font-weight)] leading-[var(--h05-heading05-line-height)] text-[length:var(--h01-heading-01-font-size)]">
+                      {activeSubscription.billing_cycle === 'annual' 
+                        ? Math.round((activeSubscription.plan.annual_price / 12) * 100) / 100
+                        : activeSubscription.plan.monthly_price}
+                    </span>
+                    <span className="font-h02-heading02 text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] font-[number:var(--text-font-weight)]">
+                      {t('account.billing.perMonth')}
+                    </span>
+                  </div>
+                  
+                  {/* Description */}
+                  <div className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-seconary)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
+                    {activeSubscription.plan.description || t('account.billing.planDescription')}
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-6">
+                  <div className="checkout-plan-name text-[color:var(--tokens-color-text-text-seconary)]">
+                    {t('account.billing.planName')}
+                  </div>
+                  <div className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-inactive-2)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
+                    {t('account.billing.noActiveSubscription')}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -185,59 +397,6 @@ export const BillingSection: React.FC = () => {
           {t('account.billing.billingHistory')}
             </h1>
             
-            {/* Controls */}
-            <div className="flex flex-col lg:flex-row items-stretch gap-3 w-full md:w-auto">
-              <ActionButton
-                onClick={handleFilter}
-                variant="outline"
-                size="sm"
-                className={`!h-9 gap-2 px-4 py-2 !rounded-lg ${
-                  isDark 
-                    ? '!border-[color:var(--tokens-color-border-border-subtle)] !bg-[color:var(--tokens-color-surface-surface-card-default)]' 
-                    : '!border-[color:var(--tokens-color-border-border-subtle)] !bg-[color:var(--tokens-color-surface-surface-primary)] hover:!bg-[color:var(--tokens-color-surface-surface-tertiary)]'
-                }`}
-                leftIcon={<Filters className="w-5 h-5 text-[color:var(--tokens-color-text-text-seconary)]" />}
-              >
-                <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-primary)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
-                  {t('account.billing.filter')}
-                </span>
-              </ActionButton>
-              
-              <div className="relative flex-1 w-full">
-                <Search02 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder={t('account.billing.search')}
-                  className={`h-9 pl-10 pr-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-[color:var(--premitives-color-brand-purple-1000)] focus:border-[color:var(--premitives-color-brand-purple-1000)] font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] w-full ${
-                    isDark ? '' : ''
-                  }`}
-                  style={isDark ? {
-                    borderColor: 'var(--tokens-color-border-border-subtle)',
-                    backgroundColor: 'var(--tokens-color-surface-surface-card-default)',
-                    color: 'var(--tokens-color-text-text-primary)'
-                  } : {
-                    borderColor: 'var(--tokens-color-border-border-subtle)',
-                    backgroundColor: 'var(--tokens-color-surface-surface-primary)',
-                    color: 'var(--tokens-color-text-text-primary)'
-                  }}
-                />
-              </div>
-              
-              <ActionButton
-                onClick={handleDownload}
-                variant="primary"
-                size="sm"
-                className={`!h-9 px-4 py-2 !rounded-lg font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] w-full sm:w-auto ${
-                  isDark 
-                    ? '!bg-[color:var(--tokens-color-surface-surface-card-purple)] !text-white' 
-                    : '!bg-[color:var(--premitives-color-brand-purple-1000)] !text-white'
-                }`}
-              >
-                {t('account.billing.download')}
-              </ActionButton>
-            </div>
           </div>
 
           {/* Billing History Table */}
@@ -276,7 +435,7 @@ export const BillingSection: React.FC = () => {
                     </p>
                   </div>
                 ) : (
-                  paginatedHistory.map((item, index) => (
+                  paginatedHistory.map((item: BillingHistoryItem, index: number) => (
                     <div
                       role="row"
                       key={item.id}
@@ -293,13 +452,12 @@ export const BillingSection: React.FC = () => {
                             </span>
                           </div>
                           {/* Action Button */}
-                          <ActionButton
-                            variant="ghost"
-                            size="sm"
-                            className="!h-5 !w-5 !p-0 !min-w-0 !rounded-lg !border !border-transparent hover:!border-[color:var(--tokens-color-border-border-subtle)] hover:!bg-[color:var(--tokens-color-surface-surface-tertiary)] flex-shrink-0"
-                          >
-                            <MoreOptions className="w-5 h-5" color="var(--tokens-color-text-text-primary)" />
-                          </ActionButton>
+                          <InvoiceActionsDropdown
+                            invoiceSubscriptionUuid={item.invoiceSubscriptionUuid || ''}
+                            onDownload={downloadInvoice}
+                            isOpen={openDropdownId === item.id}
+                            onToggle={() => setOpenDropdownId(openDropdownId === item.id ? null : item.id)}
+                          />
                         </div>
                         {/* Date on bottom left */}
                         <div className="flex items-start">
@@ -310,7 +468,7 @@ export const BillingSection: React.FC = () => {
                       </div>
 
                       {/* Desktop Layout: All Columns */}
-                      {billingColumns.map((column) => {
+                      {billingColumns.map((column: typeof billingColumns[0]) => {
                         const content = column.render ? (
                           column.render(item)
                         ) : (
