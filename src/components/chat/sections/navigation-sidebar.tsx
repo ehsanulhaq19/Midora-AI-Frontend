@@ -16,7 +16,8 @@ import {
   Logout,
   Menu,
 } from "@/icons";
-import { Tooltip, ConversationMenu } from "@/components/ui";
+import { Tooltip } from "@/components/ui";
+import { ConversationMenu } from "./conversation-menu";
 import { NewProjectModal } from "./new-project-modal";
 import Image from "next/image";
 import { t } from "@/i18n";
@@ -34,6 +35,7 @@ import {
   Project,
 } from "@/store/slices/projectsSlice";
 import { useProjects } from "@/hooks/use-projects";
+import { useConversationModal } from "./conversation-modal-context";
 
 const translateWithFallback = (key: string, fallback: string) => {
   const translated = t(key);
@@ -255,6 +257,18 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
     conversationPagination,
     isLoadingMoreConversations,
   } = useConversation();
+
+  // Get modal handlers from context (optional - may not be available in all contexts)
+  let showDeleteModal: ((uuid: string) => void) | undefined;
+  let showArchiveModal: ((uuid: string) => void) | undefined;
+  
+  try {
+    const modalContext = useConversationModal();
+    showDeleteModal = modalContext.showDeleteModal;
+    showArchiveModal = modalContext.showArchiveModal;
+  } catch (e) {
+    // Context not available - modals won't work but component won't crash
+  }
 
   useEffect(() => {
     if (conversationsListRef.current) {
@@ -1050,12 +1064,14 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                                 console.log("Remove from folder:", uuid);
                               }}
                               onArchive={(uuid) => {
-                                // TODO: Implement archive functionality
-                                console.log("Archive conversation:", uuid);
+                                if (showArchiveModal) {
+                                  showArchiveModal(uuid);
+                                }
                               }}
                               onDelete={(uuid) => {
-                                // TODO: Implement delete functionality
-                                console.log("Delete conversation:", uuid);
+                                if (showDeleteModal) {
+                                  showDeleteModal(uuid);
+                                }
                               }}
                             />
                           ))}

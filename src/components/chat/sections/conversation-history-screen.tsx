@@ -481,7 +481,7 @@ export const ConversationHistoryScreen: React.FC<
                       <div className="w-full">
                         <button
                           onClick={() => handleConversationClick(conversation)}
-                          className={`w-full text-left py-4 px-0 transition-colors hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded-lg ${
+                          className={`w-full text-left py-4 px-1 transition-colors hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded-lg ${
                             isDark ? "dark:hover:bg-white/10" : ""
                           }`}
                         >

@@ -63,19 +63,19 @@ const getMenuItems = (): Array<{
     label: t("account.sidebar.subscription"),
     icon: (isActive) => <BillingIcon color={isActive ? "var(--tokens-color-text-text-brand)" : "var(--tokens-color-text-text-primary)"} />
   },
-  {
-    id: "notifications",
-    label: t("account.sidebar.notifications"),
-    icon: (isActive) => (
-      <NotificationsIcon
-        color={
-          isActive
-            ? "var(--tokens-color-text-text-brand)"
-            : "var(--tokens-color-text-text-primary)"
-        }
-      />
-    ),
-  },
+  // {
+  //   id: "notifications",
+  //   label: t("account.sidebar.notifications"),
+  //   icon: (isActive) => (
+  //     <NotificationsIcon
+  //       color={
+  //         isActive
+  //           ? "var(--tokens-color-text-text-brand)"
+  //           : "var(--tokens-color-text-text-primary)"
+  //       }
+  //     />
+  //   ),
+  // },
   {
     id: "usage",
     label: t("account.sidebar.analytics"),

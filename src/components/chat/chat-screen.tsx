@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { NavigationSidebar } from "./sections/navigation-sidebar";
 import { ChatInterface } from "./sections/chat-interface";
 import { ConversationContainer } from "./sections/conversation-container";
@@ -12,6 +12,7 @@ import { useAIModels, useProjects } from "@/hooks";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { setSelectedProject, Project } from "@/store/slices/projectsSlice";
+import { ConversationModalProvider } from "./sections/conversation-modal-context";
 
 export const ChatScreen: React.FC = () => {
   const [hasFiles, setHasFiles] = useState(false);
@@ -84,9 +85,31 @@ export const ChatScreen: React.FC = () => {
     );
   };
 
+  // Modal handlers - these will be passed to ChatInterface which will render the modals
+  const [modalHandlers, setModalHandlers] = useState<{
+    showDeleteModal: (conversationUuid: string) => void;
+    showArchiveModal: (conversationUuid: string) => void;
+  } | null>(null);
+
+  const handleShowDelete = useCallback((uuid: string) => {
+    if (modalHandlers) {
+      modalHandlers.showDeleteModal(uuid);
+    }
+  }, [modalHandlers]);
+
+  const handleShowArchive = useCallback((uuid: string) => {
+    if (modalHandlers) {
+      modalHandlers.showArchiveModal(uuid);
+    }
+  }, [modalHandlers]);
+
   return (
-    <div className="min-h-screen flex bg-[color:var(--tokens-color-surface-surface-primary)]">
-      <NavigationSidebar
+    <ConversationModalProvider
+      onShowDelete={handleShowDelete}
+      onShowArchive={handleShowArchive}
+    >
+      <div className="min-h-screen flex bg-[color:var(--tokens-color-surface-surface-primary)]">
+        <NavigationSidebar
         isOpen={true}
         onClose={() => {}}
         onNewChat={() => {
@@ -158,6 +181,7 @@ export const ChatScreen: React.FC = () => {
                   isStreaming={isStreaming}
                   onFilesChange={setHasFiles}
                   selectedProject={selectedProject}
+                  onModalHandlersReady={setModalHandlers}
                 />
               </div>
             )}
@@ -170,9 +194,11 @@ export const ChatScreen: React.FC = () => {
             selectedProject={selectedProject}
             conversations={conversations}
             selectConversation={selectConversation}
+            onModalHandlersReady={setModalHandlers}
           />
         )}
       </div>
-    </div>
+      </div>
+    </ConversationModalProvider>
   );
 };

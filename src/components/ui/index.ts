@@ -28,9 +28,6 @@ export { Pagination } from './pagination'
 // Modal components
 export { NewFolderModal } from './modal'
 
-// Conversation menu
-export { ConversationMenu } from './conversation-menu'
-
 // Other components
 export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from './card'
 export { ErrorDisplay } from './error-display'

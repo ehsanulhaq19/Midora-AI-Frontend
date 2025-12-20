@@ -159,6 +159,32 @@ class ConversationApiClient {
   }
 
   /**
+   * Archive a conversation
+   */
+  async archiveConversation(conversationUuid: string): Promise<ApiResponse<Conversation>> {
+    const response = await this.baseClient.post<CreateConversationResponse>(`/api/v1/conversations/${conversationUuid}/archive`, {})
+    
+    if (response.error) {
+      return { error: response.error, status: response.status }
+    }
+    
+    return { data: response.data as Conversation, status: response.status }
+  }
+
+  /**
+   * Unarchive a conversation
+   */
+  async unarchiveConversation(conversationUuid: string): Promise<ApiResponse<Conversation>> {
+    const response = await this.baseClient.post<CreateConversationResponse>(`/api/v1/conversations/${conversationUuid}/unarchive`, {})
+    
+    if (response.error) {
+      return { error: response.error, status: response.status }
+    }
+    
+    return { data: response.data as Conversation, status: response.status }
+  }
+
+  /**
    * Get messages for a conversation
    */
   async getMessages(conversationUuid: string, page: number = 1, perPage: number = 50): Promise<ApiResponse<{ messages: Message[], pagination: { page: number, per_page: number, total: number, total_pages: number } }>> {

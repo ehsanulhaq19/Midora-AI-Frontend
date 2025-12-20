@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { MoreOptions, Share, Pencil, Archive, Trash } from "@/icons";
-import { ActionButton } from "../buttons/action-button";
+import { ActionButton } from "../../ui/buttons/action-button";
 
 interface ConversationMenuProps {
   onShare?: () => void;
@@ -54,7 +54,7 @@ export const ConversationMenu: React.FC<ConversationMenuProps> = ({
           }}
         >
           <div className="py-1">
-            {onShare && (
+            {/* {onShare && (
               <div onClick={(e) => e.stopPropagation()}>
                 <ActionButton
                   type="button"
@@ -88,7 +88,7 @@ export const ConversationMenu: React.FC<ConversationMenuProps> = ({
                   </span>
                 </ActionButton>
               </div>
-            )}
+            )} */}
 
             {onArchive && (
               <div onClick={(e) => e.stopPropagation()}>

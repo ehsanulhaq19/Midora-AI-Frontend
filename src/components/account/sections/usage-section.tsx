@@ -1,12 +1,14 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import { EyeIcon, CalendarIcon, ExternalLinkIcon, Logout, TickIcon, ChevronDown } from '@/icons'
 import { Toggle } from '@/components/ui'
 import { useTheme } from '@/hooks/use-theme'
 import { useAuthRedux } from '@/hooks/use-auth-redux'
 import { useAuth } from '@/contexts/AuthContext'
 import { useUserCredits } from '@/hooks/use-user-credits'
+import { useSubscriptionPlans } from '@/hooks/use-subscription-plans'
 import { t, tWithParams } from '@/i18n'
 import { ActionButton } from '@/components/ui/buttons'
 
@@ -261,6 +263,7 @@ const ModelUsageChart: React.FC<{ isDark: boolean }> = ({ isDark }) => {
 }
 
 export const UsageSection: React.FC = () => {
+  const router = useRouter()
   const { resolvedTheme } = useTheme()
   const isDark = resolvedTheme === 'dark'
   const { userEmail } = useAuthRedux()
@@ -269,11 +272,28 @@ export const UsageSection: React.FC = () => {
   const [autoTopUp, setAutoTopUp] = useState(false)
   const [dateRange, setDateRange] = useState<DateRange>('60')
   const { data: creditsData, loading: creditsLoading, error: creditsError } = useUserCredits()
+  const { activeSubscription, loadActiveSubscription, isSubscriptionLoading } = useSubscriptionPlans()
+  const hasLoadedSubscription = useRef(false)
+
+  // Load active subscription on mount (only once)
+  useEffect(() => {
+    // Only load if we haven't already loaded it
+    if (!hasLoadedSubscription.current) {
+      hasLoadedSubscription.current = true
+      loadActiveSubscription()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // Empty dependency array - only run once on mount
+
+  // Check if user has an active paid subscription (not Free and not null)
+  const hasPaidSubscription = activeSubscription && 
+    activeSubscription.plan && 
+    activeSubscription.plan.name.toLowerCase() !== 'free'
 
   // Extract data from API response
   const availableCredits = creditsData?.available_credits ?? 0
   const usedCredits = creditsData?.used_credits ?? 0
-  const planName = creditsData?.plan_name ?? 'No Plan'
+  const planName = creditsData?.plan_name ?? ''
   const nextBillingDate = creditsData?.next_billing_date 
     ? new Date(creditsData.next_billing_date).toLocaleDateString('en-US', { 
         year: 'numeric', 
@@ -320,18 +340,7 @@ export const UsageSection: React.FC = () => {
   }
 
   const handleChangePlan = () => {
-    // TODO: Implement change plan functionality
-    console.log('Change plan clicked')
-  }
-
-  const handleDeleteIndexedCode = () => {
-    // TODO: Implement delete indexed code functionality
-    console.log('Delete indexed code clicked')
-  }
-
-  const handleDeleteAccount = () => {
-    // TODO: Implement delete account functionality
-    console.log('Delete account clicked')
+    router.push('/pricing')
   }
 
   return (
@@ -340,21 +349,7 @@ export const UsageSection: React.FC = () => {
       <div className="flex text-start  w-full items-center justify-start sm:justify-end p-4 sm:p-6 border-b border-[color:var(--tokens-color-border-border-subtle)]">
         <div className="flex items-center gap-2 ">
           <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-primary)] max-w-[170px] sm:max-w-full truncate sm:whitespace-normal before:sm:text-clip">
-            {userEmail || 'user@example.com'}
           </span>
-          <ActionButton
-            onClick={handleLogout}
-            variant="ghost"
-            size="sm"
-            className={`!px-4 !py-2 !rounded-lg ${
-              isDark
-                ? '!bg-[color:var(--tokens-color-surface-surface-card-hover)] !text-[color:var(--tokens-color-text-text-primary)]'
-                : '!bg-[rgba(107,67,146,0.1)] !text-[color:var(--tokens-color-text-text-brand)]'
-            }`}
-            leftIcon={<Logout className="w-4 h-4" />}
-          >
-            <span className="hidden lg:block">{t('account.usage.logout')}</span>
-          </ActionButton>
         </div>
       </div>
 
@@ -457,15 +452,6 @@ export const UsageSection: React.FC = () => {
                       />
                     </div>
                   </div>
-
-                  {/* Auto Top-up Toggle */}
-                  <div className="flex items-center justify-between pt-2">
-                    <Toggle
-                      checked={autoTopUp}
-                      onChange={setAutoTopUp}
-                      label={t('account.usage.autoTopUp')}
-                    />
-                  </div>
                 </div>
               </div>
 
@@ -558,13 +544,15 @@ export const UsageSection: React.FC = () => {
                   </p>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <ActionButton
-                    onClick={handleCancelSubscription}
-                    variant="danger"
-                    size="sm"
-                  >
-                    {t('account.usage.cancelSubscription')}
-                  </ActionButton>
+                  {hasPaidSubscription && (
+                    <ActionButton
+                      onClick={handleCancelSubscription}
+                      variant="danger"
+                      size="sm"
+                    >
+                      {t('account.usage.cancelSubscription')}
+                    </ActionButton>
+                  )}
                   <ActionButton
                     onClick={handleChangePlan}
                     variant="primary"
@@ -577,147 +565,79 @@ export const UsageSection: React.FC = () => {
             </div>
 
             {/* Current Plan Card */}
-            <div
-              className={`w-full rounded-[24px] p-6 border ${
-                isDark
-                  ? ''
-                  : 'border-[color:var(--tokens-color-border-border-subtle)] bg-[color:var(--account-section-card-bg)]'
-              }`}
-              style={
-                isDark
-                  ? {
-                      borderColor: 'var(--tokens-color-border-border-subtle)',
-                      backgroundColor: 'var(--tokens-color-surface-surface-card-default)'
-                    }
-                  : {}
-              }
-            >
-              <h2 className="text-[length:var(--text-large-font-size)] leading-[100%] tracking-[var(--h02-heading02-letter-spacing)] font-[number:var(--h05-heading05-font-weight)] font-[family-name:var(--h02-heading02-font-family)] text-[color:var(--tokens-color-text-text-seconary)] mb-6">
-                {t('account.usage.currentPlan')}: {creditsLoading ? t('account.usage.loading') : planName}
-              </h2>
+            {planDetails && (
+              <div
+                className={`w-full rounded-[24px] p-6 border ${
+                  isDark
+                    ? ''
+                    : 'border-[color:var(--tokens-color-border-border-subtle)] bg-[color:var(--account-section-card-bg)]'
+                }`}
+                style={
+                  isDark
+                    ? {
+                        borderColor: 'var(--tokens-color-border-border-subtle)',
+                        backgroundColor: 'var(--tokens-color-surface-surface-card-default)'
+                      }
+                    : {}
+                }
+              >
+                <h2 className="text-[length:var(--text-large-font-size)] leading-[100%] tracking-[var(--h02-heading02-letter-spacing)] font-[number:var(--h05-heading05-font-weight)] font-[family-name:var(--h02-heading02-font-family)] text-[color:var(--tokens-color-text-text-seconary)] mb-6">
+                  {t('account.usage.currentPlan')}: {creditsLoading ? t('account.usage.loading') : planName}
+                </h2>
 
-              <div className="flex flex-col gap-6">
-                {/* Features List */}
-                <div className="flex flex-col gap-3">
-                  {planDetails && (
-                    <div className="flex items-center gap-3">
-                      <TickIcon className="w-5 h-5" color="var(--premitives-color-brand-purple-1000)" />
-                      <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
-                        {planDetails.credits_per_month.toLocaleString()} {t('account.usage.creditsPerMonth')}
-                      </span>
-                    </div>
-                  )}
-                  <div className="flex items-center gap-3">
-                    <TickIcon className="w-5 h-5" color="var(--premitives-color-brand-purple-1000)" />
-                    <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
-                      {t('account.usage.contextEngine')}
-                    </span>
+                <div className="flex flex-col gap-6">
+                  {/* Features List */}
+                  <div className="flex flex-col gap-3">
+                    {planDetails && (
+                      <>
+                        <div className="flex items-center gap-3">
+                          <TickIcon className="w-5 h-5" color="var(--premitives-color-brand-purple-1000)" />
+                          <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
+                            {planDetails.credits_per_month.toLocaleString()} {t('account.usage.creditsPerMonth')}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <TickIcon className="w-5 h-5" color="var(--premitives-color-brand-purple-1000)" />
+                          <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
+                            {planDetails.file_storage_gb.toLocaleString()} {t('account.usage.fileStorageGB')}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <TickIcon className="w-5 h-5" color="var(--premitives-color-brand-purple-1000)" />
+                          <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
+                            {planDetails.vector_storage_entries.toLocaleString()} {t('account.usage.vectorStorageEntries')}
+                          </span>
+                        </div>
+                         {planDetails.message_history_days !== null && (
+                           <div className="flex items-center gap-3">
+                             <TickIcon className="w-5 h-5" color="var(--premitives-color-brand-purple-1000)" />
+                             <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
+                               {planDetails.message_history_days.toLocaleString()} {t('account.usage.messageHistoryDays')}
+                             </span>
+                           </div>
+                         )}
+                         {planDetails.priority_support && (
+                           <div className="flex items-center gap-3">
+                             <TickIcon className="w-5 h-5" color="var(--premitives-color-brand-purple-1000)" />
+                             <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
+                               {t('account.usage.prioritySupport')}
+                             </span>
+                           </div>
+                         )}
+                         {planDetails.api_access.toLocaleString() != "none" && (
+                           <div className="flex items-center gap-3">
+                             <TickIcon className="w-5 h-5" color="var(--premitives-color-brand-purple-1000)" />
+                             <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
+                              {t('account.usage.apiAccess')}
+                             </span>
+                           </div>
+                         )}
+                      </>
+                    )}
                   </div>
-                  <div className="flex items-center gap-3">
-                    <TickIcon className="w-5 h-5" color="var(--premitives-color-brand-purple-1000)" />
-                    <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
-                      {t('account.usage.mcpTools')}
-                    </span>
-                  </div>
-                  <ActionButton
-                    variant="ghost"
-                    size="sm"
-                    className="!p-0 !h-auto !text-left !text-[color:var(--tokens-color-text-text-brand)] hover:!opacity-80 mt-2 font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]"
-                  >
-                    {t('account.usage.showMore')}
-                  </ActionButton>
-                </div>
-
-                {/* Pricing */}
-                <div className="flex flex-col gap-2 pt-4 border-t border-[color:var(--tokens-color-border-border-subtle)]">
-                  {planDetails ? (
-                    <>
-                      <div className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
-                        {tWithParams('account.usage.pricePerUserMo', { price: planDetails.monthly_price.toFixed(2) })}
-                      </div>
-                      <div className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
-                        {t('account.usage.monthlyTotalLabel')}: ${planDetails.monthly_price.toFixed(2)}
-                      </div>
-                    </>
-                  ) : (
-                    <div className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-inactive-2)]">
-                      {creditsLoading ? t('account.usage.loadingPricing') : t('account.usage.noPricing')}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Danger Zone */}
-            <div
-              className={`w-full rounded-[24px] p-6 border ${
-                isDark
-                  ? ''
-                  : 'border-[color:var(--tokens-color-border-border-subtle)] bg-[color:var(--account-section-card-bg)]'
-              }`}
-              style={
-                isDark
-                  ? {
-                      borderColor: 'var(--tokens-color-border-border-subtle)',
-                      backgroundColor: 'var(--tokens-color-surface-surface-card-default)'
-                    }
-                  : {}
-              }
-            >
-              <h2 className="text-[length:var(--text-large-font-size)] leading-[100%] tracking-[var(--h02-heading02-letter-spacing)] font-[number:var(--h05-heading05-font-weight)] font-[family-name:var(--h02-heading02-font-family)] text-[color:var(--tokens-color-text-text-primary)] mb-6">
-                {t('account.usage.dangerZone')}
-              </h2>
-
-              <div className="flex flex-col">
-                {/* Delete Indexed Code Section */}
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 py-4 border-b border-[color:var(--tokens-color-border-border-subtle)]">
-                  <div className="flex flex-col gap-1">
-                    <h3 className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-red-600">
-                      {t('account.usage.deleteIndexedCode')}
-                    </h3>
-                    <p className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-inactive-2)]">
-                      {t('account.usage.deleteIndexedCodeDescription')}
-                    </p>
-                  </div>
-                  <ActionButton
-                    onClick={handleDeleteIndexedCode}
-                    variant="outline"
-                    size="sm"
-                    className={`w-full md:w-auto ${
-                      isDark
-                        ? '!bg-[rgba(220,38,38,0.1)] !text-[#ef4444] !border-[rgba(220,38,38,0.3)]'
-                        : '!bg-red-50 !text-red-600 !border-red-200'
-                    }`}
-                  >
-                    {t('account.usage.deleteIndexedCode')}
-                  </ActionButton>
-                </div>
-
-                {/* Delete Account Section */}
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 py-4">
-                  <div className="flex flex-col gap-1">
-                    <h3 className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-red-600">
-                      {t('account.usage.deleteAccount')}
-                    </h3>
-                    <p className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-inactive-2)]">
-                      {t('account.usage.deleteAccountDescription')}
-                    </p>
-                  </div>
-                  <ActionButton
-                    onClick={handleDeleteAccount}
-                    variant="outline"
-                    size="sm"
-                    className={`w-full md:w-auto ${
-                      isDark
-                        ? '!bg-[rgba(220,38,38,0.1)] !text-[#ef4444] !border-[rgba(220,38,38,0.3)]'
-                        : '!bg-red-50 !text-red-600 !border-red-200'
-                    }`}
-                  >
-                    {t('account.usage.deleteAccount')}
-                  </ActionButton>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         )}
 

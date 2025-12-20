@@ -12,6 +12,8 @@ import { Conversation } from "@/api/conversation/types";
 import { ProjectScreen } from "./project-screen";
 import { useRouter } from "next/navigation";
 import { useTheme } from "@/hooks/use-theme";
+import { ConfirmationModal } from "./confirmation-modal";
+import { useConversation } from "@/hooks/use-conversation";
 
 interface Project {
   id: string;
@@ -32,6 +34,10 @@ interface ChatInterfaceProps {
   selectedProject?: Project | null;
   conversations?: Conversation[];
   selectConversation?: (conversationUuid: string) => void;
+  onModalHandlersReady?: (handlers: {
+    showDeleteModal: (conversationUuid: string) => void;
+    showArchiveModal: (conversationUuid: string) => void;
+  }) => void;
 }
 
 export const ChatInterface: React.FC<ChatInterfaceProps> = ({
@@ -42,6 +48,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   selectedProject,
   conversations = [],
   selectConversation,
+  onModalHandlersReady,
 }) => {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
@@ -50,6 +57,51 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const { error: showErrorToast } = useToast();
   const messageInputRef = useRef<MessageInputHandle>(null);
   const router = useRouter();
+  const { deleteConversation, archiveConversation } = useConversation();
+  
+  // Modal state
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showArchiveModal, setShowArchiveModal] = useState(false);
+  const [pendingConversationUuid, setPendingConversationUuid] = useState<string | null>(null);
+
+  // Handle delete confirmation
+  const handleDeleteConfirm = useCallback(async () => {
+    if (pendingConversationUuid) {
+      await deleteConversation(pendingConversationUuid);
+      setPendingConversationUuid(null);
+      setShowDeleteModal(false);
+    }
+  }, [pendingConversationUuid, deleteConversation]);
+
+  // Handle archive confirmation
+  const handleArchiveConfirm = useCallback(async () => {
+    if (pendingConversationUuid) {
+      await archiveConversation(pendingConversationUuid);
+      setPendingConversationUuid(null);
+      setShowArchiveModal(false);
+    }
+  }, [pendingConversationUuid, archiveConversation]);
+
+  // Handlers to show modals
+  const handleShowDeleteModal = useCallback((conversationUuid: string) => {
+    setPendingConversationUuid(conversationUuid);
+    setShowDeleteModal(true);
+  }, []);
+
+  const handleShowArchiveModal = useCallback((conversationUuid: string) => {
+    setPendingConversationUuid(conversationUuid);
+    setShowArchiveModal(true);
+  }, []);
+
+  // Expose handlers to parent
+  React.useEffect(() => {
+    if (onModalHandlersReady) {
+      onModalHandlersReady({
+        showDeleteModal: handleShowDeleteModal,
+        showArchiveModal: handleShowArchiveModal,
+      });
+    }
+  }, [onModalHandlersReady, handleShowDeleteModal, handleShowArchiveModal]);
   const handleProjectFilesSelect = useCallback(
     async (files: FileList | null) => {
       if (!files || files.length === 0) return;
@@ -134,55 +186,120 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
   if (isCompact) {
     return (
-      <div
-        className="w-full max-w-[808px] max-h-[106px] mx-auto p-4 relative"
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-      >
-        <DragDropOverlay isVisible={isDragOver} />
-        <MessageInput
-          ref={messageInputRef}
-          onSend={onSendMessage}
-          isStreaming={isStreaming}
-          className="max-w-[808px]"
-          textAreaClassName="!app-text-lg"
-          onFilesChange={onFilesChange}
+      <>
+        <div
+          className="w-full max-w-[808px] max-h-[106px] mx-auto p-4 relative"
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+        >
+          <DragDropOverlay isVisible={isDragOver} />
+          <MessageInput
+            ref={messageInputRef}
+            onSend={onSendMessage}
+            isStreaming={isStreaming}
+            className="max-w-[808px]"
+            textAreaClassName="!app-text-lg"
+            onFilesChange={onFilesChange}
+          />
+        </div>
+
+        {/* Delete Confirmation Modal */}
+        <ConfirmationModal
+          isOpen={showDeleteModal}
+          onClose={() => {
+            setShowDeleteModal(false);
+            setPendingConversationUuid(null);
+          }}
+          onConfirm={handleDeleteConfirm}
+          title="Delete Conversation"
+          message="Are you sure you want to delete this conversation? This action cannot be undone and all messages will be permanently removed."
+          confirmText="Delete"
+          cancelText="Cancel"
+          confirmButtonVariant="danger"
         />
-      </div>
+
+        {/* Archive Confirmation Modal */}
+        <ConfirmationModal
+          isOpen={showArchiveModal}
+          onClose={() => {
+            setShowArchiveModal(false);
+            setPendingConversationUuid(null);
+          }}
+          onConfirm={handleArchiveConfirm}
+          title="Archive Conversation"
+          message="Are you sure you want to archive this conversation? It will be hidden from your conversation list but can be restored later."
+          confirmText="Archive"
+          cancelText="Cancel"
+          confirmButtonVariant="primary"
+        />
+      </>
     );
   }
 
   // If a project is selected, show the project screen
   if (selectedProject) {
     return (
+      <>
+        <div
+          className="flex flex-col items-center px-4 lg:px-0 py-6 relative flex-1 grow min-h-screen"
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+        >
+          <DragDropOverlay isVisible={isDragOver} />
+          <ProjectScreen
+            project={selectedProject}
+            conversations={conversations || []}
+            onSelectConversation={selectConversation}
+            onSendMessage={onSendMessage}
+            isStreaming={isStreaming}
+            onFilesChange={onFilesChange}
+          />
+        </div>
+
+        {/* Delete Confirmation Modal */}
+        <ConfirmationModal
+          isOpen={showDeleteModal}
+          onClose={() => {
+            setShowDeleteModal(false);
+            setPendingConversationUuid(null);
+          }}
+          onConfirm={handleDeleteConfirm}
+          title="Delete Conversation"
+          message="Are you sure you want to delete this conversation? This action cannot be undone and all messages will be permanently removed."
+          confirmText="Delete"
+          cancelText="Cancel"
+          confirmButtonVariant="danger"
+        />
+
+        {/* Archive Confirmation Modal */}
+        <ConfirmationModal
+          isOpen={showArchiveModal}
+          onClose={() => {
+            setShowArchiveModal(false);
+            setPendingConversationUuid(null);
+          }}
+          onConfirm={handleArchiveConfirm}
+          title="Archive Conversation"
+          message="Are you sure you want to archive this conversation? It will be hidden from your conversation list but can be restored later."
+          confirmText="Archive"
+          cancelText="Cancel"
+          confirmButtonVariant="primary"
+        />
+      </>
+    );
+  }
+
+  return (
+    <>
       <div
-        className="flex flex-col items-center px-4 lg:px-0 py-6 relative flex-1 grow min-h-screen"
+        className="flex flex-col items-center gap-[246px] px-4 lg:px-0 py-6 relative flex-1 grow min-h-screen"
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
       >
         <DragDropOverlay isVisible={isDragOver} />
-        <ProjectScreen
-          project={selectedProject}
-          conversations={conversations || []}
-          onSelectConversation={selectConversation}
-          onSendMessage={onSendMessage}
-          isStreaming={isStreaming}
-          onFilesChange={onFilesChange}
-        />
-      </div>
-    );
-  }
-
-  return (
-    <div
-      className="flex flex-col items-center gap-[246px] px-4 lg:px-0 py-6 relative flex-1 grow min-h-screen"
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
-      onDrop={handleDrop}
-    >
-      <DragDropOverlay isVisible={isDragOver} />
 
       {/* Header */}
       <div className="flex items-start justify-between relative w-full px-[24px] lg:px-[24px] pl-[64px]">
@@ -232,6 +349,37 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
           onFilesChange={onFilesChange}
         />
       </div>
-    </div>
+      </div>
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setPendingConversationUuid(null);
+        }}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Conversation"
+        message="Are you sure you want to delete this conversation? This action cannot be undone and all messages will be permanently removed."
+        confirmText="Delete"
+        cancelText="Cancel"
+        confirmButtonVariant="danger"
+      />
+
+      {/* Archive Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showArchiveModal}
+        onClose={() => {
+          setShowArchiveModal(false);
+          setPendingConversationUuid(null);
+        }}
+        onConfirm={handleArchiveConfirm}
+        title="Archive Conversation"
+        message="Are you sure you want to archive this conversation? It will be hidden from your conversation list but can be restored later."
+        confirmText="Archive"
+        cancelText="Cancel"
+        confirmButtonVariant="primary"
+      />
+    </>
   );
 };
