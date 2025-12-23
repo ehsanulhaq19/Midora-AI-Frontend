@@ -292,6 +292,22 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
                 disabled={isLoggingIn}
                 placeholder={t('common.inputs.passwordPlaceholder')}
               />
+              {
+                <div className='flex justify-end w-full'>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (onShowOnboarding) {
+                      onShowOnboarding('forgotPassword')
+                    }
+                  }}
+                  className="text-sm text-[color:var(--tokens-color-text-text-inactive-2)]  mt-4 hover:text-[color:var(--tokens-color-text-text-primary)] block transition-colors duration-200 cursor-pointer text-right"
+                >
+                  forgot password?
+                </button>
+                </div>
+              }
+              
               {passwordError && (
                 <p className="mt-2 text-sm text-red-500 font-SF-Pro">
                   {passwordError}

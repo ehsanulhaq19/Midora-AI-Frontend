@@ -185,7 +185,7 @@ export const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>(({
                 onClick={handleAddAttachment}
               />
 
-              <IconButton
+              {/* <IconButton
                 type="button"
                 variant="outline"
                 size="md"
@@ -196,7 +196,7 @@ export const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>(({
                   backgroundColor: '#F4F5F5'
                 }}
                 disabled={isStreaming || isUploading}
-              />
+              /> */}
             </div>
 
             {/* Right side buttons */}

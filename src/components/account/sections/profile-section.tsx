@@ -25,6 +25,7 @@ export const ProfileSection: React.FC = () => {
     last_name: "",
     password: "",
     confirmPassword: "",
+    currentPassword: "",
     workFunction: "",
   });
   const [passwordError, setPasswordError] = useState<string | null>(null);
@@ -52,6 +53,7 @@ export const ProfileSection: React.FC = () => {
         last_name: user.last_name || "",
         password: "",
         confirmPassword: "",
+        currentPassword: "",
         workFunction: "",
       });
       
@@ -343,6 +345,28 @@ export const ProfileSection: React.FC = () => {
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 placeholder={t('account.profile.confirmPasswordPlaceholder')}
+                className={`flex h-[54px] items-center gap-3 px-6 py-3 rounded-xl border transition-all duration-200 focus:ring-2 focus:ring-[color:var(--tokens-color-text-text-seconary)] focus:ring-offset-2 outline-none font-SF-Pro font-normal text-base tracking-[-0.48px] leading-[100%] ${
+                  isDark ? '' : 'border-[#dbdbdb] bg-transparent text-black'
+                } ${passwordError ? 'border-red-500' : ''}`}
+                style={isDark ? {
+                  borderColor: passwordError ? '#ef4444' : 'var(--tokens-color-border-border-inactive)',
+                  backgroundColor: 'var(--tokens-color-surface-surface-card-default)',
+                  color: 'var(--tokens-color-text-text-primary)'
+                } : {}}
+              />
+            </div>
+
+            {/*Current Password */}
+            <div className="flex flex-col gap-2">
+              <label className="font-h02-heading02 font-[number:var(--h05-heading05-font-weight)] text-[color:var(--tokens-color-text-text-primary)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
+                {t('account.profile.currentPassword')}
+              </label>
+              <input
+                type="password"
+                name="currentPassword"
+                value={formData.currentPassword}
+                onChange={handleChange}
+                placeholder={t('account.profile.currentPasswordPlaceholder')}
                 className={`flex h-[54px] items-center gap-3 px-6 py-3 rounded-xl border transition-all duration-200 focus:ring-2 focus:ring-[color:var(--tokens-color-text-text-seconary)] focus:ring-offset-2 outline-none font-SF-Pro font-normal text-base tracking-[-0.48px] leading-[100%] ${
                   isDark ? '' : 'border-[#dbdbdb] bg-transparent text-black'
                 } ${passwordError ? 'border-red-500' : ''}`}
