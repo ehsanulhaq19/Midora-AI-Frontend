@@ -36,7 +36,11 @@ export const account = {
     displayNamePlaceholder: 'Enter your last name',
     password: 'Password',
     passwordPlaceholder: 'Enter new password',
+    currentPasswordPlaceholder: 'Enter current password',
+
     confirmPassword: 'Confirm Password',
+    currentPassword: 'Current Password',
+
     confirmPasswordPlaceholder: 'Confirm your new password',
     workFunction: 'Your work function',
     workFunctionPlaceholder: 'Enter your work function',
@@ -66,7 +70,7 @@ export const account = {
   usage: {
     logout: 'Logout',
     subscription: 'subscription',
-    team: 'team',
+    team: 'Usage',
     analytics: 'analytics',
     subscriptionTitle: 'Subscription',
     credits: 'Credits',
@@ -122,7 +126,12 @@ export const account = {
     vectorStorageEntries: 'Vector storage entries',
     messageHistoryDays: 'Message history days',
     prioritySupport: 'Priority support',
-    apiAccess: 'API access'
+    apiAccess: 'API access',
+    date: 'Date',
+    type: 'Type',
+    model: 'Model',
+    tokens: 'Tokens',
+    cost: 'Cost',
   },
 }
 
