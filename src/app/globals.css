@@ -688,6 +688,19 @@
     border-radius: var(--premitives-corner-radius-corner-radius-3);
   }
 
+  /* Input and textarea text color in dark mode - light theme color */
+  [data-theme="dark"] input[type="text"],
+  [data-theme="dark"] input[type="email"],
+  [data-theme="dark"] input[type="password"],
+  [data-theme="dark"] input[type="search"],
+  [data-theme="dark"] input[type="tel"],
+  [data-theme="dark"] input[type="url"],
+  [data-theme="dark"] input[type="number"],
+  [data-theme="dark"] input:not([type]),
+  [data-theme="dark"] textarea {
+    color: #ffffff !important;
+  }
+
   /* Message input icon buttons - inherit background in dark mode */
   [data-theme="dark"] .message-input-icon-button {
     background-color: inherit !important;
