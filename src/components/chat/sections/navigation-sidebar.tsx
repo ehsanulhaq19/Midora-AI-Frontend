@@ -416,6 +416,10 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
   const handleAccountClick = () => {
     onAccountClick?.();
     setIsDropdownOpen(false);
+    // Close mobile sidebar when clicking on mobile
+    if (isMobile) {
+      setIsMobileOpen(false);
+    }
   };
 
   // Handle click outside to close dropdown
@@ -737,7 +741,12 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
             )}
             {isShrunk ? (
               <button
-                onClick={() => setIsNewFolderModalOpen(true)}
+                onClick={() => {
+                  setIsNewFolderModalOpen(true);
+                  if (isMobile) {
+                    setIsMobileOpen(false);
+                  }
+                }}
                 className="w-10 h-10 rounded-lg mb-2 flex items-center justify-center transition-colors hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]"
                 title={t("chat.newFolder")}
               >
@@ -745,7 +754,12 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
               </button>
             ) : (
               <button
-                onClick={() => setIsNewFolderModalOpen(true)}
+                onClick={() => {
+                  setIsNewFolderModalOpen(true);
+                  if (isMobile) {
+                    setIsMobileOpen(false);
+                  }
+                }}
                 className="sidebar-menu-item flex items-center relative w-full hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded-[var(--premitives-corner-radius-corner-radius)] transition-colors px-5 py-2 gap-2 dark:hover:bg-white/10"
                 title={t("chat.newFolder")}
               >

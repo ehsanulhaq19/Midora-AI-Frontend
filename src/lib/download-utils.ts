@@ -67,15 +67,38 @@ export const downloadAsPDF = (content: string, filename: string = 'content.pdf')
               }
               code {
                 background-color: #f4f4f4;
-                padding: 2px 4px;
+                padding: 2px 6px;
+                border: 1px solid #d0d0d0;
                 border-radius: 3px;
                 font-family: 'Courier New', monospace;
+                font-size: 10pt;
+                white-space: pre-wrap;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
               }
               pre {
-                background-color: #f4f4f4;
-                padding: 10px;
+                background-color: #f5f5f5;
+                padding: 12px 16px;
+                margin: 12px 0;
                 border-radius: 5px;
-                overflow-x: auto;
+                overflow-x: visible;
+                overflow-wrap: break-word;
+                word-wrap: break-word;
+                font-family: 'Courier New', 'Consolas', 'Monaco', monospace;
+                font-size: 9pt;
+                line-height: 1.5;
+                white-space: pre-wrap;
+                max-width: 100%;
+              }
+              pre code {
+                background-color: transparent;
+                padding: 0;
+                border: none;
+                border-radius: 0;
+                font-size: inherit;
+                white-space: pre-wrap;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
               }
               blockquote {
                 border-left: 4px solid #ddd;
@@ -158,6 +181,7 @@ export const downloadAsWord = (content: string, filename: string = 'content.docx
           <w:WordDocument>
             <w:View>Print</w:View>
             <w:Zoom>90</w:Zoom>
+            <w:DoNotOptimizeForBrowser/>
           </w:WordDocument>
         </xml>
         <style>
@@ -198,11 +222,28 @@ export const downloadAsWord = (content: string, filename: string = 'content.docx
             background-color: #f4f4f4;
             padding: 2px 4px;
             font-family: 'Courier New', monospace;
+          
+            border-radius: 3px;
+            white-space: pre;
           }
           pre {
-            background-color: #f4f4f4;
+            background-color: #f5f5f5;
             padding: 10px;
+            margin: 12px 0;
             overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 10pt;
+            line-height: 1.5;
+            white-space: pre;
+            word-wrap: break-word;
+          }
+          pre code {
+            background-color: transparent;
+            padding: 0;
+            border: none;
+            border-radius: 0;
+            font-size: inherit;
+            white-space: pre;
           }
           blockquote {
             border-left: 4px solid #ccc;
@@ -225,7 +266,7 @@ export const downloadAsWord = (content: string, filename: string = 'content.docx
   const link = document.createElement('a')
   link.href = url
   link.download = filename.endsWith('.docx') || filename.endsWith('.doc') 
-    ? filename 
+    ? filename.replace('.docx', '.doc')
     : `${filename}.doc`
   document.body.appendChild(link)
   link.click()

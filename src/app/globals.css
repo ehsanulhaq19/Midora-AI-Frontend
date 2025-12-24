@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap");
-
+ 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -686,6 +686,19 @@
   [data-theme="dark"] textarea {
     background-color: #303030 !important;
     border-radius: var(--premitives-corner-radius-corner-radius-3);
+  }
+
+  /* Input and textarea text color in dark mode - light theme color */
+  [data-theme="dark"] input[type="text"],
+  [data-theme="dark"] input[type="email"],
+  [data-theme="dark"] input[type="password"],
+  [data-theme="dark"] input[type="search"],
+  [data-theme="dark"] input[type="tel"],
+  [data-theme="dark"] input[type="url"],
+  [data-theme="dark"] input[type="number"],
+  [data-theme="dark"] input:not([type]),
+  [data-theme="dark"] textarea {
+    color: #ffffff !important;
   }
 
   /* Message input icon buttons - inherit background in dark mode */
