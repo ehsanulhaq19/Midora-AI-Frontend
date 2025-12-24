@@ -292,8 +292,12 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
                 disabled={isLoggingIn}
                 placeholder={t('common.inputs.passwordPlaceholder')}
               />
-              {
-                <div className='flex justify-end w-full'>
+              <div className={`flex items-center w-full mt-4 ${passwordError ? 'justify-between' : 'justify-end'}`}>
+                {passwordError && (
+                  <p className="text-sm text-red-500 font-SF-Pro">
+                    {passwordError}
+                  </p>
+                )}
                 <button
                   type="button"
                   onClick={() => {
@@ -301,18 +305,11 @@ export const SignupFormSection: React.FC<SignupFormSectionProps> = ({ className,
                       onShowOnboarding('forgotPassword')
                     }
                   }}
-                  className="text-sm text-[color:var(--tokens-color-text-text-inactive-2)]  mt-4 hover:text-[color:var(--tokens-color-text-text-primary)] block transition-colors duration-200 cursor-pointer text-right"
+                  className="text-sm text-[color:var(--tokens-color-text-text-inactive-2)] hover:text-[color:var(--tokens-color-text-text-primary)] block transition-colors duration-200 cursor-pointer"
                 >
                   forgot password?
                 </button>
-                </div>
-              }
-              
-              {passwordError && (
-                <p className="mt-2 text-sm text-red-500 font-SF-Pro">
-                  {passwordError}
-                </p>
-              )}
+              </div>
             </div>
 
             {/* Submit Button */}
