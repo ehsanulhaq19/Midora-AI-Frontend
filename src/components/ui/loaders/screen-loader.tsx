@@ -65,8 +65,18 @@ export const ScreenLoader: React.FC<ScreenLoaderProps> = ({
 
   if (fullScreen) {
     return (
-      <div className={`fixed inset-0 z-50 flex items-center justify-center ${isDark ? 'bg-[color:var(--tokens-color-surface-surface-card-hover)]' : 'bg-white'}`}>
-        <div className={`rounded-xl p-8 ${isDark ? 'bg-[color:var(--tokens-color-surface-surface-card-hover)]' : 'bg-white'}`}>
+      <div 
+        className="fixed inset-0 z-50 flex items-center justify-center"
+        style={{
+          backgroundColor: isDark ? '#181818' : '#ffffff'
+        }}
+      >
+        <div 
+          className="rounded-xl p-8"
+          style={{
+            backgroundColor: isDark ? '#181818' : '#ffffff'
+          }}
+        >
           {content}
         </div>
       </div>

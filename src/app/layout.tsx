@@ -42,8 +42,42 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
+        {/* Blocking inline script - runs immediately before anything else renders */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var theme = localStorage.getItem('midora-theme');
+                  var getSystemTheme = function() {
+                    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                  };
+                  var getResolvedTheme = function(t) {
+                    if (t === 'system' || !t) return getSystemTheme();
+                    return t;
+                  };
+                  var resolvedTheme = getResolvedTheme(theme);
+                  var root = document.documentElement;
+                  var body = document.body;
+                  
+                  if (resolvedTheme === 'dark') {
+                    root.setAttribute('data-theme', 'dark');
+                    root.style.backgroundColor = '#212121';
+                    if (body) body.style.backgroundColor = '#212121';
+                  } else {
+                    root.removeAttribute('data-theme');
+                    root.style.backgroundColor = '#ffffff';
+                    if (body) body.style.backgroundColor = '#ffffff';
+                  }
+                } catch (e) {
+                  console.error('Theme initialization error:', e);
+                }
+              })();
+            `,
+          }}
+        />
         <Script
           id="theme-init"
           strategy="beforeInteractive"
@@ -61,10 +95,20 @@ export default function RootLayout({
                   };
                   const resolvedTheme = getResolvedTheme(theme);
                   const root = document.documentElement;
+                  const body = document.body;
+                  
                   if (resolvedTheme === 'dark') {
                     root.setAttribute('data-theme', 'dark');
+                    root.style.backgroundColor = '#212121';
+                    if (body) {
+                      body.style.backgroundColor = '#212121';
+                    }
                   } else {
                     root.removeAttribute('data-theme');
+                    root.style.backgroundColor = '#ffffff';
+                    if (body) {
+                      body.style.backgroundColor = '#ffffff';
+                    }
                   }
                 } catch (e) {
                   console.error('Theme initialization error:', e);
