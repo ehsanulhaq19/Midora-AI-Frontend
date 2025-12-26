@@ -30,3 +30,26 @@ export interface UserCreditsAndSubscriptionInfo {
   plan_details: SubscriptionPlanDetails | null;
 }
 
+export interface DailyCreditsUsage {
+  date: string;
+  credits_used: number;
+}
+
+export interface ModelUsage {
+  model_name: string;
+  percentage_used: number;
+}
+
+export interface QueryUsageAnalyticsData {
+  total_credits_used: number;
+  total_queries: number;
+  daily_credits_usage: DailyCreditsUsage[];
+  model_usage: ModelUsage[];
+}
+
+export interface QueryUsageAnalyticsResponse {
+  success: boolean;
+  data: QueryUsageAnalyticsData;
+  message: string;
+}
+

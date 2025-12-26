@@ -9,85 +9,77 @@ import { useAuthRedux } from '@/hooks/use-auth-redux'
 import { useAuth } from '@/contexts/AuthContext'
 import { useUserCredits } from '@/hooks/use-user-credits'
 import { useSubscriptionPlans } from '@/hooks/use-subscription-plans'
+import { useQueryUsageAnalytics } from '@/hooks/use-query-usage-analytics'
 import { t, tWithParams } from '@/i18n'
 import { ActionButton } from '@/components/ui/buttons'
 
 type UsageTab = 'subscription' | 'team' | 'analytics'
 type DateRange = '7' | '30' | '60' | 'billing'
 
-// Mock data for daily credit consumption
-const dailyCreditData = [
-  { date: 'Oct 28', value: 8500 },
-  { date: 'Oct 29', value: 12000 },
-  { date: 'Oct 30', value: 9800 },
-  { date: 'Oct 31', value: 15000 },
-  { date: 'Nov 1', value: 11000 },
-  { date: 'Nov 2', value: 13500 },
-  { date: 'Nov 3', value: 9200 },
-  { date: 'Nov 4', value: 18000 },
-  { date: 'Nov 5', value: 14000 },
-  { date: 'Nov 6', value: 16000 },
-  { date: 'Nov 7', value: 12500 },
-  { date: 'Nov 8', value: 19000 },
-  { date: 'Nov 9', value: 11000 },
-  { date: 'Nov 10', value: 14500 },
-  { date: 'Nov 11', value: 17000 },
-  { date: 'Nov 12', value: 13000 },
-  { date: 'Nov 13', value: 20000 },
-  { date: 'Nov 14', value: 15000 },
-  { date: 'Nov 15', value: 17500 },
-  { date: 'Nov 16', value: 14000 },
-  { date: 'Nov 17', value: 18500 },
-  { date: 'Nov 18', value: 12000 },
-  { date: 'Nov 19', value: 16000 },
-  { date: 'Nov 20', value: 19500 },
-  { date: 'Nov 21', value: 14500 },
-  { date: 'Nov 22', value: 17000 },
-  { date: 'Nov 23', value: 13500 },
-  { date: 'Nov 24', value: 21000 },
-  { date: 'Nov 25', value: 15500 },
-  { date: 'Nov 26', value: 18000 },
-  { date: 'Nov 27', value: 14000 },
-  { date: 'Nov 28', value: 19500 },
-  { date: 'Nov 29', value: 16000 }
-]
-
-const maxCreditValue = 25000
-
 // Daily Credit Consumption Chart Component
-const DailyCreditChart: React.FC<{ isDark: boolean }> = ({ isDark }) => {
+const DailyCreditChart: React.FC<{ isDark: boolean; data: Array<{ date: string; credits_used: number }> }> = ({ isDark, data }) => {
   const chartHeight = 200
   const chartWidth = 600
   const padding = { top: 10, right: 20, bottom: 40, left: 50 }
+
+  // Format date for display (e.g., "Nov 28")
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr)
+    const month = date.toLocaleDateString('en-US', { month: 'short' })
+    const day = date.getDate()
+    return `${month} ${day}`
+  }
+
+  // Transform data for chart
+  const chartData = data.map(item => ({
+    date: formatDate(item.date),
+    value: item.credits_used
+  }))
+
+  const maxCreditValue = chartData.length > 0 
+    ? Math.max(...chartData.map(d => d.value), 1000) 
+    : 1000
 
   const getYPosition = (value: number) => {
     return chartHeight - padding.bottom - ((value / maxCreditValue) * (chartHeight - padding.top - padding.bottom))
   }
 
   const getXPosition = (index: number) => {
+    if (chartData.length === 0) return padding.left
+    if (chartData.length === 1) return padding.left
     const availableWidth = chartWidth - padding.left - padding.right
-    return padding.left + (index / (dailyCreditData.length - 1)) * availableWidth
+    return padding.left + (index / (chartData.length - 1)) * availableWidth
   }
 
   // Create area path
   const createAreaPath = () => {
+    if (chartData.length === 0) return ''
     let path = `M ${getXPosition(0)} ${chartHeight - padding.bottom}`
-    dailyCreditData.forEach((point, index) => {
+    chartData.forEach((point, index) => {
       path += ` L ${getXPosition(index)} ${getYPosition(point.value)}`
     })
-    path += ` L ${getXPosition(dailyCreditData.length - 1)} ${chartHeight - padding.bottom} Z`
+    path += ` L ${getXPosition(chartData.length - 1)} ${chartHeight - padding.bottom} Z`
     return path
   }
 
   // Create line path
   const createLinePath = () => {
-    let path = `M ${getXPosition(0)} ${getYPosition(dailyCreditData[0].value)}`
-    dailyCreditData.forEach((point, index) => {
+    if (chartData.length === 0) return ''
+    let path = `M ${getXPosition(0)} ${getYPosition(chartData[0].value)}`
+    chartData.forEach((point, index) => {
       if (index > 0) {
         path += ` L ${getXPosition(index)} ${getYPosition(point.value)}`
       }
     })
     return path
+  }
+
+  if (chartData.length === 0) {
+    return (
+      <div className="w-full h-[200px] flex items-center justify-center text-[color:var(--tokens-color-text-text-inactive-2)]">
+        No data available
+      </div>
+    )
   }
 
   return (
@@ -98,30 +90,38 @@ const DailyCreditChart: React.FC<{ isDark: boolean }> = ({ isDark }) => {
         preserveAspectRatio="none"
       >
         {/* Y-axis labels */}
-        {[0, 5000, 10000, 15000, 20000, 25000].map((value) => {
-          const y = getYPosition(value)
-          return (
-            <g key={value}>
-              <line
-                x1={padding.left - 5}
-                y1={y}
-                x2={padding.left}
-                y2={y}
-                stroke={isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)'}
-                strokeWidth="1"
-              />
-              <text
-                x={padding.left - 10}
-                y={y + 4}
-                textAnchor="end"
-                fontSize="8"
-                fill={isDark ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)'}
-              >
-                {value.toLocaleString()}
-              </text>
-            </g>
-          )
-        })}
+        {(() => {
+          const steps = 5
+          const stepValue = maxCreditValue / steps
+          const labels = []
+          for (let i = 0; i <= steps; i++) {
+            labels.push(Math.round(i * stepValue))
+          }
+          return labels.map((value) => {
+            const y = getYPosition(value)
+            return (
+              <g key={value}>
+                <line
+                  x1={padding.left - 5}
+                  y1={y}
+                  x2={padding.left}
+                  y2={y}
+                  stroke={isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)'}
+                  strokeWidth="1"
+                />
+                <text
+                  x={padding.left - 10}
+                  y={y + 4}
+                  textAnchor="end"
+                  fontSize="8"
+                  fill={isDark ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)'}
+                >
+                  {value.toLocaleString()}
+                </text>
+              </g>
+            )
+          })
+        })()}
 
         {/* Area */}
         <path
@@ -146,9 +146,10 @@ const DailyCreditChart: React.FC<{ isDark: boolean }> = ({ isDark }) => {
           </linearGradient>
         </defs>
 
-        {/* X-axis labels (show every 5th date) */}
-        {dailyCreditData.map((point, index) => {
-          if (index % 5 === 0) {
+        {/* X-axis labels (show every 5th date or all if less than 10) */}
+        {chartData.map((point, index) => {
+          const showLabel = chartData.length <= 10 || index % Math.ceil(chartData.length / 10) === 0 || index === chartData.length - 1
+          if (showLabel) {
             const x = getXPosition(index)
             return (
               <g key={index}>
@@ -180,11 +181,25 @@ const DailyCreditChart: React.FC<{ isDark: boolean }> = ({ isDark }) => {
 }
 
 // Model Usage Distribution Chart Component
-const ModelUsageChart: React.FC<{ isDark: boolean }> = ({ isDark }) => {
-  const modelData = [
-    { name: 'Claude Sonnet', percentage: 90.8, color: '#FF6B35' },
-    { name: 'Claude Sonnet 4', percentage: 10.2, color: '#4A90E2' }
-  ]
+const ModelUsageChart: React.FC<{ isDark: boolean; data: Array<{ model_name: string; percentage_used: number }> }> = ({ isDark, data }) => {
+  // Color palette for models
+  const colors = ['#FF6B35', '#4A90E2', '#F7931E', '#50C878', '#9B59B6', '#E74C3C', '#3498DB', '#1ABC9C']
+  
+  const modelData = data.map((item, index) => ({
+    name: item.model_name,
+    percentage: item.percentage_used,
+    color: colors[index % colors.length]
+  }))
+
+  if (modelData.length === 0) {
+    return (
+      <div className="flex flex-col items-center gap-8">
+        <div className="text-[color:var(--tokens-color-text-text-inactive-2)]">
+          No model usage data available
+        </div>
+      </div>
+    )
+  }
 
   const size = 200
   const centerX = size / 2
@@ -216,7 +231,8 @@ const ModelUsageChart: React.FC<{ isDark: boolean }> = ({ isDark }) => {
   }
 
   return (
-    <div className="flex flex-col lg:flex-row items-center gap-8">
+    <div className="flex flex-col items-center gap-6 w-full">
+      {/* Chart */}
       <div className="flex-shrink-0">
         <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="chart-svg">
           {modelData.map((item, index) => {
@@ -239,24 +255,26 @@ const ModelUsageChart: React.FC<{ isDark: boolean }> = ({ isDark }) => {
         </svg>
       </div>
 
-      {/* Legend */}
-      <div className="flex flex-col gap-4">
-        {modelData.map((item, index) => (
-          <div key={index} className="flex items-center gap-3">
-            <div
-              className="w-4 h-4 rounded-full"
-              style={{ backgroundColor: item.color }}
-            />
-            <div className="flex flex-col">
-              <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
-                {item.name}
-              </span>
-              <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[14px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-inactive-2)]">
-                {item.percentage}%
-              </span>
+      {/* Scrollable Model List */}
+      <div className="w-full max-h-[300px] overflow-y-auto pr-2">
+        <div className="flex flex-col gap-3">
+          {modelData.map((item, index) => (
+            <div key={index} className="flex items-center gap-3 py-2">
+              <div
+                className="w-4 h-4 rounded-full flex-shrink-0"
+                style={{ backgroundColor: item.color }}
+              />
+              <div className="flex flex-col flex-1 min-w-0">
+                <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-primary)] truncate">
+                  {item.name}
+                </span>
+                <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[14px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-inactive-2)]">
+                  {item.percentage}%
+                </span>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   )
@@ -266,7 +284,7 @@ export const UsageSection: React.FC = () => {
   const router = useRouter()
   const { resolvedTheme } = useTheme()
   const isDark = resolvedTheme === 'dark'
-  const { userEmail } = useAuthRedux()
+  const { userEmail, user } = useAuthRedux()
   const { logout } = useAuth()
   const [activeTab, setActiveTab] = useState<UsageTab>('subscription')
   const [autoTopUp, setAutoTopUp] = useState(false)
@@ -274,6 +292,35 @@ export const UsageSection: React.FC = () => {
   const { data: creditsData, loading: creditsLoading, error: creditsError } = useUserCredits()
   const { activeSubscription, loadActiveSubscription, isSubscriptionLoading } = useSubscriptionPlans()
   const hasLoadedSubscription = useRef(false)
+
+  // Calculate date range for analytics
+  const getDateRange = (range: DateRange) => {
+    const endDate = new Date()
+    endDate.setHours(23, 59, 59, 999)
+    let startDate = new Date()
+    
+    if (range === 'billing') {
+      // For billing cycle, we'll use the subscription's billing period if available
+      // For now, default to 30 days
+      startDate.setDate(startDate.getDate() - 30)
+    } else {
+      const days = parseInt(range)
+      startDate.setDate(startDate.getDate() - days)
+    }
+    startDate.setHours(0, 0, 0, 0)
+    
+    return {
+      startTime: startDate.toISOString(),
+      endTime: endDate.toISOString()
+    }
+  }
+
+  const dateRangeParams = getDateRange(dateRange)
+  const { data: analyticsData, loading: analyticsLoading } = useQueryUsageAnalytics({
+    startTime: dateRangeParams.startTime,
+    endTime: dateRangeParams.endTime,
+    enabled: activeTab === 'analytics'
+  })
 
   // Load active subscription on mount (only once)
   useEffect(() => {
@@ -724,7 +771,7 @@ export const UsageSection: React.FC = () => {
                   {t('account.usage.totalCreditsUsed')}
                 </h3>
                 <div className="font-h02-heading02 font-[number:var(--h01-heading-01-font-weight)] text-[length:var(--h01-heading-01-font-size)] tracking-[var(--h01-heading-01-letter-spacing)] leading-[var(--h01-heading-01-line-height)] [font-style:var(--h01-heading-01-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
-                  141,257
+                  {analyticsLoading ? '...' : (analyticsData?.total_credits_used?.toLocaleString() ?? '0')}
                 </div>
               </div>
 
@@ -745,10 +792,10 @@ export const UsageSection: React.FC = () => {
                 }
               >
                 <h3 className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-inactive-2)] mb-4">
-                  {t('account.usage.activeUsers')}
+                  {t('account.usage.totalQueries')}
                 </h3>
                 <div className="font-h02-heading02 font-[number:var(--h01-heading-01-font-weight)] text-[length:var(--h01-heading-01-font-size)] tracking-[var(--h01-heading-01-letter-spacing)] leading-[var(--h01-heading-01-line-height)] [font-style:var(--h01-heading-01-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
-                  1
+                  {analyticsLoading ? '...' : (analyticsData?.total_queries?.toLocaleString() ?? '0')}
                 </div>
               </div>
             </div>
@@ -774,7 +821,16 @@ export const UsageSection: React.FC = () => {
                 <h3 className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-primary)] mb-6">
                   {t('account.usage.dailyCreditConsumption')}
                 </h3>
-                <DailyCreditChart isDark={isDark} />
+                {analyticsLoading ? (
+                  <div className="w-full h-[200px] flex items-center justify-center text-[color:var(--tokens-color-text-text-inactive-2)]">
+                    Loading...
+                  </div>
+                ) : (
+                  <DailyCreditChart 
+                    isDark={isDark} 
+                    data={analyticsData?.daily_credits_usage ?? []} 
+                  />
+                )}
               </div>
 
               {/* Model Usage Distribution Chart */}
@@ -796,7 +852,16 @@ export const UsageSection: React.FC = () => {
                 <h3 className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-primary)] mb-6">
                   {t('account.usage.modelUsageDistribution')}
                 </h3>
-                <ModelUsageChart isDark={isDark} />
+                {analyticsLoading ? (
+                  <div className="flex items-center justify-center h-[200px] text-[color:var(--tokens-color-text-text-inactive-2)]">
+                    Loading...
+                  </div>
+                ) : (
+                  <ModelUsageChart 
+                    isDark={isDark} 
+                    data={analyticsData?.model_usage ?? []} 
+                  />
+                )}
               </div>
             </div>
           </div>

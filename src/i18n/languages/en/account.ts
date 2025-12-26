@@ -122,7 +122,17 @@ export const account = {
     vectorStorageEntries: 'Vector storage entries',
     messageHistoryDays: 'Message history days',
     prioritySupport: 'Priority support',
-    apiAccess: 'API access'
+    apiAccess: 'API access',
+    totalQueries: 'Total queries'
+  },
+  language: {
+    title: 'Languages',
+    languagePreference: 'Language preference',
+    autoDetect: 'Auto Detect',
+    english: 'English',
+    chinese: 'Chinese',
+    german: 'German',
+    arabic: 'Arabic',
   },
 }
 

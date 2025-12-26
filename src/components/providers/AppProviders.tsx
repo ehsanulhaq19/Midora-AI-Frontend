@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { ThemeProvider } from '@/hooks/use-theme'
+import { LanguageProvider } from '@/hooks/use-language'
 import { ThemeInitializer } from '@/components/ui/theme-initializer'
 import { ReduxProvider } from '@/components/providers/ReduxProvider'
 import { AuthInitializer } from '@/components/auth/AuthInitializer'
@@ -29,18 +30,20 @@ export const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
   }
 
   return (
-    <ThemeProvider>
-      <ThemeInitializer />
-      <ReduxProvider>
-        <AuthInitializer />
-        <AuthProvider>
-          <div className="min-h-screen app-bg-primary">
-            {children}
-            <ToastContainer />
-          </div>
-        </AuthProvider>
-      </ReduxProvider>
-    </ThemeProvider>
+    <LanguageProvider>
+      <ThemeProvider>
+        <ThemeInitializer />
+        <ReduxProvider>
+          <AuthInitializer />
+          <AuthProvider>
+            <div className="min-h-screen app-bg-primary">
+              {children}
+              <ToastContainer />
+            </div>
+          </AuthProvider>
+        </ReduxProvider>
+      </ThemeProvider>
+    </LanguageProvider>
   )
 }
 
