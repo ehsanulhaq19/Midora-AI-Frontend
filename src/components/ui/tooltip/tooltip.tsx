@@ -12,12 +12,13 @@ interface TooltipProps {
 export const Tooltip: React.FC<TooltipProps> = ({
   content,
   children,
-  position = 'top',
-  delay = 500,
+  position = 'right',
+  delay = 0,
   className = ''
 }) => {
   const [isVisible, setIsVisible] = useState(false)
-  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null)
+  const [isAnimating, setIsAnimating] = useState(false)
+  const timeoutId = useRef<NodeJS.Timeout | null>(null)
   const tooltipRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLDivElement>(null)
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 })
@@ -53,23 +54,33 @@ export const Tooltip: React.FC<TooltipProps> = ({
   }
 
   const showTooltip = () => {
-    if (timeoutId) {
-      clearTimeout(timeoutId)
+    if (timeoutId.current) {
+      clearTimeout(timeoutId.current)
     }
     const id = setTimeout(() => {
       setIsVisible(true)
-      // Update position after a brief delay to ensure tooltip is rendered
-      setTimeout(updateTooltipPosition, 0)
+      // Trigger animation after a brief moment
+      requestAnimationFrame(() => {
+        setIsAnimating(true)
+        // Update position after tooltip is rendered
+        requestAnimationFrame(() => {
+          updateTooltipPosition()
+        })
+      })
     }, delay)
-    setTimeoutId(id)
+    timeoutId.current = id
   }
 
   const hideTooltip = () => {
-    if (timeoutId) {
-      clearTimeout(timeoutId)
-      setTimeoutId(null)
+    if (timeoutId.current) {
+      clearTimeout(timeoutId.current)
+      timeoutId.current = null
     }
-    setIsVisible(false)
+    setIsAnimating(false)
+    // Wait for animation to complete before hiding
+    setTimeout(() => {
+      setIsVisible(false)
+    }, 150)
   }
 
   useEffect(() => {
@@ -90,24 +101,53 @@ export const Tooltip: React.FC<TooltipProps> = ({
 
   useEffect(() => {
     return () => {
-      if (timeoutId) {
-        clearTimeout(timeoutId)
+      if (timeoutId.current) {
+        clearTimeout(timeoutId.current)
       }
     }
-  }, [timeoutId])
+  }, [])
 
-  const getArrowClasses = () => {
+  const getArrowStyle = () => {
+    const arrowSize = 6;
     switch (position) {
       case 'top':
-        return 'top-full left-1/2 transform -translate-x-1/2 border-l-transparent border-r-transparent border-b-transparent border-t-gray-800'
+        return {
+          bottom: `-${arrowSize}px`,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          borderLeft: `${arrowSize}px solid transparent`,
+          borderRight: `${arrowSize}px solid transparent`,
+          borderTop: `${arrowSize}px solid rgba(0, 0, 0, 0.85)`,
+        }
       case 'bottom':
-        return 'bottom-full left-1/2 transform -translate-x-1/2 border-l-transparent border-r-transparent border-t-transparent border-b-gray-800'
+        return {
+          top: `-${arrowSize}px`,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          borderLeft: `${arrowSize}px solid transparent`,
+          borderRight: `${arrowSize}px solid transparent`,
+          borderBottom: `${arrowSize}px solid rgba(0, 0, 0, 0.85)`,
+        }
       case 'left':
-        return 'left-full top-1/2 transform -translate-y-1/2 border-t-transparent border-b-transparent border-r-transparent border-l-gray-800'
+        return {
+          right: `-${arrowSize}px`,
+          top: '50%',
+          transform: 'translateY(-50%)',
+          borderTop: `${arrowSize}px solid transparent`,
+          borderBottom: `${arrowSize}px solid transparent`,
+          borderLeft: `${arrowSize}px solid rgba(0, 0, 0, 0.85)`,
+        }
       case 'right':
-        return 'right-full top-1/2 transform -translate-y-1/2 border-t-transparent border-b-transparent border-l-transparent border-r-gray-800'
+        return {
+          left: `-${arrowSize}px`,
+          top: '50%',
+          transform: 'translateY(-50%)',
+          borderTop: `${arrowSize}px solid transparent`,
+          borderBottom: `${arrowSize}px solid transparent`,
+          borderRight: `${arrowSize}px solid rgba(0, 0, 0, 0.85)`,
+        }
       default:
-        return 'top-full left-1/2 transform -translate-x-1/2 border-l-transparent border-r-transparent border-b-transparent border-t-gray-800'
+        return {}
     }
   }
 
@@ -126,16 +166,26 @@ export const Tooltip: React.FC<TooltipProps> = ({
       {isVisible && typeof window !== 'undefined' && createPortal(
         <div
           ref={tooltipRef}
-          className="fixed z-[999999999] px-2 py-1 text-xs text-white bg-gray-800 rounded shadow-lg whitespace-nowrap"
+          className={`fixed z-[999999999] px-3 py-1.5 text-xs text-white rounded-md shadow-xl whitespace-nowrap pointer-events-none
+            transition-all duration-150 ease-out
+            ${isAnimating 
+              ? 'opacity-100 scale-100' 
+              : 'opacity-0 scale-95'
+            }`}
           style={{
             top: `${tooltipPosition.top}px`,
             left: `${tooltipPosition.left}px`,
+            backgroundColor: 'rgba(0, 0, 0, 0.85)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            transformOrigin: position === 'right' ? 'left center' : position === 'left' ? 'right center' : 'center center',
           }}
           role="tooltip"
         >
           {content}
           <div
-            className={`absolute w-0 h-0 border-4 ${getArrowClasses()}`}
+            className="absolute w-0 h-0"
+            style={getArrowStyle()}
           />
         </div>,
         document.body

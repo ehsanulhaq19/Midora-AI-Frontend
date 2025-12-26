@@ -3,7 +3,7 @@ import Script from 'next/script'
 import { Inter } from 'next/font/google'
 import '@/app/globals.css'
 import { AppProviders } from '@/components/providers/AppProviders'
-
+ 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
