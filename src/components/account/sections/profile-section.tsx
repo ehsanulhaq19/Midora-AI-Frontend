@@ -10,6 +10,7 @@ import { UserProfileResponse } from "@/api/user/types";
 import { fileApi } from "@/api/files/api";
 import { appConfig } from "@/config/app";
 import { useToast } from "@/hooks/use-toast";
+import { ChangePasswordModal } from "./change-password-modal";
 
 export const ProfileSection: React.FC = () => {
   const { resolvedTheme } = useTheme();
@@ -23,15 +24,12 @@ export const ProfileSection: React.FC = () => {
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
-    password: "",
-    confirmPassword: "",
-    currentPassword: "",
     workFunction: "",
   });
-  const [passwordError, setPasswordError] = useState<string | null>(null);
   const [profilePictureUrl, setProfilePictureUrl] = useState<string | null>(null);
   const [profilePicturePreview, setProfilePicturePreview] = useState<string | null>(null);
   const [selectedPreferences, setSelectedPreferences] = useState<number[]>([]);
+  const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
 
   useEffect(() => {
     fetchUserProfile();
@@ -51,9 +49,6 @@ export const ProfileSection: React.FC = () => {
       setFormData({
         first_name: user.first_name || "",
         last_name: user.last_name || "",
-        password: "",
-        confirmPassword: "",
-        currentPassword: "",
         workFunction: "",
       });
       
@@ -75,10 +70,6 @@ export const ProfileSection: React.FC = () => {
       ...formData,
       [name]: value,
     });
-    
-    if (name === 'password' || name === 'confirmPassword') {
-      setPasswordError(null);
-    }
   };
 
   const handleProfilePictureClick = () => {
@@ -126,51 +117,11 @@ export const ProfileSection: React.FC = () => {
     }
   };
 
-  const validatePassword = (pwd: string): string[] => {
-    const errors: string[] = [];
-    
-    if (pwd.length < 8) {
-      errors.push('Password must be at least 8 characters long');
-    }
-    
-    if (!/[A-Z]/.test(pwd)) {
-      errors.push('Password must contain at least one uppercase letter');
-    }
-    
-    if (!/[a-z]/.test(pwd)) {
-      errors.push('Password must contain at least one lowercase letter');
-    }
-    
-    if (!/\d/.test(pwd)) {
-      errors.push('Password must contain at least one digit');
-    }
-    
-    if (!/[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]/.test(pwd)) {
-      errors.push('Password must contain at least one special character');
-    }
-    
-    return errors;
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (formData.password || formData.confirmPassword) {
-      if (formData.password !== formData.confirmPassword) {
-        setPasswordError(t('auth.passwordsDoNotMatch') || "Passwords do not match");
-        return;
-      }
-      
-      const passwordErrors = validatePassword(formData.password);
-      if (passwordErrors.length > 0) {
-        setPasswordError(passwordErrors[0]);
-        return;
-      }
-    }
-    
     try {
       setSubmitting(true);
-      setPasswordError(null);
       
       const updateData: any = {};
       if (formData.first_name !== userData?.first_name) {
@@ -178,9 +129,6 @@ export const ProfileSection: React.FC = () => {
       }
       if (formData.last_name !== userData?.last_name) {
         updateData.last_name = formData.last_name;
-      }
-      if (formData.password) {
-        updateData.password = formData.password;
       }
       if (profilePictureUrl && profilePictureUrl !== userData?.profile_picture) {
         updateData.profile_picture = profilePictureUrl;
@@ -202,12 +150,6 @@ export const ProfileSection: React.FC = () => {
       if (response.data.profile_picture) {
         setProfilePictureUrl(response.data.profile_picture);
       }
-      
-      setFormData((prev: typeof formData) => ({
-        ...prev,
-        password: "",
-        confirmPassword: "",
-      }));
       
       showSuccessToast('Profile Updated', 'Your profile has been updated successfully');
     } catch (error) {
@@ -311,80 +253,18 @@ export const ProfileSection: React.FC = () => {
                 } : {}}
               />
             </div>
-
-            {/* Password */}
-            <div className="flex flex-col gap-2">
-              <label className="font-h02-heading02 font-[number:var(--h05-heading05-font-weight)] text-[color:var(--tokens-color-text-text-primary)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
-                {t('account.profile.password')}
-              </label>
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder={t('account.profile.passwordPlaceholder')}
-                className={`flex h-[54px] items-center gap-3 px-6 py-3 rounded-xl border transition-all duration-200 focus:ring-2 focus:ring-[color:var(--tokens-color-text-text-seconary)] focus:ring-offset-2 outline-none font-SF-Pro font-normal text-base tracking-[-0.48px] leading-[100%] ${
-                  isDark ? '' : 'border-[#dbdbdb] bg-transparent text-black'
-                } ${passwordError ? 'border-red-500' : ''}`}
-                style={isDark ? {
-                  borderColor: passwordError ? '#ef4444' : 'var(--tokens-color-border-border-inactive)',
-                  backgroundColor: 'var(--tokens-color-surface-surface-card-default)',
-                  color: 'var(--tokens-color-text-text-primary)'
-                } : {}}
-              />
-            </div>
-
-            {/* Confirm Password */}
-            <div className="flex flex-col gap-2">
-              <label className="font-h02-heading02 font-[number:var(--h05-heading05-font-weight)] text-[color:var(--tokens-color-text-text-primary)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
-                {t('account.profile.confirmPassword')}
-              </label>
-              <input
-                type="password"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                placeholder={t('account.profile.confirmPasswordPlaceholder')}
-                className={`flex h-[54px] items-center gap-3 px-6 py-3 rounded-xl border transition-all duration-200 focus:ring-2 focus:ring-[color:var(--tokens-color-text-text-seconary)] focus:ring-offset-2 outline-none font-SF-Pro font-normal text-base tracking-[-0.48px] leading-[100%] ${
-                  isDark ? '' : 'border-[#dbdbdb] bg-transparent text-black'
-                } ${passwordError ? 'border-red-500' : ''}`}
-                style={isDark ? {
-                  borderColor: passwordError ? '#ef4444' : 'var(--tokens-color-border-border-inactive)',
-                  backgroundColor: 'var(--tokens-color-surface-surface-card-default)',
-                  color: 'var(--tokens-color-text-text-primary)'
-                } : {}}
-              />
-            </div>
-
-            {/*Current Password */}
-            <div className="flex flex-col gap-2">
-              <label className="font-h02-heading02 font-[number:var(--h05-heading05-font-weight)] text-[color:var(--tokens-color-text-text-primary)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
-                {t('account.profile.currentPassword')}
-              </label>
-              <input
-                type="password"
-                name="currentPassword"
-                value={formData.currentPassword}
-                onChange={handleChange}
-                placeholder={t('account.profile.currentPasswordPlaceholder')}
-                className={`flex h-[54px] items-center gap-3 px-6 py-3 rounded-xl border transition-all duration-200 focus:ring-2 focus:ring-[color:var(--tokens-color-text-text-seconary)] focus:ring-offset-2 outline-none font-SF-Pro font-normal text-base tracking-[-0.48px] leading-[100%] ${
-                  isDark ? '' : 'border-[#dbdbdb] bg-transparent text-black'
-                } ${passwordError ? 'border-red-500' : ''}`}
-                style={isDark ? {
-                  borderColor: passwordError ? '#ef4444' : 'var(--tokens-color-border-border-inactive)',
-                  backgroundColor: 'var(--tokens-color-surface-surface-card-default)',
-                  color: 'var(--tokens-color-text-text-primary)'
-                } : {}}
-              />
-            </div>
           </div>
 
-          {/* Password Error Message */}
-          {passwordError && (
-            <div className="text-red-500 text-sm mt-[-16px]">
-              {passwordError}
-            </div>
-          )}
+          {/* Change Password Button */}
+          <div className="flex justify-start mt-2">
+            <button
+              type="button"
+              onClick={() => setIsChangePasswordModalOpen(true)}
+              className="text-sm text-[color:var(--tokens-color-text-text-seconary)] hover:underline transition-colors"
+            >
+              {t('account.profile.changePassword') || 'Change Password'}
+            </button>
+          </div>
 
           {/* Submit Button */}
           <div className="flex justify-end">
@@ -399,6 +279,15 @@ export const ProfileSection: React.FC = () => {
 
         </div>
       </form>
+
+      {/* Change Password Modal */}
+      {userData && (
+        <ChangePasswordModal
+          isOpen={isChangePasswordModalOpen}
+          onClose={() => setIsChangePasswordModalOpen(false)}
+          userEmail={userData.email}
+        />
+      )}
     </div>
   );
 };

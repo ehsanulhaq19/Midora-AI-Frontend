@@ -16,6 +16,8 @@ interface MessageInputProps {
   textAreaClassName?: string
   onFilesChange?: (hasFiles: boolean) => void
   placeholder?: string
+  disabled?: boolean
+  disabledMessage?: string
 }
 
 export interface MessageInputHandle {
@@ -23,7 +25,7 @@ export interface MessageInputHandle {
   validateFile: (file: File) => { isValid: boolean; error?: string }
 }
 
-export const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>(({ onSend, isStreaming = false, className = '', textAreaClassName = '', onFilesChange, placeholder }, ref) => {
+export const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>(({ onSend, isStreaming = false, className = '', textAreaClassName = '', onFilesChange, placeholder, disabled = false, disabledMessage }, ref) => {
   const [message, setMessage] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { error: showErrorToast, info: showInfoToast } = useToast()
@@ -60,6 +62,12 @@ export const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>(({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    if (disabled) {
+      if (disabledMessage) {
+        showInfoToast('Credits Exhausted', disabledMessage)
+      }
+      return
+    }
     // Require text message - if files are uploaded, text is still required
     if (message.trim() && !isStreaming && !isUploading) {
       const modelUuid = isAutoMode ? undefined : selectedModel?.uuid
@@ -113,7 +121,11 @@ export const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>(({
   const getModelOptions = () => {
     return selectedProviderModels.map(model => ({
       value: model.uuid,
-      label: model.model_name
+      label: model.model_name,
+      disabled: model.available === false,
+      disabledHint: model.available === false
+        ? "You have exceeded your limit to use this model"
+        : undefined
     }))
   }
 
@@ -143,7 +155,7 @@ export const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>(({
   }
 
   return (
-    <div className={`relative w-full max-w-[698px] mx-auto bg-[color:var(--tokens-color-surface-surface-darkgray-50)] rounded-[var(--premitives-corner-radius-corner-radius-3)] min-h-[120px] max-h-[400px] ${className}`}>
+    <div className={`relative w-full max-w-[698px] mx-auto bg-[color:var(--tokens-color-surface-surface-darkgray-50)] rounded-[var(--premitives-corner-radius-corner-radius-3)] min-h-[120px] max-h-[400px] ${className} ${disabled ? 'opacity-60' : ''}`}>
       {/* Hidden file input */}
       <input
         ref={fileInputRef}
@@ -152,19 +164,38 @@ export const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>(({
         accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.zip,.rar,.7z"
         onChange={handleFileInputChange}
         className="hidden"
+        disabled={disabled}
       />
       
       <form onSubmit={handleSubmit} className="relative w-full h-full flex flex-col">
+        {/* Disabled message overlay */}
+        {disabled && disabledMessage && (
+          <div className="absolute inset-0 bg-[color:var(--tokens-color-surface-surface-darkgray-50)]/80 rounded-[var(--premitives-corner-radius-corner-radius-3)] flex items-center justify-center z-20">
+            <div className="text-center px-4">
+              <p className="text-sm text-[color:var(--tokens-color-text-text-primary)] font-medium mb-2">
+                {disabledMessage}
+              </p>
+              <button
+                type="button"
+                onClick={() => window.location.href = '/pricing'}
+                className="text-sm text-[color:var(--tokens-color-text-text-brand)] hover:underline"
+              >
+                Upgrade Subscription
+              </button>
+            </div>
+          </div>
+        )}
+        
         {/* Textarea covering the main area */}
         <div className="relative flex-1">
           <TextareaInput
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder={placeholder || (isStreaming ? t('chat.waitingForResponse') : t('chat.howCanIHelp'))}
+            placeholder={!(disabled && disabledMessage) && (placeholder || (isStreaming ? t('chat.waitingForResponse') : t('chat.howCanIHelp')))}
             className={`w-full border-none h-full px-4 pt-4 pb-16 text-lg lg:text-xl font-h02-heading02 font-[number:var(--text-large-font-weight)] text-[color:var(--tokens-color-text-text-primary)] placeholder-[color:var(--tokens-color-text-text-brand)] [font-style:var(--text-large-font-style)] min-h-[120px] max-h-[200px] resize-none ${textAreaClassName}`}
             variant="outline"
-            disabled={isStreaming || isUploading}
+            disabled={isStreaming || isUploading || disabled}
           />
           
           {/* Bottom buttons container - positioned relative to textarea */}
@@ -181,7 +212,7 @@ export const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>(({
                 style={{
                   backgroundColor: '#F4F5F5'
                 }}
-                disabled={isStreaming || isUploading}
+                disabled={isStreaming || isUploading || disabled}
                 onClick={handleAddAttachment}
               />
 
@@ -211,13 +242,13 @@ export const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>(({
                   className="min-w-[80px]"
                   openUpward={true}
                   variant="model-selector"
-                  disabled={isStreaming || isUploading}
+                  disabled={isStreaming || isUploading || disabled}
                 />
               )}
               
               <IconButton
                 type="submit"
-                disabled={!message.trim() || isStreaming || isUploading}
+                disabled={!message.trim() || isStreaming || isUploading || disabled}
                 variant="primary"
                 size="md"
                 icon={<ArrowUpSm className="w-6 h-6" color="white" />}

@@ -17,6 +17,7 @@ export interface AIModel {
   is_fallback_model: boolean
   is_default_model: boolean
   is_active: boolean
+  available?: boolean
   created_at: string
   updated_at: string | null
 }

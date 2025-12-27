@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useEffect, useMemo, useState, useRef } from 'react'
-import { Filters, Search02, MoreOptions, InvoiceIcon, FileUpload } from '@/icons'
+import React, { useEffect, useMemo, useState } from 'react'
+import { Filters, Search02, InvoiceIcon, FileUpload } from '@/icons'
 import { Pagination } from '@/components/ui'
 import { cn } from '@/lib/utils'
 import { useTheme } from '@/hooks/use-theme'
@@ -36,9 +36,7 @@ const formatDate = (dateString: string): string => {
 }
 
 const getBillingColumns = (
-  onDownload: (invoiceSubscriptionUuid: string) => void,
-  openDropdownId: string | null,
-  setOpenDropdownId: (id: string | null) => void
+  onDownload: (invoiceSubscriptionUuid: string) => void
 ): Array<{
   key: keyof BillingHistoryItem | 'actions'
   label: string
@@ -74,179 +72,31 @@ const getBillingColumns = (
       'text-[color:var(--tokens-color-text-text-inactive-2)]'
   },
   {
-    key: 'users',
-    label: t('account.billing.users'),
-    valueClassName:
-      'text-[color:var(--tokens-color-text-text-inactive-2)]'
-  },
-  {
     key: 'actions',
     label: t('account.billing.actions'),
-    className: 'lg:flex-row lg:items-center lg:justify-end',
+    className: 'lg:flex-row lg:items-center lg:justify-start',
     render: (item) => (
-      <InvoiceActionsDropdown
-        invoiceSubscriptionUuid={item.invoiceSubscriptionUuid || ''}
-        onDownload={onDownload}
-        isOpen={openDropdownId === item.id}
-        onToggle={() => setOpenDropdownId(openDropdownId === item.id ? null : item.id)}
-      />
+      <ActionButton
+        variant="ghost"
+        size="sm"
+        onClick={() => item.invoiceSubscriptionUuid && onDownload(item.invoiceSubscriptionUuid)}
+        className="!h-8 !px-3 !rounded-lg !border !border-transparent hover:!border-[color:var(--tokens-color-border-border-subtle)] hover:!bg-[color:var(--tokens-color-surface-surface-tertiary)]"
+      >
+        <FileUpload className="w-4 h-4 mr-2" />
+        <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
+          {t('account.billing.download')}
+        </span>
+      </ActionButton>
     )
   }
 ]
 
-interface InvoiceActionsDropdownProps {
-  invoiceSubscriptionUuid: string
-  onDownload: (invoiceSubscriptionUuid: string) => void
-  isOpen: boolean
-  onToggle: () => void
-}
-
-const InvoiceActionsDropdown: React.FC<InvoiceActionsDropdownProps> = ({
-  invoiceSubscriptionUuid,
-  onDownload,
-  isOpen,
-  onToggle
-}: InvoiceActionsDropdownProps) => {
-  const { resolvedTheme } = useTheme()
-  const isDark = resolvedTheme === 'dark'
-  const dropdownRef = useRef<HTMLDivElement>(null)
-  const dropdownMenuRef = useRef<HTMLDivElement>(null)
-  const downloadButtonRef = useRef<HTMLButtonElement>(null)
-  const isDownloadingRef = useRef(false)
-  const [openUpward, setOpenUpward] = useState(false)
-
-  useEffect(() => {
-    if (isOpen) {
-      // Check if dropdown should open upward
-      if (dropdownRef.current && dropdownMenuRef.current) {
-        const rect = dropdownRef.current.getBoundingClientRect()
-        const menuHeight = 60 // Approximate dropdown menu height
-        const spaceBelow = window.innerHeight - rect.bottom
-        const spaceAbove = rect.top
-        
-        // Open upward if there's not enough space below but enough space above
-        setOpenUpward(spaceBelow < menuHeight && spaceAbove > menuHeight)
-      }
-    }
-  }, [isOpen])
-
-  useEffect(() => {
-    if (!isOpen) return
-
-    const handleClickOutside = (event: MouseEvent) => {
-      // Don't close if download is in progress
-      if (isDownloadingRef.current) {
-        return
-      }
-      
-      const target = event.target as Node
-      // Check if click is outside both the button container and the dropdown menu
-      if (
-        dropdownRef.current && 
-        !dropdownRef.current.contains(target) &&
-        dropdownMenuRef.current &&
-        !dropdownMenuRef.current.contains(target)
-      ) {
-        onToggle()
-      }
-    }
-
-    // Use click event instead of mousedown to ensure download button click fires first
-    // Add listener with a small delay to allow download button click to register
-    const timeoutId = setTimeout(() => {
-      document.addEventListener('click', handleClickOutside)
-    }, 0)
-
-    return () => {
-      clearTimeout(timeoutId)
-      document.removeEventListener('click', handleClickOutside)
-    }
-  }, [isOpen, onToggle])
-
-  const handleDownload = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault()
-    e.stopPropagation()
-    
-    if (invoiceSubscriptionUuid) {
-      // Set flag to prevent dropdown from closing during download
-      isDownloadingRef.current = true
-      
-      // Trigger download first
-      try {
-        await onDownload(invoiceSubscriptionUuid)
-      } catch (error) {
-        // Error is already handled in the hook
-        console.error('Download error:', error)
-      } finally {
-        // Reset flag and close dropdown after download completes
-        setTimeout(() => {
-          isDownloadingRef.current = false
-          onToggle()
-        }, 100)
-      }
-    }
-  }
-
-  const handleDownloadMouseDown = (e: React.MouseEvent<HTMLButtonElement>) => {
-    // Stop propagation to prevent click outside handler from firing
-    e.stopPropagation()
-  }
-
-  const handleToggle = () => {
-    onToggle()
-  }
-
-  return (
-    <div className="relative" ref={dropdownRef}>
-      <ActionButton
-        variant="ghost"
-        size="sm"
-        onClick={handleToggle}
-        className="!h-5 !w-5 !p-0 !min-w-0 !rounded-lg !border !border-transparent hover:!border-[color:var(--tokens-color-border-border-subtle)] hover:!bg-[color:var(--tokens-color-surface-surface-tertiary)]"
-      >
-        <MoreOptions className="w-5 h-5" color="var(--tokens-color-text-text-primary)" />
-      </ActionButton>
-
-      {isOpen && (
-        <div
-          ref={dropdownMenuRef}
-          className={cn(
-            'absolute right-0 z-50 min-w-[160px] rounded-lg border shadow-lg',
-            openUpward ? 'bottom-full mb-1' : 'top-full mt-1',
-            isDark
-              ? 'bg-[color:var(--tokens-color-surface-surface-card-default)] border-[color:var(--tokens-color-border-border-subtle)]'
-              : 'bg-[color:var(--tokens-color-surface-surface-primary)] border-[color:var(--tokens-color-border-border-subtle)]'
-          )}
-        >
-          <button
-            ref={downloadButtonRef}
-            type="button"
-            onClick={handleDownload}
-            onMouseDown={handleDownloadMouseDown}
-            className={cn(
-              'w-full px-4 py-2 text-left flex items-center gap-2 hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] transition-colors duration-200 rounded-lg',
-              isDark
-                ? 'text-[color:var(--tokens-color-text-text-primary)]'
-                : 'text-[color:var(--tokens-color-text-text-primary)]'
-            )}
-          >
-            <FileUpload className="w-4 h-4" />
-            <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
-              {t('account.billing.download')}
-            </span>
-          </button>
-        </div>
-      )}
-    </div>
-  )
-}
 
 export const BillingSection: React.FC = () => {
   const { resolvedTheme } = useTheme()
   const isDark = resolvedTheme === 'dark'
   const [searchQuery, setSearchQuery] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
-  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null)
   const { invoices, isLoading, loadInvoices, downloadInvoice } = useInvoices()
   const { activeSubscription, isSubscriptionLoading, loadActiveSubscription } = useSubscriptionPlans()
 
@@ -267,7 +117,7 @@ export const BillingSection: React.FC = () => {
     }))
   }, [invoices])
 
-  const billingColumns = getBillingColumns(downloadInvoice, openDropdownId, setOpenDropdownId)
+  const billingColumns = getBillingColumns(downloadInvoice)
 
   const filteredBillingHistory = useMemo(() => {
     if (!searchQuery.trim()) {
@@ -452,12 +302,17 @@ export const BillingSection: React.FC = () => {
                             </span>
                           </div>
                           {/* Action Button */}
-                          <InvoiceActionsDropdown
-                            invoiceSubscriptionUuid={item.invoiceSubscriptionUuid || ''}
-                            onDownload={downloadInvoice}
-                            isOpen={openDropdownId === item.id}
-                            onToggle={() => setOpenDropdownId(openDropdownId === item.id ? null : item.id)}
-                          />
+                          <ActionButton
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => item.invoiceSubscriptionUuid && downloadInvoice(item.invoiceSubscriptionUuid)}
+                            className="!h-8 !px-3 !rounded-lg !border !border-transparent hover:!border-[color:var(--tokens-color-border-border-subtle)] hover:!bg-[color:var(--tokens-color-surface-surface-tertiary)]"
+                          >
+                            <FileUpload className="w-4 h-4 mr-2" />
+                            <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
+                              {t('account.billing.download')}
+                            </span>
+                          </ActionButton>
                         </div>
                         {/* Date on bottom left */}
                         <div className="flex items-start">

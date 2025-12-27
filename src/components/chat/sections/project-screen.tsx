@@ -11,6 +11,7 @@ import { MessageInput, MessageInputHandle } from "./message-input";
 import { ProjectFilesModal } from "./project-files-modal";
 import { ActionButton } from "@/components/ui/buttons";
 import { ModelSelection } from "./model-selection";
+import { useUserCredits } from "@/hooks/use-user-credits";
 
 interface Project {
   id: string;
@@ -49,6 +50,11 @@ export const ProjectScreen: React.FC<ProjectScreenProps> = ({
   const conversationsContainerRef = useRef<HTMLDivElement>(null);
   const { loadProjectConversations, projectConversationsData } = useProjects();
   const hasLoadedRef = useRef<string | null>(null);
+  const { data: creditsData } = useUserCredits();
+  
+  const isCreditsExhausted = creditsData 
+    ? creditsData.used_credits >= creditsData.available_credits 
+    : false;
 
   // Load project conversations on mount and when project changes
   useEffect(() => {
@@ -210,6 +216,8 @@ export const ProjectScreen: React.FC<ProjectScreenProps> = ({
             isStreaming={isStreaming}
             onFilesChange={onFilesChange}
             placeholder={`New chat in ${project.name}`}
+            disabled={isCreditsExhausted}
+            disabledMessage="You have used all credits, please upgrade the subscription."
           />
 
           {/* Project Chat History */}

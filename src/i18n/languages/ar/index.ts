@@ -1,0 +1,33 @@
+/**
+ * Arabic translations - Main index
+ * Combines all Arabic translation modules
+ */
+
+import { common } from './common'
+import { auth } from './auth'
+import { navigation } from './navigation'
+import { errors } from './errors'
+import { success } from './success'
+import { pricing } from './pricing'
+import { hero } from './hero'
+import { chat } from './chat'
+import { documentation } from './documentation'
+import { footer } from './footer'
+import { account } from './account'
+import { checkout } from './checkout'
+
+export const arTranslations = {
+  common,
+  auth,
+  navigation,
+  errors,
+  success,
+  pricing,
+  hero,
+  chat,
+  documentation,
+  footer,
+  account,
+  checkout,
+}
+
