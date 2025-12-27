@@ -75,6 +75,7 @@ export const auth = {
   verifyingOtp: 'Verifying OTP...',
   resendOtp: 'Resend OTP',
   resendingOtp: 'Resending OTP...',
+  regenerateOTP: 'Resend Code',
   otpVerified: 'OTP verified successfully',
   otpExpired: 'OTP has expired',
   invalidOtp: 'Invalid OTP code',

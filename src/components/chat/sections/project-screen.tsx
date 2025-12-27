@@ -10,6 +10,8 @@ import { RootState } from "@/store";
 import { MessageInput, MessageInputHandle } from "./message-input";
 import { ProjectFilesModal } from "./project-files-modal";
 import { ActionButton } from "@/components/ui/buttons";
+import { ModelSelection } from "./model-selection";
+import { useUserCredits } from "@/hooks/use-user-credits";
 
 interface Project {
   id: string;
@@ -48,6 +50,11 @@ export const ProjectScreen: React.FC<ProjectScreenProps> = ({
   const conversationsContainerRef = useRef<HTMLDivElement>(null);
   const { loadProjectConversations, projectConversationsData } = useProjects();
   const hasLoadedRef = useRef<string | null>(null);
+  const { data: creditsData } = useUserCredits();
+  
+  const isCreditsExhausted = creditsData 
+    ? creditsData.used_credits >= creditsData.available_credits 
+    : false;
 
   // Load project conversations on mount and when project changes
   useEffect(() => {
@@ -175,6 +182,13 @@ export const ProjectScreen: React.FC<ProjectScreenProps> = ({
   return (
     <>
       <div className="flex flex-col items-center gap-[50px] px-4 lg:px-0 py-6 relative flex-1 grow min-h-screen w-full">
+        {/* Model Selection Header */}
+        <div className="flex items-start justify-between relative w-full px-[24px] lg:px-[24px] pl-[64px] -mt-4">
+          <div className="flex items-center gap-4">
+            <ModelSelection />
+          </div>
+        </div>
+
         {/* Project Header Section */}
         <div className="flex items-start flex-col w-full max-w-[698px] gap-6 relative flex-[0_0_auto] mx-auto">
           <div className="flex items-center justify-between w-full gap-4 max-w-[700px] m-auto">
@@ -202,6 +216,8 @@ export const ProjectScreen: React.FC<ProjectScreenProps> = ({
             isStreaming={isStreaming}
             onFilesChange={onFilesChange}
             placeholder={`New chat in ${project.name}`}
+            disabled={isCreditsExhausted}
+            disabledMessage="You have used all credits, please upgrade the subscription."
           />
 
           {/* Project Chat History */}

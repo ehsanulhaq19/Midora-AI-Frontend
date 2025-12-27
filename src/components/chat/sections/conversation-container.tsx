@@ -25,6 +25,7 @@ import { MessageInput, MessageInputHandle } from './message-input'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/store'
 import { useTheme } from '@/hooks/use-theme'
+import { useUserCredits } from '@/hooks/use-user-credits'
 
 interface ConversationContainerProps {
   conversationUuid: string | null
@@ -67,6 +68,7 @@ interface MessageBubbleProps {
   activeCanvasMessageUuid?: string | null
   onCanvasToggle?: (messageUuid: string) => void
   showInChat?: boolean
+  isCreditsExhausted?: boolean
 }
 
 const MessageBubble: React.FC<MessageBubbleProps> = ({ 
@@ -85,7 +87,8 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
   isCanvasOpen = false,
   activeCanvasMessageUuid = null,
   onCanvasToggle,
-  showInChat = true
+  showInChat = true,
+  isCreditsExhausted = false
 }) => {
   const { resolvedTheme } = useTheme()
   const isDark = resolvedTheme === 'dark'
@@ -301,13 +304,13 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
 
               {/* Regenerate Button - only for AI messages that are the last message */}
               {!isUser && isLastMessage && onRegenerate && (
-                <Tooltip content={t('chat.regenerateMessage')}>
+                <Tooltip content={isCreditsExhausted ? "You have used all credits, please upgrade the subscription." : t('chat.regenerateMessage')}>
                   <IconButton
                     variant="outline"
                     size="sm"
                     icon={<Regenerate className="w-4 h-5" />}
                     onClick={handleRegenerate}
-                    disabled={isRegenerating}
+                    disabled={isRegenerating || isCreditsExhausted}
                     aria-label={t('chat.regenerateMessage')}
                     className=""
                   />
@@ -589,6 +592,11 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
   const { user } = useAuthRedux()
   const { regenerateMessage, isRegenerating } = useRegenerate()
   const { projectConversations } = useSelector((state: RootState) => state.projects)
+  const { data: creditsData } = useUserCredits()
+  
+  const isCreditsExhausted = creditsData 
+    ? creditsData.used_credits >= creditsData.available_credits 
+    : false
   
   // Track which message is being regenerated
   const [regeneratingMessageUuid, setRegeneratingMessageUuid] = useState<string | null>(null)
@@ -1082,10 +1090,11 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
                 streamingMetadata={streamingMetadata}
                 isThisMessageRegenerating={regeneratingMessageUuid === message.uuid}
                 onMarkdownLinkClick={handleMarkdownLinkClick}
-                  isCanvasOpen={isCanvasOpen}
-                  activeCanvasMessageUuid={activeCanvasMessageUuid}
-                  onCanvasToggle={handleCanvasToggle}
-                  showInChat={true}
+                isCanvasOpen={isCanvasOpen}
+                activeCanvasMessageUuid={activeCanvasMessageUuid}
+                onCanvasToggle={handleCanvasToggle}
+                showInChat={true}
+                isCreditsExhausted={isCreditsExhausted}
               />
             </div>
           ))}
@@ -1120,6 +1129,8 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
                 onFilesChange={onFilesChange}
                 className={`w-full max-w-full ${isCanvasOpen ? '!bg-[color:var(--tokens-color-surface-surface-input-canvas)]' : ''}`}
                 textAreaClassName="!app-text-lg"
+                disabled={isCreditsExhausted}
+                disabledMessage="You have used all credits, please upgrade the subscription."
               />
             </div>
           </div>

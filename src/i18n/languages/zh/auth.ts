@@ -69,6 +69,7 @@ export const auth = {
   verifyingOtp: '验证 OTP 中...',
   resendOtp: '重新发送 OTP',
   resendingOtp: '重新发送 OTP 中...',
+  regenerateOTP: '重新发送验证码',
   otpVerified: 'OTP 验证成功',
   otpExpired: 'OTP 已过期',
   invalidOtp: '无效的 OTP 代码',

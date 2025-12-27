@@ -22,6 +22,7 @@ export const account = {
     logout: 'Abmelden',
     deleteYourAccount: 'Ihr Konto löschen',
     deleteAccount: 'Konto löschen',
+    theme: 'Thema',
     organizationId: 'Organisations-ID',
     copyOrganizationId: 'Organisations-ID kopieren',
     copied: 'Kopiert!',
@@ -36,6 +37,9 @@ export const account = {
     passwordPlaceholder: 'Neues Passwort eingeben',
     confirmPassword: 'Passwort bestätigen',
     confirmPasswordPlaceholder: 'Bestätigen Sie Ihr neues Passwort',
+    changePassword: 'Passwort ändern',
+    changePasswordDescription: 'Wir senden einen Bestätigungscode an Ihre E-Mail-Adresse, um die Passwortänderung zu bestätigen.',
+    changePasswordEmail: 'E-Mail',
     workFunction: 'Ihre Arbeitsfunktion',
     workFunctionPlaceholder: 'Geben Sie Ihre Arbeitsfunktion ein',
     choosePreference: 'Wählen Sie Ihre Präferenz',
@@ -121,7 +125,12 @@ export const account = {
     messageHistoryDays: 'Nachrichtenverlauf Tage',
     prioritySupport: 'Prioritätssupport',
     apiAccess: 'API-Zugriff',
-    totalQueries: 'Gesamte Anfragen'
+    totalQueries: 'Gesamte Anfragen',
+    date: 'Datum',
+    type: 'Typ',
+    model: 'Modell',
+    tokens: 'Tokens',
+    cost: 'Kosten'
   },
   language: {
     title: 'Sprachen',

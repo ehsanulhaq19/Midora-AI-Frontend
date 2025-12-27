@@ -69,6 +69,7 @@ export const auth = {
   verifyingOtp: 'جاري التحقق من OTP...',
   resendOtp: 'إعادة إرسال OTP',
   resendingOtp: 'جاري إعادة إرسال OTP...',
+  regenerateOTP: 'إعادة إرسال الرمز',
   otpVerified: 'تم التحقق من OTP بنجاح',
   otpExpired: 'انتهت صلاحية OTP',
   invalidOtp: 'رمز OTP غير صالح',

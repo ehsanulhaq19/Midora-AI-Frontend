@@ -1,17 +1,29 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowRightSm, MoreOptions, TickIcon } from "@/icons";
 import { BackButton } from "../ui";
+import { userPaymentMethodsApi } from "@/api/user-payment-methods/api";
+import { UserPaymentMethod } from "@/api/user-payment-methods/types";
+import { subscriptionPlansApi } from "@/api/subscription-plans/api";
+import { SubscriptionCheckoutRequest } from "@/api/subscription-plans/types";
+import { useToast } from "@/hooks/use-toast";
+import { handleApiError } from "@/lib/error-handler";
 
 export const CheckoutContent: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const planId = searchParams.get("plan") || "power";
+  const planUuid = searchParams.get("planUuid") || "";
+  const { success: showSuccessToast, error: showErrorToast } = useToast();
   const [billingPeriod, setBillingPeriod] = useState<"monthly" | "yearly">(
     "yearly"
   );
+  const [savedPaymentMethods, setSavedPaymentMethods] = useState<UserPaymentMethod[]>([]);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>(null);
+  const [useNewCard, setUseNewCard] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
     country: "",
@@ -21,6 +33,28 @@ export const CheckoutContent: React.FC = () => {
     securityCode: "",
   });
   const [agreed, setAgreed] = useState(false);
+
+  useEffect(() => {
+    const fetchPaymentMethods = async () => {
+      try {
+        const response = await userPaymentMethodsApi.getActivePaymentMethods();
+        if (response.success && response.data) {
+          setSavedPaymentMethods(response.data);
+          if (response.data.length > 0) {
+            setSelectedPaymentMethod(response.data[0].uuid);
+            setUseNewCard(false);
+          } else {
+            setUseNewCard(true);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch payment methods:", error);
+        setUseNewCard(true);
+      }
+    };
+
+    fetchPaymentMethods();
+  }, []);
 
   const monthlyPrice = 12;
   const yearlyPrice = 200;
@@ -229,6 +263,37 @@ export const CheckoutContent: React.FC = () => {
               Payment Method
             </h2>
             <div className="flex flex-col gap-4 w-full">
+              {savedPaymentMethods.length > 0 && (
+                <div className="flex flex-col gap-2 w-full">
+                  <label className="font-h02-heading02 font-[number:var(--h05-heading05-font-weight)] text-[color:var(--tokens-color-text-text-primary)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
+                    Saved Payment Methods
+                  </label>
+                  <div className={inputClasses}>
+                    <select
+                      value={useNewCard ? "new" : selectedPaymentMethod || ""}
+                      onChange={(e) => {
+                        if (e.target.value === "new") {
+                          setUseNewCard(true);
+                          setSelectedPaymentMethod(null);
+                        } else {
+                          setUseNewCard(false);
+                          setSelectedPaymentMethod(e.target.value);
+                        }
+                      }}
+                      className="relative w-full bg-transparent border-none outline-none px-6 py-3 font-SF-Pro font-normal text-black text-base tracking-[-0.48px] leading-[100%]"
+                    >
+                      {savedPaymentMethods.map((method) => (
+                        <option key={method.uuid} value={method.uuid}>
+                          {method.card_name || `Card ending in ${method.last_4_digits}`}
+                        </option>
+                      ))}
+                      <option value="new">Add New Card</option>
+                    </select>
+                  </div>
+                </div>
+              )}
+              {useNewCard && (
+                <>
               <div className="flex flex-col gap-2 w-full">
                 <label className="font-h02-heading02 font-[number:var(--h05-heading05-font-weight)] text-[color:var(--tokens-color-text-text-primary)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
                   Full Name
@@ -348,6 +413,8 @@ export const CheckoutContent: React.FC = () => {
                   </div>
                 </div>
               </div>
+                </>
+              )}
             </div>
             <div className="flex items-start gap-3 mt-9 w-full">
               <input
@@ -370,11 +437,68 @@ export const CheckoutContent: React.FC = () => {
           {/* Checkout Button */}
           <div className="px-4 mt-9">
             <button
-              onClick={() => console.log("Checkout clicked")}
-              className="w-full flex items-center justify-center gap-2 h-[54px] p-4 bg-[color:var(--premitives-color-brand-purple-1000)] rounded-xl hover:opacity-90 transition-all cursor-pointer"
+              onClick={async () => {
+                if (!agreed) {
+                  showErrorToast("Agreement Required", "Please agree to the terms and conditions");
+                  return;
+                }
+
+                if (!useNewCard && !selectedPaymentMethod) {
+                  showErrorToast("Payment Method Required", "Please select a payment method");
+                  return;
+                }
+
+                if (useNewCard && (!formData.cardNumber || !formData.expiryDate || !formData.securityCode)) {
+                  showErrorToast("Card Details Required", "Please enter all card details");
+                  return;
+                }
+
+                if (!formData.fullName || !formData.country || !formData.addressLine1) {
+                  showErrorToast("Information Required", "Please fill in all required fields");
+                  return;
+                }
+
+                if (!planUuid) {
+                  showErrorToast("Plan Required", "Please select a plan");
+                  return;
+                }
+
+                setLoading(true);
+                try {
+                  const checkoutData: SubscriptionCheckoutRequest = {
+                    plan_uuid: planUuid,
+                    billing_cycle: billingPeriod === "monthly" ? "monthly" : "annual",
+                    full_name: formData.fullName,
+                    email: "", // This component doesn't have email field, but it's required by API
+                    country: formData.country,
+                    address_line_1: formData.addressLine1,
+                    payment_method_id: useNewCard ? "pm_temp" : undefined, // Note: This component doesn't have Stripe integration
+                    user_payment_method_uuid: !useNewCard ? selectedPaymentMethod || undefined : undefined,
+                  };
+
+                  const response = await subscriptionPlansApi.checkout(checkoutData);
+
+                  if (response.error) {
+                    const errorMessage = handleApiError(response.processedError || response);
+                    showErrorToast("Checkout Failed", errorMessage);
+                  } else {
+                    showSuccessToast("Subscription Created", "Your subscription has been successfully created!");
+                    setTimeout(() => {
+                      router.push("/pricing");
+                    }, 500);
+                  }
+                } catch (err) {
+                  const errorMessage = handleApiError(err);
+                  showErrorToast("Checkout Failed", errorMessage);
+                } finally {
+                  setLoading(false);
+                }
+              }}
+              disabled={loading}
+              className="w-full flex items-center justify-center gap-2 h-[54px] p-4 bg-[color:var(--premitives-color-brand-purple-1000)] rounded-xl hover:opacity-90 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <span className="relative w-fit font-h02-heading02 font-[number:var(--h05-heading05-font-weight)] text-white text-[length:var(--h05-heading05-font-size)] tracking-[var(--h05-heading05-letter-spacing)] leading-[var(--h05-heading05-line-height)] whitespace-nowrap [font-style:var(--h05-heading05-font-style)]">
-                Check Out
+                {loading ? "Processing..." : "Check Out"}
               </span>
             </button>
           </div>

@@ -600,6 +600,36 @@ export const useConversation = () => {
     }
   }, [dispatch, currentConversation, showErrorToast])
 
+  // Unarchive a conversation
+  const unarchiveConversation = useCallback(async (conversationUuid: string) => {
+    try {
+      dispatch(clearError())
+      
+      const response = await conversationApi.unarchiveConversation(conversationUuid)
+      if (response.error) {
+        const errorObject = response.processedError || {
+          error_type: 'CONVERSATION_UNARCHIVE_FAILED',
+          error_message: response.error,
+          error_id: response.error_id,
+          status: response.status
+        }
+        throw new Error(JSON.stringify(errorObject))
+      }
+      
+      // If conversation data is returned, add it back to the store
+      if (response.data) {
+        dispatch(addConversation(response.data))
+      }
+      
+      return true
+    } catch (err) {
+      const errorMessage = handleApiError(err)
+      dispatch(setError(errorMessage))
+      showErrorToast('Failed to Unarchive Conversation', errorMessage)
+      return false
+    }
+  }, [dispatch, showErrorToast])
+
   // Convert conversations object to array for components that expect array format
   const conversationsArray = Object.keys(conversations).map(key => conversations[key])
   
@@ -630,6 +660,7 @@ export const useConversation = () => {
     startNewChat,
     deleteConversation,
     archiveConversation,
+    unarchiveConversation,
     clearError: () => dispatch(clearError()),
   }
 }

@@ -7,6 +7,8 @@ import { useDispatch } from "react-redux";
 import { setActiveSubscription } from "@/store/slices/subscription-plans-slice";
 import { subscriptionPlansApi } from "@/api/subscription-plans/api";
 import { SubscriptionCheckoutRequest } from "@/api/subscription-plans/types";
+import { userPaymentMethodsApi } from "@/api/user-payment-methods/api";
+import { UserPaymentMethod } from "@/api/user-payment-methods/types";
 import { useToast } from "@/hooks/use-toast";
 import { handleApiError } from "@/lib/error-handler";
 import { loadStripe, StripeElementsOptions } from "@stripe/stripe-js";
@@ -192,6 +194,10 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
   const [loading, setLoading] = useState(false);
+  const [savedPaymentMethods, setSavedPaymentMethods] = useState<UserPaymentMethod[]>([]);
+  const [selectedPaymentMethodUuid, setSelectedPaymentMethodUuid] = useState<string | null>(null);
+  const [useNewCard, setUseNewCard] = useState(false);
+  const [loadingPaymentMethods, setLoadingPaymentMethods] = useState(true);
   const [formData, setFormData] = useState({
     full_name: "",
     email: "",
@@ -204,6 +210,33 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+
+  useEffect(() => {
+    const fetchPaymentMethods = async () => {
+      try {
+        setLoadingPaymentMethods(true);
+        const response = await userPaymentMethodsApi.getActivePaymentMethods();
+        if (response.success && response.data) {
+          setSavedPaymentMethods(response.data);
+          if (response.data.length > 0) {
+            setSelectedPaymentMethodUuid(response.data[0].uuid);
+            setUseNewCard(false);
+          } else {
+            setUseNewCard(true);
+          }
+        } else {
+          setUseNewCard(true);
+        }
+      } catch (error) {
+        console.error("Failed to fetch payment methods:", error);
+        setUseNewCard(true);
+      } finally {
+        setLoadingPaymentMethods(false);
+      }
+    };
+
+    fetchPaymentMethods();
+  }, []);
 
   const price =
     billingCycle === "monthly" ? plan.monthly_price : plan.annual_price;
@@ -232,15 +265,21 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.full_name.trim())
-      newErrors.full_name = "Full name is required";
-    if (!formData.email.trim()) newErrors.email = "Email is required";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
-      newErrors.email = "Invalid email format";
-    if (!formData.country.trim()) newErrors.country = "Country is required";
-    if (!formData.address_line_1.trim())
-      newErrors.address_line_1 = "Address is required";
+    if (useNewCard) {
+      if (!formData.full_name.trim())
+        newErrors.full_name = "Full name is required";
+      if (!formData.email.trim()) newErrors.email = "Email is required";
+      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
+        newErrors.email = "Invalid email format";
+      if (!formData.country.trim()) newErrors.country = "Country is required";
+      if (!formData.address_line_1.trim())
+        newErrors.address_line_1 = "Address is required";
+    }
+    
     if (!agreedToTerms) newErrors.terms = "You must agree to the terms";
+    if (!useNewCard && !selectedPaymentMethodUuid) {
+      newErrors.payment_method = "Please select a payment method";
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -253,7 +292,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
       return;
     }
 
-    if (!stripe || !elements) {
+    if (useNewCard && (!stripe || !elements)) {
       showErrorToast(
         "Stripe not loaded",
         "Please wait for payment system to load"
@@ -264,47 +303,65 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
     setLoading(true);
 
     try {
-      const cardElement = elements.getElement(CardElement);
-      if (!cardElement) {
-        throw new Error("Card element not found");
-      }
+      let paymentMethodId: string | undefined;
+      let userPaymentMethodUuid: string | undefined;
 
-      // Create payment method
-      const { error: pmError, paymentMethod } =
-        await stripe.createPaymentMethod({
-          type: "card",
-          card: cardElement,
-          billing_details: {
-            name: formData.full_name,
-            email: formData.email,
-            address: {
-              line1: formData.address_line_1,
-              line2: formData.address_line_2 || undefined,
-              city: formData.city || undefined,
-              state: formData.state || undefined,
-              postal_code: formData.postal_code || undefined,
-              country: formData.country,
+      if (useNewCard) {
+        // Create new payment method using Stripe Elements
+        if (!stripe || !elements) {
+          throw new Error("Stripe not loaded");
+        }
+
+        const cardElement = elements.getElement(CardElement);
+        if (!cardElement) {
+          throw new Error("Card element not found");
+        }
+
+        const { error: pmError, paymentMethod } =
+          await stripe.createPaymentMethod({
+            type: "card",
+            card: cardElement,
+            billing_details: {
+              name: formData.full_name,
+              email: formData.email,
+              address: {
+                line1: formData.address_line_1,
+                line2: formData.address_line_2 || undefined,
+                city: formData.city || undefined,
+                state: formData.state || undefined,
+                postal_code: formData.postal_code || undefined,
+                country: formData.country,
+              },
             },
-          },
-        });
+          });
 
-      if (pmError || !paymentMethod) {
-        throw new Error(pmError?.message || "Failed to create payment method");
+        if (pmError || !paymentMethod) {
+          throw new Error(pmError?.message || "Failed to create payment method");
+        }
+
+        paymentMethodId = paymentMethod.id;
+      } else {
+        // Use saved payment method
+        if (!selectedPaymentMethodUuid) {
+          throw new Error("No payment method selected");
+        }
+        userPaymentMethodUuid = selectedPaymentMethodUuid;
       }
 
       // Prepare checkout request
       const checkoutData: SubscriptionCheckoutRequest = {
         plan_uuid: plan.uuid,
         billing_cycle: billingCycle,
-        full_name: formData.full_name,
-        email: formData.email,
-        country: formData.country,
-        address_line_1: formData.address_line_1,
-        address_line_2: formData.address_line_2 || undefined,
-        city: formData.city || undefined,
-        state: formData.state || undefined,
-        postal_code: formData.postal_code || undefined,
-        payment_method_id: paymentMethod.id,
+        full_name: useNewCard ? formData.full_name : "",
+        email: useNewCard ? formData.email : "",
+        country: useNewCard ? formData.country : "",
+        address_line_1: useNewCard ? formData.address_line_1 : "",
+        address_line_2: useNewCard ? (formData.address_line_2 || undefined) : undefined,
+        city: useNewCard ? (formData.city || undefined) : undefined,
+        state: useNewCard ? (formData.state || undefined) : undefined,
+        postal_code: useNewCard ? (formData.postal_code || undefined) : undefined,
+        payment_method_id: paymentMethodId,
+        user_payment_method_uuid: userPaymentMethodUuid,
       };
 
       // Call checkout API
@@ -580,6 +637,48 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
                 onSubmit={handleSubmit}
                 className="flex flex-col gap-4 w-full"
               >
+                {!loadingPaymentMethods && savedPaymentMethods.length > 0 && (
+                  <div className="flex flex-col gap-2 w-full">
+                    <label className={`checkout-emphasis ${isDark ? 'text-white' : 'text-[color:var(--tokens-color-text-text-primary)]'}`}>
+                      Saved Payment Methods
+                    </label>
+                    <div className={inputClasses} style={inputStyle}>
+                      <select
+                        value={useNewCard ? "new" : selectedPaymentMethodUuid || ""}
+                        onChange={(e) => {
+                          if (e.target.value === "new") {
+                            setUseNewCard(true);
+                            setSelectedPaymentMethodUuid(null);
+                          } else {
+                            setUseNewCard(false);
+                            setSelectedPaymentMethodUuid(e.target.value);
+                          }
+                        }}
+                        className={`w-full bg-transparent border-none outline-none text-sm cursor-pointer appearance-none ${isDark ? 'text-white' : 'text-black'}`}
+                        style={{
+                          backgroundImage: isDark 
+                            ? "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M6 9L1 4h10z'/%3E%3C/svg%3E\")"
+                            : "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E\")",
+                          backgroundRepeat: "no-repeat",
+                          backgroundPosition: "right 1rem center",
+                          paddingRight: "2.5rem",
+                        }}
+                      >
+                        {savedPaymentMethods.map((method) => (
+                          <option key={method.uuid} value={method.uuid} style={isDark ? { backgroundColor: '#303030', color: '#ffffff' } : {}}>
+                            {method.card_name || `Card ending in ${method.last_4_digits}`}
+                          </option>
+                        ))}
+                        <option value="new" style={isDark ? { backgroundColor: '#303030', color: '#ffffff' } : {}}>
+                          Add New Card
+                        </option>
+                      </select>
+                    </div>
+                    {errors.payment_method && (
+                      <p className="text-sm text-red-400">{errors.payment_method}</p>
+                    )}
+                  </div>
+                )}
                 <div className="flex flex-col gap-2 w-full">
                   <label className={`checkout-emphasis ${isDark ? 'text-white' : 'text-[color:var(--tokens-color-text-text-primary)]'}`}>
                     Full Name
@@ -677,34 +776,36 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
                   )}
                 </div>
 
-                <div className="flex flex-col gap-2 w-full">
-                  <label className={`checkout-emphasis ${isDark ? 'text-white' : 'text-[color:var(--tokens-color-text-text-primary)]'}`}>
-                    Card Number
-                  </label>
-                  <div className={`${inputClasses} !px-0`} style={inputStyle}>
-                    <div className="w-full px-4">
-                      <CardElement
-                        options={{
-                          style: {
-                            base: {
-                              fontSize: "16px",
-                              color: isDark ? "#ffffff" : "#424770",
-                              fontFamily:
-                                "system-ui, -apple-system, sans-serif",
-                              "::placeholder": {
-                                color: "#aab7c4",
+                {useNewCard && (
+                  <div className="flex flex-col gap-2 w-full">
+                    <label className={`checkout-emphasis ${isDark ? 'text-white' : 'text-[color:var(--tokens-color-text-text-primary)]'}`}>
+                      Card Number
+                    </label>
+                    <div className={`${inputClasses} !px-0`} style={inputStyle}>
+                      <div className="w-full px-4">
+                        <CardElement
+                          options={{
+                            style: {
+                              base: {
+                                fontSize: "16px",
+                                color: isDark ? "#ffffff" : "#424770",
+                                fontFamily:
+                                  "system-ui, -apple-system, sans-serif",
+                                "::placeholder": {
+                                  color: "#aab7c4",
+                                },
+                              },
+                              invalid: {
+                                color: isDark ? "#ff6b6b" : "#9e2146",
                               },
                             },
-                            invalid: {
-                              color: isDark ? "#ff6b6b" : "#9e2146",
-                            },
-                          },
-                          hidePostalCode: true,
-                        }}
-                      />
+                            hidePostalCode: true,
+                          }}
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
 
                 <div className="flex items-start gap-3 mt-4">
                   <input
@@ -732,7 +833,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
 
                 <ActionButton
                   type="submit"
-                  disabled={loading || !stripe || !elements}
+                  disabled={loading || (useNewCard && (!stripe || !elements)) || loadingPaymentMethods}
                   loading={loading}
                   variant="primary"
                   fullWidth

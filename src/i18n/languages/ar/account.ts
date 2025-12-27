@@ -22,6 +22,7 @@ export const account = {
     logout: 'تسجيل الخروج',
     deleteYourAccount: 'حذف حسابك',
     deleteAccount: 'حذف الحساب',
+    theme: 'المظهر',
     organizationId: 'معرف المنظمة',
     copyOrganizationId: 'نسخ معرف المنظمة',
     copied: 'تم النسخ!',
@@ -36,6 +37,9 @@ export const account = {
     passwordPlaceholder: 'أدخل كلمة مرور جديدة',
     confirmPassword: 'تأكيد كلمة المرور',
     confirmPasswordPlaceholder: 'أكد كلمة المرور الجديدة',
+    changePassword: 'تغيير كلمة المرور',
+    changePasswordDescription: 'سنرسل رمز التحقق إلى عنوان بريدك الإلكتروني لتأكيد تغيير كلمة المرور.',
+    changePasswordEmail: 'البريد الإلكتروني',
     workFunction: 'وظيفتك',
     workFunctionPlaceholder: 'أدخل وظيفتك',
     choosePreference: 'اختر تفضيلك',
@@ -121,7 +125,12 @@ export const account = {
     messageHistoryDays: 'أيام سجل الرسائل',
     prioritySupport: 'دعم ذو أولوية',
     apiAccess: 'الوصول إلى API',
-    totalQueries: 'إجمالي الطلبات'
+    totalQueries: 'إجمالي الطلبات',
+    date: 'التاريخ',
+    type: 'النوع',
+    model: 'النموذج',
+    tokens: 'الاعتمادات',
+    cost: 'التكلفة'
   },
   language: {
     title: 'اللغات',

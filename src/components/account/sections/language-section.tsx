@@ -6,8 +6,8 @@ import { useTheme } from "@/hooks/use-theme";
 import { useLanguage, useTranslation } from "@/hooks/use-language";
 
 export const LanguageSection: React.FC = () => {
-  const { language, setLanguage } = useLanguage();
-  const { t } = useTranslation();
+  const { setLanguage } = useLanguage();
+  const { t, language } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';

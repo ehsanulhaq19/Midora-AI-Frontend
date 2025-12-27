@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 import { useTheme } from "@/hooks/use-theme";
 import { ConfirmationModal } from "./confirmation-modal";
 import { useConversation } from "@/hooks/use-conversation";
+import { useUserCredits } from "@/hooks/use-user-credits";
 
 interface Project {
   id: string;
@@ -58,6 +59,11 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const messageInputRef = useRef<MessageInputHandle>(null);
   const router = useRouter();
   const { deleteConversation, archiveConversation } = useConversation();
+  const { data: creditsData } = useUserCredits();
+  
+  const isCreditsExhausted = creditsData 
+    ? creditsData.used_credits >= creditsData.available_credits 
+    : false;
   
   // Modal state
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -201,6 +207,8 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             className="max-w-[808px]"
             textAreaClassName="!app-text-lg"
             onFilesChange={onFilesChange}
+            disabled={isCreditsExhausted}
+            disabledMessage="You have used all credits, please upgrade the subscription."
           />
         </div>
 
@@ -347,6 +355,8 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
           onSend={onSendMessage}
           isStreaming={isStreaming}
           onFilesChange={onFilesChange}
+          disabled={isCreditsExhausted}
+          disabledMessage="You have used all credits, please upgrade the subscription."
         />
       </div>
       </div>

@@ -82,13 +82,13 @@ export function useLanguage() {
 export function useTranslation() {
   const { language } = useLanguage()
   
-  // The t function reads from the updated module-level state
-  // When language changes in context, this component re-renders automatically
-  // We include language in the dependency to ensure the function reference updates
-  const t = useCallback((key: string): string => {
+  // Don't memoize the t function - create a new one on each render
+  // This ensures components re-render when language changes
+  // The function reads from the updated module-level state
+  const t = (key: string): string => {
     // Read from module-level state (which is updated by setLanguage)
     return i18nT(key)
-  }, [language]) // When language changes, this callback is recreated, ensuring fresh reads
+  }
   
   return { t, language }
 }

@@ -53,3 +53,17 @@ export interface QueryUsageAnalyticsResponse {
   message: string;
 }
 
+export interface QueryUsageListItem {
+  created_at: string;
+  model_name: string;
+  total_credits: number;
+  total_cost: number;
+  subscription_plan_name: string | null;
+}
+
+export interface QueryUsageListData {
+  success: boolean;
+  data: QueryUsageListItem[];
+  message: string;
+}
+

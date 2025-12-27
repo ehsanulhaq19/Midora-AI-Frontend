@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap");
-
+ 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -263,11 +263,33 @@
   stroke: var(--tokens-color-surface-surface-dark) !important;
 }
 
+/* Prevent white flash on page load - set initial background based on system preference */
+/* This runs before JavaScript, so it prevents the white flash */
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) {
+    background-color: #212121 !important;
+  }
+  html:not([data-theme="light"]) body {
+    background-color: #212121 !important;
+  }
+}
+
+/* Fallback: if script hasn't run yet, use system preference */
+html {
+  background-color: #ffffff;
+}
+
+html[data-theme="dark"],
+html[data-theme="dark"] body {
+  background-color: #212121 !important;
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
     font-size: 16px; /* Set 14px as default font size */
     /* Removed global transitions for instant theme switching */
+    background-color: #ffffff; /* Default light background */
   }
   
   /* Disable all transitions during theme changes for instant switching */
@@ -285,15 +307,16 @@
     font-feature-settings: "rlig" 1, "calt" 1;
     font-size: 14px; /* Ensure body uses 14px as base */
     line-height: 1.4; /* Consistent line height with app text classes */
+    background-color: #ffffff; /* Default light background */
   }
 
   /* Ensure dark mode html and body background is #212121 */
   [data-theme="dark"] {
-    background-color: #212121;
+    background-color: #212121 !important;
   }
   
   [data-theme="dark"] body {
-    background-color: #212121;
+    background-color: #212121 !important;
   }
 
   input,
@@ -686,6 +709,19 @@
   [data-theme="dark"] textarea {
     background-color: #303030 !important;
     border-radius: var(--premitives-corner-radius-corner-radius-3);
+  }
+
+  /* Input and textarea text color in dark mode - light theme color */
+  [data-theme="dark"] input[type="text"],
+  [data-theme="dark"] input[type="email"],
+  [data-theme="dark"] input[type="password"],
+  [data-theme="dark"] input[type="search"],
+  [data-theme="dark"] input[type="tel"],
+  [data-theme="dark"] input[type="url"],
+  [data-theme="dark"] input[type="number"],
+  [data-theme="dark"] input:not([type]),
+  [data-theme="dark"] textarea {
+    color: #ffffff !important;
   }
 
   /* Message input icon buttons - inherit background in dark mode */

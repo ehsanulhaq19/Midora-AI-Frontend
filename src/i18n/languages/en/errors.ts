@@ -9,7 +9,7 @@ export const errors = {
   UNAUTHORIZED: 'You do not have permission to access this resource',
   INVALID_TOKEN: 'Your session has expired. Please sign in again',
   TOKEN_EXPIRED: 'Your session has expired. Please sign in again',
-  INVALID_CREDENTIALS: 'Invalid email or password',
+  INVALID_CREDENTIALS: 'Invalid password',
   ACCOUNT_DISABLED: 'Your account has been disabled. Please contact support',
   ACCOUNT_LOCKED: 'Your account has been temporarily locked. Please try again later',
   INSUFFICIENT_PERMISSIONS: 'You do not have sufficient permissions for this action',

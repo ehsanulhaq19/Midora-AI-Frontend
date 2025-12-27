@@ -15,6 +15,7 @@ import {
   FolderOpen01,
   Logout,
   Menu,
+  Archive,
 } from "@/icons";
 import { Tooltip } from "@/components/ui";
 import { ConversationMenu } from "./conversation-menu";
@@ -51,6 +52,7 @@ interface ChatListItemProps {
   onRemoveFromFolder?: (conversationUuid: string) => void;
   onArchive?: (conversationUuid: string) => void;
   onDelete?: (conversationUuid: string) => void;
+  isShrunk?: boolean;
 }
 
 const ChatListItem: React.FC<ChatListItemProps> = ({
@@ -62,26 +64,62 @@ const ChatListItem: React.FC<ChatListItemProps> = ({
   onRemoveFromFolder,
   onArchive,
   onDelete,
-}) => (
-  <div
-    className={`sidebar-menu-item group w-full flex items-center gap-2.5 px-5 py-2 transition-colors hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded-[var(--premitives-corner-radius-corner-radius)] dark:hover:bg-white/10 ${
-      isSelected
-        ? "bg-[color:var(--tokens-color-surface-surface-tertiary)] dark:bg-white/10"
-        : "hover:bg-[color:var(--tokens-color-surface-surface-secondary)]"
-    }`}
-  >
-    <button onClick={onClick} className="flex-1 text-left max-w-[160px]">
-      <div
-        className="font-h02-heading02 flex-1 tracking-[var(--text-small-letter-spacing)] text-[14px] [font-style:var(--text-small-font-style)] font-[number:var(--text-small-font-weight)] leading-[var(--text-small-line-height)] truncate max-w-[160px]"
-        style={{
-          color: isSelected
-            ? "var(--tokens-color-text-text-brand)"
-            : "var(--tokens-color-text-text-conversation)",
-        }}
-      >
-        {text}
-      </div>
-    </button>
+  isShrunk = false,
+}) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const textRef = useRef<HTMLDivElement>(null);
+  const [isTruncated, setIsTruncated] = useState(false);
+
+  useEffect(() => {
+    if (textRef.current) {
+      setIsTruncated(textRef.current.scrollWidth > textRef.current.clientWidth);
+    }
+  }, [text]);
+
+  // Only show tooltip when sidebar is shrunk
+  const shouldShowTooltip = isShrunk && isTruncated && isHovered;
+
+  return (
+    <div
+      className={`sidebar-menu-item group w-full flex items-center gap-2.5 px-5 py-2 transition-colors hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded-[var(--premitives-corner-radius-corner-radius)] dark:hover:bg-white/10 ${
+        isSelected
+          ? "bg-[color:var(--tokens-color-surface-surface-tertiary)] dark:bg-white/10"
+          : "hover:bg-[color:var(--tokens-color-surface-surface-secondary)]"
+      }`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {shouldShowTooltip ? (
+        <Tooltip content={text} position="right" delay={0}>
+          <button onClick={onClick} className="flex-1 text-left max-w-[160px]">
+            <div
+              ref={textRef}
+              className="font-h02-heading02 flex-1 tracking-[var(--text-small-letter-spacing)] text-[14px] [font-style:var(--text-small-font-style)] font-[number:var(--text-small-font-weight)] leading-[var(--text-small-line-height)] truncate max-w-[160px]"
+              style={{
+                color: isSelected
+                  ? "var(--tokens-color-text-text-brand)"
+                  : "var(--tokens-color-text-text-conversation)",
+              }}
+            >
+              {text}
+            </div>
+          </button>
+        </Tooltip>
+      ) : (
+        <button onClick={onClick} className="flex-1 text-left max-w-[160px]">
+          <div
+            ref={textRef}
+            className="font-h02-heading02 flex-1 tracking-[var(--text-small-letter-spacing)] text-[14px] [font-style:var(--text-small-font-style)] font-[number:var(--text-small-font-weight)] leading-[var(--text-small-line-height)] truncate max-w-[160px]"
+            style={{
+              color: isSelected
+                ? "var(--tokens-color-text-text-brand)"
+                : "var(--tokens-color-text-text-conversation)",
+            }}
+          >
+            {text}
+          </div>
+        </button>
+      )}
     {conversationUuid && (
       <ConversationMenu
         className={`opacity-0 group-hover:opacity-100 transition-opacity duration-150 ${
@@ -98,7 +136,8 @@ const ChatListItem: React.FC<ChatListItemProps> = ({
       />
     )}
   </div>
-);
+  );
+};
 
 interface NavigationSidebarProps {
   isOpen: boolean;
@@ -110,6 +149,7 @@ interface NavigationSidebarProps {
   onAccountClick?: () => void;
   onNavigate?: () => void;
   onSearchClick?: () => void;
+  onArchiveClick?: () => void;
 }
 
 export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
@@ -122,6 +162,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
   onAccountClick,
   onNavigate,
   onSearchClick,
+  onArchiveClick,
 }) => {
   const [selectedChat, setSelectedChat] = useState<number | null>(null);
   const [selectedProjectConversationUuid, setSelectedProjectConversationUuid] =
@@ -416,6 +457,10 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
   const handleAccountClick = () => {
     onAccountClick?.();
     setIsDropdownOpen(false);
+    // Close mobile sidebar when clicking on mobile
+    if (isMobile) {
+      setIsMobileOpen(false);
+    }
   };
 
   // Handle click outside to close dropdown
@@ -551,44 +596,61 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
           >
             {isShrunk ? (
               <>
-                <button
-                  onClick={handleNewChat}
-                  className="w-10 h-10 rounded-lg flex items-center justify-center transition-colors hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]"
-                  title={t("chat.newChat")}
-                >
-                  <div
-                    className={`first-letter:w-6 h-6 flex items-center justify-center gap-2.5 rounded-[4px] text-white purple-bg-icon-container ${
-                      isDark
-                        ? "bg-[color:var(--tokens-color-surface-surface-card-purple)]"
-                        : " bg-[color:var(--tokens-color-surface-surface-brand)]"
-                    }`}
-                    // style={{ backgroundColor: '#6B4392' }}
+                <Tooltip content={t("chat.newChat")} position="right" delay={0}>
+                  <button
+                    onClick={handleNewChat}
+                    className="w-10 h-10 rounded-lg flex items-center justify-center transition-colors hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]"
                   >
-                    <Plus01_5 className="w-5 h-5" color={isDark ? "var(--tokens-color-surface-surface-dark)" : "#ffffff"} />
-                  </div>
-                </button>
-                <button
-                  onClick={() => {
-                    onSearchClick?.();
-                    if (isMobile) {
-                      setIsMobileOpen(false);
-                    }
-                  }}
-                  className="w-10 h-10 rounded-lg flex items-center justify-center transition-colors hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]"
-                  title={t("chat.searchChat")}
-                >
-                  <Search02
-                    className="w-5 h-5"
-                    color="var(--tokens-color-text-text-primary)"
-                  />
-                </button>
+                    <div
+                      className={`first-letter:w-6 h-6 flex items-center justify-center gap-2.5 rounded-[4px] text-white purple-bg-icon-container ${
+                        isDark
+                          ? "bg-[color:var(--tokens-color-surface-surface-card-purple)]"
+                          : " bg-[color:var(--tokens-color-surface-surface-brand)]"
+                      }`}
+                      // style={{ backgroundColor: '#6B4392' }}
+                    >
+                      <Plus01_5 className="w-5 h-5" color={isDark ? "var(--tokens-color-surface-surface-dark)" : "#ffffff"} />
+                    </div>
+                  </button>
+                </Tooltip>
+                <Tooltip content={t("chat.searchChat")} position="right" delay={0}>
+                  <button
+                    onClick={() => {
+                      onSearchClick?.();
+                      if (isMobile) {
+                        setIsMobileOpen(false);
+                      }
+                    }}
+                    className="w-10 h-10 rounded-lg flex items-center justify-center transition-colors hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]"
+                  >
+                    <Search02
+                      className="w-5 h-5"
+                      color="var(--tokens-color-text-text-primary)"
+                    />
+                  </button>
+                </Tooltip>
+                <Tooltip content="Archive" position="right" delay={0}>
+                  <button
+                    onClick={() => {
+                      onArchiveClick?.();
+                      if (isMobile) {
+                        setIsMobileOpen(false);
+                      }
+                    }}
+                    className="w-10 h-10 rounded-lg flex items-center justify-center transition-colors hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]"
+                  >
+                    <Archive
+                      className="w-5 h-5"
+                      color="var(--tokens-color-text-text-primary)"
+                    />
+                  </button>
+                </Tooltip>
               </>
             ) : (
               <>
                 <button
                   onClick={handleNewChat}
                   className="sidebar-menu-item flex items-center gap-2 py-2 relative w-full hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded-[var(--premitives-corner-radius-corner-radius)] transition-colors px-5 dark:hover:bg-white/10"
-                  title={t("chat.newChat")}
                 >
                   <div
                     className={`w-6 h-6 flex items-center justify-center gap-2.5 rounded-[4px] text-white purple-bg-icon-container ${
@@ -621,7 +683,6 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                   }`}
                   onMouseEnter={() => setSearchHovered(true)}
                   onMouseLeave={() => setSearchHovered(false)}
-                  title={t("chat.searchChat")}
                 >
                   <Search02
                     className="w-5 h-5"
@@ -632,6 +693,23 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                     color="var(--tokens-color-text-text-primary)"
                   >
                     {t("chat.searchChat")}
+                  </div>
+                </button>
+                <button
+                  onClick={() => {
+                    onArchiveClick?.();
+                    if (isMobile) {
+                      setIsMobileOpen(false);
+                    }
+                  }}
+                  className="sidebar-menu-item flex items-center relative w-full hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded-[var(--premitives-corner-radius-corner-radius)] transition-colors px-5 py-2 gap-2 dark:hover:bg-white/10"
+                >
+                  <Archive
+                    className="w-5 h-5"
+                    color="var(--tokens-color-text-text-primary)"
+                  />
+                  <div className="relative flex items-center justify-center w-fit font-h02-heading02 font-[number:var(--text-font-weight)] text-[color:var(--tokens-color-text-text-primary)] text-[14px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] whitespace-nowrap [font-style:var(--text-font-style)]">
+                    Archive
                   </div>
                 </button>
               </>
@@ -736,18 +814,28 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
               </>
             )}
             {isShrunk ? (
-              <button
-                onClick={() => setIsNewFolderModalOpen(true)}
-                className="w-10 h-10 rounded-lg mb-2 flex items-center justify-center transition-colors hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]"
-                title={t("chat.newFolder")}
-              >
-                <FoldersIcon />
-              </button>
+              <Tooltip content={t("chat.newFolder")} position="right" delay={0}>
+                <button
+                  onClick={() => {
+                    setIsNewFolderModalOpen(true);
+                    if (isMobile) {
+                      setIsMobileOpen(false);
+                    }
+                  }}
+                  className="w-10 h-10 rounded-lg mb-2 flex items-center justify-center transition-colors hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]"
+                >
+                  <FoldersIcon />
+                </button>
+              </Tooltip>
             ) : (
               <button
-                onClick={() => setIsNewFolderModalOpen(true)}
+                onClick={() => {
+                  setIsNewFolderModalOpen(true);
+                  if (isMobile) {
+                    setIsMobileOpen(false);
+                  }
+                }}
                 className="sidebar-menu-item flex items-center relative w-full hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded-[var(--premitives-corner-radius-corner-radius)] transition-colors px-5 py-2 gap-2 dark:hover:bg-white/10"
-                title={t("chat.newFolder")}
               >
                 <FoldersIcon
                   color="var(--tokens-color-text-text-primary)"
@@ -994,22 +1082,22 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                       )
                       .slice(0, 10)
                       .map((conversation) => (
-                        <button
-                          key={conversation.uuid}
-                          onClick={() => handleSelectChat(conversation.uuid)}
-                          className={`w-10 h-10 rounded-lg mb-2 flex items-center justify-center transition-colors dark:hover:bg-white/10 ${
-                            currentConversation?.uuid === conversation.uuid &&
-                            selectedProjectConversationUuid === null &&
-                            reduxSelectedProjectId === null
-                              ? "bg-[color:var(--tokens-color-surface-surface-tertiary)] dark:bg-white/10"
-                              : "hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]"
-                          }`}
-                          title={conversation.name}
-                        >
-                          <div className="w-6 h-6 rounded bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white text-xs font-semibold">
-                            {conversation.name.charAt(0).toUpperCase()}
-                          </div>
-                        </button>
+                        <Tooltip key={conversation.uuid} content={conversation.name} position="right" delay={0}>
+                          <button
+                            onClick={() => handleSelectChat(conversation.uuid)}
+                            className={`w-10 h-10 rounded-lg mb-2 flex items-center justify-center transition-colors dark:hover:bg-white/10 ${
+                              currentConversation?.uuid === conversation.uuid &&
+                              selectedProjectConversationUuid === null &&
+                              reduxSelectedProjectId === null
+                                ? "bg-[color:var(--tokens-color-surface-surface-tertiary)] dark:bg-white/10"
+                                : "hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]"
+                            }`}
+                          >
+                            <div className="w-6 h-6 rounded bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white text-xs font-semibold">
+                              {conversation.name.charAt(0).toUpperCase()}
+                            </div>
+                          </button>
+                        </Tooltip>
                       ))}
                   </>
                 ) : (
@@ -1055,6 +1143,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                                 handleSelectChat(conversation.uuid)
                               }
                               conversationUuid={conversation.uuid}
+                              isShrunk={isShrunk}
                               onShare={(uuid) => {
                                 // TODO: Implement share functionality
                                 console.log("Share conversation:", uuid);

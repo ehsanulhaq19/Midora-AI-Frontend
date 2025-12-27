@@ -69,6 +69,7 @@ export const auth = {
   verifyingOtp: 'OTP wird verifiziert...',
   resendOtp: 'OTP erneut senden',
   resendingOtp: 'OTP wird erneut gesendet...',
+  regenerateOTP: 'Code erneut senden',
   otpVerified: 'OTP erfolgreich verifiziert',
   otpExpired: 'OTP ist abgelaufen',
   invalidOtp: 'Ungültiger OTP-Code',

@@ -45,7 +45,8 @@ export interface SubscriptionCheckoutRequest {
   city?: string
   state?: string
   postal_code?: string
-  payment_method_id: string
+  payment_method_id?: string
+  user_payment_method_uuid?: string
   stripe_customer_id?: string
 }
 

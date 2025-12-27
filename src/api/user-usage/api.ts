@@ -4,7 +4,7 @@
  */
 
 import { baseApiClient, ApiResponse } from '../base'
-import { UserCreditsAndSubscriptionInfo, QueryUsageAnalyticsData } from './types'
+import { UserCreditsAndSubscriptionInfo, QueryUsageAnalyticsData, QueryUsageListItem } from './types'
 
 class UserUsageApiClient {
   private baseClient = baseApiClient
@@ -31,6 +31,22 @@ class UserUsageApiClient {
     })
     return this.baseClient.get<QueryUsageAnalyticsData>(
       `/api/v1/query-usage/analytics?${params.toString()}`
+    )
+  }
+
+  /**
+   * Get user query usage list within a date range
+   */
+  async getQueryUsageList(
+    startTime: string,
+    endTime: string
+  ): Promise<ApiResponse<QueryUsageListItem[]>> {
+    const params = new URLSearchParams({
+      start_time: startTime,
+      end_time: endTime,
+    })
+    return this.baseClient.get<QueryUsageListItem[]>(
+      `/api/v1/query-usage/list?${params.toString()}`
     )
   }
 }

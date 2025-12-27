@@ -24,6 +24,7 @@ export const account = {
     logout: '登出',
     deleteYourAccount: '删除您的账户',
     deleteAccount: '删除账户',
+    theme: '主题',
     organizationId: '组织ID',
     copyOrganizationId: '复制组织ID',
     copied: '已复制！',
@@ -38,6 +39,9 @@ export const account = {
     passwordPlaceholder: '输入新密码',
     confirmPassword: '确认密码',
     confirmPasswordPlaceholder: '确认您的新密码',
+    changePassword: '更改密码',
+    changePasswordDescription: '我们将向您的电子邮件地址发送验证码以确认密码更改。',
+    changePasswordEmail: '电子邮件',
     workFunction: '您的工作职能',
     workFunctionPlaceholder: '输入您的工作职能',
     choosePreference: '选择您的偏好',
@@ -123,7 +127,12 @@ export const account = {
     messageHistoryDays: '消息历史天数',
     prioritySupport: '优先支持',
     apiAccess: 'API 访问',
-    totalQueries: '总查询次数'
+    totalQueries: '总查询次数',
+    date: '日期',
+    type: '类型',
+    model: '模型',
+    tokens: '积分',
+    cost: '成本'
   },
   language: {
     title: '语言',

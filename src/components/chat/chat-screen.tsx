@@ -6,6 +6,7 @@ import { ChatInterface } from "./sections/chat-interface";
 import { ConversationContainer } from "./sections/conversation-container";
 import { ChatHeader } from "./sections/chat-header";
 import { ConversationHistoryScreen } from "./sections/conversation-history-screen";
+import { ArchiveScreen } from "./sections/archive-screen";
 import { useConversation } from "@/hooks/use-conversation";
 import { AccountScreen } from "../account/account-screen";
 import { useAIModels, useProjects } from "@/hooks";
@@ -19,6 +20,7 @@ export const ChatScreen: React.FC = () => {
   const [isCanvasOpen, setIsCanvasOpen] = useState(false);
   const [isAccountOpen, setIsAccountOpen] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [isArchiveOpen, setIsArchiveOpen] = useState(false);
   const hasInitialized = useRef(false);
   const dispatch = useDispatch();
   const { selectedProjectId, projects } = useSelector(
@@ -118,6 +120,7 @@ export const ChatScreen: React.FC = () => {
           setIsCanvasOpen(false);
           setIsAccountOpen(false);
           setIsHistoryOpen(false);
+          setIsArchiveOpen(false);
         }}
         showFullSidebar={!isCanvasOpen}
         selectedProjectId={selectedProjectId || undefined}
@@ -125,18 +128,27 @@ export const ChatScreen: React.FC = () => {
           handleProjectSelect(project);
           setIsAccountOpen(false);
           setIsHistoryOpen(false);
+          setIsArchiveOpen(false);
         }}
         onAccountClick={() => {
           setIsAccountOpen(true);
           setIsHistoryOpen(false);
+          setIsArchiveOpen(false);
         }}
         onNavigate={() => {
           setIsAccountOpen(false);
           setIsHistoryOpen(false);
+          setIsArchiveOpen(false);
         }}
         onSearchClick={() => {
           setIsHistoryOpen(true);
           setIsAccountOpen(false);
+          setIsArchiveOpen(false);
+        }}
+        onArchiveClick={() => {
+          setIsArchiveOpen(true);
+          setIsAccountOpen(false);
+          setIsHistoryOpen(false);
         }}
       />
 
@@ -152,6 +164,16 @@ export const ChatScreen: React.FC = () => {
               onSelectConversation={(uuid) => {
                 selectConversation(uuid);
                 setIsHistoryOpen(false);
+              }}
+            />
+          </div>
+        ) : isArchiveOpen ? (
+          <div className="w-full h-full relative z-0">
+            <ArchiveScreen
+              onClose={() => setIsArchiveOpen(false)}
+              onSelectConversation={(uuid) => {
+                selectConversation(uuid);
+                setIsArchiveOpen(false);
               }}
             />
           </div>
