@@ -125,8 +125,7 @@ export const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>(({
       disabled: model.available === false,
       disabledHint: model.available === false
         ? "You have exceeded your limit to use this model"
-        : undefined,
-      modelType: model.model_type
+        : undefined
     }))
   }
 

@@ -12,7 +12,6 @@ interface DropdownOption {
   image?: string;
   disabled?: boolean;
   disabledHint?: string;
-  modelType?: 'high' | 'medium' | 'low';
 }
 
 interface DropdownProps {
@@ -105,69 +104,17 @@ export const Dropdown: React.FC<DropdownProps> = ({
     setTooltipPosition(null);
   };
 
-  const getModelTypeColor = (modelType?: 'high' | 'medium' | 'low') => {
-    if (!modelType) return '';
-    switch (modelType) {
-      case 'high':
-        return {
-          border: 'border-red-500',
-          bg: 'bg-red-50 dark:bg-red-900/20',
-          text: 'text-red-700 dark:text-red-400',
-          badge: 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300'
-        };
-      case 'medium':
-        return {
-          border: 'border-green-500',
-          bg: 'bg-green-50 dark:bg-green-900/20',
-          text: 'text-green-700 dark:text-green-400',
-          badge: 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300'
-        };
-      case 'low':
-        return {
-          border: 'border-blue-500',
-          bg: 'bg-blue-50 dark:bg-blue-900/20',
-          text: 'text-blue-700 dark:text-blue-400',
-          badge: 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300'
-        };
-      default:
-        return {
-          border: '',
-          bg: '',
-          text: '',
-          badge: ''
-        };
-    }
-  };
-
-  const getModelTypeLabel = (modelType?: 'high' | 'medium' | 'low') => {
-    if (!modelType) return '';
-    switch (modelType) {
-      case 'high':
-        return 'High Cost';
-      case 'medium':
-        return 'Medium Cost';
-      case 'low':
-        return 'Low Cost';
-      default:
-        return '';
-    }
-  };
-
   const getButtonClasses = () => {
     if (variant === "model-selector") {
-      const modelTypeColor = getModelTypeColor(selectedOption?.modelType);
       return `
         inline-flex items-center justify-between w-full 
-        px-3 py-2
-        border-2 ${modelTypeColor.border || 'border-transparent'}
-        ${modelTypeColor.bg || 'bg-[color:var(--tokens-color-surface-surface-darkgray-50)]'}
-        rounded-lg
-        text-left cursor-pointer transition-all duration-200
-        shadow-sm hover:shadow-md
+        border-0
+        rounded-[var(--premitives-corner-radius-corner-radius-2)]
+        text-left cursor-pointer transition-colors duration-200
         ${
           disabled
             ? "opacity-50 cursor-not-allowed"
-            : "hover:border-opacity-80 hover:scale-[1.02] active:scale-[0.98]"
+            : "hover:bg-[color:var(--tokens-color-surface-surface-secondary)]"
         }
       `;
     }
@@ -186,10 +133,10 @@ export const Dropdown: React.FC<DropdownProps> = ({
         ? `${!isDark ? "bg-white" : "bg-tokens-color-surface-surface-dark" } `
         : "bg-[color:var(--tokens-color-surface-surface-button-pressed)]";
     const widthClass = variant === "model-selector" ? "w-full" : "left-0 ";
-    const baseClasses = `absolute ${widthClass} mt-2 ${bgColor} border border-[color:var(--tokens-color-border-border-subtle)] rounded-lg shadow-xl z-50 max-h-60 overflow-y-auto backdrop-blur-sm`;
+    const baseClasses = `absolute ${widthClass} mt-1 ${bgColor} border border-[color:var(--tokens-color-border-border-subtle)] rounded-[var(--premitives-corner-radius-corner-radius-2)] shadow-lg z-50 max-h-60 overflow-y-auto`;
 
     if (openUpward) {
-      return `${baseClasses} bottom-full mb-2`;
+      return `${baseClasses} bottom-full mb-1`;
     }
 
     return `${baseClasses} top-full`;
@@ -197,9 +144,13 @@ export const Dropdown: React.FC<DropdownProps> = ({
 
   const getButtonContent = () => {
     if (variant === "model-selector") {
-      const modelTypeColor = getModelTypeColor(selectedOption?.modelType);
       return (
-        <div className="flex items-center gap-2.5 w-full">
+        <div className="flex items-center gap-2 w-full">
+          {modeText && (
+            <span className="font-h02-heading02 font-[number:var(--text-medium-font-weight)] text-tokens-color-text-text-neutral text-sm tracking-[var(--text-medium-letter-spacing)] leading-[var(--text-medium-line-height)] whitespace-nowrap [font-style:var(--text-medium-font-style)]">
+              {modeText}
+            </span>
+          )}
           {selectedOption?.icon && (
             <div className="flex-shrink-0">{selectedOption.icon}</div>
           )}
@@ -207,30 +158,23 @@ export const Dropdown: React.FC<DropdownProps> = ({
             <img
               src={selectedOption.image}
               alt={selectedOption.label}
-              className="w-5 h-5 rounded flex-shrink-0"
+              className="w-4 h-4 rounded flex-shrink-0"
             />
           )}
-          <div className="flex-1 min-w-0 flex items-center gap-2">
-            <span className="font-text-medium font-[number:var(--text-medium-font-weight)] text-[color:var(--tokens-color-text-text-brand)] text-sm tracking-[var(--text-medium-letter-spacing)] leading-[var(--text-medium-line-height)] truncate [font-style:var(--text-medium-font-style)]">
-              {selectedOption?.label || placeholder}
-            </span>
-            {selectedOption?.modelType && (
-              <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${modelTypeColor.badge} flex-shrink-0`}>
-                {getModelTypeLabel(selectedOption.modelType)}
-              </span>
-            )}
-          </div>
           {isOpen ? (
             <ArrowUpSm
               color="rgba(31, 23, 64, 0.9)"
-              className="transition-transform duration-200 flex-shrink-0 w-4 h-4"
+              className="transition-transform duration-200 flex-shrink-0 w-5 h-6"
             />
           ) : (
             <ArrowDownSm
               color="rgba(31, 23, 64, 0.9)"
-              className="transition-transform duration-200 flex-shrink-0 w-4 h-4"
+              className="transition-transform duration-200 flex-shrink-0 w-3 h-3"
             />
           )}
+          <span className="font-text-medium font-[number:var(--text-medium-font-weight)] text-[color:var(--tokens-color-text-text-brand)] text-sm tracking-[var(--text-medium-letter-spacing)] leading-[var(--text-medium-line-height)] whitespace-nowrap [font-style:var(--text-medium-font-style)]">
+            {selectedOption?.label || placeholder}
+          </span>
         </div>
       );
     }
@@ -281,8 +225,6 @@ export const Dropdown: React.FC<DropdownProps> = ({
           <div className={getDropdownClasses()}>
             {options.map((option) => {
               const isDisabled = option.disabled || false;
-              const optionModelTypeColor = variant === "model-selector" ? getModelTypeColor(option.modelType) : { border: '', bg: '', text: '', badge: '' };
-              const isSelected = option.value === value;
               return (
                 <div
                   key={option.value}
@@ -291,20 +233,18 @@ export const Dropdown: React.FC<DropdownProps> = ({
                   <button
                     type="button"
                     className={`
-                      w-full px-4 py-3 text-left flex items-center gap-3 
-                      transition-all duration-200
-                      ${variant === "model-selector" && optionModelTypeColor.border ? `border-l-4 ${optionModelTypeColor.border}` : ''}
+                      w-full px-3 py-2 text-left flex items-center gap-2 
+                      transition-colors duration-200
                       ${
                         isDisabled
                           ? "opacity-50 cursor-not-allowed"
-                          : `hover:bg-[color:var(--tokens-color-surface-surface-secondary)] cursor-pointer hover:translate-x-1 ${optionModelTypeColor.bg ? `hover:${optionModelTypeColor.bg}` : ''}`
+                          : "hover:bg-[color:var(--tokens-color-surface-surface-secondary)] cursor-pointer"
                       }
                       ${
-                        isSelected
-                          ? `bg-[color:var(--tokens-color-surface-surface-secondary)] ${optionModelTypeColor.bg || ''}`
+                        option.value === value
+                          ? "bg-[color:var(--tokens-color-surface-surface-secondary)]"
                           : ""
                       }
-                      ${variant === "model-selector" ? "rounded-r-lg" : ""}
                     `}
                     onClick={() => !isDisabled && handleOptionClick(option.value)}
                     disabled={isDisabled}
@@ -316,40 +256,18 @@ export const Dropdown: React.FC<DropdownProps> = ({
                       <img
                         src={option.image}
                         alt={option.label}
-                        className="w-5 h-5 rounded flex-shrink-0"
+                        className="w-4 h-4 rounded flex-shrink-0"
                       />
                     )}
-                    <div className="flex-1 min-w-0 flex items-center gap-2">
-                      <span
-                        className={`font-h02-heading02 font-[number:var(--text-small-font-weight)] text-sm tracking-[var(--text-small-letter-spacing)] leading-[var(--text-small-line-height)] truncate [font-style:var(--text-small-font-style)] ${
-                          variant === "model-selector"
-                            ? "text-[color:var(--tokens-color-text-text-brand)]"
-                            : "text-[color:var(--tokens-color-text-text-neutral)]"
-                        }`}
-                      >
-                        {option.label}
-                      </span>
-                      {option.modelType && variant === "model-selector" && (
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${optionModelTypeColor.badge} flex-shrink-0`}>
-                          {getModelTypeLabel(option.modelType)}
-                        </span>
-                      )}
-                    </div>
-                    {isSelected && (
-                      <div className="flex-shrink-0">
-                        <svg
-                          className="w-5 h-5 text-[color:var(--tokens-color-text-text-brand)]"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </div>
-                    )}
+                    <span
+                      className={`font-h02-heading02 font-[number:var(--text-small-font-weight)] text-sm tracking-[var(--text-small-letter-spacing)] leading-[var(--text-small-line-height)] [font-style:var(--text-small-font-style)] ${
+                        variant === "model-selector"
+                          ? "text-[color:var(--tokens-color-text-text-brand)]"
+                          : "text-[color:var(--tokens-color-text-text-neutral)]"
+                      }`}
+                    >
+                      {option.label}
+                    </span>
                     {isDisabled && option.disabledHint && (
                       <div
                         ref={(el) => {
@@ -359,7 +277,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
                             tooltipRefs.current.delete(option.value);
                           }
                         }}
-                        className="ml-auto flex-shrink-0"
+                        className="ml-auto"
                         onMouseEnter={(e) => handleTooltipMouseEnter(option.value, e)}
                         onMouseLeave={handleTooltipMouseLeave}
                       >

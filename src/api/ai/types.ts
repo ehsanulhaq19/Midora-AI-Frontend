@@ -18,7 +18,6 @@ export interface AIModel {
   is_default_model: boolean
   is_active: boolean
   available?: boolean
-  model_type?: 'high' | 'medium' | 'low'
   created_at: string
   updated_at: string | null
 }
