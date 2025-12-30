@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useCallback, useState } from 'react'
 import { useConversation } from '@/hooks/use-conversation'
 import { Message, LinkedFile } from '@/api/conversation/types'
-import { Copy, LogoOnly, CheckBroken, Regenerate } from '@/icons'
+import { Copy, LogoOnly, CheckBroken, Regenerate, Expand, Close } from '@/icons'
 import { IconButton } from '@/components/ui/buttons'
 import { Spinner } from '@/components/ui/loaders'
 import { Tooltip } from '@/components/ui/tooltip'
@@ -67,8 +67,14 @@ interface MessageBubbleProps {
   isCanvasOpen?: boolean
   activeCanvasMessageUuid?: string | null
   onCanvasToggle?: (messageUuid: string) => void
+  onOpenInCanvas?: (messageUuid: string) => void
+  onCloseInlineCanvas?: (messageUuid: string) => void
   showInChat?: boolean
   isCreditsExhausted?: boolean
+  isMobile?: boolean
+  inlineCanvasMessageUuid?: string | null
+  inlineCanvasContent?: string
+  onMarkdownLinkClick?: (event: React.MouseEvent<HTMLAnchorElement>, href?: string) => void
 }
 
 const MessageBubble: React.FC<MessageBubbleProps> = ({ 
@@ -87,8 +93,13 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
   isCanvasOpen = false,
   activeCanvasMessageUuid = null,
   onCanvasToggle,
+  onOpenInCanvas,
+  onCloseInlineCanvas,
   showInChat = true,
-  isCreditsExhausted = false
+  isCreditsExhausted = false,
+  isMobile = false,
+  inlineCanvasMessageUuid = null,
+  inlineCanvasContent = ''
 }) => {
   const { resolvedTheme } = useTheme()
   const isDark = resolvedTheme === 'dark'
@@ -105,12 +116,16 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
   const shouldShowCanvas = !isUser && exceedsWordThreshold(displayContent, 100)
   
   // Get truncated content for chat display
-  const { truncated: truncatedContent, wasTruncated } = shouldShowCanvas && showInChat
+  // Always show truncated in chat, inline canvas will show full content
+  const shouldTruncate = shouldShowCanvas && showInChat
+  const { truncated: truncatedContent, wasTruncated } = shouldTruncate
     ? truncateMarkdown(displayContent, 50)
     : { truncated: displayContent, wasTruncated: false }
   
-  // Check if this message is active in canvas
+  // Check if this message is active in canvas (side-by-side)
   const isActiveInCanvas = isCanvasOpen && activeCanvasMessageUuid === message.uuid
+  // Check if this message has inline canvas open (mobile)
+  const hasInlineCanvas = isMobile && inlineCanvasMessageUuid === message.uuid
   
   // Handle canvas toggle
   const handleCanvasToggle = () => {
@@ -189,8 +204,8 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
   const canGoNext = currentVersionIndex < (message.versions?.length || 1) - 1
 
   return (
-    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-6 px-4 message-blub`}>
-      <div className={`max-w-[75%] ${isUser ? 'order-2' : 'order-1'}`}>
+    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-6 ${hasInlineCanvas ? 'px-0 -mx-6 flex-col items-stretch' : 'px-4'} message-blub`}>
+      <div className={`${hasInlineCanvas ? 'w-full' : 'max-w-[75%]'} ${isUser ? 'order-2' : 'order-1'} ${hasInlineCanvas ? '' : ''}`}>
         <div
         className={`p-[6px] sm:p-[12px] rounded-lg break-words whitespace-pre-wrap ${textClassName} ${
             isUser
@@ -239,7 +254,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
           <LinkedFilesPreview linkedFiles={message.linked_files} isUser={isUser} />
         )}
 
-        <div className="ml-2">
+        <div className={`${hasInlineCanvas ? 'px-4' : 'ml-2'}`}>
           {/* Display AI model name with copy button for AI messages */}
           {!isUser && message.model_name && !isThisMessageRegenerating && (
             <div className="flex items-center gap-1 pl-[3px]">
@@ -263,7 +278,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
           )}
           
           {/* Canvas Toggle Button - shown for messages over 100 words - full width */}
-          {shouldShowCanvas && onCanvasToggle && (
+          {shouldShowCanvas && onCanvasToggle && !hasInlineCanvas && (
             <div className="mt-3 mb-2 -mx-4 px-4">
               <CanvasToggleButton
                 isCanvasOpen={isCanvasOpen}
@@ -272,6 +287,71 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
                 disabled={false}
                 content={displayContent}
               />
+            </div>
+          )}
+          
+          {/* Inline Canvas Display (Mobile) */}
+          {hasInlineCanvas && inlineCanvasContent && (
+            <div className="mt-4 mb-2 w-full">
+              <div 
+                className={`rounded-lg border-2 w-full ${
+                  isDark 
+                    ? 'border-[color:var(--tokens-color-border-border-active)] bg-[color:var(--tokens-color-surface-surface-card-default)]' 
+                    : 'border-[color:var(--tokens-color-text-text-brand)] bg-white shadow-lg'
+                }`}
+              >
+                {/* Inline Canvas Header */}
+                <div className={`flex items-center justify-between px-4 py-3 border-b ${
+                  isDark 
+                    ? 'border-[color:var(--tokens-color-border-border-subtle)]' 
+                    : 'border-gray-200'
+                }`}>
+                  <span className={`font-h02-heading02 font-[number:var(--h05-heading05-font-weight)] text-sm ${
+                    isDark ? 'text-white' : 'text-[color:var(--tokens-color-text-text-brand)]'
+                  }`}>
+                    {t('chat.canvasView') || 'Canvas View'}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => onOpenInCanvas?.(message.uuid)}
+                      className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${
+                        isDark
+                          ? 'bg-[color:var(--tokens-color-surface-surface-secondary)] text-white hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]'
+                          : 'bg-[color:var(--tokens-color-text-text-brand)] text-white hover:opacity-90'
+                      }`}
+                    >
+                      {t('chat.openInCanvas')}
+                    </button>
+                    <button
+                      onClick={() => onCloseInlineCanvas?.(message.uuid)}
+                      className={`p-1.5 rounded transition-colors ${
+                        isDark
+                          ? 'hover:bg-[color:var(--tokens-color-surface-surface-secondary)] text-white'
+                          : 'hover:bg-gray-100 text-gray-600'
+                      }`}
+                      aria-label="Close"
+                    >
+                      <Close className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+                
+                {/* Inline Canvas Content */}
+                <div 
+                  className={`overflow-y-auto p-4 max-h-[85vh] ${
+                    isDark 
+                      ? 'bg-[color:var(--tokens-color-surface-surface-card-hover)]' 
+                      : 'bg-white'
+                  }`}
+                >
+                  <div className="max-w-full">
+                    <MarkdownRenderer 
+                      content={inlineCanvasContent} 
+                      onLinkClick={onMarkdownLinkClick}
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
           )}
           <div className={`flex items-center gap-2 mt-2 ${isUser ? 'justify-end' : 'justify-start'}`}>
@@ -345,7 +425,12 @@ interface StreamingMessageProps {
   isCanvasOpen?: boolean
   activeCanvasMessageUuid?: string | null
   onCanvasToggle?: (messageUuid: string) => void
+  onOpenInCanvas?: (messageUuid: string) => void
+  onCloseInlineCanvas?: (messageUuid: string) => void
   messageUuid?: string
+  isMobile?: boolean
+  inlineCanvasMessageUuid?: string | null
+  inlineCanvasContent?: string
 }
 
 const StreamingMessage: React.FC<StreamingMessageProps> = ({ 
@@ -358,7 +443,12 @@ const StreamingMessage: React.FC<StreamingMessageProps> = ({
   isCanvasOpen = false,
   activeCanvasMessageUuid = null,
   onCanvasToggle,
-  messageUuid
+  onOpenInCanvas,
+  onCloseInlineCanvas,
+  messageUuid,
+  isMobile = false,
+  inlineCanvasMessageUuid = null,
+  inlineCanvasContent = ''
 }) => {
   const { resolvedTheme } = useTheme()
   const isDark = resolvedTheme === 'dark'
@@ -372,12 +462,16 @@ const StreamingMessage: React.FC<StreamingMessageProps> = ({
   const isShowingInitialContent = hasInitialContent && !hasContent
   const displayContent = content || initialContent
   const shouldShowCanvas = !isShowingInitialContent && exceedsWordThreshold(displayContent, 100)
-  const { truncated: truncatedContent, wasTruncated } = shouldShowCanvas
+  // Always show truncated in chat, inline canvas will show full content
+  const shouldTruncate = shouldShowCanvas
+  const { truncated: truncatedContent, wasTruncated } = shouldTruncate
     ? truncateMarkdown(displayContent, 50)
     : { truncated: displayContent, wasTruncated: false }
   
-  // Check if this message is active in canvas
+  // Check if this message is active in canvas (side-by-side)
   const isActiveInCanvas = isCanvasOpen && activeCanvasMessageUuid === messageUuid
+  // Check if this message has inline canvas open (mobile)
+  const hasInlineCanvas = isMobile && inlineCanvasMessageUuid === messageUuid
   
   // Handle canvas toggle
   const handleCanvasToggle = () => {
@@ -446,9 +540,9 @@ const StreamingMessage: React.FC<StreamingMessageProps> = ({
   }
   
   return (
-    <div className="flex justify-start mb-6 px-4">
-      <div className="max-w-[75%]">
-        <div className="px-4 py-3 rounded-lg rounded-bl-sm bg-[color:var(--tokens-color-surface-surface-secondary)] text-[color:var(--tokens-color-text-text-primary)] text-sm relative">
+    <div className={`flex justify-start mb-6 ${hasInlineCanvas ? 'px-0 -mx-6 flex-col items-stretch w-full' : 'px-4'}`}>
+      <div className={`${hasInlineCanvas ? 'w-full' : 'max-w-[75%]'}`}>
+        <div className={`${hasInlineCanvas ? '' : 'px-4'} py-3 rounded-lg rounded-bl-sm bg-[color:var(--tokens-color-surface-surface-secondary)] text-[color:var(--tokens-color-text-text-primary)] text-sm relative ${hasInlineCanvas ? 'px-4' : ''}`}>
           {!hasContent && !hasInitialContent ? (
             // Show loading animation before content arrives
             <div className="flex items-center gap-3">
@@ -520,7 +614,7 @@ const StreamingMessage: React.FC<StreamingMessageProps> = ({
           
           {/* Canvas Toggle Button - shown for streaming messages over 100 words - full width */}
           {/* Hide canvas toggle button when showing initial_content (local model preview) */}
-          {shouldShowCanvas && !isShowingInitialContent && onCanvasToggle && messageUuid && (
+          {shouldShowCanvas && !isShowingInitialContent && onCanvasToggle && messageUuid && !hasInlineCanvas && (
             <div className="mt-3 mb-2 -mx-4 px-4">
               <CanvasToggleButton
                 isCanvasOpen={isCanvasOpen}
@@ -529,6 +623,71 @@ const StreamingMessage: React.FC<StreamingMessageProps> = ({
                 disabled={false}
                 content={displayContent}
               />
+            </div>
+          )}
+          
+          {/* Inline Canvas Display (Mobile) */}
+          {hasInlineCanvas && inlineCanvasContent && (
+            <div className="mt-4 mb-2 w-full">
+              <div 
+                className={`rounded-lg border-2 w-full ${
+                  isDark 
+                    ? 'border-[color:var(--tokens-color-border-border-active)] bg-[color:var(--tokens-color-surface-surface-card-default)]' 
+                    : 'border-[color:var(--tokens-color-text-text-brand)] bg-white shadow-lg'
+                }`}
+              >
+                {/* Inline Canvas Header */}
+                <div className={`flex items-center justify-between px-4 py-3 border-b ${
+                  isDark 
+                    ? 'border-[color:var(--tokens-color-border-border-subtle)]' 
+                    : 'border-gray-200'
+                }`}>
+                  <span className={`font-h02-heading02 font-[number:var(--h05-heading05-font-weight)] text-sm ${
+                    isDark ? 'text-white' : 'text-[color:var(--tokens-color-text-text-brand)]'
+                  }`}>
+                    {t('chat.canvasView')}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => onOpenInCanvas?.(messageUuid)}
+                      className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${
+                        isDark
+                          ? 'bg-[color:var(--tokens-color-surface-surface-secondary)] text-white hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]'
+                          : 'bg-[color:var(--tokens-color-text-text-brand)] text-white hover:opacity-90'
+                      }`}
+                    >
+                      {t('chat.openInCanvas')}
+                    </button>
+                    <button
+                      onClick={() => onCloseInlineCanvas?.(messageUuid)}
+                      className={`p-1.5 rounded transition-colors ${
+                        isDark
+                          ? 'hover:bg-[color:var(--tokens-color-surface-surface-secondary)] text-white'
+                          : 'hover:bg-gray-100 text-gray-600'
+                      }`}
+                      aria-label="Close"
+                    >
+                      <Close className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+                
+                {/* Inline Canvas Content */}
+                <div 
+                  className={`overflow-y-auto p-4 max-h-[60vh] ${
+                    isDark 
+                      ? 'bg-[color:var(--tokens-color-surface-surface-card-hover)]' 
+                      : 'bg-white'
+                  }`}
+                >
+                  <div className="max-w-full">
+                    <MarkdownRenderer 
+                      content={inlineCanvasContent} 
+                      onLinkClick={onLinkClick}
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
           )}
           
@@ -608,6 +767,21 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
   const [hasAutoOpenedCanvas, setHasAutoOpenedCanvas] = useState(false)
   // Store last streaming content to use as fallback after streaming completes
   const [lastStreamingContent, setLastStreamingContent] = useState<string>('')
+  
+  // Track inline canvas message on mobile (only one can be open at a time)
+  const [inlineCanvasMessageUuid, setInlineCanvasMessageUuid] = useState<string | null>(null)
+  const [isMobile, setIsMobile] = useState(false)
+  
+  // Detect mobile screen size
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 640) // sm breakpoint
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
   
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
@@ -815,16 +989,45 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
   
   // Handle canvas toggle
   const handleCanvasToggle = useCallback((messageUuid: string) => {
-    if (isCanvasOpen && activeCanvasMessageUuid === messageUuid) {
-      // Close canvas if it's already open with this message
-      setIsCanvasOpen(false)
-      setActiveCanvasMessageUuid(null)
-    } else {
-      // Open canvas or switch to this message
+    // On mobile, open full-screen canvas instead of inline
+    if (isMobile) {
+      setInlineCanvasMessageUuid(null)
       setIsCanvasOpen(true)
       setActiveCanvasMessageUuid(messageUuid)
+    } else {
+      // Desktop behavior: open canvas side-by-side
+      if (isCanvasOpen && activeCanvasMessageUuid === messageUuid) {
+        // Close canvas if it's already open with this message
+        setIsCanvasOpen(false)
+        setActiveCanvasMessageUuid(null)
+      } else {
+        // Open canvas or switch to this message
+        setIsCanvasOpen(true)
+        setActiveCanvasMessageUuid(messageUuid)
+      }
     }
-  }, [isCanvasOpen, activeCanvasMessageUuid])
+  }, [isCanvasOpen, activeCanvasMessageUuid, isMobile, inlineCanvasMessageUuid])
+  
+  // Handle opening canvas side-by-side from mobile (when user clicks "Open in Canvas" button)
+  const handleOpenInCanvas = useCallback((messageUuid: string) => {
+    // Close inline canvas and open side-by-side
+    setInlineCanvasMessageUuid(null)
+    setIsCanvasOpen(true)
+    setActiveCanvasMessageUuid(messageUuid)
+  }, [])
+  
+  // Get inline canvas content
+  const getInlineCanvasContent = useCallback((messageUuid: string) => {
+    const message = messages.find((m: Message) => m.uuid === messageUuid)
+    if (message) {
+      return message.content || ''
+    }
+    // Check if it's the streaming message
+    if (messageUuid === streamingMessageUuid && streamingContent) {
+      return streamingContent
+    }
+    return ''
+  }, [messages, streamingMessageUuid, streamingContent])
   
   // Handle canvas close
   const handleCanvasClose = useCallback(() => {
@@ -1051,7 +1254,7 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
       {/* Chat Container */}
       <div 
         className={`flex-1 transition-all duration-300 ease-in-out overflow-hidden flex flex-col relative ${
-          isCanvasOpen ? 'w-1/2' : 'w-full'
+          isCanvasOpen ? (isMobile ? 'hidden' : 'w-1/2') : 'w-full'
         } ${isCanvasOpen ? 'bg-[color:var(--tokens-color-surface-surface-conversation-canvas)]' : ''}`}
         style={{ height: '100%' }}
       >
@@ -1093,8 +1296,14 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
                 isCanvasOpen={isCanvasOpen}
                 activeCanvasMessageUuid={activeCanvasMessageUuid}
                 onCanvasToggle={handleCanvasToggle}
+                onOpenInCanvas={handleOpenInCanvas}
+                onCloseInlineCanvas={(uuid) => setInlineCanvasMessageUuid(null)}
                 showInChat={true}
                 isCreditsExhausted={isCreditsExhausted}
+                isMobile={isMobile}
+                inlineCanvasMessageUuid={inlineCanvasMessageUuid}
+                inlineCanvasContent={inlineCanvasMessageUuid === message.uuid ? getInlineCanvasContent(message.uuid) : ''}
+                onMarkdownLinkClick={handleMarkdownLinkClick}
               />
             </div>
           ))}
@@ -1110,7 +1319,12 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
                 isCanvasOpen={isCanvasOpen}
                 activeCanvasMessageUuid={activeCanvasMessageUuid}
                 onCanvasToggle={handleCanvasToggle}
+                onOpenInCanvas={handleOpenInCanvas}
+                onCloseInlineCanvas={(uuid) => setInlineCanvasMessageUuid(null)}
                 messageUuid={streamingMessageUuid || (sortedMessages.length > 0 ? sortedMessages[sortedMessages.length - 1]?.uuid : undefined)}
+                isMobile={isMobile}
+                inlineCanvasMessageUuid={inlineCanvasMessageUuid}
+                inlineCanvasContent={inlineCanvasMessageUuid === (streamingMessageUuid || '') ? (streamingContent || '') : ''}
             />
           )}
           
@@ -1118,8 +1332,8 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
           </div>
         </div>
         
-        {/* Message Input - shown inside conversation container when canvas is open */}
-        {isCanvasOpen && onSendMessage && (
+        {/* Message Input - shown inside conversation container when canvas is open (desktop only) */}
+        {isCanvasOpen && onSendMessage && !isMobile && (
           <div className="flex-shrink-0 p-4 border-t border-[color:var(--tokens-color-border-border-inactive)]">
             <div className="max-w-full px-2">
               <MessageInput
@@ -1137,9 +1351,9 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
         )}
       </div>
       
-      {/* Canvas Sidebar */}
+      {/* Canvas Sidebar - side-by-side (not modal) */}
       {isCanvasOpen && (
-        <div className="relative z-40 flex-shrink-0 w-1/2" style={{ height: '100%' }}>
+        <div className={`${isMobile ? 'fixed inset-0 z-40 w-full h-screen' : 'relative z-40 flex-shrink-0 w-1/2'}`} style={{ height: isMobile ? '100vh' : '100%' }}>
           <Canvas
             isOpen={isCanvasOpen}
             content={getCanvasContent()}
