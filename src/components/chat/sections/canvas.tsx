@@ -231,6 +231,14 @@ export const Canvas: React.FC<CanvasProps> = ({
           </button>
         </div>
         <div className="flex items-center gap-2">
+          {/* Mobile-only close shown left of Copy on small screens */}
+          <button
+            onClick={onClose}
+            className="p-1 hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded transition-colors sm:hidden"
+            aria-label={t("chat.closeCanvas")}
+          >
+            <Close className="w-5 h-5" color="currentColor" />
+          </button>
           <button
             className="flex items-center gap-2 px-3 py-1.5 text-sm text-[color:var(--tokens-color-text-text-primary)] bg-[color:var(--tokens-color-surface-surface-tertiary)] rounded-full transition-colors"
             onClick={handleCopy}

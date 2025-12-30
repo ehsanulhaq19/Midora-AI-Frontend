@@ -1027,15 +1027,15 @@ export const UsageSection: React.FC = () => {
                 {/* Headers */}
                 <div
                   role="rowgroup"
-                  className="hidden border-b border-[color:var(--tokens-color-border-border-subtle)] px-6 py-4 md:grid md:grid-cols-[2fr_1fr_1fr_1fr_1.5fr]"
+                    className="hidden border-b border-[color:var(--tokens-color-border-border-subtle)] px-6 py-4 md:grid md:grid-cols-[2fr_1fr_1fr_1fr_1.5fr] md:gap-x-6 items-center"
                 >
                   {getUsageColumns().map((column) => (
                     <span
                       key={column.key}
-                      className={cn(
-                        "text-left text-xs font-semibold uppercase tracking-[0.08em] text-[color:var(--tokens-color-text-text-inactive-2)]",
-                        column.className
-                      )}
+                        className={cn(
+                          "text-left text-xs font-semibold uppercase tracking-[0.08em] text-[color:var(--tokens-color-text-text-inactive-2)] whitespace-normal break-words",
+                          column.className
+                        )}
                     >
                       {column.label}
                     </span>
@@ -1097,13 +1097,13 @@ export const UsageSection: React.FC = () => {
                               key={column.key}
                               role="cell"
                               className={cn(
-                                "hidden md:flex flex-col items-start",
+                                "hidden md:flex flex-col items-start min-w-0",
                                 column.className
                               )}
                             >
                               <span
                                 className={cn(
-                                  "font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]",
+                                  "font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] truncate",
                                   column.valueClassName
                                 )}
                               >
