@@ -12,6 +12,7 @@ interface DropdownOption {
   image?: string;
   disabled?: boolean;
   disabledHint?: string;
+  modelType?: 'low' | 'medium' | 'high';
 }
 
 interface DropdownProps {
@@ -161,6 +162,24 @@ export const Dropdown: React.FC<DropdownProps> = ({
               className="w-4 h-4 rounded flex-shrink-0"
             />
           )}
+          {selectedOption?.modelType && (
+            <div
+              className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                selectedOption.modelType === 'high'
+                  ? 'bg-red-500'
+                  : selectedOption.modelType === 'medium'
+                  ? 'bg-yellow-500'
+                  : 'bg-green-500'
+              }`}
+              title={
+                selectedOption.modelType === 'high'
+                  ? 'High cost model'
+                  : selectedOption.modelType === 'medium'
+                  ? 'Medium cost model'
+                  : 'Low cost model'
+              }
+            />
+          )}
           {isOpen ? (
             <ArrowUpSm
               color="rgba(31, 23, 64, 0.9)"
@@ -257,6 +276,24 @@ export const Dropdown: React.FC<DropdownProps> = ({
                         src={option.image}
                         alt={option.label}
                         className="w-4 h-4 rounded flex-shrink-0"
+                      />
+                    )}
+                    {option.modelType && (
+                      <div
+                        className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                          option.modelType === 'high'
+                            ? 'bg-red-500'
+                            : option.modelType === 'medium'
+                            ? 'bg-yellow-500'
+                            : 'bg-green-500'
+                        }`}
+                        title={
+                          option.modelType === 'high'
+                            ? 'High cost model'
+                            : option.modelType === 'medium'
+                            ? 'Medium cost model'
+                            : 'Low cost model'
+                        }
                       />
                     )}
                     <span
