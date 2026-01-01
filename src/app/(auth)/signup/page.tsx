@@ -22,6 +22,7 @@ import { tokenManager } from '@/lib/token-manager'
 import { setTokens } from '@/lib/auth'
 import { useRouter } from 'next/navigation'
 import { useTheme } from '@/hooks/use-theme'
+import { useLanguage } from '@/hooks/use-language'
 
 function SignupPageContent() {
   const router = useRouter()
@@ -30,6 +31,7 @@ function SignupPageContent() {
   const { data, updateData } = useSignupData()
   const { error: showErrorToast, success: showSuccessToast } = useToast()
   const { getCurrentUser, updateProfile, completeOnboarding } = useAuth()
+  const { setLanguage } = useLanguage()
   
   const stepParam = searchParams.get('step')
   const isInOnboardingFlow = stepParam && ['welcome', 'fullName', 'profession', 'password', 'forgotPassword', 'resetPassword', 'otp', 'success'].includes(stepParam)
@@ -40,6 +42,12 @@ function SignupPageContent() {
   const [isProcessingSSO, setIsProcessingSSO] = useState(false)
   const [showSSOLoader, setShowSSOLoader] = useState(false)
   const [initialOnboardingStep, setInitialOnboardingStep] = useState<string | undefined>(stepParam || undefined)
+
+  // Remove language from localStorage when signup page loads
+  // Reset to default language (en) which effectively clears any custom language preference
+  useEffect(() => {
+    setLanguage('en')
+  }, [setLanguage])
 
   useEffect(() => {
     if (isInOnboardingFlow) {

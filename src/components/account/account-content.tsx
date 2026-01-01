@@ -11,16 +11,17 @@ import { UsageSection } from './sections/usage-section'
 
 interface AccountContentProps {
   section: AccountSectionType
+  onLoadingChange?: (isLoading: boolean) => void
 }
 
-export const AccountContent: React.FC<AccountContentProps> = ({ section }) => {
+export const AccountContent: React.FC<AccountContentProps> = ({ section, onLoadingChange }) => {
   switch (section) {
     case 'account':
       return <AccountSection />
     case 'profile':
       return <ProfileSection />
     case 'language':
-      return <LanguageSection />
+      return <LanguageSection onLoadingChange={onLoadingChange} />
     case 'subscription':
       return <BillingSection />
     case 'notifications':

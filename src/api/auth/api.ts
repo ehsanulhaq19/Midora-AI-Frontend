@@ -164,8 +164,8 @@ class AuthApiClient {
   /**
    * Update user profile
    */
-  async updateProfile(data: { first_name: string; last_name: string; profession: string }): Promise<ApiResponse<UserResponse>> {
-    return this.baseClient.put<UserResponse>('/api/v1/auth/profile', data)
+  async updateProfile(data: { first_name?: string; last_name?: string; profession?: string; language?: string | null }): Promise<ApiResponse<UserResponse>> {
+    return this.baseClient.put<UserResponse>('/api/v1/user/profile', data)
   }
 
   /**

@@ -23,6 +23,8 @@ import { setTokens, clearAuthCookies } from '@/lib/auth'
 import { tokenManager } from '@/lib/token-manager'
 import { handleApiError } from '@/lib/error-handler'
 import { resetThemeToSystem } from '@/hooks/use-theme'
+import { getLanguageCodeFromName } from '@/lib/language-constants'
+import { setCurrentLanguage } from '@/i18n'
 
 type UseAuthReturn = AuthContextType
 
@@ -79,6 +81,15 @@ export const useAuth = (): UseAuthReturn => {
           refreshToken: refresh_token,
           authMethod: 'email'
         }))
+
+        // Load language from user data and save to localStorage
+        if (userResponse.data.language) {
+          const languageCode = getLanguageCodeFromName(userResponse.data.language)
+          setCurrentLanguage(languageCode)
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('midora-language', languageCode)
+          }
+        }
 
         try {
           const urlParams = new URLSearchParams(window.location.search)
@@ -259,7 +270,7 @@ export const useAuth = (): UseAuthReturn => {
     }
   }, [dispatch])
 
-  const updateProfile = useCallback(async (data: { first_name: string; last_name: string; profession: string }) => {
+  const updateProfile = useCallback(async (data: { first_name?: string; last_name?: string; profession?: string; language?: string | null }) => {
     try {
       dispatch(clearError())
 
@@ -335,6 +346,15 @@ export const useAuth = (): UseAuthReturn => {
       // Update user data in Redux store
       if (response.data) {
         dispatch(updateUser(response.data))
+
+        // Load language from user data and save to localStorage
+        if (response.data.language) {
+          const languageCode = getLanguageCodeFromName(response.data.language)
+          setCurrentLanguage(languageCode)
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('midora-language', languageCode)
+          }
+        }
       }
 
       dispatch(setLoading(false))
@@ -541,6 +561,15 @@ export const useAuth = (): UseAuthReturn => {
             refreshToken: response.data.refresh_token,
             authMethod: provider
           }))
+
+          // Load language from user data and save to localStorage
+          if (response.data.user.language) {
+            const languageCode = getLanguageCodeFromName(response.data.user.language)
+            setCurrentLanguage(languageCode)
+            if (typeof window !== 'undefined') {
+              localStorage.setItem('midora-language', languageCode)
+            }
+          }
           
           // Redirect to chat page
           router.push('/chat')
@@ -617,6 +646,16 @@ export const useAuth = (): UseAuthReturn => {
           )
           
           setTokens(loginResponse.data.access_token, loginResponse.data.refresh_token)
+
+          // Load language from user data and save to localStorage
+          if (userResponse.data.language) {
+            const languageCode = getLanguageCodeFromName(userResponse.data.language)
+            setCurrentLanguage(languageCode)
+            if (typeof window !== 'undefined') {
+              localStorage.setItem('midora-language', languageCode)
+            }
+          }
+
           router.push('/chat')
         } else {
           const errorObject = {

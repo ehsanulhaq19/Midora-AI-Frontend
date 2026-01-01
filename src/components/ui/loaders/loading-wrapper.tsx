@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { ScreenLoader } from './screen-loader'
 
 interface LoadingWrapperProps {
@@ -27,30 +27,42 @@ export const LoadingWrapper: React.FC<LoadingWrapperProps> = ({
   isLoading: externalLoading
 }) => {
   const [internalLoading, setInternalLoading] = useState(showInitially)
-  const [startTime] = useState(Date.now())
+  const startTimeRef = useRef<number>(Date.now())
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     if (externalLoading !== undefined) {
       // Use external loading state
       if (!externalLoading) {
-        const elapsed = Date.now() - startTime
+        // Clear any existing timeout
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current)
+        }
+        
+        const elapsed = Date.now() - startTimeRef.current
         const remainingTime = Math.max(0, minLoadingTime - elapsed)
         
-        setTimeout(() => {
+        timeoutRef.current = setTimeout(() => {
           setInternalLoading(false)
         }, remainingTime)
       } else {
+        // Reset start time when loading begins
+        startTimeRef.current = Date.now()
         setInternalLoading(true)
       }
     } else if (showInitially) {
       // Use internal timing
-      const timer = setTimeout(() => {
+      timeoutRef.current = setTimeout(() => {
         setInternalLoading(false)
       }, minLoadingTime)
-
-      return () => clearTimeout(timer)
     }
-  }, [externalLoading, showInitially, minLoadingTime, startTime])
+    
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+    }
+  }, [externalLoading, showInitially, minLoadingTime])
 
   const shouldShowLoader = externalLoading !== undefined ? externalLoading : internalLoading
 

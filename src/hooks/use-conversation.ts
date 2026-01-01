@@ -630,6 +630,34 @@ export const useConversation = () => {
     }
   }, [dispatch, showErrorToast])
 
+  // Load archived conversations
+  const loadArchivedConversations = useCallback(async (messageSearch?: string, page: number = 1, perPage: number = 20) => {
+    try {
+      dispatch(clearError())
+      
+      const response = await conversationApi.getArchivedConversations(page, perPage, "-created_at", messageSearch)
+      if (response.error) {
+        const errorObject = response.processedError || {
+          error_type: 'ARCHIVED_CONVERSATIONS_LOAD_FAILED',
+          error_message: response.error,
+          error_id: response.error_id,
+          status: response.status
+        }
+        throw new Error(JSON.stringify(errorObject))
+      }
+      
+      return {
+        conversations: response.data?.conversations || [],
+        pagination: response.data?.pagination || { page: 1, per_page: 20, total: 0, total_pages: 0 }
+      }
+    } catch (err) {
+      const errorMessage = handleApiError(err)
+      dispatch(setError(errorMessage))
+      showErrorToast('Failed to Load Archived Conversations', errorMessage)
+      throw err
+    }
+  }, [dispatch, showErrorToast])
+
   // Convert conversations object to array for components that expect array format
   const conversationsArray = Object.keys(conversations).map(key => conversations[key])
   
@@ -661,6 +689,7 @@ export const useConversation = () => {
     deleteConversation,
     archiveConversation,
     unarchiveConversation,
+    loadArchivedConversations,
     clearError: () => dispatch(clearError()),
   }
 }

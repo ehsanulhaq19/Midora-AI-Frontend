@@ -125,7 +125,8 @@ export const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>(({
       disabled: model.available === false,
       disabledHint: model.available === false
         ? "You have exceeded your limit to use this model"
-        : undefined
+        : undefined,
+      modelType: model.ai_model_type || undefined
     }))
   }
 
@@ -239,7 +240,7 @@ export const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>(({
                   value={selectedModel?.uuid || ''}
                   onChange={handleModelChange}
                   placeholder={t('chat.selectModel')}
-                  className="min-w-[80px]"
+                  className="min-w-[150px]"
                   openUpward={true}
                   variant="model-selector"
                   disabled={isStreaming || isUploading || disabled}

@@ -135,6 +135,7 @@ export const account = {
   language: {
     title: 'Sprachen',
     languagePreference: 'Spracheinstellung',
+    updating: 'Sprache wird aktualisiert...',
     autoDetect: 'Automatisch erkennen',
     english: 'Englisch',
     chinese: 'Chinesisch',
