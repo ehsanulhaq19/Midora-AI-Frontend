@@ -13,6 +13,7 @@ export interface User {
   is_active: boolean
   is_verified: boolean
   is_onboarded: boolean
+  language?: string | null
 }
 
 // Authentication request types
@@ -46,6 +47,7 @@ export interface UserResponse {
   is_active: boolean
   is_verified: boolean
   is_onboarded: boolean
+  language?: string | null
   meta_data?: Record<string, any>
 }
 
@@ -223,7 +225,7 @@ export interface AuthContextType extends AuthState {
   resetPassword: (data: PasswordResetRequest) => Promise<void>
   verifyOTP: (data: OTPVerificationRequest) => Promise<void>
   regenerateOTP: (email: string) => Promise<void>
-  updateProfile: (data: { first_name: string; last_name: string; profession: string }) => Promise<void>
+  updateProfile: (data: { first_name?: string; last_name?: string; profession?: string; language?: string | null }) => Promise<void>
   completeOnboarding: (data?: CompleteOnboardingRequest) => Promise<void>
   getCurrentUser: () => Promise<User | undefined>
   clearError: () => void

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { Search02, Trash, Archive } from "@/icons";
 import { useTheme } from "@/hooks/use-theme";
 import { t, tWithParams } from "@/i18n";
@@ -35,45 +35,16 @@ const formatDaysAgo = (days: number): string => {
   }
 };
 
-// Dummy archived conversations data
-const generateDummyArchivedConversations = (): Conversation[] => {
-  const now = new Date();
-  return [
-    {
-      id: "dummy-archive-1",
-      uuid: "dummy-archive-1",
-      name: "Archived Conversation 1",
-      created_by: 1,
-      created_at: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-      updated_at: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-    },
-    {
-      id: "dummy-archive-2",
-      uuid: "dummy-archive-2",
-      name: "Archived Conversation 2",
-      created_by: 1,
-      created_at: new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000).toISOString(),
-      updated_at: new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000).toISOString(),
-    },
-    {
-      id: "dummy-archive-3",
-      uuid: "dummy-archive-3",
-      name: "Archived Conversation 3",
-      created_by: 1,
-      created_at: new Date(now.getTime() - 21 * 24 * 60 * 60 * 1000).toISOString(),
-      updated_at: new Date(now.getTime() - 21 * 24 * 60 * 60 * 1000).toISOString(),
-    },
-  ];
-};
-
 export const ArchiveScreen: React.FC<ArchiveScreenProps> = ({ onClose, onSelectConversation }) => {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
-  const { unarchiveConversation, deleteConversation, selectConversation } = useConversation();
+  const { unarchiveConversation, deleteConversation, selectConversation, loadArchivedConversations } = useConversation();
   const router = useRouter();
   const pathname = usePathname();
   const [searchQuery, setSearchQuery] = useState("");
-  const [archivedConversations] = useState<Conversation[]>(() => generateDummyArchivedConversations());
+  const [archivedConversations, setArchivedConversations] = useState<Conversation[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [pagination, setPagination] = useState({ page: 1, per_page: 20, total: 0, total_pages: 0 });
   
   // Modal states
   const [showUnarchiveModal, setShowUnarchiveModal] = useState(false);
@@ -82,25 +53,60 @@ export const ArchiveScreen: React.FC<ArchiveScreenProps> = ({ onClose, onSelectC
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSelectingConversation, setIsSelectingConversation] = useState(false);
 
-  // Filter conversations based on search query
-  const filteredConversations = useMemo(() => {
-    if (!searchQuery.trim()) {
-      return archivedConversations;
+  // Load conversations on mount and when search query changes (with debounce)
+  useEffect(() => {
+    let isMounted = true;
+    
+    const loadData = async () => {
+      setIsLoading(true);
+      try {
+        const result = await loadArchivedConversations(searchQuery.trim() || undefined, 1, 20);
+        if (isMounted) {
+          setArchivedConversations(result.conversations);
+          setPagination(result.pagination);
+        }
+      } catch (error) {
+        console.error("Error loading archived conversations:", error);
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    const timeoutId = setTimeout(() => {
+      loadData();
+    }, 300); // Debounce search by 300ms
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timeoutId);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery]);
+
+  // Stable function to reload conversations (used in handlers)
+  const reloadConversations = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const result = await loadArchivedConversations(searchQuery.trim() || undefined, 1, 20);
+      setArchivedConversations(result.conversations);
+      setPagination(result.pagination);
+    } catch (error) {
+      console.error("Error loading archived conversations:", error);
+    } finally {
+      setIsLoading(false);
     }
-    const query = searchQuery.toLowerCase();
-    return archivedConversations.filter((conv: Conversation) =>
-      conv.name.toLowerCase().includes(query)
-    );
-  }, [archivedConversations, searchQuery]);
+  }, [loadArchivedConversations, searchQuery]);
 
   // Sort conversations by most recent first
   const sortedConversations = useMemo(() => {
-    return [...filteredConversations].sort(
+    return [...archivedConversations].sort(
       (a, b) =>
         new Date(b.updated_at || b.created_at).getTime() -
         new Date(a.updated_at || a.created_at).getTime()
     );
-  }, [filteredConversations]);
+  }, [archivedConversations]);
 
   // Handle unarchive
   const handleUnarchive = useCallback(async () => {
@@ -108,19 +114,21 @@ export const ArchiveScreen: React.FC<ArchiveScreenProps> = ({ onClose, onSelectC
     
     setIsProcessing(true);
     try {
-      // Call the API (will fail with dummy data, but we implement it anyway)
-      await unarchiveConversation(pendingConversationUuid);
-      // Note: In real implementation, we would remove from the list here
-      // For dummy data, we'll just close the modal
+      const success = await unarchiveConversation(pendingConversationUuid);
+      if (success) {
+        // Remove from the list and reload
+        setArchivedConversations(prev => prev.filter(conv => conv.uuid !== pendingConversationUuid));
+        // Reload to update pagination
+        await reloadConversations();
+      }
     } catch (error) {
-      // Expected to fail with dummy data
-      console.log("Unarchive failed (expected with dummy data):", error);
+      console.error("Unarchive failed:", error);
     } finally {
       setIsProcessing(false);
       setShowUnarchiveModal(false);
       setPendingConversationUuid(null);
     }
-  }, [pendingConversationUuid, unarchiveConversation]);
+  }, [pendingConversationUuid, unarchiveConversation, reloadConversations]);
 
   // Handle delete
   const handleDelete = useCallback(async () => {
@@ -128,19 +136,21 @@ export const ArchiveScreen: React.FC<ArchiveScreenProps> = ({ onClose, onSelectC
     
     setIsProcessing(true);
     try {
-      // Call the API (will fail with dummy data, but we implement it anyway)
-      await deleteConversation(pendingConversationUuid);
-      // Note: In real implementation, we would remove from the list here
-      // For dummy data, we'll just close the modal
+      const success = await deleteConversation(pendingConversationUuid);
+      if (success) {
+        // Remove from the list and reload
+        setArchivedConversations(prev => prev.filter(conv => conv.uuid !== pendingConversationUuid));
+        // Reload to update pagination
+        await reloadConversations();
+      }
     } catch (error) {
-      // Expected to fail with dummy data
-      console.log("Delete failed (expected with dummy data):", error);
+      console.error("Delete failed:", error);
     } finally {
       setIsProcessing(false);
       setShowDeleteModal(false);
       setPendingConversationUuid(null);
     }
-  }, [pendingConversationUuid, deleteConversation]);
+  }, [pendingConversationUuid, deleteConversation, reloadConversations]);
 
   const openUnarchiveModal = (conversationUuid: string) => {
     setPendingConversationUuid(conversationUuid);
@@ -248,7 +258,7 @@ export const ArchiveScreen: React.FC<ArchiveScreenProps> = ({ onClose, onSelectC
                   color: "var(--tokens-color-text-text-primary)",
                 }}
               >
-                {sortedConversations.length} archived conversation{sortedConversations.length !== 1 ? 's' : ''}
+                {isLoading ? 'Loading...' : `${pagination.total} archived conversation${pagination.total !== 1 ? 's' : ''}`}
               </span>
             </div>
           </div>
@@ -259,7 +269,20 @@ export const ArchiveScreen: React.FC<ArchiveScreenProps> = ({ onClose, onSelectC
       <div className="flex-1 overflow-y-auto px-4 lg:px-0 pb-6">
         <div className="px-[24px] lg:px-[24px] pl-[64px]">
           <div className="max-w-[548px] mx-auto">
-            {sortedConversations.length > 0 ? (
+            {isLoading ? (
+              <div
+                className="flex items-center justify-center h-full text-center py-8"
+                style={{
+                  color: "var(--tokens-color-text-text-inactive-2)",
+                }}
+              >
+                <div>
+                  <p className="font-text font-[number:var(--text-font-weight)] text-[14px] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
+                    {t("chat.loading")}
+                  </p>
+                </div>
+              </div>
+            ) : sortedConversations.length > 0 ? (
               <div className="space-y-0">
                 {sortedConversations.map((conversation: Conversation, index: number) => {
                   const lastUpdated = conversation.updated_at || conversation.created_at;

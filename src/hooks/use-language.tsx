@@ -2,10 +2,12 @@
 
 import { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react'
 import { getCurrentLanguage as getI18nLanguage, setCurrentLanguage as setI18nLanguage, type SupportedLanguage, t as i18nT } from '@/i18n'
+import { getLanguageCodeFromName } from '@/lib/language-constants'
 
 interface LanguageContextType {
   language: SupportedLanguage
   setLanguage: (language: SupportedLanguage) => void
+  loadLanguageFromUser: (userLanguage: string | null | undefined) => void
   mounted: boolean
 }
 
@@ -52,12 +54,31 @@ export function LanguageProvider({ children, defaultLanguage = 'en' }: LanguageP
     }
   }, [])
 
+  /**
+   * Load language from user data (from backend API)
+   * Converts full language name to language code and sets it
+   * @param userLanguage - Full language name from user data (e.g., "English", "Chinese")
+   */
+  const loadLanguageFromUser = useCallback((userLanguage: string | null | undefined) => {
+    if (!userLanguage) {
+      return
+    }
+
+    const languageCode = getLanguageCodeFromName(userLanguage)
+    
+    // Only update if the language is different from current
+    if (languageCode !== language) {
+      setLanguage(languageCode)
+    }
+  }, [language, setLanguage])
+
   // Memoize context value to ensure React detects changes properly
   const contextValue = useMemo(() => ({
     language,
     setLanguage,
+    loadLanguageFromUser,
     mounted
-  }), [language, setLanguage, mounted])
+  }), [language, setLanguage, loadLanguageFromUser, mounted])
 
   return (
     <LanguageContext.Provider value={contextValue}>

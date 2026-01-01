@@ -135,6 +135,7 @@ export const account = {
   language: {
     title: 'اللغات',
     languagePreference: 'تفضيل اللغة',
+    updating: 'جاري تحديث اللغة...',
     autoDetect: 'اكتشاف تلقائي',
     english: 'الإنجليزية',
     chinese: 'الصينية',

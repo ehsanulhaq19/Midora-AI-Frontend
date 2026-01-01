@@ -137,6 +137,7 @@ export const account = {
   language: {
     title: '语言',
     languagePreference: '语言偏好',
+    updating: '正在更新语言...',
     autoDetect: '自动检测',
     english: '英语',
     chinese: '中文',

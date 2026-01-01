@@ -120,6 +120,42 @@ class ConversationApiClient {
   }
 
   /**
+   * Get archived conversations
+   */
+  async getArchivedConversations(
+    page: number = 1, 
+    perPage: number = 20, 
+    orderBy: string = "-created_at",
+    messageSearch?: string
+  ): Promise<ApiResponse<{ conversations: Conversation[], pagination: { page: number, per_page: number, total: number, total_pages: number } }>> {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      per_page: perPage.toString(),
+      order_by: orderBy
+    })
+    
+    if (messageSearch && messageSearch.trim()) {
+      params.append('message_search', messageSearch.trim())
+    }
+    
+    const response = await this.baseClient.get<GetConversationsResponse>(`/api/v1/conversations/archive?${params.toString()}`)
+    if (response.error) {
+      return { error: response.error, status: response.status }
+    }
+    
+    // Extract conversations and pagination from the response data
+    const conversations = response?.data?.items || []
+    const pagination = {
+      page: response?.data?.page || page,
+      per_page: response?.data?.per_page || perPage,
+      total: response?.data?.total || 0,
+      total_pages: response?.data?.total_pages || 0
+    }
+    
+    return { data: { conversations, pagination }, status: response.status }
+  }
+
+  /**
    * Get a specific conversation
    */
   async getConversation(conversationUuid: string): Promise<ApiResponse<Conversation>> {

@@ -13,6 +13,7 @@ export interface UserProfileResponse {
   is_verified: boolean
   is_onboarded: boolean
   profile_picture: string | null
+  language: string | null
   created_at: string
   updated_at: string | null
 }
@@ -22,5 +23,6 @@ export interface UserProfileUpdateRequest {
   last_name?: string
   password?: string
   profile_picture?: string | null
+  language?: string | null
 }
 
