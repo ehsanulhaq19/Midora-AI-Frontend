@@ -1,13 +1,15 @@
 'use client'
 
 import React, { useState, useRef, useEffect, useImperativeHandle, forwardRef } from 'react'
-import { ArrowUpSm, Plus01_5, Microphone, Filters } from '@/icons'
+import { ArrowUpSm, Plus01_5, Microphone, Filters, FileUpload, Pencil } from '@/icons'
 import { IconButton } from '@/components/ui/buttons'
 import { TextareaInput } from '@/components/ui/inputs'
 import { Dropdown } from '@/components/ui'
 import { FilePreview } from '@/components/ui/file-preview'
 import { useAIModels, useFileUpload, useToast } from '@/hooks'
 import { t } from '@/i18n'
+import { useConversation } from '@/hooks/use-conversation'
+import { ConversationLinkModal } from '@/components/chat/sections'
 
 interface MessageInputProps {
   onSend: (message: string, modelUuid?: string, fileUuids?: string[], uploadedFiles?: any[]) => void
@@ -149,6 +151,10 @@ export const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>(({
     fileInputRef.current?.click()
   }
 
+  const { currentConversation } = useConversation()
+  const [showOptionsMenu, setShowOptionsMenu] = useState(false)
+  const [showLinkModal, setShowLinkModal] = useState(false)
+
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     handleFileSelect(e.target.files)
     // Reset input value to allow selecting the same file again
@@ -203,19 +209,48 @@ export const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>(({
           <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between z-10">
             {/* Left side buttons */}
             <div className="flex items-center gap-[13px]">
-              <IconButton
-                type="button"
-                variant="outline"
-                size="md"
-                icon={<Plus01_5 className="w-5 h-5" color="currentColor" />}
-                aria-label="Add attachment"
-                className="border-[color:var(--tokens-color-border-border-subtle)] message-input-icon-button"
-                style={{
-                  backgroundColor: '#F4F5F5'
-                }}
-                disabled={isStreaming || isUploading || disabled}
-                onClick={handleAddAttachment}
-              />
+              <div className="relative">
+                <IconButton
+                  type="button"
+                  variant="outline"
+                  size="md"
+                  icon={<Plus01_5 className="w-5 h-5" color="currentColor" />}
+                  aria-label={t('chat.uploadFiles')}
+                  className="border-[color:var(--tokens-color-border-border-subtle)] message-input-icon-button"
+                  style={{
+                    backgroundColor: '#F4F5F5'
+                  }}
+                  disabled={isStreaming || isUploading || disabled}
+                  onClick={() => setShowOptionsMenu(!showOptionsMenu)}
+                />
+
+                {showOptionsMenu && (
+                  <div className="absolute bottom-10 right-0 z-50 w-[180px] bg-white dark:bg-[#0b0b0e] border rounded shadow-md py-1">
+                    <button
+                      className="w-full text-left px-3 py-2 hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] flex items-center gap-2"
+                      onClick={() => {
+                        setShowOptionsMenu(false)
+                        handleAddAttachment()
+                      }}
+                    >
+                      <FileUpload className="w-4 h-4" />
+                      <span>{t('chat.uploadFiles')}</span>
+                    </button>
+                    <button
+                      className={`w-full text-left px-3 py-2 ${(!currentConversation || !currentConversation.uuid) ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]'} flex items-center gap-2`}
+                      onClick={() => {
+                        if (!currentConversation || !currentConversation.uuid) return
+                        setShowOptionsMenu(false)
+                        setShowLinkModal(true)
+                      }}
+                      disabled={!currentConversation || !currentConversation.uuid}
+                    >
+                      <Pencil className="w-4 h-4" />
+                      <span>{t('chat.linkChats')}</span>
+                    </button>
+                  </div>
+                )}
+              </div>
 
               {/* <IconButton
                 type="button"
@@ -272,6 +307,14 @@ export const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>(({
               ))}
             </div>
           </div>
+        )}
+        {/* Link conversation modal */}
+        {showLinkModal && currentConversation && currentConversation.uuid && (
+          <ConversationLinkModal
+            isOpen={showLinkModal}
+            onClose={() => setShowLinkModal(false)}
+            conversationUuid={currentConversation.uuid}
+          />
         )}
       </form>
     </div>

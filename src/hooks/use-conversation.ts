@@ -631,11 +631,11 @@ export const useConversation = () => {
   }, [dispatch, showErrorToast])
 
   // Load archived conversations
-  const loadArchivedConversations = useCallback(async (messageSearch?: string, page: number = 1, perPage: number = 20) => {
+  const loadArchivedConversations = useCallback(async (messageSearch?: string, page: number = 1, perPage: number = 20, doDeepSearch?: boolean) => {
     try {
       dispatch(clearError())
       
-      const response = await conversationApi.getArchivedConversations(page, perPage, "-created_at", messageSearch)
+      const response = await conversationApi.getArchivedConversations(page, perPage, "-created_at", messageSearch, doDeepSearch)
       if (response.error) {
         const errorObject = response.processedError || {
           error_type: 'ARCHIVED_CONVERSATIONS_LOAD_FAILED',

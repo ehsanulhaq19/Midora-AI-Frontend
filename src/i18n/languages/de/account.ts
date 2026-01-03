@@ -65,6 +65,9 @@ export const account = {
     perMonth: '/Monat',
     noActiveSubscription: 'Kein aktives Abonnement',
   },
+  paymentMethods: {
+    cannotDeleteLastCard: 'Sie können Ihre letzte Zahlungsmethode nicht löschen.'
+  },
   usage: {
     logout: 'Abmelden',
     subscription: 'Abonnement',

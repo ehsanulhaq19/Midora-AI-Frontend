@@ -65,6 +65,9 @@ export const account = {
     perMonth: '/شهر',
     noActiveSubscription: 'لا يوجد اشتراك نشط',
   },
+  paymentMethods: {
+    cannotDeleteLastCard: 'لا يمكنك حذف طريقة الدفع الأخيرة.'
+  },
   usage: {
     logout: 'تسجيل الخروج',
     subscription: 'الاشتراك',

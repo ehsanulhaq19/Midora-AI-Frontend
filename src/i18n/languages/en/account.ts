@@ -155,6 +155,7 @@ export const account = {
     deleteWarning: 'This action cannot be undone. You will need to add a new payment method to use it for future transactions.',
     delete: 'Delete',
     deleting: 'Deleting...'
+    ,cannotDeleteLastCard: 'You cannot delete your last payment method.'
   },
   language: {
     title: 'Languages',

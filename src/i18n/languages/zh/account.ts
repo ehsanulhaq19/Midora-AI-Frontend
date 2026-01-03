@@ -67,6 +67,9 @@ export const account = {
     perMonth: '/月',
     noActiveSubscription: '无活跃订阅',
   },
+  paymentMethods: {
+    cannotDeleteLastCard: '您无法删除最后一张支付卡。'
+  },
   usage: {
     logout: '登出',
     subscription: '订阅',

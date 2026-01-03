@@ -62,6 +62,11 @@ export interface Conversation {
   updated_at: string
   messages?: Message[]
   related_messages?: Message[]
+  project?: {
+    uuid: string
+    name: string
+    created_at?: string
+  }
 }
 
 // Request types
@@ -99,6 +104,13 @@ export interface CreateMessageResponse extends Message {}
 
 export interface DeleteConversationResponse {
   success: boolean
+}
+
+// Linked conversation minimal item
+export interface LinkedConversationItem {
+  uuid: string
+  name: string
+  created_at: string
 }
 
 // Error object structure for throw new Error

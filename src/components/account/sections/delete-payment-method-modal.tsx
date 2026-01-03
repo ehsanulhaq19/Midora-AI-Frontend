@@ -10,6 +10,7 @@ interface DeletePaymentMethodModalProps {
   onClose: () => void
   onConfirm: () => Promise<void>
   paymentMethod: UserPaymentMethod | null
+  totalPaymentMethods?: number
 }
 
 export const DeletePaymentMethodModal: React.FC<DeletePaymentMethodModalProps> = ({
@@ -17,8 +18,11 @@ export const DeletePaymentMethodModal: React.FC<DeletePaymentMethodModalProps> =
   onClose,
   onConfirm,
   paymentMethod,
+  totalPaymentMethods,
 }) => {
   const [isDeleting, setIsDeleting] = useState(false)
+
+  const isLastPaymentMethod = totalPaymentMethods === 1
 
   useEffect(() => {
     if (isOpen) {
@@ -117,14 +121,18 @@ export const DeletePaymentMethodModal: React.FC<DeletePaymentMethodModalProps> =
           </button>
           <button
             onClick={handleConfirm}
-            disabled={isDeleting}
+            disabled={isDeleting || isLastPaymentMethod}
             className={`px-4 py-2 rounded-full font-medium text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
               isDeleting
                 ? "bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed"
                 : "bg-red-500 text-white hover:opacity-90"
             }`}
           >
-            {isDeleting ? t('account.paymentMethods.deleting') : t('account.paymentMethods.delete')}
+            {isDeleting
+              ? t('account.paymentMethods.deleting')
+              : isLastPaymentMethod
+              ? t('account.paymentMethods.cannotDeleteLastCard') || t('account.paymentMethods.delete')
+              : t('account.paymentMethods.delete')}
           </button>
         </div>
       </div>

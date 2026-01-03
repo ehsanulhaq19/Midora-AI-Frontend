@@ -35,6 +35,127 @@ const formatDaysAgo = (days: number): string => {
   }
 };
 
+// Truncate text to show highlighted word, truncating from both ends if needed
+const truncateToShowQuery = (text: string, query: string, maxLength: number = 150): string => {
+  if (!query.trim() || text.length <= maxLength) {
+    return text;
+  }
+  
+  const queryLower = query.trim().toLowerCase();
+  const textLower = text.toLowerCase();
+  
+  // Find the first occurrence of the query
+  const queryIndex = textLower.indexOf(queryLower);
+  
+  if (queryIndex === -1) {
+    // Query not found, just truncate from end
+    return text.substring(0, maxLength - 3) + "...";
+  }
+  
+  // Calculate how much space we have for context around the query
+  const queryLength = query.length;
+  const availableSpace = maxLength - queryLength - 6; // Reserve space for ellipsis (3 + 3)
+  const contextBefore = Math.floor(availableSpace / 2);
+  const contextAfter = Math.ceil(availableSpace / 2);
+  
+  // Calculate start and end positions
+  let start = Math.max(0, queryIndex - contextBefore);
+  let end = Math.min(text.length, queryIndex + queryLength + contextAfter);
+  
+  // Adjust if we're near the beginning or end
+  if (start === 0) {
+    // At the beginning, use more space at the end
+    end = Math.min(text.length, start + maxLength - 3);
+  } else if (end === text.length) {
+    // At the end, use more space at the beginning
+    start = Math.max(0, end - maxLength + 3);
+  }
+  
+  // Build the truncated text with ellipsis
+  let truncated = "";
+  if (start > 0) {
+    truncated += "...";
+  }
+  truncated += text.substring(start, end);
+  if (end < text.length) {
+    truncated += "...";
+  }
+  
+  return truncated;
+};
+
+// Highlight search query in text
+const highlightSearchQuery = (text: string, query: string, isDark: boolean, maxLength?: number): React.ReactNode => {
+  if (!query.trim()) {
+    return text;
+  }
+  
+  // Truncate text to show the query if needed
+  const displayText = maxLength ? truncateToShowQuery(text, query, maxLength) : text;
+  
+  const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const regex = new RegExp(`(${escapedQuery})`, 'gi');
+  const parts = displayText.split(regex);
+  
+  // Check if a part matches the query (case-insensitive)
+  const queryLower = query.trim().toLowerCase();
+  
+  return parts.map((part, index) => {
+    if (part.toLowerCase() === queryLower) {
+      return (
+        <mark
+          key={index}
+          className="rounded px-1"
+          style={{
+            backgroundColor: isDark 
+              ? "rgba(250, 204, 21, 0.3)" 
+              : "rgba(250, 204, 21, 0.4)",
+            color: "inherit",
+          }}
+        >
+          {part}
+        </mark>
+      );
+    }
+    return part;
+  });
+};
+
+// Memoized message preview component to prevent unnecessary re-renders
+const MessagePreview = React.memo<{
+  message: { content: string; uuid?: string; relevance_score?: number };
+  searchQuery: string;
+  isDark: boolean;
+}>(({ message, searchQuery, isDark }) => {
+  const highlightedContent = useMemo(
+    () => highlightSearchQuery(message.content, searchQuery, isDark, 200),
+    [message.content, searchQuery, isDark]
+  );
+
+  return (
+    <div
+      className="p-3 rounded-lg border"
+      style={{
+        backgroundColor: isDark
+          ? "var(--tokens-color-surface-surface-card-default)"
+          : "var(--tokens-color-surface-surface-secondary)",
+        borderColor: "var(--tokens-color-border-border-subtle)",
+      }}
+    >
+      <div
+        className="text-sm"
+        style={{
+          color: "var(--tokens-color-text-text-primary)",
+        }}
+      >
+        {highlightedContent}
+      </div>
+    </div>
+  );
+});
+
+MessagePreview.displayName = "MessagePreview";
+
 export const ArchiveScreen: React.FC<ArchiveScreenProps> = ({ onClose, onSelectConversation }) => {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
@@ -42,6 +163,7 @@ export const ArchiveScreen: React.FC<ArchiveScreenProps> = ({ onClose, onSelectC
   const router = useRouter();
   const pathname = usePathname();
   const [searchQuery, setSearchQuery] = useState("");
+  const [doDeepSearch, setDoDeepSearch] = useState(false);
   const [archivedConversations, setArchivedConversations] = useState<Conversation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [pagination, setPagination] = useState({ page: 1, per_page: 20, total: 0, total_pages: 0 });
@@ -60,7 +182,7 @@ export const ArchiveScreen: React.FC<ArchiveScreenProps> = ({ onClose, onSelectC
     const loadData = async () => {
       setIsLoading(true);
       try {
-        const result = await loadArchivedConversations(searchQuery.trim() || undefined, 1, 20);
+        const result = await loadArchivedConversations(searchQuery.trim() || undefined, 1, 20, doDeepSearch);
         if (isMounted) {
           setArchivedConversations(result.conversations);
           setPagination(result.pagination);
@@ -83,13 +205,13 @@ export const ArchiveScreen: React.FC<ArchiveScreenProps> = ({ onClose, onSelectC
       clearTimeout(timeoutId);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchQuery]);
+    }, [searchQuery, doDeepSearch]);
 
   // Stable function to reload conversations (used in handlers)
   const reloadConversations = useCallback(async () => {
     setIsLoading(true);
     try {
-      const result = await loadArchivedConversations(searchQuery.trim() || undefined, 1, 20);
+      const result = await loadArchivedConversations(searchQuery.trim() || undefined, 1, 20, doDeepSearch);
       setArchivedConversations(result.conversations);
       setPagination(result.pagination);
     } catch (error) {
@@ -97,7 +219,7 @@ export const ArchiveScreen: React.FC<ArchiveScreenProps> = ({ onClose, onSelectC
     } finally {
       setIsLoading(false);
     }
-  }, [loadArchivedConversations, searchQuery]);
+  }, [loadArchivedConversations, searchQuery, doDeepSearch]);
 
   // Sort conversations by most recent first
   const sortedConversations = useMemo(() => {
@@ -248,6 +370,36 @@ export const ArchiveScreen: React.FC<ArchiveScreenProps> = ({ onClose, onSelectC
                   }}
                 />
               </div>
+            {/* Deep search switch */}
+            <div className="flex items-center gap-3 mt-2 px-1 justify-end">
+              <button
+                type="button"
+                aria-pressed={doDeepSearch}
+                onClick={() => {
+                  const checked = !doDeepSearch
+                  setDoDeepSearch(checked)
+                  const currentQuery = searchQuery.trim() || undefined
+                  loadArchivedConversations(currentQuery, 1, 20, checked).then(result => {
+                    setArchivedConversations(result.conversations)
+                    setPagination(result.pagination)
+                  }).catch(err => {
+                    console.error("Deep search toggle load failed:", err)
+                  })
+                }}
+                className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none ${
+                  doDeepSearch ? "bg-[color:var(--tokens-color-text-text-brand)]" : "bg-[color:var(--tokens-color-surface-surface-secondary)]"
+                }`}
+              >
+                <span
+                  className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform ${
+                    doDeepSearch ? "translate-x-5" : "translate-x-1"
+                  }`}
+                />
+              </button>
+              <span className="text-sm" style={{ color: "var(--tokens-color-text-text-inactive-2)" }}>
+                {t("chat.history.deepSearch") || "Deep search"}
+              </span>
+            </div>
             </div>
 
             {/* Conversations Count */}
@@ -288,6 +440,7 @@ export const ArchiveScreen: React.FC<ArchiveScreenProps> = ({ onClose, onSelectC
                   const lastUpdated = conversation.updated_at || conversation.created_at;
                   const daysAgo = getDaysAgo(lastUpdated);
                   const daysAgoText = formatDaysAgo(daysAgo);
+                  const hasRelatedMessages = searchQuery.trim() && conversation.related_messages && conversation.related_messages.length > 0;
 
                   return (
                     <div key={conversation.uuid}>
@@ -313,7 +466,14 @@ export const ArchiveScreen: React.FC<ArchiveScreenProps> = ({ onClose, onSelectC
                                 color: "var(--tokens-color-text-text-primary)",
                               }}
                             >
-                              {conversation.name}
+                              <div className="flex items-center gap-3">
+                                <div className="flex-1">{conversation.name}</div>
+                                {conversation.project && (
+                                  <div className="font-text text-xs" style={{ color: "var(--tokens-color-text-text-inactive-2)" }}>
+                                    {conversation.project.name}
+                                  </div>
+                                )}
+                              </div>
                             </div>
                             <div
                               className="font-text font-[number:var(--text-small-font-weight)] text-[14px] tracking-[var(--text-small-letter-spacing)] leading-[var(--text-small-line-height)] [font-style:var(--text-small-font-style)] ml-4"
@@ -347,6 +507,29 @@ export const ArchiveScreen: React.FC<ArchiveScreenProps> = ({ onClose, onSelectC
                             Delete
                           </ActionButton>
                         </div>
+                        {/* Related Messages Section */}
+                        {hasRelatedMessages && (
+                          <div className="px-0 pb-4 mt-3">
+                            <div
+                              className="text-xs font-medium mb-2"
+                              style={{
+                                color: "var(--tokens-color-text-text-inactive-2)",
+                              }}
+                            >
+                              {t("chat.history.relatedMessages") || "Related Messages"} ({conversation.related_messages!.length})
+                            </div>
+                            <div className="space-y-2">
+                              {conversation.related_messages!.slice(0, 3).map((message, msgIndex) => (
+                                <MessagePreview
+                                  key={message.uuid || msgIndex}
+                                  message={message}
+                                  searchQuery={searchQuery}
+                                  isDark={isDark}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   );
