@@ -136,7 +136,12 @@ export const chat = {
     noConversations: 'Noch keine Unterhaltungen. Starten Sie einen neuen Chat, um zu beginnen!',
     noResults: 'Keine Unterhaltungen gefunden, die Ihrer Suche entsprechen.',
     noResultsWithMessageSearch: 'Keine Unterhaltungen gefunden, die Ihrer Nachrichtensuche entsprechen.',
-    relatedMessages: 'Verwandte Nachrichten'
+    relatedMessages: 'Verwandte Nachrichten',
+    manageLinks: 'Links verwalten',
+    link: 'Verknüpfen',
+    unlink: 'Verknüpfung aufheben',
+    uploadFiles: 'Dateien hochladen',
+    linkChats: 'Unterhaltungen verknüpfen'
   }
 }
 

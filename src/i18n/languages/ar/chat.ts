@@ -136,7 +136,11 @@ export const chat = {
     noConversations: 'لا توجد محادثات بعد. ابدأ دردشة جديدة للبدء!',
     noResults: 'لم يتم العثور على محادثات تطابق بحثك.',
     noResultsWithMessageSearch: 'لم يتم العثور على محادثات تطابق بحث رسائلك.',
-    relatedMessages: 'الرسائل ذات الصلة'
+    relatedMessages: 'الرسائل ذات الصلة',
+    manageLinks: 'إدارة الروابط',
+    link: 'ربط',
+    unlink: 'إلغاء الربط',
+    uploadFiles: 'تحميل الملفات',
+    linkChats: 'ربط المحادثات'
   }
 }
-

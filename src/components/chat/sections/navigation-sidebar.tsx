@@ -56,6 +56,7 @@ interface ChatListItemProps {
   onRemoveFromFolder?: (conversationUuid: string) => void;
   onArchive?: (conversationUuid: string) => void;
   onDelete?: (conversationUuid: string) => void;
+  onLink?: (conversationUuid: string) => void;
   isShrunk?: boolean;
 }
 
@@ -68,6 +69,7 @@ const ChatListItem: React.FC<ChatListItemProps> = ({
   onRemoveFromFolder,
   onArchive,
   onDelete,
+  onLink,
   isShrunk = false,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -137,6 +139,7 @@ const ChatListItem: React.FC<ChatListItemProps> = ({
           }
           onArchive={onArchive ? () => onArchive(conversationUuid) : undefined}
           onDelete={onDelete ? () => onDelete(conversationUuid) : undefined}
+          onLink={onLink ? () => onLink(conversationUuid) : undefined}
         />
       )}
     </div>
@@ -187,6 +190,8 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
   const [isMobileOpen, setIsMobileOpen] = useState<boolean>(false);
   const [isNewFolderModalOpen, setIsNewFolderModalOpen] = useState(false);
   const [showRenameProjectModal, setShowRenameProjectModal] = useState(false);
+  const [showLinkModal, setShowLinkModal] = useState(false);
+  const [linkTargetConversationUuid, setLinkTargetConversationUuid] = useState<string | null>(null);
   const [showDeleteProjectModal, setShowDeleteProjectModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [shareProjectName, setShareProjectName] = useState<string | null>(null);
@@ -1289,7 +1294,11 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                                   if (showDeleteModal) {
                                     showDeleteModal(uuid);
                                   }
-                                }}
+                            }}
+                            onLink={(uuid) => {
+                              setLinkTargetConversationUuid(uuid);
+                              setShowLinkModal(true);
+                            }}
                               />
                             ))}
                         </>
@@ -1480,6 +1489,15 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
             setShareProjectName(null);
           }}
         />
+      )}
+      {/* Conversation Link Modal */}
+      {showLinkModal && linkTargetConversationUuid && (
+        // Lazy load the modal component to avoid bundle bloat (component is local)
+        // eslint-disable-next-line @next/next/no-img-element
+        (() => {
+          const Component = require("./conversation-link-modal").ConversationLinkModal as any;
+          return <Component isOpen={showLinkModal} onClose={() => setShowLinkModal(false)} conversationUuid={linkTargetConversationUuid} />;
+        })()
       )}
     </>
   );

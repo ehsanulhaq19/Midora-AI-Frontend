@@ -110,8 +110,23 @@ class BaseApiClient {
     options?: RequestInit
   ): Promise<ApiResponse<T>> {
     try {
+      // Allow per-request timeout override via header 'X-Request-Timeout' (milliseconds)
+      let timeoutMs = this.timeout;
+      try {
+        const hdrs: any = options?.headers;
+        const hdrTimeout = hdrs && (hdrs['X-Request-Timeout'] || hdrs['x-request-timeout']);
+        if (hdrTimeout) {
+          const parsed = parseInt(String(hdrTimeout), 10);
+          if (!isNaN(parsed) && parsed > 0) {
+            timeoutMs = parsed;
+          }
+        }
+      } catch (e) {
+        // ignore and use default timeout
+      }
+
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
       const url = `${this.baseUrl}${endpoint}`;
       console.log("Making GET request to:", url);

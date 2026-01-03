@@ -65,16 +65,6 @@ const MessagePreview = React.memo<{
       >
         {highlightedContent}
       </div>
-      {message.relevance_score !== undefined && (
-        <div
-          className="text-xs mt-1"
-          style={{
-            color: "var(--tokens-color-text-text-inactive-2)",
-          }}
-        >
-          {t("chat.history.relevance") || "Relevance"}: {Math.round(message.relevance_score * 100)}%
-        </div>
-      )}
     </div>
   );
 });
@@ -176,6 +166,7 @@ export const ConversationHistoryScreen: React.FC<
   const router = useRouter();
   const pathname = usePathname();
   const [searchQuery, setSearchQuery] = useState("");
+  const [doDeepSearch, setDoDeepSearch] = useState(false);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -202,6 +193,7 @@ export const ConversationHistoryScreen: React.FC<
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const previousSearchQueryRef = useRef<string | undefined>(undefined);
   const isInitialMountRef = useRef<boolean>(true);
+  const lastDeepSearchRef = useRef<boolean>(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -212,7 +204,7 @@ export const ConversationHistoryScreen: React.FC<
   }, [searchQuery]);
 
   // Load conversations from API (not from Redux)
-  const loadConversations = useCallback(async (page: number = 1, append: boolean = false, messageSearch?: string) => {
+  const loadConversations = useCallback(async (page: number = 1, append: boolean = false, messageSearch?: string, doDeep?: boolean) => {
     if (append) {
       setIsLoadingMore(true);
     } else {
@@ -220,7 +212,7 @@ export const ConversationHistoryScreen: React.FC<
     }
     
     try {
-      const response = await conversationApi.getConversations(page, 20, "-created_at", messageSearch);
+      const response = await conversationApi.getConversations(page, 20, "-created_at", messageSearch, doDeep);
       if (response.error) {
         console.error("Failed to load conversations:", response.error);
         return;
@@ -250,16 +242,19 @@ export const ConversationHistoryScreen: React.FC<
     if (isInitialMountRef.current) {
       isInitialMountRef.current = false;
       previousSearchQueryRef.current = currentQuery;
-      loadConversations(1, false, currentQuery);
+      lastDeepSearchRef.current = doDeepSearch;
+      loadConversations(1, false, currentQuery, doDeepSearch);
       return;
     }
     
-    // Only load if the search query actually changed
-    if (previousSearchQueryRef.current !== currentQuery) {
+    // Reload when query changed or deep search toggled
+    const deepChanged = lastDeepSearchRef.current !== doDeepSearch;
+    if (previousSearchQueryRef.current !== currentQuery || deepChanged) {
       previousSearchQueryRef.current = currentQuery;
-      loadConversations(1, false, currentQuery);
+      lastDeepSearchRef.current = doDeepSearch;
+      loadConversations(1, false, currentQuery, doDeepSearch);
     }
-  }, [debouncedSearchQuery, loadConversations]);
+  }, [debouncedSearchQuery, doDeepSearch, loadConversations]);
 
   // Handle scroll to load more
   const handleScroll = useCallback(
@@ -279,7 +274,7 @@ export const ConversationHistoryScreen: React.FC<
         !isLoading &&
         pagination.page < pagination.total_pages
       ) {
-        loadConversations(pagination.page + 1, true, debouncedSearchQuery.trim() || undefined);
+        loadConversations(pagination.page + 1, true, debouncedSearchQuery.trim() || undefined, doDeepSearch);
       }
     },
     [isLoadingMore, isLoading, pagination, loadConversations, debouncedSearchQuery]
@@ -413,6 +408,31 @@ export const ConversationHistoryScreen: React.FC<
                   }}
                 />
               </div>
+              {/* Deep search switch */}
+              <div className="flex items-center gap-3 mt-2 px-1 justify-end">
+                <button
+                  type="button"
+                  aria-pressed={doDeepSearch}
+                  onClick={() => {
+                    const checked = !doDeepSearch
+                    setDoDeepSearch(checked)
+                    const currentQuery = debouncedSearchQuery.trim() || undefined
+                    loadConversations(1, false, currentQuery, checked)
+                  }}
+                  className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none ${
+                    doDeepSearch ? "bg-[color:var(--tokens-color-text-text-brand)]" : "bg-[color:var(--tokens-color-surface-surface-secondary)]"
+                  }`}
+                >
+                  <span
+                    className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform ${
+                      doDeepSearch ? "translate-x-5" : "translate-x-1"
+                    }`}
+                  />
+                </button>
+                <span className="text-sm" style={{ color: "var(--tokens-color-text-text-inactive-2)" }}>
+                  {t("chat.history.deepSearch") || "Deep search"}
+                </span>
+              </div>
             </div>
 
             {/* Conversations Count */}
@@ -491,7 +511,14 @@ export const ConversationHistoryScreen: React.FC<
                               color: "var(--tokens-color-text-text-primary)",
                             }}
                           >
-                            {conversation.name}
+                            <div className="flex items-center justify-between">
+                              {conversation.name}
+                              {conversation.project && (
+                                <div className="font-text text-xs mb-1" style={{ color: "var(--tokens-color-text-text-inactive-2)" }}>
+                                  {conversation.project.name}
+                                </div>
+                              )}
+                            </div>
                           </div>
                           <div
                             className="font-text font-[number:var(--text-small-font-weight)] text-[14px] tracking-[var(--text-small-letter-spacing)] leading-[var(--text-small-line-height)] [font-style:var(--text-small-font-style)] text-end"

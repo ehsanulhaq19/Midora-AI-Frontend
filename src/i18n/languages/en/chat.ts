@@ -151,5 +151,13 @@ export const chat = {
     noResults: 'No conversations found matching your search.',
     noResultsWithMessageSearch: 'No conversations found matching your message search.',
     relatedMessages: 'Related messages'
-  }
+    ,
+    deepSearch: 'Deep search'
+  },
+  manageLinks: 'Manage Links',
+  searchPlaceholder: 'Search conversations...',
+  link: 'Link',
+  unlink: 'Unlink',
+  uploadFiles: 'Upload files',
+  linkChats: 'Link chats'
 }

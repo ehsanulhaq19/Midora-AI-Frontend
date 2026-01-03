@@ -168,9 +168,11 @@ export const PaymentMethodsModal: React.FC<PaymentMethodsModalProps> = ({
                       )}
                     </div>
                     <button
-                      onClick={() => handleDelete(method)}
-                      className="p-2 rounded-md hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] transition-colors text-red-500"
+                      onClick={() => paymentMethods.length > 1 && handleDelete(method)}
+                      disabled={paymentMethods.length === 1}
+                      className={`p-2 rounded-md transition-colors text-red-500 ${paymentMethods.length === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]'}`}
                       aria-label="Delete payment method"
+                      aria-disabled={paymentMethods.length === 1}
                     >
                       <Trash className="w-5 h-5" />
                     </button>
@@ -202,6 +204,7 @@ export const PaymentMethodsModal: React.FC<PaymentMethodsModalProps> = ({
         }}
         onConfirm={handleDeleteConfirm}
         paymentMethod={selectedPaymentMethod}
+        totalPaymentMethods={paymentMethods.length}
       />
 
       {/* Add Payment Method Modal */}

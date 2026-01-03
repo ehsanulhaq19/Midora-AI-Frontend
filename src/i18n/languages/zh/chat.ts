@@ -136,7 +136,11 @@ export const chat = {
     noConversations: '还没有对话。开始新聊天以开始！',
     noResults: '未找到匹配您搜索的对话。',
     noResultsWithMessageSearch: '未找到匹配您消息搜索的对话。',
-    relatedMessages: '相关消息'
+    relatedMessages: '相关消息',
+    manageLinks: '管理链接',
+    link: '链接',
+    unlink: '取消链接',
+    uploadFiles: '上传文件',
+    linkChats: '链接对话'
   }
 }
-

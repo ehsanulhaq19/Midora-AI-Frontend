@@ -16,6 +16,7 @@ import {
   CreateMessageRequest,
   CreateMessageResponse,
   DeleteConversationResponse
+  , LinkedConversationItem
 } from './types'
 
 class ConversationApiClient {
@@ -90,7 +91,8 @@ class ConversationApiClient {
     page: number = 1, 
     perPage: number = 20, 
     orderBy: string = "-created_at",
-    messageSearch?: string
+    messageSearch?: string,
+    doDeepSearch?: boolean
   ): Promise<ApiResponse<{ conversations: Conversation[], pagination: { page: number, per_page: number, total: number, total_pages: number } }>> {
     const params = new URLSearchParams({
       page: page.toString(),
@@ -102,7 +104,16 @@ class ConversationApiClient {
       params.append('message_search', messageSearch.trim())
     }
     
-    const response = await this.baseClient.get<GetConversationsResponse>(`/api/v1/conversations?${params.toString()}`)
+    if (doDeepSearch) {
+      params.append('do_deep_search', 'true')
+    }
+    
+    const headers: Record<string,string> = {}
+    if (messageSearch && messageSearch.trim()) {
+      // Increase timeout for message search to 20 minutes
+      headers['X-Request-Timeout'] = String(1200000)
+    }
+    const response = await this.baseClient.get<GetConversationsResponse>(`/api/v1/conversations?${params.toString()}`, { headers })
     if (response.error) {
       return { error: response.error, status: response.status }
     }
@@ -126,7 +137,8 @@ class ConversationApiClient {
     page: number = 1, 
     perPage: number = 20, 
     orderBy: string = "-created_at",
-    messageSearch?: string
+    messageSearch?: string,
+    doDeepSearch?: boolean
   ): Promise<ApiResponse<{ conversations: Conversation[], pagination: { page: number, per_page: number, total: number, total_pages: number } }>> {
     const params = new URLSearchParams({
       page: page.toString(),
@@ -138,7 +150,15 @@ class ConversationApiClient {
       params.append('message_search', messageSearch.trim())
     }
     
-    const response = await this.baseClient.get<GetConversationsResponse>(`/api/v1/conversations/archive?${params.toString()}`)
+    if (doDeepSearch) {
+      params.append('do_deep_search', 'true')
+    }
+    
+    const headers: Record<string,string> = {}
+    if (messageSearch && messageSearch.trim()) {
+      headers['X-Request-Timeout'] = String(120000)
+    }
+    const response = await this.baseClient.get<GetConversationsResponse>(`/api/v1/conversations/archive?${params.toString()}`, { headers })
     if (response.error) {
       return { error: response.error, status: response.status }
     }
@@ -242,6 +262,39 @@ class ConversationApiClient {
     }
     
     return { data: { messages, pagination }, status: response.status }
+  }
+
+  /**
+   * Get linked conversations (minimal details) for a conversation
+   */
+  async getLinkedConversations(conversationUuid: string): Promise<ApiResponse<{ items: LinkedConversationItem[] }>> {
+    const response = await this.baseClient.get<{ success: boolean; data: { items: LinkedConversationItem[] } }>(`/api/v1/conversations/${conversationUuid}/links`)
+    if (response.error) {
+      return { error: response.error, status: response.status }
+    }
+    return { data: { items: response.data?.items || [] }, status: response.status }
+  }
+
+  /**
+   * Link a conversation to another conversation
+   */
+  async linkConversation(conversationUuid: string, linkedConversationUuid: string): Promise<ApiResponse<any>> {
+    const response = await this.baseClient.post(`/api/v1/conversations/${conversationUuid}/link`, { linked_conversation_uuid: linkedConversationUuid })
+    if (response.error) {
+      return { error: response.error, status: response.status }
+    }
+    return { data: response.data, status: response.status }
+  }
+
+  /**
+   * Unlink (soft delete) a link between conversations
+   */
+  async unlinkConversation(conversationUuid: string, linkedConversationUuid: string): Promise<ApiResponse<any>> {
+    const response = await this.baseClient.delete(`/api/v1/conversations/${conversationUuid}/link/${linkedConversationUuid}`)
+    if (response.error) {
+      return { error: response.error, status: response.status }
+    }
+    return { data: response.data, status: response.status }
   }
 
   /**
