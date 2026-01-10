@@ -192,4 +192,7 @@ export const auth = {
   successSubtitle: 'Your account has been created successfully. We\'re setting up your account for you.',
   settingUpAccount: 'Setting up your account...',
   accountSetupComplete: 'Account setup complete!',
+
+  // Public chat screen
+  loginToJoin: 'Log in to Join',
 }

@@ -39,4 +39,5 @@ export const common = {
     uploading: 'Uploading...',
     selectFile: 'Select file',
     removeFile: 'Remove file',},
+  copying: 'Copying...',
 }

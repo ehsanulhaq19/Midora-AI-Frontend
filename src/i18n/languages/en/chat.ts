@@ -160,4 +160,8 @@ export const chat = {
   unlink: 'Unlink',
   uploadFiles: 'Upload files',
   linkChats: 'Link chats'
+  ,
+  shareConversation: 'Share Conversation',
+  shareConversationDescription: 'Share this conversation by copying the link below.',
+  copyLink: 'Copy link'
 }

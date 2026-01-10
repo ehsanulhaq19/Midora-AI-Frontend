@@ -83,6 +83,7 @@ export const account = {
     billing: 'Abrechnung',
     paymentHistory: 'Zahlungsverlauf',
     nextBillingDate: 'Nächstes Abrechnungsdatum',
+    planEndsOn: 'Plan endet am',
     cardCharged: 'Ihre Karte wird mit {amount} belastet',
     updatePayment: 'Zahlungsmethode und Rechnungsinformationen aktualisieren',
     manageSubscription: 'Ihr Abonnement verwalten',

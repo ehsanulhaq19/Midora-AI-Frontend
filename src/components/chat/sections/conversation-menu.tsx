@@ -54,7 +54,7 @@ export const ConversationMenu: React.FC<ConversationMenuProps> = ({
           }}
         >
           <div className="py-1">
-            {/* {onShare && (
+            {onShare && (
               <div onClick={(e) => e.stopPropagation()}>
                 <ActionButton
                   type="button"
@@ -72,7 +72,7 @@ export const ConversationMenu: React.FC<ConversationMenuProps> = ({
               </div>
             )}
 
-            {onRemoveFromFolder && (
+            {/* {onRemoveFromFolder && (
               <div onClick={(e) => e.stopPropagation()}>
                 <ActionButton
                   type="button"

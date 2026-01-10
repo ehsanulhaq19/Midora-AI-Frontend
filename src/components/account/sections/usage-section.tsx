@@ -494,6 +494,31 @@ export const UsageSection: React.FC = () => {
   const usagePercentage =
     totalCredits > 0 ? (usedCredits / totalCredits) * 100 : 0;
 
+  /**
+   * Determine billing date label and value based on subscription status.
+   * For FUTURE_COMPLETE subscriptions, shows "Plan Ends On" instead of "Next Billing Date".
+   */
+  const getBillingDateInfo = () => {
+    const isFutureComplete = activeSubscription?.status === 'FUTURE_COMPLETE';
+    const dateToShow = isFutureComplete 
+      ? activeSubscription?.current_period_end 
+      : creditsData?.next_billing_date;
+    
+    const label = isFutureComplete
+      ? t("account.usage.planEndsOn")
+      : t("account.usage.nextBillingDate");
+
+    const formattedDate = dateToShow
+      ? new Date(dateToShow).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })
+      : null;
+
+    return { label, date: formattedDate };
+  };
+
   const handleLogout = async () => {
     try {
       await logout();
@@ -761,7 +786,7 @@ export const UsageSection: React.FC = () => {
                 </div>
 
                 <div className="flex flex-col gap-6">
-                  {/* Next Billing Date */}
+                  {/* Next Billing Date or Plan End Date (if FUTURE_COMPLETE) */}
                   <div className="flex items-center gap-3">
                     <CalendarIcon
                       className="w-5 h-5"
@@ -769,12 +794,12 @@ export const UsageSection: React.FC = () => {
                     />
                     <div className="flex flex-col gap-1">
                       <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-inactive-2)]">
-                        {t("account.usage.nextBillingDate")}
+                        {getBillingDateInfo().label}
                       </span>
                       <span className="font-h02-heading02 font-[number:var(--text-font-weight)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-[color:var(--tokens-color-text-text-primary)]">
                         {creditsLoading
                           ? t("account.usage.loading")
-                          : nextBillingDate ?? "N/A"}
+                          : getBillingDateInfo().date ?? "N/A"}
                       </span>
                     </div>
                   </div>

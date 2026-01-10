@@ -41,6 +41,7 @@ import {
 } from "@/store/slices/projectsSlice";
 import { useProjects } from "@/hooks/use-projects";
 import { useConversationModal } from "./conversation-modal-context";
+import { ConversationShareModal } from "./conversation-share-modal";
 
 const translateWithFallback = (key: string, fallback: string) => {
   const translated = t(key);
@@ -197,6 +198,8 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
   const [shareProjectName, setShareProjectName] = useState<string | null>(null);
   const [selectedProjectForAction, setSelectedProjectForAction] =
     useState<Project | null>(null);
+  const [showConversationShareModal, setShowConversationShareModal] = useState(false);
+  const [shareConversationUuid, setShareConversationUuid] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const projectsListRef = useRef<HTMLDivElement>(null);
@@ -1278,8 +1281,8 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                                 conversationUuid={conversation.uuid}
                                 isShrunk={isShrunk}
                                 onShare={(uuid) => {
-                                  // TODO: Implement share functionality
-                                  console.log("Share conversation:", uuid);
+                                  setShareConversationUuid(uuid);
+                                  setShowConversationShareModal(true);
                                 }}
                                 onRemoveFromFolder={(uuid) => {
                                   // TODO: Implement remove from folder functionality
@@ -1487,6 +1490,17 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
           onClose={() => {
             setShowShareModal(false);
             setShareProjectName(null);
+          }}
+        />
+      )}
+      {/* Conversation Share Modal */}
+      {showConversationShareModal && shareConversationUuid && (
+        <ConversationShareModal
+          isOpen={showConversationShareModal}
+          conversationUuid={shareConversationUuid}
+          onClose={() => {
+            setShowConversationShareModal(false);
+            setShareConversationUuid(null);
           }}
         />
       )}

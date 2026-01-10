@@ -35,6 +35,7 @@ interface ConversationContainerProps {
   isStreaming?: boolean
   onFilesChange?: (hasFiles: boolean) => void
   hasFiles?: boolean
+  publicPreview?: boolean
 }
 
 interface MessageBubbleProps {
@@ -105,6 +106,20 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
   const isDark = resolvedTheme === 'dark'
   const [isCopied, setIsCopied] = useState(false)
   const { switchMessageVersion } = useRegenerate()
+  
+  // Get sender name
+  const getSenderName = () => {
+    if (message.sender) {
+      const firstName = message.sender.first_name || ''
+      const lastName = message.sender.last_name || ''
+      const fullName = `${firstName} ${lastName}`.trim()
+      return fullName || message.sender.username || 'User'
+    }
+    // If no sender info (AI message), return appropriate label
+    return isUser ? null : 'Assistant'
+  }
+
+  const senderName = getSenderName()
   
   // Determine content to display
   const displayContent = isThisMessageRegenerating && isStreaming 
@@ -206,6 +221,13 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-6 ${hasInlineCanvas ? 'px-0 -mx-6 flex-col items-stretch' : 'px-4'} message-blub`}>
       <div className={`${hasInlineCanvas ? 'w-full' : 'max-w-[75%]'} ${isUser ? 'order-2' : 'order-1'} ${hasInlineCanvas ? '' : ''}`}>
+        {/* Always show sender name for non-user messages */}
+        {senderName && (
+          <div className="text-xs font-medium mb-1 text-[color:var(--tokens-color-text-text-secondary)]">
+            {senderName}
+          </div>
+        )}
+
         <div
         className={`p-[6px] sm:p-[12px] rounded-lg break-words whitespace-pre-wrap ${textClassName} ${
             isUser
@@ -729,7 +751,8 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
   onSendMessage,
   isStreaming: externalIsStreaming,
   onFilesChange,
-  hasFiles
+  hasFiles,
+  publicPreview = false
 }) => {
   const { 
     messages, 
@@ -790,6 +813,8 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
   const userScrolledRef = useRef(false)
   const scrollRafRef = useRef<number | null>(null)
   const prevIsStreamingRef = useRef<boolean>(false)
+  const hasInitializedRef = useRef(false) // Track if we've scrolled to bottom on initial load
+  const prevMessageCountRef = useRef(0) // Track previous message count to detect load more
 
   const {
     isAutoMode,
@@ -1124,8 +1149,10 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     const container = e.currentTarget
     const scrollTop = container.scrollTop
+    const threshold = 50
     
-    if (scrollTop === 0 && !isLoadingMoreRef.current && conversationUuid && pagination) {
+    // Detect if user scrolled to top to load more messages
+    if (scrollTop <= threshold && !isLoadingMoreRef.current && conversationUuid && pagination) {
       const { page, total_pages } = pagination
       if (page < total_pages) {
         isLoadingMoreRef.current = true
@@ -1135,6 +1162,7 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
       }
     }
 
+    // Track if user has scrolled away from bottom
     if (isStreaming) {
       const atBottom = isAtBottom()
       shouldAutoScrollRef.current = atBottom
@@ -1147,9 +1175,16 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
     }
   }, [conversationUuid, pagination, loadMoreMessages, isStreaming, isAtBottom])
 
+  // Only scroll to bottom on initial load or when streaming new content
+  // Don't scroll when loading more messages from the top
   useEffect(() => {
-    scrollToBottom(false)
-  }, [messages, scrollToBottom])
+    if (!hasInitializedRef.current && messages.length > 0 && !isStreaming && !isRegenerating) {
+      // Initial load - scroll to bottom
+      hasInitializedRef.current = true
+      shouldAutoScrollRef.current = true
+      scrollToBottom(true)
+    }
+  }, [isStreaming, isRegenerating, messages.length])
 
   useEffect(() => {
     if (isStreaming) {
@@ -1280,13 +1315,13 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
           
           {sortedMessages.map((message, index) => (
             <div key={message.uuid} className="group">
-              <MessageBubble
+          <MessageBubble
                 message={message}
                 isUser={message?.sender?.uuid === user?.uuid}
                 textClassName={message?.sender?.uuid === user?.uuid ? '' : 'pb-0'}
                 isLastMessage={index === sortedMessages.length - 1}
                 conversationUuid={conversationUuid}
-                onRegenerate={handleRegenerate}
+                onRegenerate={publicPreview ? undefined : handleRegenerate}
                 isRegenerating={isRegenerating}
                 isStreaming={isStreaming}
                 streamingContent={streamingContent}

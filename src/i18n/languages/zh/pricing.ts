@@ -60,6 +60,7 @@ export const pricing = {
   currentPlan: '当前计划',
   renewsSoon: '即将续订',
   renewsOn: '续订于',
+  endsOn: '结束于',
   getPlan: '获取 {planName} 计划',
   cancelSubscription: '取消订阅',
   cancelSubscriptionTitle: '取消订阅',

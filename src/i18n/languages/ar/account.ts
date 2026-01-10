@@ -83,6 +83,7 @@ export const account = {
     billing: 'الفواتير',
     paymentHistory: 'سجل الدفع',
     nextBillingDate: 'تاريخ الفوترة التالي',
+    planEndsOn: 'تنتهي الخطة في',
     cardCharged: 'سيتم خصم {amount} من بطاقتك',
     updatePayment: 'تحديث طريقة الدفع ومعلومات الفوترة',
     manageSubscription: 'إدارة اشتراكك',

@@ -60,6 +60,7 @@ export const pricing = {
   currentPlan: 'الخطة الحالية',
   renewsSoon: 'تجديد قريبًا',
   renewsOn: 'تجديد في',
+  endsOn: 'ينتهي في',
   getPlan: 'احصل على خطة {planName}',
   cancelSubscription: 'إلغاء الاشتراك',
   cancelSubscriptionTitle: 'إلغاء الاشتراك',

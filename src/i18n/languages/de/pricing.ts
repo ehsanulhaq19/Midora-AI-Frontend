@@ -60,6 +60,7 @@ export const pricing = {
   currentPlan: 'Aktueller Plan',
   renewsSoon: 'Erneuert bald',
   renewsOn: 'Erneuert am',
+  endsOn: 'Endet am',
   getPlan: '{planName} Plan erhalten',
   cancelSubscription: 'Abonnement kündigen',
   cancelSubscriptionTitle: 'Abonnement kündigen',

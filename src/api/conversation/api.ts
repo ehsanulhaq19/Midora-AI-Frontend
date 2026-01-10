@@ -90,7 +90,7 @@ class ConversationApiClient {
   async getConversations(
     page: number = 1, 
     perPage: number = 20, 
-    orderBy: string = "-created_at",
+    orderBy: string = "-last_message_at",
     messageSearch?: string,
     doDeepSearch?: boolean
   ): Promise<ApiResponse<{ conversations: Conversation[], pagination: { page: number, per_page: number, total: number, total_pages: number } }>> {
@@ -136,7 +136,7 @@ class ConversationApiClient {
   async getArchivedConversations(
     page: number = 1, 
     perPage: number = 20, 
-    orderBy: string = "-created_at",
+    orderBy: string = "-last_message_at",
     messageSearch?: string,
     doDeepSearch?: boolean
   ): Promise<ApiResponse<{ conversations: Conversation[], pagination: { page: number, per_page: number, total: number, total_pages: number } }>> {
@@ -265,6 +265,41 @@ class ConversationApiClient {
   }
 
   /**
+   * Get public grouped messages for a conversation (no auth required, protected by domain header)
+   */
+  async getPublicGroupedMessages(conversationUuid: string, page: number = 1, perPage: number = 50, orderBy: string = "-created_at"): Promise<ApiResponse<{ items: any[], pagination: any }>> {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      per_page: perPage.toString(),
+      order_by: orderBy
+    })
+
+    const headers: Record<string,string> = {}
+    try {
+      if (typeof window !== "undefined" && window.location && window.location.origin) {
+        headers['X-Calling-Domain'] = window.location.origin
+      }
+    } catch (e) {}
+
+    const response = await this.baseClient.get<{ success: boolean; data: any }>(`/api/v1/public/messages/conversations/${conversationUuid}?${params.toString()}`, { headers })
+    if (response.error) {
+      return { error: response.error, status: response.status }
+    }
+    // Transform message groups into individual messages with versioning support
+    const messageGroups = response?.data?.items || []
+    const messages = this.transformMessageGroups(messageGroups)
+    
+    const pagination = {
+      page: response?.data?.page || page,
+      per_page: response?.data?.per_page || perPage,
+      total: response?.data?.total || 0,
+      total_pages: response?.data?.total_pages || 0
+    }
+    
+    return { data: { messages, pagination }, status: response.status }
+  }
+
+  /**
    * Get linked conversations (minimal details) for a conversation
    */
   async getLinkedConversations(conversationUuid: string): Promise<ApiResponse<{ items: LinkedConversationItem[] }>> {
@@ -287,6 +322,17 @@ class ConversationApiClient {
   }
 
   /**
+   * Join a conversation (add current authenticated user to conversation participants)
+   */
+  async joinConversation(conversationUuid: string): Promise<ApiResponse<any>> {
+    const response = await this.baseClient.post(`/api/v1/conversations/${conversationUuid}/join`, {})
+    if (response.error) {
+      return { error: response.error, status: response.status }
+    }
+    return { data: response.data, status: response.status }
+  }
+
+  /**
    * Unlink (soft delete) a link between conversations
    */
   async unlinkConversation(conversationUuid: string, linkedConversationUuid: string): Promise<ApiResponse<any>> {
@@ -295,6 +341,35 @@ class ConversationApiClient {
       return { error: response.error, status: response.status }
     }
     return { data: response.data, status: response.status }
+  }
+
+  /**
+   * Check if current user is a member of a conversation
+   */
+  async checkConversationMembership(conversationUuid: string): Promise<ApiResponse<{ is_member: boolean }>> {
+    const response = await this.baseClient.get<{ is_member: boolean }>(`/api/v1/conversations/${conversationUuid}/check-membership`)
+    if (response.error) {
+      return { error: response.error, status: response.status }
+    }
+    return { data: response.data as { is_member: boolean }, status: response.status }
+  }
+
+  /**
+   * Get public conversation details without authentication
+   */
+  async getPublicConversationDetails(conversationUuid: string): Promise<ApiResponse<Conversation>> {
+    const headers: Record<string, string> = {}
+    try {
+      if (typeof window !== "undefined" && window.location && window.location.origin) {
+        headers['X-Calling-Domain'] = window.location.origin
+      }
+    } catch (e) {}
+
+    const response = await this.baseClient.get<Conversation>(`/api/v1/public/conversations/${conversationUuid}/details`, { headers })
+    if (response.error) {
+      return { error: response.error, status: response.status }
+    }
+    return { data: response.data as Conversation, status: response.status }
   }
 
   /**

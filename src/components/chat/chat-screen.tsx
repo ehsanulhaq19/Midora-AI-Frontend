@@ -10,12 +10,18 @@ import { ArchiveScreen } from "./sections/archive-screen";
 import { useConversation } from "@/hooks/use-conversation";
 import { AccountScreen } from "../account/account-screen";
 import { useAIModels, useProjects } from "@/hooks";
+import { useAuthRedux } from "@/hooks/use-auth-redux";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { setSelectedProject, Project } from "@/store/slices/projectsSlice";
 import { ConversationModalProvider } from "./sections/conversation-modal-context";
+import { MessageInput } from "./sections/message-input";
 
-export const ChatScreen: React.FC = () => {
+interface ChatScreenProps {
+  initialConversationUuid?: string | null;
+}
+
+export const ChatScreen: React.FC<ChatScreenProps> = ({ initialConversationUuid = null }) => {
   const [hasFiles, setHasFiles] = useState(false);
   const [isCanvasOpen, setIsCanvasOpen] = useState(false);
   const [isAccountOpen, setIsAccountOpen] = useState(false);
@@ -40,6 +46,7 @@ export const ChatScreen: React.FC = () => {
     error,
     isStreaming,
   } = useConversation();
+  const { isAuthenticated } = useAuthRedux();
 
   const { fetchServiceProviders } = useAIModels();
   const { loadProjects } = useProjects();
@@ -54,10 +61,17 @@ export const ChatScreen: React.FC = () => {
       hasInitialized.current = true;
       loadConversations();
       fetchServiceProviders();
-      loadProjects(1, 10); // Load first page of projects
+      loadProjects(1, 10);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // If an initial conversation uuid was provided, select it
+  useEffect(() => {
+    if (initialConversationUuid && isAuthenticated) {
+      selectConversation(initialConversationUuid);
+    }
+  }, [initialConversationUuid, isAuthenticated, selectConversation]);
 
   const handleProjectSelect = (project: Project | null) => {
     if (project) {
@@ -89,9 +103,9 @@ export const ChatScreen: React.FC = () => {
 
   // Modal handlers - these will be passed to ChatInterface which will render the modals
   const [modalHandlers, setModalHandlers] = useState<{
-    showDeleteModal: (conversationUuid: string) => void;
-    showArchiveModal: (conversationUuid: string) => void;
-  } | null>(null);
+    showDeleteModal: (conversationUuid: string) => void
+    showArchiveModal: (conversationUuid: string) => void
+  } | null>(null)
 
   const handleShowDelete = useCallback((uuid: string) => {
     if (modalHandlers) {

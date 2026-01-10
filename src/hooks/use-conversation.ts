@@ -161,13 +161,21 @@ export const useConversation = () => {
         if (!messages[conversationUuid]) {
           loadingConversationsRef.current.add(conversationUuid)
           try {
-            const response = await conversationApi.getMessages(conversationUuid, 1, 50)
+            let response
+            if (user) {
+              response = await conversationApi.getMessages(conversationUuid, 1, 50)
+            } else {
+              // Use public grouped messages API for unauthenticated users (domain middleware must allow)
+              response = await conversationApi.getPublicGroupedMessages(conversationUuid, 1, 50)
+            }
             if (response.error) {
               throw new Error(response.error)
             }
+            // For public grouped messages, API returns grouped items under items; transform to messages list
+            const messagesData = response.data?.messages || response.data?.items || []
             dispatch(setMessages({ 
               conversationUuid, 
-              messages: response.data?.messages || [], 
+              messages: messagesData || [], 
               pagination: response.data?.pagination 
             }))
           } finally {

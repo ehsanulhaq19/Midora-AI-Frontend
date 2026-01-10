@@ -85,6 +85,7 @@ export const account = {
     billing: '账单',
     paymentHistory: '支付历史',
     nextBillingDate: '下次账单日期',
+    planEndsOn: '计划结束于',
     cardCharged: '您的卡将被扣费 {amount}',
     updatePayment: '更新支付方式和账单信息',
     manageSubscription: '管理您的订阅',

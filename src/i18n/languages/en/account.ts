@@ -86,6 +86,7 @@ export const account = {
     billing: 'Billing',
     paymentHistory: 'Payment history',
     nextBillingDate: 'Next Billing Date',
+    planEndsOn: 'Plan Ends On',
     cardCharged: 'Your card will be charged {amount}',
     updatePayment: 'Update Payment Method & Billing Info',
     manageSubscription: 'Manage Your Subscription',

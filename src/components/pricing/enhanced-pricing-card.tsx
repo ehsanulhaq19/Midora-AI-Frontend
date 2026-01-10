@@ -16,6 +16,7 @@ interface EnhancedPricingCardProps {
   onCancelClick?: () => void
   showCancelButton?: boolean
   renewalDate?: string | null
+  subscriptionStatus?: string | null
 }
 
 export const EnhancedPricingCard: React.FC<EnhancedPricingCardProps> = ({ 
@@ -26,7 +27,8 @@ export const EnhancedPricingCard: React.FC<EnhancedPricingCardProps> = ({
   onButtonClick,
   onCancelClick,
   showCancelButton = false,
-  renewalDate = null
+  renewalDate = null,
+  subscriptionStatus = null
 }) => {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
@@ -64,8 +66,11 @@ export const EnhancedPricingCard: React.FC<EnhancedPricingCardProps> = ({
     ? 'text-white' 
     : (isHovered ? 'text-white' : 'text-[color:var(--tokens-color-text-text-seconary)]');
 
-  // Format renewal date
-  const formatRenewalDate = (dateString: string | null): string => {
+  /**
+   * Format renewal or end date based on subscription status.
+   * For FUTURE_COMPLETE subscriptions, displays "Ends on" instead of "Renews on".
+   */
+  const formatRenewalDate = (dateString: string | null, status?: string | null): string => {
     if (!dateString) return t('pricing.renewsSoon')
     try {
       const date = new Date(dateString)
@@ -74,19 +79,28 @@ export const EnhancedPricingCard: React.FC<EnhancedPricingCardProps> = ({
         month: 'short', 
         day: 'numeric' 
       })
+      
+      // Check if subscription is marked for cancellation
+      if (status === 'FUTURE_COMPLETE') {
+        return `${t('pricing.endsOn')} ${formattedDate}`
+      }
+      
       return `${t('pricing.renewsOn')} ${formattedDate}`
     } catch (error) {
       return t('pricing.renewsSoon')
     }
   }
 
-  // Button text
+  /**
+   * Determine button text based on plan status.
+   * Shows renewal/end date for current plans.
+   */
   const getButtonText = () => {
     if (isCurrentPlan) {
       if (plan.name === 'Free') {
         return t('pricing.currentPlan')
       }
-      return formatRenewalDate(renewalDate)
+      return formatRenewalDate(renewalDate, subscriptionStatus)
     }
     return tWithParams('pricing.getPlan', { planName: plan.name })
   }

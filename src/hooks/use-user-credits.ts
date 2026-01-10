@@ -5,6 +5,7 @@
 import { useState, useEffect } from 'react'
 import { userUsageApi } from '@/api/user-usage/api'
 import { UserCreditsAndSubscriptionInfo } from '@/api/user-usage/types'
+import { useAuthRedux } from '@/hooks/use-auth-redux'
 
 interface UseUserCreditsReturn {
   data: UserCreditsAndSubscriptionInfo | null
@@ -23,6 +24,7 @@ export const useUserCredits = (): UseUserCreditsReturn => {
     error_message?: string
     backend_error?: any
   } | null>(null)
+  const { user } = useAuthRedux()
 
   const fetchData = async () => {
     try {
@@ -53,8 +55,18 @@ export const useUserCredits = (): UseUserCreditsReturn => {
   }
 
   useEffect(() => {
-    fetchData()
-  }, [])
+    let mounted = true
+    if (user) {
+      fetchData()
+    } else {
+      // Not authenticated - no credits to fetch
+      if (mounted) {
+        setData(null)
+        setLoading(false)
+      }
+    }
+    return () => { mounted = false }
+  }, [user])
 
   return {
     data,

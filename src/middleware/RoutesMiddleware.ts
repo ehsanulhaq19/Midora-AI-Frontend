@@ -8,6 +8,8 @@ const ROUTES = {
   PUBLIC: [
     '/',
     '/signup',
+    '/chat',
+    '/chat/*',
     '/api/health',
     '/api/hello',
   ],
@@ -20,7 +22,6 @@ const ROUTES = {
   PROTECTED: [
     '/profile',
     '/settings',
-    '/chat',
     '/app-documents',
     '/pricing',
     '/checkout',

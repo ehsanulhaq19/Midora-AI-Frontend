@@ -82,6 +82,7 @@ export const EnhancedPricingSection: React.FC = () => {
   const hasLoadedPlansRef = useRef(false)
   const hasLoadedSubscriptionRef = useRef(false)
   const currentPlanId = activeSubscription?.plan?.uuid ?? null
+  
   useEffect(() => {
     if (!hasLoadedPlansRef.current && plans.length === 0 && !isLoading) {
       hasLoadedPlansRef.current = true
@@ -250,6 +251,7 @@ export const EnhancedPricingSection: React.FC = () => {
               onCancelClick={() => handleCancelClick(plan)}
               showCancelButton={isCurrent && !!activeSubscription}
               renewalDate={renewalDate}
+              subscriptionStatus={activeSubscription?.status}
             />
           )
         })}
@@ -273,6 +275,7 @@ export const EnhancedPricingSection: React.FC = () => {
               onCancelClick={() => handleCancelClick(plan)}
               showCancelButton={isCurrent && !!activeSubscription}
               renewalDate={renewalDate}
+              subscriptionStatus={activeSubscription?.status}
             />
           )
         })}

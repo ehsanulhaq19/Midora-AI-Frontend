@@ -61,6 +61,7 @@ export const pricing = {
   currentPlan: 'Current plan',
   renewsSoon: 'Renews soon',
   renewsOn: 'Renews on',
+  endsOn: 'Ends on',
   getPlan: 'Get {planName} Plan',
   cancelSubscription: 'Cancel Subscription',
   cancelSubscriptionTitle: 'Cancel Subscription',
