@@ -7,6 +7,8 @@ import { TextareaInput } from '@/components/ui/inputs'
 import { Dropdown } from '@/components/ui'
 import { FilePreview } from '@/components/ui/file-preview'
 import { useAIModels, useFileUpload, useToast } from '@/hooks'
+import { useTheme } from '@/hooks/use-theme'
+import { cn } from '@/lib/utils'
 import { t } from '@/i18n'
 import { useConversation } from '@/hooks/use-conversation'
 import { ConversationLinkModal } from '@/components/chat/sections'
@@ -31,6 +33,8 @@ export const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>(({
   const [message, setMessage] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { error: showErrorToast, info: showInfoToast } = useToast()
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
   
   // Using t function from i18n
   const {
@@ -218,16 +222,26 @@ export const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>(({
                   aria-label={t('chat.uploadFiles')}
                   className="border-[color:var(--tokens-color-border-border-subtle)] message-input-icon-button"
                   style={{
-                    backgroundColor: '#F4F5F5'
+                    backgroundColor: isDark ? 'var(--tokens-color-surface-surface-card-default)' : '#F4F5F5'
                   }}
                   disabled={isStreaming || isUploading || disabled}
                   onClick={() => setShowOptionsMenu(!showOptionsMenu)}
                 />
 
                 {showOptionsMenu && (
-                  <div className="absolute bottom-10 right-0 z-50 w-[180px] bg-white dark:bg-[#0b0b0e] border rounded shadow-md py-1">
+                  <div className={cn(
+                    "absolute bottom-10 right-0 z-50 w-[180px] border rounded shadow-md py-1 transition-colors duration-200",
+                    isDark 
+                      ? 'bg-[color:var(--tokens-color-surface-surface-card-default)] border-[color:var(--tokens-color-border-border-subtle)]'
+                      : 'bg-white border-[color:var(--tokens-color-border-border-subtle)]'
+                  )}>
                     <button
-                      className="w-full text-left px-3 py-2 hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] flex items-center gap-2"
+                      className={cn(
+                        "w-full text-left px-3 py-2 flex items-center gap-2 transition-colors duration-150",
+                        isDark
+                          ? 'text-[color:var(--tokens-color-text-text-primary)] hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]'
+                          : 'text-[color:var(--tokens-color-text-text-primary)] hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]'
+                      )}
                       onClick={() => {
                         setShowOptionsMenu(false)
                         handleAddAttachment()
@@ -237,7 +251,14 @@ export const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>(({
                       <span>{t('chat.uploadFiles')}</span>
                     </button>
                     <button
-                      className={`w-full text-left px-3 py-2 ${(!currentConversation || !currentConversation.uuid) ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]'} flex items-center gap-2`}
+                      className={cn(
+                        "w-full text-left px-3 py-2 flex items-center gap-2 transition-colors duration-150",
+                        (!currentConversation || !currentConversation.uuid) 
+                          ? 'opacity-50 cursor-not-allowed' 
+                          : isDark
+                            ? 'text-[color:var(--tokens-color-text-text-primary)] hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]'
+                            : 'text-[color:var(--tokens-color-text-text-primary)] hover:bg-[color:var(--tokens-color-surface-surface-tertiary)]'
+                      )}
                       onClick={() => {
                         if (!currentConversation || !currentConversation.uuid) return
                         setShowOptionsMenu(false)
