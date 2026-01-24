@@ -420,16 +420,16 @@ export const ConversationHistoryScreen: React.FC<
                     loadConversations(1, false, currentQuery, checked)
                   }}
                   className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none ${
-                    doDeepSearch ? "bg-[color:var(--tokens-color-text-text-brand)]" : "bg-[color:var(--tokens-color-surface-surface-secondary)]"
+                    doDeepSearch ? "app-bg-button-active" : "app-bg-button-inactive"
                   }`}
                 >
                   <span
-                    className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform ${
+                    className={`inline-block w-4 h-4 transform app-bg-primary rounded-full transition-transform ${
                       doDeepSearch ? "translate-x-5" : "translate-x-1"
                     }`}
                   />
                 </button>
-                <span className="text-sm" style={{ color: "var(--tokens-color-text-text-inactive-2)" }}>
+                <span className="app-text-sm app-text-secondary">
                   {t("chat.history.deepSearch") || "Deep search"}
                 </span>
               </div>

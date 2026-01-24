@@ -8,6 +8,7 @@ import { ChatHeader } from "./sections/chat-header";
 import { ConversationHistoryScreen } from "./sections/conversation-history-screen";
 import { ArchiveScreen } from "./sections/archive-screen";
 import { useConversation } from "@/hooks/use-conversation";
+import { useWebSocketConversation } from "@/hooks/use-websocket-conversation";
 import { AccountScreen } from "../account/account-screen";
 import { useAIModels, useProjects } from "@/hooks";
 import { useAuthRedux } from "@/hooks/use-auth-redux";
@@ -47,6 +48,9 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ initialConversationUuid 
     isStreaming,
   } = useConversation();
   const { isAuthenticated } = useAuthRedux();
+
+  // Initialize WebSocket listener for real-time conversation updates
+  useWebSocketConversation();
 
   const { fetchServiceProviders } = useAIModels();
   const { loadProjects } = useProjects();

@@ -7,6 +7,7 @@ import { PublicConversationContainer } from './sections/public-conversation-cont
 import { conversationApi } from '@/api/conversation/api'
 import { Buttons } from '@/components/ui'
 import { t } from '@/i18n'
+import { useWebSocketConversation } from '@/hooks/use-websocket-conversation'
 
 interface GuestChatScreenProps {
   conversationUuid: string
@@ -22,6 +23,9 @@ export const GuestChatScreen: React.FC<GuestChatScreenProps> = ({ conversationUu
   const [isLoadingMore, setIsLoadingMore] = useState(false)
   const [isJoining, setIsJoining] = useState(false)
   const hasInitialized = useRef(false)
+
+  // Initialize WebSocket listener for real-time conversation updates
+  useWebSocketConversation()
 
   const loadPublicMessages = useCallback(async (page: number = 1) => {
     try {

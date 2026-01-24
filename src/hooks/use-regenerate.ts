@@ -135,7 +135,7 @@ export const useRegenerate = () => {
               // Update the message with final content and model info
               const finalMessage = {
                 ...metadata.message,
-                content: accumulatedContent,
+                content: accumulatedContent || metadata.message.content,
                 model_name: metadata.selected_model || metadata.model_used
               }
               
