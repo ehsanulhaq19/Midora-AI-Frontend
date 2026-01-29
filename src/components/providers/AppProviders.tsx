@@ -8,6 +8,7 @@ import { ReduxProvider } from '@/components/providers/ReduxProvider'
 import { AuthInitializer } from '@/components/auth/AuthInitializer'
 import { AuthProvider } from '@/contexts/AuthContext'
 import { ToastContainer } from '@/components/ui/toast'
+import { WebSocketInitializer } from '@/components/providers/WebSocketInitializer'
 
 interface AppProvidersProps {
   children: React.ReactNode
@@ -16,6 +17,15 @@ interface AppProvidersProps {
 /**
  * Wraps all client-side providers and defers rendering until after mount
  * to avoid SSR/CSR hydration mismatches around Suspense boundaries.
+ * 
+ * Provider hierarchy (order matters):
+ * 1. LanguageProvider - Language/i18n support
+ * 2. ThemeProvider - Theme management
+ * 3. ThemeInitializer - Theme initialization
+ * 4. ReduxProvider - Redux store
+ * 5. AuthInitializer - Auth state restoration
+ * 6. AuthProvider - Auth context
+ * 7. WebSocketInitializer - WebSocket connection (depends on Auth)
  */
 export const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
   const [mounted, setMounted] = useState(false)
@@ -36,10 +46,12 @@ export const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
         <ReduxProvider>
           <AuthInitializer />
           <AuthProvider>
-            <div className="min-h-screen app-bg-primary">
-              {children}
-              <ToastContainer />
-            </div>
+            <WebSocketInitializer>
+              <div className="min-h-screen app-bg-primary">
+                {children}
+                <ToastContainer />
+              </div>
+            </WebSocketInitializer>
           </AuthProvider>
         </ReduxProvider>
       </ThemeProvider>
