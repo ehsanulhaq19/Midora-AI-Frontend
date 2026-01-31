@@ -257,9 +257,26 @@ export const useProjects = () => {
   }, [showErrorToast])
 
   // Link conversation to project
-  const linkConversationToProject = useCallback((projectId: string, conversationUuid: string) => {
+  const linkConversationToProject = useCallback(async (projectId: string, conversationUuid: string) => {
+    try {
+      const response = await projectApi.linkConversationToProject(projectId, conversationUuid)
+      if (response.error) {
+        const errorObject = response.processedError || {
+          error_type: 'LINK_CONVERSATION_FAILED',
+          error_message: response.error,
+          error_id: response.error_id,
+          status: response.status
+        }
+        throw new Error(JSON.stringify(errorObject))
+      }
     dispatch(addConversationToProject({ projectId, conversationUuid }))
-  }, [dispatch])
+      return true
+    } catch (err) {
+      const errorMessage = handleApiError(err)
+      showErrorToast('Failed to Link Conversation to Project', errorMessage)
+      return false
+    }
+  }, [dispatch, showErrorToast])
 
   // Select project
   const selectProject = useCallback((projectId: string | null) => {

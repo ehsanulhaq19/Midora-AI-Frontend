@@ -6,12 +6,16 @@ import { Conversation } from "@/api/conversation/types";
 import { useToast, useProjects, useFileUpload } from "@/hooks";
 import { t } from "@/i18n";
 import { useSelector } from "react-redux";
-import { RootState } from "@/store";
+import type { RootState } from "@/store";
 import { MessageInput, MessageInputHandle } from "./message-input";
 import { ProjectFilesModal } from "./project-files-modal";
 import { ActionButton } from "@/components/ui/buttons";
 import { ModelSelection } from "./model-selection";
 import { useUserCredits } from "@/hooks/use-user-credits";
+import { ConversationActionMenu } from "./conversation-action-menu";
+import { MoveConversationModal } from "./move-conversation-modal";
+import { MoveConversationConfirmation } from "./move-conversation-confirmation";
+import { useLinkConversation } from "@/hooks/use-link-conversation";
 
 interface Project {
   id: string;
@@ -46,11 +50,36 @@ export const ProjectScreen: React.FC<ProjectScreenProps> = ({
   const [projectConversationsList, setProjectConversationsList] = useState<Array<{ uuid: string; name: string; created_at: string }>>([]);
   const [conversationsPagination, setConversationsPagination] = useState<{ page: number, per_page: number, total: number, total_pages: number } | null>(null);
   const [isLoadingMoreConversations, setIsLoadingMoreConversations] = useState(false);
+  const [isMoveModalOpen, setIsMoveModalOpen] = useState(false);
+  const [isMoveConfirmationOpen, setIsMoveConfirmationOpen] = useState(false);
+  const [selectedConversationForMove, setSelectedConversationForMove] = useState<{ uuid: string; name: string } | null>(null);
+  const [selectedProjectForMove, setSelectedProjectForMove] = useState<{ uuid: string; name: string } | null>(null);
   const messageInputRef = useRef<MessageInputHandle>(null);
   const conversationsContainerRef = useRef<HTMLDivElement>(null);
   const { loadProjectConversations, projectConversationsData } = useProjects();
   const hasLoadedRef = useRef<string | null>(null);
   const { data: creditsData } = useUserCredits();
+  const authState = useSelector((state: RootState) => state.auth);
+  const { linkConversationToProject, isLoading: isLinkingConversation } = useLinkConversation({
+    onSuccess: () => {
+      setIsMoveConfirmationOpen(false);
+      setIsMoveModalOpen(false);
+      setSelectedConversationForMove(null);
+      setSelectedProjectForMove(null);
+      setTimeout(async () => {
+        try {
+          const result = await loadProjectConversations(project.id, 1, 10, true);
+          if (result) {
+            setProjectConversationsList(result.conversations);
+            setConversationsPagination(result.pagination);
+            hasLoadedRef.current = null;
+          }
+        } catch (error) {
+          console.error('Failed to reload project conversations:', error);
+        }
+      }, 500);
+    }
+  });
   
   const isCreditsExhausted = creditsData 
     ? creditsData.used_credits >= creditsData.available_credits 
@@ -179,6 +208,31 @@ export const ProjectScreen: React.FC<ProjectScreenProps> = ({
     }, 1500);
   }, [onSendMessage, project.id, loadProjectConversations]);
 
+  const handleOpenMoveModal = useCallback((conversation: { uuid: string; name: string; created_at: string }) => {
+    setSelectedConversationForMove({ uuid: conversation.uuid, name: conversation.name });
+    setIsMoveModalOpen(true);
+  }, []);
+
+  const handleSelectProjectForMove = useCallback((selectedProject: { uuid: string; name: string }) => {
+    setSelectedProjectForMove(selectedProject);
+    setIsMoveModalOpen(false);
+    setIsMoveConfirmationOpen(true);
+  }, []);
+
+  const handleConfirmMove = useCallback(async () => {
+    if (!selectedConversationForMove || !selectedProjectForMove || !authState.accessToken) return;
+
+    const success = await linkConversationToProject(
+      selectedProjectForMove.uuid,
+      selectedConversationForMove.uuid,
+      authState.accessToken
+    );
+
+    if (!success) {
+      setIsMoveConfirmationOpen(false);
+    }
+  }, [selectedConversationForMove, selectedProjectForMove, authState.accessToken, linkConversationToProject]);
+
   return (
     <>
       <div className="flex flex-col items-center gap-[50px] px-4 lg:px-0 py-6 relative flex-1 grow min-h-screen w-full">
@@ -232,30 +286,38 @@ export const ProjectScreen: React.FC<ProjectScreenProps> = ({
                 const dateStr = formatConversationDate(conversation.created_at);
 
                 return (
-                  <ActionButton
+                  <div
                     key={conversation.uuid}
-                    onClick={() => {
-                      if (onSelectConversation) {
-                        onSelectConversation(conversation.uuid);
-                      }
-                    }}
-                    variant="ghost"
-                    size="sm"
-                    className="!flex !items-center !justify-between !p-4 !rounded-lg !bg-[color:var(--tokens-color-surface-surface-tertiary)] !text-left group hover:!bg-[color:var(--tokens-color-surface-surface-secondary)] !h-auto"
-                    fullWidth
+                    className={`sidebar-menu-item group w-full flex items-center gap-2.5 px-5 py-2 transition-colors rounded-[var(--premitives-corner-radius-corner-radius)] hover:bg-[color:var(--tokens-color-surface-surface-tertiary)] dark:hover:bg-white/10`}
                   >
-                    <div className="flex flex-col gap-1 flex-1 min-w-0">
-                      <div className="font-h02-heading02 text-[color:var(--tokens-color-text-text-seconary)] font-semibold leading-[var(--text-line-height)] truncate">
-                        {conversation.name}
+                    <ActionButton
+                      onClick={() => {
+                        if (onSelectConversation) {
+                          onSelectConversation(conversation.uuid);
+                        }
+                      }}
+                      variant="ghost"
+                      size="sm"
+                      className="!flex !items-center !justify-between !p-4 !rounded-lg !bg-[color:var(--tokens-color-surface-surface-tertiary)] !text-left group hover:!bg-[color:var(--tokens-color-surface-surface-secondary)] !h-auto"
+                      fullWidth
+                    >
+                      <div className="flex flex-col gap-1 flex-1 min-w-0">
+                        <div className="font-h02-heading02 text-[color:var(--tokens-color-text-text-seconary)] font-semibold leading-[var(--text-line-height)] truncate">
+                          {conversation.name}
+                        </div>
+                        <div className="font-h02-heading02 text-[color:var(--tokens-color-text-text-inactive-2)] text-[13px] font-[number:var(--text-small-font-weight)] leading-[var(--text-small-line-height)]">
+                          {subtitle || "Data will appear here"}
+                        </div>
                       </div>
-                      <div className="font-h02-heading02 text-[color:var(--tokens-color-text-text-inactive-2)] text-[13px] font-[number:var(--text-small-font-weight)] leading-[var(--text-small-line-height)]">
-                        {subtitle || "Data will appear here"}
+                      <div className="font-h02-heading02 text-[color:var(--tokens-color-text-text-inactive-2)] text-[13px] font-[number:var(--text-small-font-weight)] leading-[var(--text-small-line-height)] ml-4 whitespace-nowrap">
+                        {dateStr}
                       </div>
-                    </div>
-                    <div className="font-h02-heading02 text-[color:var(--tokens-color-text-text-inactive-2)] text-[13px] font-[number:var(--text-small-font-weight)] leading-[var(--text-small-line-height)] ml-4 whitespace-nowrap">
-                      {dateStr}
-                    </div>
-                  </ActionButton>
+                      <ConversationActionMenu
+                        onMoveToProject={() => handleOpenMoveModal(conversation)}
+                        className={`group-hover:opacity-100 transition-opacity duration-150`}
+                      />
+                    </ActionButton>
+                  </div>
                 );
               })}
               
@@ -280,6 +342,32 @@ export const ProjectScreen: React.FC<ProjectScreenProps> = ({
         isOpen={isFilesModalOpen}
         onClose={() => setIsFilesModalOpen(false)}
         projectId={project.id}
+      />
+
+      {/* Move Conversation Modal */}
+      <MoveConversationModal
+        isOpen={isMoveModalOpen}
+        currentProjectUuid={project.id}
+        onSelectProject={handleSelectProjectForMove}
+        onClose={() => setIsMoveModalOpen(false)}
+      />
+
+      {/* Move Conversation Confirmation */}
+      <MoveConversationConfirmation
+        isOpen={isMoveConfirmationOpen}
+        conversationName={selectedConversationForMove?.name || ""}
+        projectName={selectedProjectForMove?.name || ""}
+        onConfirm={handleConfirmMove}
+        onCancel={() => {
+          setIsMoveConfirmationOpen(false);
+          setSelectedConversationForMove(null);
+          setSelectedProjectForMove(null);
+        }}
+        onReopenMoveModal={() => {
+          setIsMoveConfirmationOpen(false);
+          setIsMoveModalOpen(true);
+        }}
+        isLoading={isLinkingConversation}
       />
     </>
   );

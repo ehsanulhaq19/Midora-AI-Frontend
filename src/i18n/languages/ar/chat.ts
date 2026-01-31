@@ -142,5 +142,26 @@ export const chat = {
     unlink: 'إلغاء الربط',
     uploadFiles: 'تحميل الملفات',
     linkChats: 'ربط المحادثات'
-  }
+  },
+  shareConversation: 'مشاركة المحادثة',
+  shareConversationDescription: 'شارك هذه المحادثة بنسخ الرابط أدناه.',
+  copyLink: 'نسخ الرابط',
+  
+  moveToProject: 'نقل إلى مشروع',
+  selectProject: 'اختر مشروعًا',
+  moveConversation: 'نقل المحادثة',
+  moveConversationDescription: 'اختر مشروعًا لنقل هذه المحادثة إليه',
+  confirmMove: 'تأكيد النقل',
+  movingConversation: 'جاري نقل المحادثة...',
+  conversationMovedSuccess: 'تم نقل المحادثة بنجاح',
+  conversationMoveError: 'فشل نقل المحادثة',
+  noOtherProjects: 'لا توجد مشاريع أخرى متاحة',
+  loadingProjects: 'جاري تحميل المشاريع...',
+  search: 'بحث',
+  cancel: 'إلغاء',
+  move: 'نقل',
+  
+  // Move conversation confirmation
+  moveConversationConfirmationTitle: 'نقل المحادثة',
+  moveConversationConfirmationMessage: 'هل أنت متأكد من رغبتك في نقل هذه المحادثة؟ سيتم فصلها عن مشروعها الحالي وربطها بالمشروع الجديد.'
 }

@@ -15,7 +15,9 @@ import {
   GetProjectFilesResponse,
   AddProjectFileResponse,
   DeleteProjectFileResponse,
-  DeleteProjectResponse
+  DeleteProjectResponse,
+  LinkConversationToProjectRequest,
+  LinkConversationToProjectResponse
 } from './types'
 
 class ProjectApiClient {
@@ -183,6 +185,25 @@ class ProjectApiClient {
     }
     
     return { data: { success: true }, status: response.status }
+  }
+
+  /**
+   * Link a conversation to a project
+   */
+  async linkConversationToProject(
+    projectUuid: string,
+    conversationUuid: string
+  ): Promise<ApiResponse<LinkConversationToProjectResponse>> {
+    const response = await this.baseClient.post<LinkConversationToProjectResponse>(
+      `/api/v1/projects/${projectUuid}/conversations/${conversationUuid}/link`,
+      {}
+    )
+    
+    if (response.error) {
+      return { error: response.error, status: response.status }
+    }
+    
+    return { data: response.data as LinkConversationToProjectResponse, status: response.status }
   }
 }
 

@@ -163,5 +163,24 @@ export const chat = {
   ,
   shareConversation: 'Share Conversation',
   shareConversationDescription: 'Share this conversation by copying the link below.',
-  copyLink: 'Copy link'
+  copyLink: 'Copy link',
+  
+  // Move conversation to project
+  moveToProject: 'Move to project',
+  selectProject: 'Select a project',
+  moveConversation: 'Move conversation',
+  moveConversationDescription: 'Choose a project to move this conversation to',
+  confirmMove: 'Confirm move',
+  movingConversation: 'Moving conversation...',
+  conversationMovedSuccess: 'Conversation moved successfully',
+  conversationMoveError: 'Failed to move conversation',
+  noOtherProjects: 'No other projects available',
+  loadingProjects: 'Loading projects...',
+  search: 'Search',
+  cancel: 'Cancel',
+  move: 'Move',
+  
+  // Move conversation confirmation
+  moveConversationConfirmationTitle: 'Move Conversation',
+  moveConversationConfirmationMessage: 'Are you sure you want to move this conversation? It will be unlinked from its current project and linked to the new one.'
 }

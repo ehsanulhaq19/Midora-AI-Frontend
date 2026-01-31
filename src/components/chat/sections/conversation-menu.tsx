@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { MoreOptions, Share, Pencil, Archive, Trash } from "@/icons";
+import { MoreOptions, Share, Pencil, Archive, Trash, FolderOpen01 } from "@/icons";
 import { ActionButton } from "../../ui/buttons/action-button";
 
 interface ConversationMenuProps {
@@ -9,6 +9,7 @@ interface ConversationMenuProps {
   onRemoveFromFolder?: () => void;
   onArchive?: () => void;
   onDelete?: () => void;
+  onMoveToProject?: () => void;
   className?: string;
 }
 
@@ -17,6 +18,7 @@ export const ConversationMenu: React.FC<ConversationMenuProps> = ({
   onRemoveFromFolder,
   onArchive,
   onDelete,
+  onMoveToProject,
   className = "",
 }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -103,6 +105,24 @@ export const ConversationMenu: React.FC<ConversationMenuProps> = ({
                 >
                   <span className="font-h02-heading02 text-[14px] font-[number:var(--text-small-font-weight)]">
                     Archive
+                  </span>
+                </ActionButton>
+              </div>
+            )}
+
+            {onMoveToProject && (
+              <div onClick={(e) => e.stopPropagation()}>
+                <ActionButton
+                  type="button"
+                  onClick={() => handleAction(onMoveToProject)}
+                  variant="ghost"
+                  size="sm"
+                  className="!w-full !justify-start !gap-3 !px-4 !py-2 !text-left hover:!bg-[color:var(--tokens-color-surface-surface-tertiary)] !text-[color:var(--tokens-color-text-text-brand)]"
+                  leftIcon={<FolderOpen01 className="w-4 h-4" color="var(--tokens-color-text-text-brand)" />}
+                  fullWidth
+                >
+                  <span className="font-h02-heading02 text-[14px] font-[number:var(--text-small-font-weight)]">
+                    Move to project
                   </span>
                 </ActionButton>
               </div>

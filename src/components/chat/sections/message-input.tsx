@@ -22,6 +22,7 @@ interface MessageInputProps {
   placeholder?: string
   disabled?: boolean
   disabledMessage?: string
+  onScroll?: () => void
 }
 
 export interface MessageInputHandle {
@@ -29,7 +30,7 @@ export interface MessageInputHandle {
   validateFile: (file: File) => { isValid: boolean; error?: string }
 }
 
-export const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>(({ onSend, isStreaming = false, className = '', textAreaClassName = '', onFilesChange, placeholder, disabled = false, disabledMessage }, ref) => {
+export const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>(({ onSend, isStreaming = false, className = '', textAreaClassName = '', onFilesChange, placeholder, disabled = false, disabledMessage, onScroll }, ref) => {
   const [message, setMessage] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { error: showErrorToast, info: showInfoToast } = useToast()
@@ -81,6 +82,10 @@ export const MessageInput = forwardRef<MessageInputHandle, MessageInputProps>(({
       onSend(message, modelUuid, fileUuids, files)
       setMessage('')
       clearFiles() // Clear files after sending message
+      // Scroll to bottom after message is sent
+      if (onScroll) {
+        onScroll()
+      }
     } else if (files.length > 0 && !message.trim()) {
       // Show error toast when trying to send with files but no text
       showInfoToast(

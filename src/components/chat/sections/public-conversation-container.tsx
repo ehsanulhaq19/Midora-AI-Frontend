@@ -53,6 +53,7 @@ interface PublicConversationContainerProps {
   currentPage: number
   totalPages: number
   className?: string
+  isStreaming?: boolean
 }
 
 interface PublicMessageBubbleProps {
@@ -210,7 +211,8 @@ export const PublicConversationContainer: React.FC<PublicConversationContainerPr
   onLoadMore,
   currentPage,
   totalPages,
-  className = ''
+  className = '',
+  isStreaming = false
 }) => {
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -224,6 +226,8 @@ export const PublicConversationContainer: React.FC<PublicConversationContainerPr
   const [currentVersionIndices, setCurrentVersionIndices] = useState<Record<string, number>>({})
   const hasInitializedRef = useRef(false)
   const userScrolledRef = useRef(false)
+  const shouldAutoScrollRef = useRef(true)
+  const scrollRafRef = useRef<number | null>(null)
 
   const scrollToBottom = useCallback((instant: boolean = false) => {
     if (messagesContainerRef.current) {
@@ -233,6 +237,15 @@ export const PublicConversationContainer: React.FC<PublicConversationContainerPr
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
       }
     }
+  }, [])
+
+  // Helper function to check if user is at bottom
+  const isAtBottom = useCallback(() => {
+    if (!messagesContainerRef.current) return false
+    const container = messagesContainerRef.current
+    const threshold = 50 // Allow some tolerance for scroll detection
+    const scrollBottom = container.scrollHeight - container.scrollTop - container.clientHeight
+    return scrollBottom <= threshold
   }, [])
 
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
@@ -246,7 +259,19 @@ export const PublicConversationContainer: React.FC<PublicConversationContainerPr
       isLoadingMoreRef.current = true
       onLoadMore()
     }
-  }, [currentPage, totalPages, onLoadMore])
+
+    // Track if user has scrolled away from bottom during streaming
+    if (isStreaming) {
+      const atBottom = isAtBottom()
+      shouldAutoScrollRef.current = atBottom
+      
+      if (!atBottom && !userScrolledRef.current) {
+        userScrolledRef.current = true
+      } else if (atBottom && userScrolledRef.current) {
+        userScrolledRef.current = false
+      }
+    }
+  }, [currentPage, totalPages, onLoadMore, isStreaming, isAtBottom])
 
   // Reset loading flag when isLoadingMore changes
   useEffect(() => {
@@ -262,6 +287,35 @@ export const PublicConversationContainer: React.FC<PublicConversationContainerPr
       scrollToBottom(true) // Scroll to bottom on first render
     }
   }, [])
+
+  // When streaming starts, enable auto-scroll by default (if user is at bottom)
+  useEffect(() => {
+    if (isStreaming) {
+      shouldAutoScrollRef.current = isAtBottom()
+      userScrolledRef.current = false
+    }
+  }, [isStreaming, isAtBottom])
+
+  // Auto-scroll while streaming if user is at bottom or hasn't scrolled away
+  useEffect(() => {
+    if (isStreaming && shouldAutoScrollRef.current) {
+      if (scrollRafRef.current) {
+        cancelAnimationFrame(scrollRafRef.current)
+      }
+      
+      scrollRafRef.current = requestAnimationFrame(() => {
+        scrollToBottom(true)
+        scrollRafRef.current = null
+      })
+
+      return () => {
+        if (scrollRafRef.current) {
+          cancelAnimationFrame(scrollRafRef.current)
+          scrollRafRef.current = null
+        }
+      }
+    }
+  }, [isStreaming, messages.length, scrollToBottom])
 
   if (isLoading) {
     return (

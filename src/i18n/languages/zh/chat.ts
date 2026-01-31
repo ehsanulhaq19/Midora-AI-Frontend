@@ -142,5 +142,26 @@ export const chat = {
     unlink: '取消链接',
     uploadFiles: '上传文件',
     linkChats: '链接对话'
-  }
+  },
+  shareConversation: '分享对话',
+  shareConversationDescription: '复制下面的链接来分享此对话。',
+  copyLink: '复制链接',
+  
+  moveToProject: '移动到项目',
+  selectProject: '选择一个项目',
+  moveConversation: '移动对话',
+  moveConversationDescription: '选择一个项目以将此对话移动到其中',
+  confirmMove: '确认移动',
+  movingConversation: '正在移动对话...',
+  conversationMovedSuccess: '对话移动成功',
+  conversationMoveError: '移动对话失败',
+  noOtherProjects: '没有其他可用项目',
+  loadingProjects: '正在加载项目...',
+  search: '搜索',
+  cancel: '取消',
+  move: '移动',
+  
+  // Move conversation confirmation
+  moveConversationConfirmationTitle: '移动对话',
+  moveConversationConfirmationMessage: '您确定要移动此对话吗？它将从当前项目中取消链接并与新项目链接。'
 }

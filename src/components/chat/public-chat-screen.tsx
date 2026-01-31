@@ -152,6 +152,7 @@ export const PublicChatScreen: React.FC<PublicChatScreenProps> = ({ conversation
         currentPage={currentPage}
         totalPages={totalPages}
         className="flex-1"
+        isStreaming={false}
       />
 
       {/* Login Button Footer - Sticky at bottom */}

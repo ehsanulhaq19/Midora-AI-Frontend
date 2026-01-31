@@ -79,3 +79,14 @@ export interface GetProjectFilesResponse {
   total_pages: number
 }
 
+export interface LinkConversationToProjectRequest {
+  project_uuid: string
+  conversation_uuid: string
+}
+
+export interface LinkConversationToProjectResponse {
+  uuid: string
+  created_at: string
+  updated_at: string
+}
+

@@ -42,6 +42,9 @@ import {
 import { useProjects } from "@/hooks/use-projects";
 import { useConversationModal } from "./conversation-modal-context";
 import { ConversationShareModal } from "./conversation-share-modal";
+import { MoveConversationModal } from "./move-conversation-modal";
+import { MoveConversationConfirmation } from "./move-conversation-confirmation";
+import { useLinkConversation } from "@/hooks/use-link-conversation";
 
 const translateWithFallback = (key: string, fallback: string) => {
   const translated = t(key);
@@ -58,6 +61,7 @@ interface ChatListItemProps {
   onArchive?: (conversationUuid: string) => void;
   onDelete?: (conversationUuid: string) => void;
   onLink?: (conversationUuid: string) => void;
+  onMoveToProject?: (conversationUuid: string) => void;
   isShrunk?: boolean;
 }
 
@@ -71,6 +75,7 @@ const ChatListItem: React.FC<ChatListItemProps> = ({
   onArchive,
   onDelete,
   onLink,
+  onMoveToProject,
   isShrunk = false,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -141,6 +146,7 @@ const ChatListItem: React.FC<ChatListItemProps> = ({
           onArchive={onArchive ? () => onArchive(conversationUuid) : undefined}
           onDelete={onDelete ? () => onDelete(conversationUuid) : undefined}
           onLink={onLink ? () => onLink(conversationUuid) : undefined}
+          onMoveToProject={onMoveToProject ? () => onMoveToProject(conversationUuid) : undefined}
         />
       )}
     </div>
@@ -201,6 +207,10 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
   const [showConversationShareModal, setShowConversationShareModal] = useState(false);
   const [shareConversationUuid, setShareConversationUuid] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isMoveConversationModalOpen, setIsMoveConversationModalOpen] = useState(false);
+  const [isMoveConversationConfirmationOpen, setIsMoveConversationConfirmationOpen] = useState(false);
+  const [selectedConversationForMove, setSelectedConversationForMove] = useState<{ uuid: string; name: string } | null>(null);
+  const [selectedProjectForMove, setSelectedProjectForMove] = useState<{ uuid: string; name: string } | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const projectsListRef = useRef<HTMLDivElement>(null);
   const conversationsListRef = useRef<HTMLDivElement>(null);
@@ -210,6 +220,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
   const router = useRouter();
   const pathname = usePathname();
   const dispatch = useDispatch();
+  const authState = useSelector((state: RootState) => state.auth);
 
   // Get projects from Redux store
   const {
@@ -227,6 +238,14 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
     updateProjectName,
     deleteProject,
   } = useProjects();
+  const { linkConversationToProject, isLoading: isLinkingConversation } = useLinkConversation({
+    onSuccess: () => {
+      setIsMoveConversationConfirmationOpen(false);
+      setIsMoveConversationModalOpen(false);
+      setSelectedConversationForMove(null);
+      setSelectedProjectForMove(null);
+    }
+  });
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
   const brandNameLabel = translateWithFallback("chat.brandName", "Midora");
@@ -514,6 +533,31 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  const handleOpenMoveModal = (conversationUuid: string, conversationName: string) => {
+    setSelectedConversationForMove({ uuid: conversationUuid, name: conversationName });
+    setIsMoveConversationModalOpen(true);
+  };
+
+  const handleSelectProjectForMove = (selectedProject: { uuid: string; name: string }) => {
+    setSelectedProjectForMove(selectedProject);
+    setIsMoveConversationModalOpen(false);
+    setIsMoveConversationConfirmationOpen(true);
+  };
+
+  const handleConfirmMove = async () => {
+    if (!selectedConversationForMove || !selectedProjectForMove || !authState.accessToken) return;
+
+    const success = await linkConversationToProject(
+      selectedProjectForMove.uuid,
+      selectedConversationForMove.uuid,
+      authState.accessToken
+    );
+
+    if (!success) {
+      setIsMoveConversationConfirmationOpen(false);
+    }
   };
 
   const handleAccountClick = () => {
@@ -1298,10 +1342,19 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                                     showDeleteModal(uuid);
                                   }
                             }}
-                            onLink={(uuid) => {
-                              setLinkTargetConversationUuid(uuid);
-                              setShowLinkModal(true);
-                            }}
+                                onLink={(uuid) => {
+                                  setLinkTargetConversationUuid(uuid);
+                                  setShowLinkModal(true);
+                                }}
+                                onMoveToProject={(uuid) => {
+                                  // Find the conversation from the current list
+                                  const foundConversation = conversations.find(
+                                    (c: any) => c.uuid === uuid
+                                  );
+                                  if (foundConversation) {
+                                    handleOpenMoveModal(uuid, foundConversation.name);
+                                  }
+                                }}
                               />
                             ))}
                         </>
@@ -1513,6 +1566,32 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
           return <Component isOpen={showLinkModal} onClose={() => setShowLinkModal(false)} conversationUuid={linkTargetConversationUuid} />;
         })()
       )}
+
+      {/* Move Conversation Modal */}
+      <MoveConversationModal
+        isOpen={isMoveConversationModalOpen}
+        currentProjectUuid={selectedProjectId || ""}
+        onSelectProject={handleSelectProjectForMove}
+        onClose={() => setIsMoveConversationModalOpen(false)}
+      />
+
+      {/* Move Conversation Confirmation */}
+      <MoveConversationConfirmation
+        isOpen={isMoveConversationConfirmationOpen}
+        conversationName={selectedConversationForMove?.name || ""}
+        projectName={selectedProjectForMove?.name || ""}
+        onConfirm={handleConfirmMove}
+        onCancel={() => {
+          setIsMoveConversationConfirmationOpen(false);
+          setSelectedConversationForMove(null);
+          setSelectedProjectForMove(null);
+        }}
+        onReopenMoveModal={() => {
+          setIsMoveConversationConfirmationOpen(false);
+          setIsMoveConversationModalOpen(true);
+        }}
+        isLoading={isLinkingConversation}
+      />
     </>
   );
 };

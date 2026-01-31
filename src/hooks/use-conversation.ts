@@ -343,7 +343,6 @@ export const useConversation = () => {
               dispatch(setStreamingMetadata({ message_type: metadata.message_type }))
             }
           } else if (type === 'model_selection') {
-            console.log("metadata = ", metadata)
             // Handle model selection stream responses
             dispatch(setStreamingMetadata({
               selected_model: metadata?.selected_model,

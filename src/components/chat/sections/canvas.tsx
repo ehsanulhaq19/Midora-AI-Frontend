@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { MarkdownRenderer } from "@/components/markdown";
 import { Close, Copy } from "@/icons";
 import { IconButton } from "@/components/ui/buttons";
@@ -46,7 +46,17 @@ export const Canvas: React.FC<CanvasProps> = ({
   const isDark = resolvedTheme === 'dark';
   const canvasRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const [isCopied, setIsCopied] = React.useState(false);
+  const [isCopied, setIsCopied] = useState(false);
+  
+  // Smooth scroll buffer state
+  const [displayedContent, setDisplayedContent] = useState<string>('');
+  const [isBuffering, setIsBuffering] = useState(false);
+  const contentBufferRef = useRef<string>('');
+  const scrollScheduledRef = useRef<NodeJS.Timeout | null>(null);
+  const scrollRafRef = useRef<number | null>(null);
+  const prevContentLengthRef = useRef(0);
+  const lastScrollTimeRef = useRef(0);
+  const scrollThrottleRef = useRef(100); // Throttle scroll updates to every 100ms for smoothness
 
   // Handle escape key to close canvas
   useEffect(() => {
@@ -67,12 +77,76 @@ export const Canvas: React.FC<CanvasProps> = ({
     };
   }, [isOpen, onClose]);
 
-  // Scroll to bottom when content changes
-  useEffect(() => {
-    if (isOpen && contentRef.current) {
-      contentRef.current.scrollTop = contentRef.current.scrollHeight;
+  // Smooth scroll function with throttling to prevent excessive updates
+  const smoothScrollToBottom = useCallback(() => {
+    const now = Date.now();
+    // Only scroll if enough time has passed since last scroll
+    if (now - lastScrollTimeRef.current < scrollThrottleRef.current) {
+      return;
     }
-  }, [content, isOpen]);
+    lastScrollTimeRef.current = now;
+
+    if (contentRef.current) {
+      // Cancel any pending animation frame
+      if (scrollRafRef.current) {
+        cancelAnimationFrame(scrollRafRef.current);
+      }
+
+      // Use requestAnimationFrame for smooth scrolling
+      scrollRafRef.current = requestAnimationFrame(() => {
+        if (contentRef.current) {
+          contentRef.current.scrollTop = contentRef.current.scrollHeight;
+        }
+        scrollRafRef.current = null;
+      });
+    }
+  }, []);
+
+  // Process content with smooth buffering system - NOW SCROLLS IN PARALLEL
+  useEffect(() => {
+    if (!isOpen) return;
+
+    // Clear any scheduled operations when content resets
+    if (content.length < prevContentLengthRef.current) {
+      if (scrollScheduledRef.current) {
+        clearTimeout(scrollScheduledRef.current);
+        scrollScheduledRef.current = null;
+      }
+      if (scrollRafRef.current) {
+        cancelAnimationFrame(scrollRafRef.current);
+        scrollRafRef.current = null;
+      }
+      setDisplayedContent('');
+      setIsBuffering(false);
+      prevContentLengthRef.current = 0;
+      contentBufferRef.current = '';
+      lastScrollTimeRef.current = 0;
+      return;
+    }
+
+    // Only process if content has increased
+    if (content.length <= prevContentLengthRef.current) return;
+
+    // Update buffer with new content
+    contentBufferRef.current = content;
+    const newContentLength = content.length;
+    const contentDiff = newContentLength - prevContentLengthRef.current;
+
+    // SCROLL IN PARALLEL with content rendering
+    // Display new content immediately and scroll at the same time
+    setDisplayedContent(content);
+
+    // Throttled smooth scroll happens in parallel with rendering
+    smoothScrollToBottom();
+
+    prevContentLengthRef.current = newContentLength;
+
+    return () => {
+      if (scrollRafRef.current) {
+        cancelAnimationFrame(scrollRafRef.current);
+      }
+    };
+  }, [content, isOpen, smoothScrollToBottom]);
 
   const handleCopy = async () => {
     if (isCopied) return;
@@ -278,7 +352,7 @@ export const Canvas: React.FC<CanvasProps> = ({
         <div className="max-w-3xl mx-auto">
           <div className="app-text-primary">
             <MarkdownRenderer
-              content={content || ""}
+              content={displayedContent || ""}
               onLinkClick={handleLinkClick}
             />
           </div>

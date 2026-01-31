@@ -814,7 +814,7 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
   const scrollRafRef = useRef<number | null>(null)
   const prevIsStreamingRef = useRef<boolean>(false)
   const hasInitializedRef = useRef(false) // Track if we've scrolled to bottom on initial load
-  const prevMessageCountRef = useRef(0) // Track previous message count to detect load more
+  const prevMessageCountRef = useRef(0) // Track previous message count to detect new messages
 
   const {
     isAutoMode,
@@ -1194,7 +1194,9 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
   }, [isStreaming])
 
   useEffect(() => {
-    if (isStreaming && streamingContent && shouldAutoScrollRef.current) {
+    // Scroll to bottom when either streaming content or initial content (from local model) arrives
+    // This ensures auto-scroll works for both full content streaming and initial_content preview
+    if (isStreaming && (streamingContent || initialContent) && shouldAutoScrollRef.current) {
       if (scrollRafRef.current) {
         cancelAnimationFrame(scrollRafRef.current)
       }
@@ -1211,7 +1213,21 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
         }
       }
     }
-  }, [streamingContent, isStreaming, scrollToBottom])
+  }, [streamingContent, initialContent, isStreaming, scrollToBottom])
+
+  // Scroll to bottom when a new user message is sent
+  // This detects when message count increases and last message is from user
+  useEffect(() => {
+    if (messages.length > prevMessageCountRef.current) {
+      const lastMessage = messages[messages.length - 1]
+      // Check if the last message is from the current user (new message just sent)
+      if (lastMessage && lastMessage.sender?.uuid === user?.uuid) {
+        // User just sent a message, scroll to bottom immediately
+        scrollToBottom(true)
+      }
+    }
+    prevMessageCountRef.current = messages.length
+  }, [messages.length, messages, user?.uuid, scrollToBottom])
 
   // Sort messages by created_at date (oldest first, newest last)
   // Filter out null/undefined messages before sorting
@@ -1380,6 +1396,7 @@ export const ConversationContainer: React.FC<ConversationContainerProps> = ({
                 textAreaClassName="!app-text-lg"
                 disabled={isCreditsExhausted}
                 disabledMessage="You have used all credits, please upgrade the subscription."
+                onScroll={() => scrollToBottom(true)}
               />
             </div>
           </div>

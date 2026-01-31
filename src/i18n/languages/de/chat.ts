@@ -142,6 +142,27 @@ export const chat = {
     unlink: 'Verknüpfung aufheben',
     uploadFiles: 'Dateien hochladen',
     linkChats: 'Unterhaltungen verknüpfen'
-  }
+  },
+  shareConversation: 'Unterhaltung teilen',
+  shareConversationDescription: 'Teilen Sie diese Unterhaltung, indem Sie den Link unten kopieren.',
+  copyLink: 'Link kopieren',
+  
+  moveToProject: 'In Projekt verschieben',
+  selectProject: 'Wählen Sie ein Projekt',
+  moveConversation: 'Unterhaltung verschieben',
+  moveConversationDescription: 'Wählen Sie ein Projekt, in das Sie diese Unterhaltung verschieben möchten',
+  confirmMove: 'Verschiebung bestätigen',
+  movingConversation: 'Verschiebt Unterhaltung...',
+  conversationMovedSuccess: 'Unterhaltung erfolgreich verschoben',
+  conversationMoveError: 'Fehler beim Verschieben der Unterhaltung',
+  noOtherProjects: 'Keine anderen Projekte verfügbar',
+  loadingProjects: 'Projekte werden geladen...',
+  search: 'Suche',
+  cancel: 'Abbrechen',
+  move: 'Verschieben',
+  
+  // Move conversation confirmation
+  moveConversationConfirmationTitle: 'Unterhaltung verschieben',
+  moveConversationConfirmationMessage: 'Sind Sie sicher, dass Sie diese Unterhaltung verschieben möchten? Sie wird von ihrem aktuellen Projekt getrennt und mit dem neuen Projekt verknüpft.'
 }
 

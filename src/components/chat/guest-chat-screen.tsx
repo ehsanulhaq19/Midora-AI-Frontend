@@ -176,6 +176,7 @@ export const GuestChatScreen: React.FC<GuestChatScreenProps> = ({ conversationUu
           currentPage={currentPage}
           totalPages={totalPages}
           className="flex-1"
+          isStreaming={false}
         />
 
         {/* Join Chat Button - Fixed at Bottom */}

@@ -16,7 +16,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { setSelectedProject, Project } from "@/store/slices/projectsSlice";
 import { ConversationModalProvider } from "./sections/conversation-modal-context";
-import { MessageInput } from "./sections/message-input";
 
 interface ChatScreenProps {
   initialConversationUuid?: string | null;
