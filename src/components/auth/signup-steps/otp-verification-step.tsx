@@ -1,0 +1,207 @@
+import { useState, useEffect } from 'react'
+import { t, tArray } from '@/i18n'
+import { LogoOnly } from '@/icons'
+import { OTPInput, PrimaryButton, BackButton } from '../../ui'
+import { handleApiError } from '@/lib/error-handler'
+import { useTheme } from '@/hooks/use-theme'
+import { ActionButton } from '@/components/ui/buttons'
+interface OTPVerificationStepProps {
+  onNext: (otpCode: string) => Promise<void>
+  onBack: () => void
+  onRegenerateOTP: () => Promise<void>
+  email: string
+  isLoading?: boolean
+  className?: string
+}
+
+export const OTPVerificationStep = ({ 
+  onNext, 
+  onBack, 
+  onRegenerateOTP,
+  email,
+  isLoading = false,
+  className 
+}: OTPVerificationStepProps) => {
+  const [otpCode, setOtpCode] = useState('')
+  const [error, setError] = useState('')
+  const [isRegenerating, setIsRegenerating] = useState(false)
+  const [isVerifying, setIsVerifying] = useState(false)
+  const [regenerateCooldown, setRegenerateCooldown] = useState(0)
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
+  useEffect(() => {
+    setRegenerateCooldown(60)
+    const timer = setInterval(() => {
+      setRegenerateCooldown(prev => {
+        if (prev <= 1) {
+          clearInterval(timer)
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [])
+
+  const handleOTPSubmit = async (code: string) => {
+    if (code.length !== 6) {
+      setError('Please enter a 6-digit code')
+      return
+    }
+    
+    if (!/^\d{6}$/.test(code)) {
+      setError('Please enter a valid 6-digit code')
+      return
+    }
+    
+    if (isVerifying || isLoading) return
+    
+    setIsVerifying(true)
+    setError('')
+    
+    try {
+      await onNext(code)
+    } catch (err: any) {
+      const errorMessage = handleApiError(err)
+      setError(errorMessage)
+    } finally {
+      setIsVerifying(false)
+    }
+  }
+
+  const handleRegenerateOTP = async () => {
+    if (regenerateCooldown > 0 || isRegenerating) return
+    
+    setIsRegenerating(true)
+    setError('')
+    
+    try {
+      await onRegenerateOTP()
+      setRegenerateCooldown(60)
+      
+      // Start new cooldown timer
+      const timer = setInterval(() => {
+        setRegenerateCooldown(prev => {
+          if (prev <= 1) {
+            clearInterval(timer)
+            return 0
+          }
+          return prev - 1
+        })
+      }, 1000)
+    } catch (err: any) {
+      const errorMessage = handleApiError(err)
+      setError(errorMessage)
+    } finally {
+      setIsRegenerating(false)
+    }
+  }
+
+  const handleOTPChange = (value: string) => {
+    setOtpCode(value)
+    
+    if (error) {
+      setError('')
+    }
+  }
+
+  const handleOTPComplete = (value: string) => {
+    handleOTPSubmit(value)
+  }
+
+  return (
+    <div className={`relative w-full bg-tokens-color-surface-surface-primary flex flex-col justify-center ${className}`}>
+      <div className="inline-flex flex-col items-start gap-9 max-w-[475px] w-full px-1">   
+      <div className="flex relativeitems-center gap-3 justify-start md:justify-center">
+      <div className='absolute left-[-250px] top-0'> <BackButton /></div>
+              <a 
+                href="/" 
+                className="flex flex-col w-[120px] sm:w-[140px] lg:w-[154px] items-start gap-2.5 cursor-pointer hover:opacity-80 transition-opacity duration-200"
+              >
+                {isDark ? (
+                  <img
+                    className="relative self-stretch w-full "
+                    alt="Midora AI Logo"
+                    src="/img/dark-logo-text.png"
+                  />
+                ) : (
+                  <img
+                    className="relative self-stretch w-full aspect-[5.19] object-cover"
+                    alt="Midora AI Logo"
+                    src="/img/logo.png"
+                  />
+                )}
+              </a>
+            </div>
+        <div className="flex flex-col items-start gap-4 relative self-stretch w-full flex-[0_0_auto]">
+          <div className="flex items-center gap-2.5 relative self-stretch w-full">
+            <h1 className="relative w-fit [font-family:'Poppins',Helvetica] font-normal text-[color:var(--tokens-color-text-text-seconary)] text-[24px] tracking-[-1.80px] leading-[36px]">
+              {t('auth.verifyEmailTitle')}
+            </h1>
+          </div>
+          
+          <div className="flex items-center gap-2.5 relative self-stretch w-full">
+            <p className="relative w-full font-text font-[number:var(--text-font-weight)] [color:var(--tokens-color-text-text-inactive-2)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
+              {t('auth.verifyEmailSubtitle')} <strong>{email}</strong>. Please enter it below.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-4 w-full">
+          {/* Check your email instructions - moved above OTP field */}
+          <div className="bg-tokens-color-surface-surface-secondary p-4 rounded-lg pt-0 pl-0">
+            <h3 className="text-sm font-medium font-SF-Pro text-tokens-color-text-text-secondary mb-2">
+              {t('auth.checkYourEmail')}
+            </h3>
+            <ul className="text-xs [color:var(--tokens-color-text-text-inactive-2)] space-y-1">
+              {tArray('auth.checkEmailInstructions').map((instruction, index) => (
+                <li key={index}>• {instruction}</li>
+              ))}
+            </ul>
+          </div>
+
+          {/* OTP Input */}
+          <OTPInput
+            value={otpCode}
+            onChange={handleOTPChange}
+            onComplete={handleOTPComplete}
+            error={error}
+            disabled={isVerifying || isLoading}
+            className="!self-stretch !w-full"
+          />
+
+          {/* Verify Button */}
+          <PrimaryButton
+            text={(isVerifying || isLoading) ? t('auth.verifyingOtpCode') : t('auth.verifyOtpCode')}
+            onClick={() => handleOTPSubmit(otpCode)}
+            disabled={isVerifying || isLoading || otpCode.length !== 6}
+            loading={isVerifying || isLoading}
+            className="!self-stretch !w-full"
+          />
+
+          <div className="flex flex-col">
+            <p className="text-sm [color:var(--tokens-color-text-text-inactive-2)] text-center">
+              {t('auth.didntReceiveCode')}
+            </p>
+            <ActionButton
+              type="button"
+              onClick={handleRegenerateOTP}
+              disabled={regenerateCooldown > 0 || isRegenerating}
+              variant="ghost"
+              size="sm"
+              className="text-sm font-medium justify-center"
+            >
+              {isRegenerating 
+                ? t('auth.resendingCode')
+                : regenerateCooldown > 0 
+                  ? `${t('auth.resendIn')} ${regenerateCooldown}${t('auth.seconds')}` 
+                  : t('auth.resendCode')
+              }
+            </ActionButton>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

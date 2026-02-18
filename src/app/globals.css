@@ -1,0 +1,957 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap");
+ 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Light Mode CSS Variables */
+:root {
+  /* Legacy support - keeping for backward compatibility */
+  --brand-80: rgba(55, 48, 163, 1);
+  --gray0-white: rgba(255, 255, 255, 1);
+  --h01-heading-01-font-family: "Poppins", Helvetica;
+  --h01-heading-01-font-size: 40px;
+  --h01-heading-01-font-style: normal;
+  --h01-heading-01-font-weight: 500;
+  --h01-heading-01-letter-spacing: -2px;
+  --h01-heading-01-line-height: 139.9999976158142%;
+  --h02-heading02-font-family: "Poppins", Helvetica;
+  --h02-heading02-font-size: 36px;
+  --h02-heading02-font-style: normal;
+  --h02-heading02-font-weight: 400;
+  --h02-heading02-letter-spacing: -1.2px;
+  --h02-heading02-line-height: 100%;
+  --h03-heading-light-font-family: "Poppins", Helvetica;
+  --h03-heading-light-font-size: 36px;
+  --h03-heading-light-font-style: normal;
+  --h03-heading-light-font-weight: 300;
+  --h03-heading03-light-letter-spacing: -1.8px;
+  --h03-heading-light-line-height: 100%;
+  --h05-heading05-font-family: "Poppins", Helvetica;
+  --h05-heading05-font-size: 16px;
+  --h05-heading05-font-style: normal;
+  --h05-heading05-font-weight: 600;
+  --h05-heading05-letter-spacing: -0.05em;
+  --h05-heading05-line-height: 139.9999976158142%;
+  --text-small-font-family: "SF Pro", Helvetica;
+  --text-small-font-size: 14px;
+  --text-small-font-style: normal;
+  --text-small-font-weight: 400;
+  --text-small-letter-spacing: 0px;
+  --text-small-line-height: 139.9999976158142%;
+  --text-medium-font-family: "SF Pro", Helvetica;
+  --text-medium-font-size: 16px;
+  --text-medium-font-style: normal;
+  --text-medium-font-weight: 400;
+  --text-medium-letter-spacing: 0px;
+  --text-extra-large-letter-spacing: 3%;
+  --text-medium-line-height: 139.9999976158142%;
+  --premitives-color-dark-puprle-1000: rgba(31, 23, 64, 1);
+  --premitives-color-dark-puprle-900: rgba(31, 23, 64, 0.9);
+  --premitives-color-darkgray-900: rgba(41, 50, 65, 0.9);
+  --light-mode-colors-dark-gray-900: rgba(41, 50, 65, 0.9); /* #293241 at 90% */
+  --premitives-color-darkgray-conversation: rgba(41, 50, 65, 0.9);
+  --premitives-color-darkgray-50: rgba(41, 50, 65, 0.05);
+  --premitives-color-light-gray-1000: rgba(242, 242, 242, 1);
+  --premitives-color-light-gray-2000: rgba(255, 255, 255, 1);
+  --premitives-color-light-gray-300: rgba(242, 242, 242, 0.3);
+  --premitives-color-light-gray-700: rgba(242, 242, 242, 0.7);
+  --premitives-color-light-purple-1000: rgba(107, 67, 146, 1);
+  --premitives-color-light-purple-200: rgba(94, 77, 116, 0.2);
+  --premitives-color-light-purple-400: rgba(94, 77, 116, 0.4);
+  --premitives-color-brand-purple-1000: #6b4392;
+  --premitives-color-neutral-surface: #f4f5f5;
+  --premitives-color-dropdown-icon: rgba(31, 23, 64, 0.9);
+  --premitives-corner-radius-corner-radius: 8px;
+  --premitives-corner-radius-corner-radius-2: 12px;
+  --premitives-corner-radius-corner-radius-3: 16px;
+  --premitives-corner-radius-corner-radius-5: 24px;
+  --text-font-family: "SF Pro", Helvetica;
+  --text-font-size: 16px;
+  --text-font-style: normal;
+  --text-font-weight: 400;
+  --text-large-font-family: "SF Pro", Helvetica;
+  --text-large-font-size: 20px;
+  --text-large-font-style: normal;
+  --text-large-font-weight: 400;
+  --text-large-letter-spacing: 0px;
+  --text-large-line-height: 139.9999976158142%;
+  --text-letter-spacing: 0px;
+  --text-line-height: 139.9999976158142%;
+  --text-xs-bold-font-family: "Plus Jakarta Sans", Helvetica;
+  --text-xs-bold-font-size: 12px;
+  --text-xs-bold-font-style: normal;
+  --text-xs-bold-font-weight: 700;
+  --text-xs-bold-letter-spacing: -0.06px;
+  --text-xs-bold-line-height: 16px;
+  --tokens-color-surface-surface-button: var(
+    --premitives-color-light-purple-1000
+  );
+  --tokens-color-surface-surface-button-inactive: var(
+    --premitives-color-light-purple-400
+  );
+  --tokens-color-surface-surface-button-pressed: var(
+    --premitives-color-dark-puprle-1000
+  );
+  --tokens-color-surface-surface-dark: var(--premitives-color-dark-puprle-900);
+  --tokens-color-surface-surface-primary: var(
+    --premitives-color-light-gray-2000
+  );
+  --tokens-color-surface-surface-tertiary: var(
+    --premitives-color-light-purple-200
+  );
+  --tokens-color-text-text-brand: var(--premitives-color-light-purple-1000);
+  --tokens-color-text-text-neutral: var(--premitives-color-light-gray-2000);
+  --tokens-color-text-text-primary: var(--premitives-color-darkgray-900);
+  --tokens-color-text-text-seconary: var(--premitives-color-dark-puprle-1000);
+  --tokens-color-text-text-inactive-2: rgba(107, 114, 128, 0.6);
+  --tokens-color-text-text-inactive-3: rgba(41, 50, 65, 0.5);
+  --tokens-color-text-text-conversation: var(
+    --premitives-color-darkgray-conversation
+  );
+  --tokens-color-surface-surface-neutral: var(
+    --premitives-color-neutral-surface
+  );
+  --tokens-color-surface-surface-neutral-alt: var(
+    --premitives-color-light-gray-1000
+  );
+  --tokens-color-surface-surface-secondary: var(
+    --premitives-color-light-gray-300
+  );
+  --tokens-color-surface-surface-secondary-alt: var(
+    --premitives-color-light-gray-700
+  );
+  --tokens-color-surface-surface-brand: var(
+    --premitives-color-light-purple-1000
+  );
+  --tokens-color-icon-surface-icon-inactive-brand: var(
+    --premitives-color-brand-purple-1000
+  );
+  --tokens-color-icon-dropdown: var(--premitives-color-dropdown-icon);
+  --tokens-color-border-border-inactive: var(--premitives-color-light-gray-300);
+  --tokens-color-border-border-active: var(
+    --premitives-color-light-purple-1000
+  );
+  --tokens-color-border-border-subtle: rgba(41, 50, 65, 0.1);
+  --tokens-color-text-text-section-header: rgba(41, 50, 65, 0.5);
+  --tokens-color-surface-surface-sidebar-shrunk: rgba(41, 50, 65, 0.05);
+  --tokens-color-surface-surface-conversation-canvas: rgba(41, 50, 65, 0.10);
+  --tokens-color-surface-surface-input-canvas: rgba(41, 50, 65, 0.05);
+  --tokens-color-surface-surface-darkgray-50: var(--premitives-color-darkgray-50);
+  --sidebar-conversations-max-height: calc(100vh - 450px);
+  --account-section-card-bg: rgba(41, 50, 65, 0.05);
+
+  /* Pricing card specific colors - Light mode */
+  --tokens-color-surface-surface-card-default: var(--tokens-color-surface-surface-sidebar-shrunk);
+  --tokens-color-surface-surface-card-hover: var(--tokens-color-surface-surface-button-pressed);
+
+  /* Surface colors for Tailwind config */
+  --surface-primary: var(--premitives-color-light-gray-2000);
+  --surface-secondary: var(--premitives-color-light-gray-1000);
+  --surface-tertiary: var(--premitives-color-light-purple-200);
+  --surface-card: var(--premitives-color-light-gray-2000);
+  --surface-overlay: rgba(0, 0, 0, 0.5);
+  --surface-backdrop: rgba(0, 0, 0, 0.1);
+  --surface-button: var(--premitives-color-light-purple-1000);
+  --surface-button-hover: var(--premitives-color-light-purple-800);
+  --surface-button-active: var(--premitives-color-dark-puprle-1000);
+  --surface-button-inactive: var(--premitives-color-light-purple-400);
+  --surface-button-disabled: var(--premitives-color-light-gray-400);
+
+  /* Text colors for Tailwind config */
+  --text-primary: var(--premitives-color-darkgray-900);
+  --text-secondary: var(--premitives-color-dark-puprle-1000);
+  --text-tertiary: var(--premitives-color-light-gray-600);
+  --text-inverse: var(--premitives-color-light-gray-2000);
+  --text-muted: var(--premitives-color-light-gray-500);
+  --text-brand: var(--premitives-color-light-purple-1000);
+  --text-accent: var(--premitives-color-light-purple-600);
+  --text-success: #10b981;
+  --text-warning: #f59e0b;
+  --text-error: #ef4444;
+  --text-info: #3b82f6;
+
+  /* Border colors for Tailwind config */
+  --border-primary: var(--premitives-color-light-gray-300);
+  --border-secondary: var(--premitives-color-light-gray-200);
+  --border-focus: var(--premitives-color-light-purple-1000);
+  --border-error: #ef4444;
+  --border-success: #10b981;
+}
+
+/* Dark Mode CSS Variables - ChatGPT-inspired design */
+[data-theme="dark"] {
+  /* Main background: #212121, Sidebar panel: #181818 */
+  --tokens-color-text-text-primary: #ffffff;
+  --tokens-color-text-text-seconary: #ffffff;
+  --tokens-color-text-text-neutral: #ffffff;
+  --tokens-color-surface-surface-primary: #212121;
+  --tokens-color-surface-surface-button: #40414f;
+  --tokens-color-surface-surface-button-inactive: rgba(64, 65, 79, 0.4);
+  --tokens-color-surface-surface-button-pressed: #343541;
+  --tokens-color-surface-surface-dark: #181818;
+  --tokens-color-surface-surface-tertiary: rgba(255, 255, 255, 0.1);
+  --tokens-color-text-text-inactive-2: rgba(255, 255, 255, 0.5);
+  --tokens-color-text-text-inactive-3: rgba(255, 255, 255, 0.4);
+  --tokens-color-surface-surface-neutral: #181818;
+  --tokens-color-surface-surface-sidebar-shrunk: #181818;
+  --tokens-color-surface-surface-secondary: rgba(255, 255, 255, 0.05);
+  --tokens-color-surface-surface-brand: #40414f;
+  --tokens-color-icon-surface-icon-inactive-brand: #ffffff;
+  --tokens-color-border-border-inactive: rgba(255, 255, 255, 0.1);
+  --tokens-color-border-border-active: rgba(255, 255, 255, 0.2);
+  --tokens-color-border-border-subtle: rgba(255, 255, 255, 0.05);
+  --tokens-color-text-text-section-header: rgba(255, 255, 255, 0.5);
+  --tokens-color-text-text-brand: #ffffff;
+  --tokens-color-text-text-conversation: #ffffff;
+  --sidebar-conversations-max-height: calc(100vh - 450px);
+
+  /* Dark mode surface colors - ChatGPT style */
+  --surface-primary: #212121;
+  --surface-secondary: #181818;
+  --surface-tertiary: rgba(255, 255, 255, 0.1);
+  --surface-card: #181818;
+  --surface-overlay: rgba(0, 0, 0, 0.8);
+  --surface-backdrop: rgba(0, 0, 0, 0.5);
+  --surface-button: #40414f;
+  --surface-button-hover: #4a4b5a;
+  --surface-button-active: #343541;
+  --surface-button-inactive: rgba(64, 65, 79, 0.4);
+  --surface-button-disabled: rgba(64, 65, 79, 0.2);
+  --surface-sidebar: #181818;
+
+  /* Dark mode text colors - Pure white */
+  --text-primary: #ffffff;
+  --text-secondary: #ffffff;
+  --text-tertiary: rgba(255, 255, 255, 0.7);
+  --text-inverse: #212121;
+  --text-muted: rgba(255, 255, 255, 0.5);
+  --text-brand: #ffffff;
+  --text-accent: #ffffff;
+  --text-success: #10b981;
+  --text-warning: #f59e0b;
+  --text-error: #ef4444;
+  --text-info: #3b82f6;
+
+  /* Dark mode border colors */
+  --border-primary: rgba(255, 255, 255, 0.1);
+  --border-secondary: rgba(255, 255, 255, 0.05);
+  --border-focus: rgba(255, 255, 255, 0.2);
+  --border-error: #ef4444;
+  --border-success: #10b981;
+
+  /* Pricing card specific colors - Dark mode */
+  --tokens-color-surface-surface-card-default: #303030;
+  --tokens-color-surface-surface-card-hover: #181818;
+  --tokens-color-surface-surface-card-purple: #D1ADF9;
+}
+
+/* Dark mode: When background is surface-card-purple, use surface-dark for text */
+[data-theme="dark"] [style*="background-color: var(--tokens-color-surface-surface-card-purple)"],
+[data-theme="dark"] [style*="background: var(--tokens-color-surface-surface-card-purple)"],
+[data-theme="dark"] [class*="bg-[color:var(--tokens-color-surface-surface-card-purple)]"] {
+  color: var(--tokens-color-surface-surface-dark) !important;
+}
+
+/* Dark mode: Override SVG icon stroke color for elements with purple background */
+[data-theme="dark"] [style*="background-color: var(--tokens-color-surface-surface-card-purple)"] svg path,
+[data-theme="dark"] [style*="background: var(--tokens-color-surface-surface-card-purple)"] svg path,
+[data-theme="dark"] [class*="bg-[color:var(--tokens-color-surface-surface-card-purple)]"] svg path,
+[data-theme="dark"] .purple-bg-icon-container svg path {
+  stroke: var(--tokens-color-surface-surface-dark) !important;
+}
+
+/* Prevent white flash on page load - set initial background based on system preference */
+/* This runs before JavaScript, so it prevents the white flash */
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) {
+    background-color: #212121 !important;
+  }
+  html:not([data-theme="light"]) body {
+    background-color: #212121 !important;
+  }
+}
+
+/* Fallback: if script hasn't run yet, use system preference */
+html {
+  background-color: #ffffff;
+}
+
+html[data-theme="dark"],
+html[data-theme="dark"] body {
+  background-color: #212121 !important;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    font-size: 16px; /* Set 14px as default font size */
+    /* Removed global transitions for instant theme switching */
+    background-color: #ffffff; /* Default light background */
+  }
+  
+  /* Disable all transitions during theme changes for instant switching */
+  html.theme-transitioning *,
+  html.theme-transitioning *::before,
+  html.theme-transitioning *::after {
+    transition: none !important;
+  }
+  
+  /* Media and SVG elements don't need transitions for theme changes */
+
+  body {
+    @apply text-text-primary bg-surface-primary;
+    font-family: "Poppins", Helvetica, Arial, sans-serif;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    font-size: 14px; /* Ensure body uses 14px as base */
+    line-height: 1.4; /* Consistent line height with app text classes */
+    background-color: #ffffff; /* Default light background */
+  }
+
+  /* Ensure dark mode html and body background is #212121 */
+  [data-theme="dark"] {
+    background-color: #212121 !important;
+  }
+  
+  [data-theme="dark"] body {
+    background-color: #212121 !important;
+  }
+
+  input,
+  button,
+  textarea,
+  select {
+    font-family: "Poppins", Helvetica, Arial, sans-serif;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-display text-text-primary;
+  }
+
+  h1 {
+    @apply text-4xl font-bold;
+  }
+
+  h2 {
+    @apply text-3xl font-semibold;
+  }
+
+  h3 {
+    @apply text-2xl font-semibold;
+  }
+
+  h4 {
+    @apply text-xl font-medium;
+  }
+
+  h5 {
+    @apply text-lg font-medium;
+  }
+
+  h6 {
+    @apply text-base font-medium;
+  }
+
+  /* Custom scrollbar - removed purple styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+  }
+
+  /* Dark mode scrollbar - ChatGPT style */
+  [data-theme="dark"] ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  [data-theme="dark"] ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+  }
+
+  [data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  /* File preview scrollbar - ensure visibility */
+  .file-preview-scroll::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  .file-preview-scroll::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+    margin: 0 4px;
+  }
+
+  .file-preview-scroll::-webkit-scrollbar-thumb {
+    background: #9ca3af;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .file-preview-scroll::-webkit-scrollbar-thumb:hover {
+    background: #6b7280;
+  }
+
+  /* Dark mode file preview scrollbar */
+  [data-theme="dark"] .file-preview-scroll::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.15);
+    margin: 0 4px;
+  }
+
+  [data-theme="dark"] .file-preview-scroll::-webkit-scrollbar-thumb {
+    background: #4b5563;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+  }
+
+  [data-theme="dark"] .file-preview-scroll::-webkit-scrollbar-thumb:hover {
+    background: #6b7280;
+  }
+}
+
+@layer components {
+  /* ===== APP FONT SIZE CLASSES ===== */
+  .app-text-xs {
+    font-size: 10px;
+    line-height: 1.4;
+  }
+
+  .checkout-emphasis {
+    font-family: var(--h05-heading05-font-family);
+    font-size: var(--h05-heading05-font-size);
+    font-weight: var(--h05-heading05-font-weight);
+    line-height: var(--h05-heading05-line-height);
+    letter-spacing: var(--h05-heading05-letter-spacing);
+  }
+
+  .checkout-plan-name {
+    font-family: "Poppins", Helvetica;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 100%;
+    letter-spacing: -1.2px; /* -5% of 24px */
+  }
+
+  /* Default text class - 14px (same as body default) */
+  .app-text {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  .app-text-sm {
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .app-text-md {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  .app-text-lg {
+    font-size: 16px;
+    line-height: 1.4;
+  }
+
+  .app-text-xl {
+    font-size: 18px;
+    line-height: 1.4;
+  }
+
+  .app-text-2xl {
+    font-size: 20px;
+    line-height: 1.4;
+  }
+
+  .app-text-3xl {
+    font-size: 24px;
+    line-height: 1.4;
+  }
+
+  .app-text-4xl {
+    font-size: 28px;
+    line-height: 1.4;
+  }
+
+  .app-text-28 {
+    font-size: 28px;
+    line-height: 140%;
+    letter-spacing: 0;
+  }
+
+  .app-text-5xl {
+    font-size: 32px;
+    line-height: 1.4;
+  }
+
+  /* ===== DARK AND LIGHT MODE COLOR CLASSES ===== */
+  .app-bg-primary {
+    @apply bg-surface-primary;
+  }
+
+  .app-bg-secondary {
+    @apply bg-surface-secondary;
+  }
+
+  .app-bg-tertiary {
+    @apply bg-surface-tertiary;
+  }
+
+  .app-bg-card {
+    @apply bg-surface-card;
+  }
+
+  .app-bg-button {
+    @apply bg-surface-button;
+  }
+
+  .app-bg-button-hover {
+    @apply bg-surface-button-hover;
+  }
+
+  .app-bg-button-active {
+    @apply bg-surface-button-active;
+  }
+
+  .app-bg-button-inactive {
+    @apply bg-surface-button-inactive;
+  }
+
+  .app-bg-button-disabled {
+    @apply bg-surface-button-disabled;
+  }
+
+  .app-text-primary {
+    @apply text-text-primary;
+  }
+
+  .app-text-secondary {
+    @apply text-text-secondary;
+  }
+
+  .app-text-tertiary {
+    @apply text-text-tertiary;
+  }
+
+  .app-text-muted {
+    @apply text-text-muted;
+  }
+
+  .app-text-brand {
+    @apply text-text-brand;
+  }
+
+  .app-text-accent {
+    @apply text-text-accent;
+  }
+
+  .app-text-success {
+    @apply text-text-success;
+  }
+
+  .app-text-warning {
+    @apply text-text-warning;
+  }
+
+  .app-text-error {
+    @apply text-text-error;
+  }
+
+  .app-text-info {
+    @apply text-text-info;
+  }
+
+  .app-border-primary {
+    @apply border-border-primary;
+  }
+
+  .app-border-secondary {
+    @apply border-border-secondary;
+  }
+
+  .app-border-focus {
+    @apply border-border-focus;
+  }
+
+  .app-border-error {
+    @apply border-border-error;
+  }
+
+  .app-border-success {
+    @apply border-border-success;
+  }
+
+  /* ===== BUTTON COMPONENTS ===== */
+  .btn {
+    @apply inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  .btn-primary {
+    @apply btn bg-surface-button text-white hover:bg-primary-600 focus:ring-primary shadow-lg hover:shadow-xl hover:scale-105;
+  }
+
+  .btn-secondary {
+    @apply btn bg-secondary-500 text-white hover:bg-secondary-600 focus:ring-secondary-500 hover:scale-105;
+  }
+
+  .btn-outline {
+    @apply btn border-2 border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white focus:ring-primary-500 hover:scale-105;
+  }
+
+  .btn-ghost {
+    @apply btn text-primary-500 hover:bg-primary-50 focus:ring-primary-500;
+  }
+
+  .btn-accent {
+    @apply btn bg-gradient-to-r from-primary-500 to-secondary-500 text-white hover:shadow-xl hover:scale-105 focus:ring-primary-500;
+  }
+
+  .card {
+    @apply bg-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 p-6 border border-gray-200;
+  }
+
+  .card-hover {
+    @apply card hover:scale-105 hover:border-primary-200;
+  }
+
+  .input {
+    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 bg-white text-gray-900;
+  }
+
+  .input-focus {
+    @apply input focus:ring-4 focus:ring-primary-100;
+  }
+
+  /* AI Platform specific components */
+  .ai-card {
+    @apply card-hover bg-gradient-to-br from-primary-50 to-secondary-50 border-primary-200;
+  }
+
+  .feature-icon {
+    @apply w-16 h-16 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center text-white shadow-lg;
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary-500 to-secondary-500 bg-clip-text text-transparent;
+  }
+
+  .glass-effect {
+    @apply backdrop-blur-sm bg-white/80 border border-gray-200/20 shadow-lg;
+  }
+
+  .floating-element {
+    @apply animate-float;
+  }
+
+  .glow-effect {
+    @apply animate-glow;
+  }
+
+  /* Dark mode component overrides */
+  [data-theme="dark"] .card {
+    @apply bg-gray-800 border-gray-700;
+  }
+
+  [data-theme="dark"] .input {
+    @apply bg-gray-800 border-gray-700 text-gray-100;
+  }
+
+  [data-theme="dark"] .glass-effect {
+    @apply bg-gray-800/80 border-gray-700/20;
+  }
+
+  /* Dark mode icon colors - white stroke only, no fill */
+  [data-theme="dark"] svg {
+    color: #ffffff;
+  }
+
+  /* Apply white stroke only, remove fill (exclude chart SVGs) */
+  [data-theme="dark"] svg:not(.chart-svg) path {
+    stroke: #ffffff;
+    fill: none;
+  }
+
+  /* Override icon color for elements with purple background in dark mode */
+  [data-theme="dark"] [class*="bg-[color:var(--tokens-color-surface-surface-card-purple)]"] svg path,
+  [data-theme="dark"] .purple-bg-icon-container svg path {
+    stroke: var(--tokens-color-surface-surface-dark) !important;
+  }
+
+  /* Midora logo icons - keep original purple color in both light and dark mode */
+  [data-theme="dark"] svg.midora-logo path,
+  [data-theme="dark"] svg[data-logo="midora"] path {
+    fill: #6B4392 !important;
+    stroke: none !important;
+  }
+
+
+  /* Textarea dark mode background - preserve border-radius from light mode */
+  [data-theme="dark"] textarea {
+    background-color: #303030 !important;
+    border-radius: var(--premitives-corner-radius-corner-radius-3);
+  }
+
+  /* Input and textarea text color in dark mode - light theme color */
+  [data-theme="dark"] input[type="text"],
+  [data-theme="dark"] input[type="email"],
+  [data-theme="dark"] input[type="password"],
+  [data-theme="dark"] input[type="search"],
+  [data-theme="dark"] input[type="tel"],
+  [data-theme="dark"] input[type="url"],
+  [data-theme="dark"] input[type="number"],
+  [data-theme="dark"] input:not([type]),
+  [data-theme="dark"] textarea {
+    color: #ffffff !important;
+  }
+
+  /* Message input icon buttons - inherit background in dark mode */
+  [data-theme="dark"] .message-input-icon-button {
+    background-color: inherit !important;
+  }
+
+  /* Select dropdown options - dark mode background */
+  [data-theme="dark"] select {
+    background-color: var(--tokens-color-surface-surface-card-default) !important;
+  }
+
+  [data-theme="dark"] select option {
+    background-color: var(--tokens-color-surface-surface-card-default) !important;
+    color: var(--tokens-color-text-text-primary) !important;
+  }
+
+  /* Sidebar separator styling */
+  .sidebar-separator {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 8px 0;
+  }
+
+  [data-theme="light"] .sidebar-separator {
+    background: rgba(0, 0, 0, 0.1);
+  }
+
+  /* Sidebar menu item hover effects */
+  .sidebar-menu-item {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .sidebar-menu-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  [data-theme="light"] .sidebar-menu-item:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary-500 to-secondary-500 bg-clip-text text-transparent;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  .animate-slide-down {
+    animation: slideDown 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  .animate-bounce-gentle {
+    animation: bounceGentle 2s infinite;
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+
+  /* Background patterns */
+  .bg-grid-pattern {
+    background-image: linear-gradient(
+        rgba(168, 85, 247, 0.1) 1px,
+        transparent 1px
+      ),
+      linear-gradient(90deg, rgba(168, 85, 247, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+  .app-border-inactive {
+    border-color: var(--tokens-color-border-border-inactive);
+  }
+  .bg-dots-pattern {
+    background-image: radial-gradient(
+      circle,
+      rgba(168, 85, 247, 0.2) 1px,
+      transparent 1px
+    );
+    background-size: 20px 20px;
+  }
+
+  /* Text shadows */
+  .text-shadow-sm {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+
+  .text-shadow-md {
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+  }
+
+  .text-shadow-lg {
+    text-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Custom gradients */
+  .bg-gradient-ai {
+    background: linear-gradient(135deg, #a855f7 0%, #d946ef 50%, #ec4899 100%);
+  }
+
+  .bg-gradient-hero {
+    background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 50%, #e9d5ff 100%);
+  }
+
+  .bg-gradient-features {
+    background: linear-gradient(135deg, #fdf4ff 0%, #fae8ff 50%, #f5d0fe 100%);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes bounceGentle {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes glow {
+  0% {
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 30px rgba(168, 85, 247, 0.8);
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.markdown-paragraph {
+  display: block;
+}
+
+/* Paragraphs that are first child inside list items: inline-block to stay on the same line as the bullet */
+.markdown-content li > .markdown-paragraph:first-child {
+  display: inline-block;
+}

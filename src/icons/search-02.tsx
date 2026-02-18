@@ -1,0 +1,28 @@
+import React from 'react'
+
+interface Search02Props {
+  className?: string
+  color?: string
+}
+
+export const Search02: React.FC<Search02Props> = ({ 
+  className = "w-6 h-6", 
+  color = "#1F1740" 
+}) => (
+  <svg 
+    width="24" 
+    height="24" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    xmlns="http://www.w3.org/2000/svg"
+    className={className}
+  >
+    <path 
+      d="M16.927 17.0401L20.4001 20.4001M11.4001 7.2001C13.3883 7.2001 15.0001 8.81187 15.0001 10.8001M19.2801 11.4401C19.2801 15.77 15.77 19.2801 11.4401 19.2801C7.11018 19.2801 3.6001 15.77 3.6001 11.4401C3.6001 7.11018 7.11018 3.6001 11.4401 3.6001C15.77 3.6001 19.2801 7.11018 19.2801 11.4401Z" 
+      stroke={color} 
+      strokeOpacity="0.9" 
+      strokeWidth="2" 
+      strokeLinecap="round"
+    />
+  </svg>
+)

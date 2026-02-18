@@ -1,0 +1,37 @@
+name: Deploy to Dev
+
+on:
+  push:
+    branches: ["dev"]
+
+concurrency:
+  group: deploy-dev
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  deploy: 
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Execute remote deploy commands via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ vars.DEV_HOST }}
+          username: ${{ vars.DEV_USER }}
+          key: ${{ secrets.MIDORA_DEV_SERVER_OPENSSH_PRIVATEKEY }}
+          port: 22
+          script: |
+            set -euo pipefail
+            cd "${{ vars.DEV_PATH }}"
+            git fetch --all --prune
+            git reset --hard origin/dev
+            # build & (re)start services
+            sudo docker-compose -f "${{ vars.COMPOSE_FILE }}" up -d --build
+            sudo docker image prune -f || true
