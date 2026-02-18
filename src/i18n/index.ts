@@ -5,18 +5,42 @@
 
 import { appConfig } from '@/config/app'
 
-export type SupportedLanguage = 'en'
+export type SupportedLanguage = 'en' | 'zh' | 'de' | 'ar'
+
+const LANGUAGE_STORAGE_KEY = 'midora-language'
 
 // Import language modules
 import { enTranslations } from './languages/en'
+import { zhTranslations } from './languages/zh'
+import { deTranslations } from './languages/de'
+import { arTranslations } from './languages/ar'
 
 // Translation storage
 const translations: Record<SupportedLanguage, any> = {
   en: enTranslations,
+  zh: zhTranslations,
+  de: deTranslations,
+  ar: arTranslations,
 }
 
-// Current language state
-let currentLanguage: SupportedLanguage = appConfig.ui.defaultLanguage as SupportedLanguage
+/**
+ * Get language from localStorage or default
+ */
+function getStoredLanguage(): SupportedLanguage {
+  if (typeof window === 'undefined') {
+    return appConfig.ui.defaultLanguage as SupportedLanguage
+  }
+  
+  const stored = localStorage.getItem(LANGUAGE_STORAGE_KEY)
+  if (stored && (stored === 'en' || stored === 'zh' || stored === 'de' || stored === 'ar')) {
+    return stored as SupportedLanguage
+  }
+  
+  return appConfig.ui.defaultLanguage as SupportedLanguage
+}
+
+// Current language state - initialize from localStorage
+let currentLanguage: SupportedLanguage = getStoredLanguage()
 
 /**
  * Get current language
@@ -26,11 +50,14 @@ export function getCurrentLanguage(): SupportedLanguage {
 }
 
 /**
- * Set current language
+ * Set current language and save to localStorage
  */
 export function setCurrentLanguage(language: SupportedLanguage): void {
-  if (appConfig.ui.supportedLanguages.includes(language)) {
+  if (language === 'en' || language === 'zh' || language === 'de' || language === 'ar') {
     currentLanguage = language
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(LANGUAGE_STORAGE_KEY, language)
+    }
   }
 }
 
@@ -114,11 +141,8 @@ export function getAvailableLanguages(): SupportedLanguage[] {
  * Initialize i18n
  */
 export function initializeI18n(): void {
-  // Set initial language from config
-  currentLanguage = appConfig.ui.defaultLanguage as SupportedLanguage
-  
-  // You can add logic here to detect user's preferred language
-  // from browser settings, localStorage, etc.
+  // Set initial language from localStorage or config
+  currentLanguage = getStoredLanguage()
 }
 
 // Export the translation function as default

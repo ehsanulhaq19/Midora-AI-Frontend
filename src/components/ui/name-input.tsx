@@ -11,7 +11,7 @@ interface NameInputProps {
 export const NameInput = ({ 
   value, 
   onChange, 
-  placeholder = "Enter your name",
+  placeholder,
   className,
   error
 }: NameInputProps) => {
@@ -23,7 +23,7 @@ export const NameInput = ({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         className={cn(
-          "w-full px-4 py-3 bg-tokens-color-surface-surface-tertiary border border-tokens-color-border-border-inactive rounded-xl font-text text-tokens-color-text-text-brand placeholder:text-tokens-color-text-text-inactive-2 focus:outline-none focus:border-tokens-color-surface-surface-button focus:ring-2 focus:ring-tokens-color-surface-surface-button focus:ring-opacity-20 transition-all duration-200",
+          "w-full px-4 py-3 bg-tokens-color-surface-surface-tertiary border border-tokens-color-border-border-inactive rounded-xl font-text text-tokens-color-text-text-brand placeholder:[color:var(--tokens-color-text-text-inactive-2)] focus:outline-none focus:border-tokens-color-surface-surface-button focus:ring-2 focus:ring-tokens-color-surface-surface-button focus:ring-opacity-20 transition-all duration-200",
           error && "border-red-500 focus:border-red-500 focus:ring-red-500"
         )}
       />

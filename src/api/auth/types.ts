@@ -13,6 +13,7 @@ export interface User {
   is_active: boolean
   is_verified: boolean
   is_onboarded: boolean
+  language?: string | null
 }
 
 // Authentication request types
@@ -46,6 +47,7 @@ export interface UserResponse {
   is_active: boolean
   is_verified: boolean
   is_onboarded: boolean
+  language?: string | null
   meta_data?: Record<string, any>
 }
 
@@ -216,30 +218,23 @@ export interface AuthState {
 
 // Authentication context types
 export interface AuthContextType extends AuthState {
+  login: (credentials: UserLogin) => Promise<void>
   register: (userData: UserCreate) => Promise<void>
   logout: () => Promise<void>
   refreshAccessToken: () => Promise<string>
-  forgotPassword: (email: string) => Promise<void>
   resetPassword: (data: PasswordResetRequest) => Promise<void>
   verifyOTP: (data: OTPVerificationRequest) => Promise<void>
   regenerateOTP: (email: string) => Promise<void>
+  updateProfile: (data: { first_name?: string; last_name?: string; profession?: string; language?: string | null }) => Promise<void>
+  completeOnboarding: (data?: CompleteOnboardingRequest) => Promise<void>
+  getCurrentUser: () => Promise<User | undefined>
   clearError: () => void
+  signInWithGoogle: () => Promise<void>
+  signInWithMicrosoft: () => Promise<void>
+  signInWithGitHub: () => Promise<void>
+  handleSSOCallback: (provider: 'google' | 'microsoft' | 'github', code: string, state?: string) => Promise<void>
+  verifyOTPAndLogin: (email: string, password: string, otpCode: string) => Promise<void>
 }
 
 // Authentication hook types
-export interface UseAuthReturn {
-  user: User | null
-  accessToken: string | null
-  refreshToken: string | null
-  isAuthenticated: boolean
-  isLoading: boolean
-  error: string | null
-  register: (userData: UserCreate) => Promise<void>
-  logout: () => Promise<void>
-  refreshAccessToken: () => Promise<void>
-  forgotPassword: (email: string) => Promise<void>
-  resetPassword: (data: PasswordResetRequest) => Promise<void>
-  verifyOTP: (data: OTPVerificationRequest) => Promise<void>
-  regenerateOTP: (email: string) => Promise<void>
-  clearError: () => void
-}
+export type UseAuthReturn = AuthContextType

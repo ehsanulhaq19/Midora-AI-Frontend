@@ -2,22 +2,24 @@ import React from 'react'
 
 interface SearchProps {
   className?: string
+  color?: string
 }
 
-export const Search: React.FC<SearchProps> = ({ className }) => {
+export const Search: React.FC<SearchProps> = ({ className, color = '#6B4392' }) => {
   return (
     <svg
-      className={`w-6 h-6 text-gray-600 ${className}`}
-      viewBox="0 0 24 24"
+      className={className}
+      width="20"
+      height="20"
+      viewBox="0 0 20 20"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M21 21L16.514 16.506L21 21ZM19 10.5C19 15.194 15.194 19 10.5 19C5.806 19 2 15.194 2 10.5C2 5.806 5.806 2 10.5 2C15.194 2 19 5.806 19 10.5Z"
-        stroke="currentColor"
+        d="M14.1057 14.2L17 17M9.5 6C11.1569 6 12.5 7.34315 12.5 9M16.0667 9.53333C16.0667 13.1416 13.1416 16.0667 9.53333 16.0667C5.92507 16.0667 3 13.1416 3 9.53333C3 5.92507 5.92507 3 9.53333 3C13.1416 3 16.0667 5.92507 16.0667 9.53333Z"
+        stroke={color}
         strokeWidth="2"
         strokeLinecap="round"
-        strokeLinejoin="round"
       />
     </svg>
   )

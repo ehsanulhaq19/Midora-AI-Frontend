@@ -8,6 +8,8 @@ const ROUTES = {
   PUBLIC: [
     '/',
     '/signup',
+    '/chat',
+    '/chat/*',
     '/api/health',
     '/api/hello',
   ],
@@ -18,11 +20,11 @@ const ROUTES = {
   ],
   // Protected routes that require authentication
   PROTECTED: [
-    '/dashboard',
     '/profile',
     '/settings',
-    '/chat',
     '/app-documents',
+    '/pricing',
+    '/checkout',
   ],
 } as const
 

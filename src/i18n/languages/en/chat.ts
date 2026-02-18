@@ -11,6 +11,9 @@ export const chat = {
   sendMessage: 'Send Message',
   waitingForResponse: 'Waiting for AI response...',
   newChat: 'New Chat',
+  brandName: 'Midora',
+  expandSidebar: 'Expand sidebar',
+  shrinkSidebar: 'Collapse sidebar',
   chatHistory: 'Chat History',
   clearChat: 'Clear Chat',
   exportChat: 'Export Chat',
@@ -35,7 +38,7 @@ export const chat = {
   facialRecognition: 'Facial recognition and analysis',
   manual: 'Manual',
   claude: 'Claude',
-  upgradeToPro: 'Upgrade to Pro+',
+  upgradeToPro: 'Upgrade to Pro +',
   
   // AI Model Selection
   auto: 'Auto',
@@ -48,7 +51,13 @@ export const chat = {
   // Conversation related translations
   selectConversation: 'Select a conversation to start chatting',
   copyMessage: 'Copy message',
+  copied: 'Copied!',
+  regenerateMessage: 'Regenerate message',
+  regenerating: 'Regenerating...',
   typing: 'AI is typing...',
+  thinking: 'Thinking...',
+  evaluating: 'Evaluating...',
+  generating: 'Generating...',
   loading: 'Loading...',
   loadingMoreMessages: 'Loading more messages...',
   loadingMoreConversations: 'Loading more conversations...',
@@ -57,6 +66,13 @@ export const chat = {
   loadConversationsError: 'Failed to load conversations',
   createConversationError: 'Failed to create conversation',
   loadMoreMessagesError: 'Failed to load more messages',
+  regenerateMessageError: 'Failed to regenerate message',
+  
+  // Message versioning
+  messageVersions: 'Message versions',
+  previousVersion: 'Previous version',
+  nextVersion: 'Next version',
+  currentVersion: 'Current version',
   
   // AI Stream Status Messages
   aiStatus: {
@@ -110,5 +126,61 @@ export const chat = {
     preparing_details: 'Preparing details...',
     stay_with_me: 'Stay with me...',
     on_it: 'On it...'
-  }
+  },
+  
+  // Canvas UI translations
+  canvasTitle: 'Canvas',
+  canvasView: 'Canvas view',
+  viewInCanvas: 'View in Canvas',
+  openInCanvas: 'Open in Canvas',
+  hideCanvas: 'Hide Canvas',
+  closeCanvas: 'Close Canvas',
+  canvasExpanded: 'Content expanded to canvas',
+  
+  // Conversation History translations
+  history: {
+    title: 'Your Chat History',
+    searchPlaceholder: 'Explore your message archive',
+    conversationsCount: '{count} conversations with {brandName}',
+    choose: 'Choose',
+    mostRecentMessage: 'Most recent message {daysAgo}',
+    today: 'today',
+    yesterday: 'yesterday',
+    daysAgo: '{days} days ago',
+    noConversations: 'No conversations yet. Start a new chat to begin!',
+    noResults: 'No conversations found matching your search.',
+    noResultsWithMessageSearch: 'No conversations found matching your message search.',
+    relatedMessages: 'Related messages'
+    ,
+    deepSearch: 'Deep search'
+  },
+  manageLinks: 'Manage Links',
+  searchPlaceholder: 'Search conversations...',
+  link: 'Link',
+  unlink: 'Unlink',
+  uploadFiles: 'Upload files',
+  linkChats: 'Link chats'
+  ,
+  shareConversation: 'Share Conversation',
+  shareConversationDescription: 'Share this conversation by copying the link below.',
+  copyLink: 'Copy link',
+  
+  // Move conversation to project
+  moveToProject: 'Move to project',
+  selectProject: 'Select a project',
+  moveConversation: 'Move conversation',
+  moveConversationDescription: 'Choose a project to move this conversation to',
+  confirmMove: 'Confirm move',
+  movingConversation: 'Moving conversation...',
+  conversationMovedSuccess: 'Conversation moved successfully',
+  conversationMoveError: 'Failed to move conversation',
+  noOtherProjects: 'No other projects available',
+  loadingProjects: 'Loading projects...',
+  search: 'Search',
+  cancel: 'Cancel',
+  move: 'Move',
+  
+  // Move conversation confirmation
+  moveConversationConfirmationTitle: 'Move Conversation',
+  moveConversationConfirmationMessage: 'Are you sure you want to move this conversation? It will be unlinked from its current project and linked to the new one.'
 }

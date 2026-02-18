@@ -14,10 +14,11 @@ interface InputWithButtonProps {
   error?: string
   disabled?: boolean
   buttonText?: string
+  variant?: 'light' | 'dark'
 }
 
 export const InputWithButton = ({
-  placeholder = "Enter your personal or work email",
+  placeholder,
   onSubmit,
   className,
   value: controlledValue,
@@ -27,12 +28,14 @@ export const InputWithButton = ({
   maxLength,
   error,
   disabled = false,
-  buttonText = "Continue"
+  buttonText = "Continue",
+  variant = 'light'
 }: InputWithButtonProps) => {
   const [internalValue, setInternalValue] = useState("")
   
   const value = controlledValue !== undefined ? controlledValue : internalValue
   const setValue = onChange || setInternalValue
+  const isDark = variant === 'dark'
 
   const handleSubmit = () => {
     if (onSubmit && value.trim()) {
@@ -66,13 +69,16 @@ export const InputWithButton = ({
           inputMode={inputMode}
           maxLength={maxLength}
           disabled={disabled}
-          className="relative flex-1 bg-transparent outline-none font-text font-[number:var(--text-font-weight)] text-tokens-color-text-text-seconary text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] placeholder:text-tokens-color-text-text-inactive-2 disabled:opacity-50"
+          className={cn(
+            "relative flex-1 bg-transparent outline-none font-text font-[number:var(--text-font-weight)] text-tokens-color-text-text-seconary text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] placeholder:[color:var(--tokens-color-text-text-inactive-2)] disabled:opacity-50",
+            isDark && "text-white placeholder:text-white/70"
+          )}
         />
 
         <button
           onClick={handleSubmit}
           disabled={disabled || !value.trim()}
-          className="flex w-[46px] h-[46px] items-center justify-center gap-2.5 px-3 py-[18px] relative mt-[-8.00px] mb-[-8.00px] bg-tokens-color-surface-surface-button rounded-xl hover:opacity-80 transition-opacity cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex w-[46px] h-[46px] items-center justify-center gap-2.5 px-3 py-[18px] relative mt-[-8.00px] mb-[-8.00px] rounded-xl hover:opacity-80 transition-opacity cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed bg-tokens-color-surface-surface-button dark:bg-[color:var(--tokens-color-surface-surface-card-purple)]"
         >
           <ArrowRightSm className="text-white !mr-[-1.00px] !mt-[-7.00px] !ml-[-1.00px] !mb-[-7.00px] !relative !left-[unset] !top-[unset]" />
         </button>

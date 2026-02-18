@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { t } from '@/i18n'
 import { LogoOnly } from '@/icons/logo-only'
 import { tokenManager } from '@/lib/token-manager'
-import { useToast } from '@/hooks/useToast'
+import { useToast } from '@/hooks/use-toast'
 import { useAuth } from '@/hooks/use-auth'
 import { handleApiError } from '@/lib/error-handler'
 import { useAppDispatch } from '@/store/hooks'
@@ -138,13 +138,13 @@ export const SuccessStep = ({ onNext, className, email, password, isSSOOnboardin
           </div>
 
           <div className="flex flex-col items-center gap-6 text-center">
-            <h1 className="relative w-full max-w-[400px] mt-[-1.00px] font-heading-primary font-normal text-[color:var(--tokens-color-text-text-seconary)] text-3xl sm:text-4xl tracking-[-1.80px] leading-9">
+            <h1 className="relative w-full max-w-[400px] mt-[-1.00px] font-h02-heading02 font-normal text-[color:var(--tokens-color-text-text-seconary)] text-3xl sm:text-4xl tracking-[-1.80px] leading-9">
               <span className="font-light tracking-[-0.65px]">
                 {t('auth.successTitle')}
               </span>
             </h1>
             
-            <p className="relative w-full max-w-[350px] font-body-primary font-normal text-[#a0a0a0] text-base tracking-[-0.48px] leading-6">
+            <p className="relative w-full max-w-[350px] font-body-primary font-normal [color:var(--tokens-color-text-text-inactive-2)]text-base tracking-[-0.48px] leading-6">
               {t('auth.successSubtitle')}
             </p>
           </div>
@@ -157,7 +157,7 @@ export const SuccessStep = ({ onNext, className, email, password, isSSOOnboardin
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                 </div>
               )}
-              <p className="text-center text-tokens-color-text-text-inactive-2 text-sm">
+              <p className="text-center [color:var(--tokens-color-text-text-inactive-2)] text-sm">
                 {loadingMessage}
               </p>
             </div>

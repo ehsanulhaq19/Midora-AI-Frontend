@@ -3,21 +3,53 @@
  * Type definitions for all conversation-related API requests and responses
  */
 
+// Sender types
+export interface Sender {
+  email: string
+  first_name: string
+  last_name: string
+  uuid: string
+  username: string
+  is_active: boolean
+  is_verified: boolean
+  is_onboarded: boolean
+  meta_data: {
+    sso_created?: boolean
+    created_via?: string
+  } | null
+}
+
+// Linked file types
+export interface LinkedFile {
+  uuid: string
+  filename: string
+  file_extension: string
+  file_type: string
+  file_size: number
+  storage_type: string
+}
+
 // Message types
 export interface Message {
-  uuid: string
   content: string
-  sender_id: number
-  conversation_uuid: string
+  uuid: string
+  sender: Sender
+  model_name: string | null
+  linked_files?: LinkedFile[]
   created_at: string
-  updated_at: string
-  model_name?: string
-  sender?: {
-    uuid: string
-    email: string
-    first_name: string
-    last_name: string
-  }
+  updated_at: string | null
+  // Versioning support for regeneration
+  versions?: Message[]
+  currentVersionIndex?: number
+  // Relevance score for message search results
+  relevance_score?: number
+}
+
+// Message group types for new response structure
+export interface MessageGroup {
+  type: 'single_message' | 'multi_message'
+  messages: Message[]
+  parent_message_uuid: string | null
 }
 
 // Conversation types
@@ -29,6 +61,12 @@ export interface Conversation {
   created_at: string
   updated_at: string
   messages?: Message[]
+  related_messages?: Message[]
+  project?: {
+    uuid: string
+    name: string
+    created_at?: string
+  }
 }
 
 // Request types
@@ -41,46 +79,38 @@ export interface CreateMessageRequest {
   content: string
 }
 
-// Response types
-export interface CreateConversationResponse {
-  success: boolean
-  data: Conversation
-}
+// Response types (after baseApiClient processing)
+export interface CreateConversationResponse extends Conversation {}
 
 export interface GetConversationsResponse {
-  success: boolean
-  data: {
-    items: Conversation[]
-    total: number
-    page: number
-    per_page: number
-    total_pages: number
-  }
+  items: Conversation[]
+  total: number
+  page: number
+  per_page: number
+  total_pages: number
 }
 
-export interface GetConversationResponse {
-  success: boolean
-  data: Conversation
-}
+export interface GetConversationResponse extends Conversation {}
 
 export interface GetMessagesResponse {
-  success: boolean
-  data: {
-    items: Message[]
-    total: number
-    page: number
-    per_page: number
-    total_pages: number
-  }
+  items: MessageGroup[]
+  total: number
+  page: number
+  per_page: number
+  total_pages: number
 }
 
-export interface CreateMessageResponse {
-  success: boolean
-  data: Message
-}
+export interface CreateMessageResponse extends Message {}
 
 export interface DeleteConversationResponse {
   success: boolean
+}
+
+// Linked conversation minimal item
+export interface LinkedConversationItem {
+  uuid: string
+  name: string
+  created_at: string
 }
 
 // Error object structure for throw new Error

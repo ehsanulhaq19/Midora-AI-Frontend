@@ -14,13 +14,15 @@ import { MultiStepContainer } from '@/components/auth/signup-steps/multi-step-co
 import { useSignupData, SignupDataProvider } from '@/contexts/SignupDataContext'
 import { LoadingWrapper } from '@/components/ui/loaders'
 import { handleApiError } from '@/lib/error-handler'
-import { useToast } from '@/hooks/useToast'
+import { useToast } from '@/hooks/use-toast'
 import { useAuth } from '@/hooks/use-auth'
 import { useAppDispatch } from '@/store/hooks'
 import { loginSuccess, setLoading, setError } from '@/store/slices/authSlice'
 import { tokenManager } from '@/lib/token-manager'
 import { setTokens } from '@/lib/auth'
 import { useRouter } from 'next/navigation'
+import { useTheme } from '@/hooks/use-theme'
+import { useLanguage } from '@/hooks/use-language'
 
 function SignupPageContent() {
   const router = useRouter()
@@ -29,31 +31,85 @@ function SignupPageContent() {
   const { data, updateData } = useSignupData()
   const { error: showErrorToast, success: showSuccessToast } = useToast()
   const { getCurrentUser, updateProfile, completeOnboarding } = useAuth()
-  const [showOnboarding, setShowOnboarding] = useState(false)
+  const { setLanguage } = useLanguage()
+  
+  const stepParam = searchParams.get('step')
+  const isInOnboardingFlow = stepParam && ['welcome', 'fullName', 'profession', 'password', 'forgotPassword', 'resetPassword', 'otp', 'success'].includes(stepParam)
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
+  const [showOnboarding, setShowOnboarding] = useState(isInOnboardingFlow)
   const [isSSOOnboarding, setIsSSOOnboarding] = useState(false)
   const [isProcessingSSO, setIsProcessingSSO] = useState(false)
-  const [initialOnboardingStep, setInitialOnboardingStep] = useState<string | undefined>(undefined)
+  const [showSSOLoader, setShowSSOLoader] = useState(false)
+  const [initialOnboardingStep, setInitialOnboardingStep] = useState<string | undefined>(stepParam || undefined)
 
-  // Handle SSO onboarding from stored tokens (new flow)
+  // Remove language from localStorage when signup page loads
+  // Reset to default language (en) which effectively clears any custom language preference
   useEffect(() => {
+    setLanguage('en')
+  }, [setLanguage])
+
+  useEffect(() => {
+    if (isInOnboardingFlow) {
+      setShowOnboarding(true)
+      setInitialOnboardingStep(stepParam || undefined)
+      
+      // If navigating to OTP step, ensure email is loaded from localStorage/sessionStorage
+      if (stepParam === 'otp' && !data.email) {
+        // Try to load email from localStorage or sessionStorage
+        if (typeof window !== 'undefined') {
+          const storedData = sessionStorage.getItem('signupData') || localStorage.getItem('midora_onboarding_data')
+          if (storedData) {
+            try {
+              const parsed = JSON.parse(storedData)
+              if (parsed.email) {
+                updateData({ email: parsed.email })
+              }
+            } catch (error) {
+              console.error('Error parsing stored data:', error)
+            }
+          }
+        }
+      }
+    } else {
+      setShowOnboarding(false)
+      setInitialOnboardingStep(undefined)
+    }
+  }, [stepParam, isInOnboardingFlow])
+
+  useEffect(() => {
+    // Check for error query params from SSO callbacks
+    const errorParam = searchParams.get('error')
+    const errorType = searchParams.get('error_type')
+    const errorMessage = searchParams.get('error_message')
+    
+    if (errorParam === 'sso_error' && errorMessage) {
+      // Show error toast
+      const errorObj = errorType && errorMessage ? {
+        error_type: errorType,
+        error_message: errorMessage
+      } : { error_message: errorMessage }
+      showErrorToast('SSO Authentication Failed', handleApiError(errorObj))
+      
+      // Remove error query params
+      const params = new URLSearchParams(searchParams.toString())
+      params.delete('error')
+      params.delete('error_type')
+      params.delete('error_message')
+      router.replace(`/signup?${params.toString()}`, { scroll: false })
+      return
+    }
+    
     const checkSSOOnboarding = async () => {
-      // Check if we have valid tokens and user is not authenticated
+      tokenManager.debugTokenState()
       const tokens = tokenManager.getTokens()
       if (tokens.accessToken && tokens.refreshToken && !isProcessingSSO) {
         try {
-          // Get user details from backend
+          setIsProcessingSSO(true)
+          setShowSSOLoader(true)
           const userData = await getCurrentUser()
-          if (userData && !userData.is_onboarded) { 
-            // Store user data for SSO onboarding
-            updateData({ 
-              email: userData.email,
-              fullName: `${userData.first_name} ${userData.last_name}`.trim()
-            })
-            // Show SSO onboarding flow
-            setIsSSOOnboarding(true)
-            setShowOnboarding(true)
-          } else if (userData && userData.is_onboarded) {
-            // User is already onboarded, redirect to chat
+          if (userData) {
+            // Regardless of onboarding status, persist auth state and go to chat
             dispatch(loginSuccess({
               user: userData,
               accessToken: tokens.accessToken,
@@ -67,17 +123,20 @@ function SignupPageContent() {
           // Clear invalid tokens
           tokenManager.clearTokens()
         } finally {
+          setIsProcessingSSO(false)
+          setShowSSOLoader(false)
           dispatch(setLoading(false))
         }
       }
     }
-
     // Only check if we're not already processing SSO and no query params
     if (!isProcessingSSO && searchParams.has('access_token') && searchParams.has('refresh_token')) {
+      setShowSSOLoader(true)
       tokenManager.storeTokens(searchParams.get('access_token')!, searchParams.get('refresh_token')!, searchParams.get('auth_method')!)
+      console.log('Stored tokens from query params')
       checkSSOOnboarding()
     }
-  }, [dispatch, router, isProcessingSSO, searchParams])
+  }, [dispatch, router, isProcessingSSO, searchParams, showErrorToast])
 
   const handleOnboardingComplete = async (onboardingData: { email: string; fullName: string; profession: string }) => {
     try {
@@ -106,22 +165,39 @@ function SignupPageContent() {
   }
 
   const handleOnShowOnboarding = (step?: string) => {
+    // Navigate to the appropriate step using query parameters
+    const params = new URLSearchParams(searchParams.toString())
     if (step) {
+      params.set('step', step)
       setInitialOnboardingStep(step)
+    } else {
+      params.set('step', 'welcome')
+      setInitialOnboardingStep('welcome')
     }
+    router.push(`/signup?${params.toString()}`, { scroll: false })
     setShowOnboarding(true)
   }
-  // Show onboarding flow in full screen blank layout if needed
-  if (showOnboarding) {
+  if (showSSOLoader) {
     return (
       <LoadingWrapper 
-        message="Setting up your account..."
+        message="Signing you in..."
         minLoadingTime={300}
         showInitially={true}
+        isLoading={showSSOLoader}
       >
-        <div className="fixed inset-0 w-full h-full bg-[color:var(--tokens-color-surface-surface-primary)] flex flex-col justify-between">
+        <div />
+      </LoadingWrapper>
+    )
+  }
+
+  // Show onboarding flow in full screen blank layout if needed
+  if (showOnboarding) {
+    // Don't show loader for OTP step - show it immediately
+    if (stepParam === 'otp') {
+      return (
+        <div className="fixed inset-0 w-full h-full bg-[color:var(--tokens-color-surface-surface-primary)] overflow-y-auto flex flex-col justify-between">
           {/* Main content area */}
-          <div className="flex-1 flex justify-center px-4 py-8">
+          <div className="flex-1 flex justify-center px-4 py-24">
             <div className="w-full">
               <MultiStepContainer 
                 onComplete={handleOnboardingComplete}
@@ -136,14 +212,59 @@ function SignupPageContent() {
           
           {/* Footer */}
           <div className="flex justify-center px-4 pb-8">
-            <p className="font-text font-[number:var(--text-font-weight)] text-tokens-color-text-text-inactive-2 text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-center max-w-full">
-              <span className="font-text font-[number:var(--text-font-weight)] text-[#29324180] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
+            <p className="font-h02-heading02 font-[number:var(--text-font-weight)] [color:var(--tokens-color-text-text-inactive-2)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-center  max-w-full">
+              <span className={`font-h02-heading02 font-[number:var(--text-font-weight)] text-[color:var(--light-mode-colors-dark-gray-900)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] ${isDark && 'text-white'} `}>
                 All rights reserved@ 2025, midora.ai, You can view our{" "}
               </span>
-              <span className="underline font-text [font-style:var(--text-font-style)] font-[number:var(--text-font-weight)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] text-[length:var(--text-font-size)]">
-                Privacy Policy
+              <button 
+            className="underline underline-offset-0 decoration-0 [text-decoration-skip-ink:auto] [color:var(--tokens-color-text-text-inactive-2)] hover:text-gray-700 transition-colors cursor-pointer"
+          >
+            Privacy Policy
+            </button>
+          
+              <span className={`font-h02-heading02 font-[number:var(--text-font-weight)] text-[color:var(--light-mode-colors-dark-gray-900)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] ${isDark && 'text-white'} `}>
+                {" "}here
               </span>
-              <span className="font-text font-[number:var(--text-font-weight)] text-[#29324180] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)]">
+            </p>
+          </div>
+        </div>
+      )
+    }
+    
+    return (
+      <LoadingWrapper 
+        message="Setting up your account..."
+        minLoadingTime={300}
+        showInitially={true}
+      >
+        <div className="fixed inset-0 w-full h-full bg-[color:var(--tokens-color-surface-surface-primary)] overflow-y-auto flex flex-col justify-between">
+          {/* Main content area */}
+          <div className="flex-1 flex justify-center px-4 py-24">
+            <div className="w-full">
+              <MultiStepContainer 
+                onComplete={handleOnboardingComplete}
+                initialEmail={data.email}
+                initialFullName={data.fullName}
+                initialPassword={data.password}
+                isSSOOnboarding={isSSOOnboarding}
+                initialStep={initialOnboardingStep as any}
+              />
+            </div>
+          </div>
+          
+          {/* Footer */}
+          <div className="flex justify-center px-4 pb-8">
+            <p className="font-h02-heading02 font-[number:var(--text-font-weight)] [color:var(--tokens-color-text-text-inactive-2)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-center  max-w-full">
+              <span className={`font-h02-heading02 font-[number:var(--text-font-weight)] text-[color:var(--light-mode-colors-dark-gray-900)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] ${isDark && 'text-white'} `}>
+                All rights reserved@ 2025, midora.ai, You can view our{" "}
+              </span>
+              <button 
+            className="underline underline-offset-0 decoration-0 [text-decoration-skip-ink:auto] [color:var(--tokens-color-text-text-inactive-2)] hover:text-gray-700 transition-colors cursor-pointer"
+          >
+            Privacy Policy
+            </button>
+          
+              <span className={`font-h02-heading02 font-[number:var(--text-font-weight)] text-[color:var(--light-mode-colors-dark-gray-900)] text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] ${isDark && 'text-white'} `}>
                 {" "}here
               </span>
             </p>
@@ -162,17 +283,22 @@ function SignupPageContent() {
     >
       <div className="relative min-h-screen w-auto bg-[color:var(--tokens-color-surface-surface-primary)]">
         {/* Header with Logo */}
-        <header className="relative top-[37px] left-[44px] w-auto md:absolute h-[60px]">
+        <header className="relative top-[37px] left-[-2px] md:left-[44px] w-auto md:absolute h-[60px]">
           <div className="max-w-7xl mx-auto ml-0">
-            <div className="flex justify-start md:justify-center">
+            <div className="flex justify-center">
               <a 
                 href="/" 
                 className="flex flex-col w-[120px] sm:w-[140px] lg:w-[154px] items-start gap-2.5 cursor-pointer hover:opacity-80 transition-opacity duration-200"
               >
                 <img
-                  className="relative self-stretch w-full aspect-[5.19] object-cover"
+                  className="relative self-stretch w-full aspect-[5.19] object-cover dark:hidden"
                   alt="Midora AI Logo"
                   src="/img/logo.png"
+                />
+                <img
+                  className="relative self-stretch w-full hidden dark:block"
+                  alt="Midora AI Logo"
+                  src="/img/dark-logo-text.png"
                 />
               </a>
             </div>
@@ -182,48 +308,48 @@ function SignupPageContent() {
         {/* Main Content */}
         <main className="w-full">
           {/* Top Section - Signup Form and Sales Chart */}
-          <section className="w-full pt-4 lg:pt-8 pb-8 lg:pb-16">
+          <section className="w-full pt-4 lg:pt-8 pb-6 lg:pb-12">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 xl:gap-16 min-h-[600px]">
               {/* Signup Form Section */}
-              <div className="order-2 lg:order-1 flex justify-center lg:justify-center px-4 sm:px-6 lg:px-8 m-auto items-end w-full h-full">
+              <div id="signup-form-section" className="order-1 lg:order-1 flex justify-center lg:justify-center px-4 sm:px-6 lg:px-8 m-auto items-end w-full h-full">
                 <SignupFormSection onShowOnboarding={(step: string | undefined) => handleOnShowOnboarding(step)} />
               </div>
 
               {/* Group Wrapper - Sales Funnel Chart */}
-              <div className="order-1 lg:order-2 flex justify-center lg:justify-end px-4 sm:px-6 lg:px-8">
+              <div className="order-2 lg:order-2 flex justify-center lg:justify-end px-4 sm:px-6 lg:px-8">
                 <GroupWrapper />
               </div>
             </div>
           </section>
 
           {/* Hero Section with Background Images */}
-          <section className="relative w-full py-16 lg:py-24">
+          <section className="relative w-full pt-16 pb-8 lg:pt-24 lg:pb-16">
             <div className="w-full px-4 sm:px-6 lg:px-8">
               {/* Background Images - Hidden on mobile, visible on larger screens */}
               <div className="hidden lg:block absolute inset-0 pointer-events-none">
                 <img
-                  className="absolute w-[80px] h-[80px] lg:w-[114px] lg:h-[114px] top-[20%] left-[25%] aspect-[1] object-cover opacity-60"
+                  className="absolute w-[80px] h-[80px] lg:w-[114px] lg:h-[114px] top-[43.5%] left-[31%] aspect-[1] object-cover opacity-90"
                   alt="Image"
                   src="/img/image-16.png"
                 />
 
-                <img
+                {/* <img
                   className="absolute w-4 h-4 lg:w-6 lg:h-6 top-[25%] left-[40%] aspect-[1] object-cover opacity-60"
                   alt="Image"
                   src="/img/image-19.png"
-                />
+                /> */}
 
                 <img
-                  className="absolute w-[120px] h-[120px] lg:w-[202px] lg:h-[202px] top-[35%] right-[15%] aspect-[1] object-cover opacity-60"
+                  className="absolute w-[120px] h-[120px] lg:w-[202px] lg:h-[202px] top-[65%] right-[35%] aspect-[1] object-cover opacity-60"
                   alt="Image"
                   src="/img/image-18.png"
                 />
 
-                <img
+                {/* <img
                   className="absolute w-[20px] h-[24px] lg:w-[30px] lg:h-8 top-[40%] left-[25%] aspect-[0.96] opacity-60"
                   alt="Image"
                   src="/img/image-17.png"
-                />
+                /> */}
               </div>
 
               <HeroSection />
@@ -231,14 +357,14 @@ function SignupPageContent() {
           </section>
 
           {/* Pricing Section */}
-          <section className="w-full py-16 lg:py-24">
+          <section className="w-full py-8 lg:py-16">
             <div className="w-full px-4 sm:px-6 lg:px-8">
-              <PricingSection />
+              <PricingSection onSignupPage={true} signupFormId="signup-form-section" />
             </div>
           </section>
 
           {/* FAQ Section */}
-          <section className="w-full py-16 lg:py-24">
+          <section className="w-full pt-8 pb-32 lg:pb-32 ">
             <div className="w-full px-4 sm:px-6 lg:px-8">
               <FaqSection />
             </div>

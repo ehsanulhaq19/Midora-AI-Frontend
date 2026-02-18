@@ -16,7 +16,7 @@ interface PasswordInputProps {
 }
 
 export const PasswordInput: React.FC<PasswordInputProps> = ({
-  placeholder = "Enter your password",
+  placeholder,
   value = "",
   onChange,
   onKeyDown,
@@ -52,7 +52,7 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
   const passwordRequirements = showPasswordRequirements ? validatePassword(value) : null
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col">
       <div
         className={cn(
           "flex w-[360px] h-[54px] items-center pl-4 pr-1 py-3 relative rounded-xl border border-solid",
@@ -69,7 +69,7 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
           onKeyDown={onKeyDown}
           placeholder={placeholder}
           disabled={disabled}
-          className="relative flex-1 bg-transparent outline-none font-text font-[number:var(--text-font-weight)] text-tokens-color-text-text-seconary text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] placeholder:text-tokens-color-text-text-inactive-2 disabled:opacity-50"
+          className="relative flex-1 bg-transparent outline-none font-text font-[number:var(--text-font-weight)] text-tokens-color-text-text-seconary text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] placeholder:[color:var(--tokens-color-text-text-inactive-2)] disabled:opacity-50"
         />
 
         <button
@@ -78,7 +78,7 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
           disabled={disabled}
           className="flex w-[46px] h-[46px] items-center justify-center gap-2.5 px-3 py-[18px] relative mt-[-8.00px] mb-[-8.00px] bg-transparent hover:bg-gray-100 rounded-xl transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <span className="text-tokens-color-text-text-inactive-2 text-sm">
+          <span className="[color:var(--tokens-color-text-text-inactive-2)] text-sm">
             {showPassword ? '👁️' : '👁️‍🗨️'}
           </span>
         </button>
@@ -93,7 +93,7 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
           <h3 className="text-sm font-medium text-tokens-color-text-text-secondary mb-2">
             Password Requirements:
           </h3>
-          <ul className="text-xs text-tokens-color-text-text-inactive-2 space-y-1">
+          <ul className="text-xs [color:var(--tokens-color-text-text-inactive-2)] space-y-1">
             <li className={`flex items-center gap-2 ${passwordRequirements.length ? 'text-green-500' : ''}`}>
               <span>{passwordRequirements.length ? '✓' : '○'}</span>
               At least 8 characters

@@ -216,7 +216,7 @@ export const Slider: React.FC<SliderProps> = ({
                 paddingRight: centerMode && index === totalSlides - 1 ? centerPadding : '0px'
               }}
             >
-              <div className="px-3 h-full">
+              <div className="flex justify-center h-full">
                 {child}
               </div>
             </div>

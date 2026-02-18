@@ -158,7 +158,7 @@ describe('useConversation', () => {
     const mockConversation = {
       id: '1',
       uuid: 'conv-1',
-      name: 'Chat - Test message...',
+      name: 'Test message...',
       created_by: 1,
       created_at: '2024-01-01T00:00:00Z',
       updated_at: '2024-01-01T00:00:00Z',
@@ -188,7 +188,7 @@ describe('useConversation', () => {
     })
 
     expect(conversationApi.createConversation).toHaveBeenCalledWith({
-      name: 'Chat - Test message...',
+      name: 'Test message...',
     })
     expect(conversationApi.generateContentStream).toHaveBeenCalled()
     expect(result.current.currentConversation).toEqual(mockConversation)

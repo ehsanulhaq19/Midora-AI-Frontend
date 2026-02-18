@@ -51,6 +51,8 @@ export const auth = {
   enterEmailForReset: 'Enter your email address',
   sendResetCode: 'Send Reset Code',
   sendingResetCode: 'Sending reset code...',
+  checking: 'Checking...',
+  continueWithEmail: 'Continue with email',
   resetCodeSent: 'Reset code sent successfully',
   resetCodeSentMessage: 'We\'ve sent a reset code to your email address. Please check your inbox and enter the code below.',
   backToLogin: 'Back to Sign In',
@@ -62,7 +64,6 @@ export const auth = {
   enterResetCode: 'Enter reset code',
   enterNewPassword: 'Enter new password',
   confirmNewPassword: 'Confirm new password',
-  resetPassword: 'Reset Password',
   resettingPassword: 'Resetting password...',
   passwordResetSuccess: 'Password reset successfully',
   passwordResetSuccessMessage: 'Your password has been reset successfully. You can now sign in with your new password.',
@@ -74,6 +75,7 @@ export const auth = {
   verifyingOtp: 'Verifying OTP...',
   resendOtp: 'Resend OTP',
   resendingOtp: 'Resending OTP...',
+  regenerateOTP: 'Resend Code',
   otpVerified: 'OTP verified successfully',
   otpExpired: 'OTP has expired',
   invalidOtp: 'Invalid OTP code',
@@ -85,8 +87,8 @@ export const auth = {
   welcomeSubtitle: 'We\'re excited to have you join our community. Let\'s get you set up with a few quick questions.',
   fullNameTitle: 'What\'s your full name?',
   fullNameSubtitle: 'This helps us personalize your experience.',
-  fullNamePlaceholder: 'Enter your full name',
-  professionTitle: 'What are you into? Pick any three topics to explore',
+  fullNamePlaceholder: 'Enter your name here',
+  professionTitle: 'Tell your name to start your journey with us.',
   professionSubtitle: 'Tell your name to start your journey with us.',
   professionPlaceholder: 'Enter your name',
   fullNameRequired: 'Full name is required',
@@ -104,7 +106,6 @@ export const auth = {
   passwordRequirementLowercase: 'One lowercase letter',
   passwordRequirementDigit: 'One digit',
   passwordRequirementSpecial: 'One special character',
-  passwordsDoNotMatch: 'Passwords do not match',
   signUpUser: 'Sign Up',
   signingUp: 'Signing up...',
   showPassword: 'Show password',
@@ -113,7 +114,7 @@ export const auth = {
   // OTP Verification
   verifyEmailTitle: 'Verify your email',
   verifyEmailSubtitle: 'We\'ve sent a 6-digit verification code to',
-  enterOtpCode: 'Enter 6-digit code',
+  enterOtpCodeSixDigit: 'Enter 6-digit code',
   verifyOtpCode: 'Verify OTP Code',
   verifyingOtpCode: 'Verifying...',
   checkYourEmail: 'Check your email:',
@@ -138,7 +139,7 @@ export const auth = {
   featureAICollaboration: 'Collaborate with AI that adapts to your goals',
   privacyNoticeText: 'We use chat and code sessions to train midora.ai, You can settings in anytime in your',
   privacySection: 'Privacy section.',
-  continueWithEmail: 'Continue with email',
+  // continueWithEmail: 'Continue with email',
   footerRightsReserved: 'All rights reserved@ 2025, midora.ai, You can view our',
   privacyPolicy: 'Privacy Policy',
   footerHere: 'here',
@@ -153,7 +154,6 @@ export const auth = {
   back: 'Back',
 
   // SSO Authentication
-  signInWithGoogle: 'Continue with Google',
   signInWithMicrosoft: 'Continue with Microsoft',
   signInWithGitHub: 'Continue with GitHub',
   ssoSigningIn: 'Signing in with {provider}...',
@@ -192,4 +192,7 @@ export const auth = {
   successSubtitle: 'Your account has been created successfully. We\'re setting up your account for you.',
   settingUpAccount: 'Setting up your account...',
   accountSetupComplete: 'Account setup complete!',
+
+  // Public chat screen
+  loginToJoin: 'Log in to Join',
 }

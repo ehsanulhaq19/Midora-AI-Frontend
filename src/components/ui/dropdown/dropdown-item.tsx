@@ -42,7 +42,7 @@ export const DropdownItem: React.FC<DropdownItemProps> = ({
           className="w-4 h-4 rounded flex-shrink-0"
         />
       )}
-      <span className="font-text-small font-[number:var(--text-small-font-weight)] text-tokens-color-text-text-neutral text-[length:var(--text-small-font-size)] tracking-[var(--text-small-letter-spacing)] leading-[var(--text-small-line-height)] [font-style:var(--text-small-font-style)]">
+      <span className="font-h02-heading02 font-[number:var(--text-small-font-weight)] text-tokens-color-text-text-neutral text-[length:var(--text-small-font-size)] tracking-[var(--text-small-letter-spacing)] leading-[var(--text-small-line-height)] [font-style:var(--text-small-font-style)]">
         {label}
       </span>
     </button>

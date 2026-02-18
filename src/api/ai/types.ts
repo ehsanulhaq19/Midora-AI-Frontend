@@ -17,6 +17,9 @@ export interface AIModel {
   is_fallback_model: boolean
   is_default_model: boolean
   is_active: boolean
+  release_date?: string | null
+  ai_model_type?: 'low' | 'medium' | 'high' | null
+  available?: boolean
   created_at: string
   updated_at: string | null
 }
@@ -57,6 +60,15 @@ export interface GenerateContentRequest {
   ai_model_uuid?: string
   max_tokens?: number
   temperature?: number
+  file_uuids?: string[]
+  project_uuid?: string
+}
+
+// Regenerate Content types
+export interface RegenerateContentRequest {
+  message_uuid: string
+  ai_model_uuid?: string
+  project_uuid?: string
 }
 
 export interface GenerateContentResponse {
@@ -73,7 +85,7 @@ export interface GenerateContentResponse {
 
 // Streaming response types
 export interface StreamingResponse {
-  type: 'metadata' | 'meta_data' | 'model_selection' | 'content' | 'completion' | 'error' | 'unethical' | 'initial_metadata'
+  type: 'metadata' | 'meta_data' | 'model_selection' | 'content' | 'initial_content' | 'completion' | 'error' | 'unethical' | 'initial_metadata'
   conversation_uuid?: string
   message_id?: string
   chunk?: string
@@ -86,6 +98,14 @@ export interface StreamingResponse {
   ai_message_id?: string
   error?: string
   message?: string | null
+  linked_files?: Array<{
+    uuid: string
+    filename: string
+    file_extension: string
+    file_type: string
+    file_size: number
+    storage_type: string
+  }>
 }
 
 // Streaming callback types

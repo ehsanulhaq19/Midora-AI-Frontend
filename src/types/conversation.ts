@@ -10,6 +10,7 @@ export interface ConversationState {
   error: string | null
   isStreaming: boolean
   streamingContent: string
+  initialContent: string
   streamingMetadata: { 
     message_type?: string
     selected_model?: string

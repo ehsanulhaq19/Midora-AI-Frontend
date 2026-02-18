@@ -18,19 +18,10 @@ function getAccessToken(): string | null {
 }
 
 /**
- * Get refresh token from cookie
+ * Get refresh token from token manager
  */
 function getRefreshToken(): string | null {
-  if (typeof document === 'undefined') return null
-  
-  const cookies = document.cookie.split(';')
-  for (const cookie of cookies) {
-    const [name, value] = cookie.trim().split('=')
-    if (name === 'refresh_token') {
-      return decodeURIComponent(value)
-    }
-  }
-  return null
+  return tokenManager.getRefreshToken()
 }
 
 /**
@@ -41,7 +32,7 @@ function isBackendApiCall(url: string): boolean {
 }
 
 /**
- * Request interceptor to add authorization headers and refresh token
+ * Request interceptor to add authorization headers
  */
 export function requestInterceptor(url: string, options: RequestInit = {}): RequestInit {
   // Only add authorization header for backend API calls
@@ -60,15 +51,22 @@ export function requestInterceptor(url: string, options: RequestInit = {}): Requ
       console.log('No access token available for request:', url)
     }
     
+    // Note: Refresh token is automatically sent as a cookie with the request
+    // when credentials: 'include' is set in the base API client
     if (refreshToken) {
-      console.log('Adding refresh token to request:', url)
-      headers['X-Refresh-Token'] = refreshToken
+      console.log('✅ Refresh token cookie will be sent with request:', url)
+      console.log('Refresh token preview:', refreshToken.substring(0, 20) + '...')
+    } else {
+      console.log('⚠️ No refresh token cookie available for request:', url)
     }
     
-    return {
+    // Return options with headers only (credentials handled by base client)
+    const requestOptions: RequestInit = {
       ...options,
       headers,
     }
+    
+    return requestOptions
   }
   
   return options

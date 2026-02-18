@@ -13,12 +13,12 @@ export const Faqs: React.FC<FaqsProps> = ({ property1, className }) => {
     >
       <button 
         type="button"
-        className="inline-flex items-center justify-between w-full text-left hover:bg-gray-50 rounded-lg p-2 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        className="inline-flex items-center justify-between w-full text-left rounded-lg p-2 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
         onClick={() => {}}
         aria-expanded={property1 === "expanded"}
         aria-label="Toggle FAQ: What is midora and how does it work?"
       >
-        <p className="font-text-large w-full max-w-[509px] mt-[-1.00px] tracking-[var(--text-large-letter-spacing)] text-lg sm:text-xl lg:text-[length:var(--text-large-font-size)] [font-style:var(--text-large-font-style)] text-tokens-color-text-text-primary font-[number:var(--text-large-font-weight)] leading-[var(--text-large-line-height)] relative text-left">
+        <p className="font-h03-heading03 w-full max-w-[509px]  tracking-[var(--text-large-letter-spacing)] text-lg sm:text-xl lg:text-[length:var(--text-large-font-size)] [font-style:var(--text-large-font-style)] text-tokens-color-text-text-primary font-[number:var(--text-large-font-weight)] leading-[var(--text-large-line-height)] relative text-left">
           What is midora and how does it work?
         </p>
 
@@ -30,7 +30,7 @@ export const Faqs: React.FC<FaqsProps> = ({ property1, className }) => {
       </button>
 
       {property1 === "expanded" && (
-        <p className="relative w-full max-w-[544px] font-text font-[number:var(--text-font-weight)] text-tokens-color-text-text-primary text-sm sm:text-base lg:text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-left">
+        <p className="relative w-full max-w-[544px] font-h03-heading03 font-[number:var(--text-font-weight)] text-tokens-color-text-text-primary text-sm sm:text-base lg:text-[length:var(--text-font-size)] tracking-[var(--text-letter-spacing)] leading-[var(--text-line-height)] [font-style:var(--text-font-style)] text-left">
           If you can dream it, Claude can help you do it. Claude can process
           large amounts of information, brainstorm ideas, generate text and
           code, help you understand subjects, coach you through difficult

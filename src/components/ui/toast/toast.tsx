@@ -4,7 +4,8 @@ import React, { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import { removeToast } from '@/store/slices/toastSlice'
 import { Toast as ToastType } from '@/store/slices/toastSlice'
-import { Check, X, AlertTriangle, Info, X as CloseIcon } from 'lucide-react'
+import { Check, X, AlertTriangle, AlertOctagon, Info } from 'lucide-react'
+import { useTheme } from '@/hooks/use-theme'
 
 interface ToastProps {
   toast: ToastType
@@ -12,6 +13,8 @@ interface ToastProps {
 
 const Toast: React.FC<ToastProps> = ({ toast }) => {
   const dispatch = useDispatch()
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
 
   useEffect(() => {
     if (toast.duration && toast.duration > 0) {
@@ -32,11 +35,11 @@ const Toast: React.FC<ToastProps> = ({ toast }) => {
       case 'success':
         return <Check className="w-5 h-5 text-green-600" />
       case 'error':
-        return <X className="w-5 h-5 text-red-600" />
+        return <AlertOctagon className="w-5 h-5 text-red-600" />
       case 'warning':
         return <AlertTriangle className="w-5 h-5 text-yellow-600" />
       case 'info':
-        return <Info className="w-5 h-5 text-blue-600" />
+        return <Info className={`w-5 h-5 ${isDark ? 'text-blue-400' : 'text-blue-600'}`} />
       default:
         return <Info className="w-5 h-5 text-gray-600" />
     }
@@ -51,7 +54,7 @@ const Toast: React.FC<ToastProps> = ({ toast }) => {
       case 'warning':
         return 'bg-yellow-50 border-yellow-200'
       case 'info':
-        return 'bg-blue-50 border-blue-200'
+        return isDark ? 'bg-blue-900 border-blue-700/50' : 'bg-blue-50 border-blue-200'
       default:
         return 'bg-gray-50 border-gray-200'
     }
@@ -66,7 +69,7 @@ const Toast: React.FC<ToastProps> = ({ toast }) => {
       case 'warning':
         return 'text-yellow-800'
       case 'info':
-        return 'text-blue-800'
+        return isDark ? 'text-blue-300' : 'text-blue-800'
       default:
         return 'text-gray-800'
     }
@@ -81,7 +84,7 @@ const Toast: React.FC<ToastProps> = ({ toast }) => {
       case 'warning':
         return 'text-yellow-700'
       case 'info':
-        return 'text-blue-700'
+        return isDark ? 'text-blue-200' : 'text-blue-700'
       default:
         return 'text-gray-700'
     }
@@ -111,7 +114,11 @@ const Toast: React.FC<ToastProps> = ({ toast }) => {
         {toast.action && (
           <button
             onClick={toast.action.onClick}
-            className="mt-2 text-sm font-medium text-blue-600 hover:text-blue-800 underline"
+            className={`mt-2 text-sm font-medium underline ${
+              toast.type === 'info' && isDark
+                ? 'text-blue-400 hover:text-blue-300' 
+                : 'text-blue-600 hover:text-blue-800'
+            }`}
           >
             {toast.action.label}
           </button>
@@ -120,10 +127,14 @@ const Toast: React.FC<ToastProps> = ({ toast }) => {
       
       <button
         onClick={handleClose}
-        className="flex-shrink-0 p-1 rounded-md hover:bg-black/5 transition-colors"
+        className={`flex-shrink-0 p-1 rounded-md transition-colors ${
+          toast.type === 'info' && isDark
+            ? 'hover:bg-white/10' 
+            : 'hover:bg-black/5'
+        }`}
         aria-label="Close notification"
       >
-        <CloseIcon className="w-4 h-4 text-gray-500" />
+        <X className={`w-4 h-4 ${toast.type === 'info' && isDark ? 'text-gray-300' : 'text-gray-500'}`} />
       </button>
     </div>
   )

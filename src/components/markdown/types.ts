@@ -1,3 +1,5 @@
+import type { MouseEvent } from 'react'
+
 export interface MarkdownRendererProps {
   /**
    * The markdown content to render
@@ -8,4 +10,9 @@ export interface MarkdownRendererProps {
    * Additional CSS classes to apply to the markdown container
    */
   className?: string
+
+  /**
+   * Optional handler invoked when an anchor tag is clicked
+   */
+  onLinkClick?: (event: MouseEvent<HTMLAnchorElement>, href?: string) => void
 }

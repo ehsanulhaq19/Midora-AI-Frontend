@@ -15,45 +15,18 @@ import {
 import { 
   UserLogin, 
   UserCreate, 
-  ForgotPasswordRequest,
   PasswordResetRequest,
-  OTPVerificationRequest
+  OTPVerificationRequest,
+  AuthContextType
 } from '@/api/auth/types'
 import { setTokens, clearAuthCookies } from '@/lib/auth'
 import { tokenManager } from '@/lib/token-manager'
 import { handleApiError } from '@/lib/error-handler'
+import { resetThemeToSystem } from '@/hooks/use-theme'
+import { getLanguageCodeFromName } from '@/lib/language-constants'
+import { setCurrentLanguage } from '@/i18n'
 
-interface UseAuthReturn {
-  // State
-  user: any
-  isAuthenticated: boolean
-  isLoading: boolean
-  error: string | null
-  accessToken: string | null
-  refreshToken: string | null
-  
-  // Actions
-  login: (credentials: UserLogin) => Promise<void>
-  register: (userData: UserCreate) => Promise<void>
-  logout: () => Promise<void>
-  refreshAccessToken: () => Promise<string>
-  resetPassword: (data: PasswordResetRequest) => Promise<void>
-  verifyOTP: (data: OTPVerificationRequest) => Promise<void>
-  regenerateOTP: (email: string) => Promise<void>
-  updateProfile: (data: { first_name: string; last_name: string; profession: string }) => Promise<void>
-  completeOnboarding: (data?: { first_name?: string; last_name?: string; profession?: string[] }) => Promise<void>
-  getCurrentUser: () => Promise<any>
-  clearError: () => void
-  
-  // SSO Methods
-  signInWithGoogle: () => Promise<void>
-  signInWithMicrosoft: () => Promise<void>
-  signInWithGitHub: () => Promise<void>
-  handleSSOCallback: (provider: 'google' | 'microsoft' | 'github', code: string, state?: string) => Promise<void>
-  
-  // OTP Login
-  verifyOTPAndLogin: (email: string, password: string, otpCode: string) => Promise<void>
-}
+type UseAuthReturn = AuthContextType
 
 /**
  * Consolidated authentication hook that provides all authentication functionality
@@ -108,6 +81,15 @@ export const useAuth = (): UseAuthReturn => {
           refreshToken: refresh_token,
           authMethod: 'email'
         }))
+
+        // Load language from user data and save to localStorage
+        if (userResponse.data.language) {
+          const languageCode = getLanguageCodeFromName(userResponse.data.language)
+          setCurrentLanguage(languageCode)
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('midora-language', languageCode)
+          }
+        }
 
         try {
           const urlParams = new URLSearchParams(window.location.search)
@@ -164,6 +146,10 @@ export const useAuth = (): UseAuthReturn => {
       clearAuthCookies()
       tokenManager.clearTokens()
       dispatch(logoutAction())
+      // Reset theme to system on logout
+      if (typeof window !== 'undefined') {
+        resetThemeToSystem()
+      }
       router.push('/')
     }
   }, [router, dispatch])
@@ -284,7 +270,7 @@ export const useAuth = (): UseAuthReturn => {
     }
   }, [dispatch])
 
-  const updateProfile = useCallback(async (data: { first_name: string; last_name: string; profession: string }) => {
+  const updateProfile = useCallback(async (data: { first_name?: string; last_name?: string; profession?: string; language?: string | null }) => {
     try {
       dispatch(clearError())
 
@@ -360,6 +346,15 @@ export const useAuth = (): UseAuthReturn => {
       // Update user data in Redux store
       if (response.data) {
         dispatch(updateUser(response.data))
+
+        // Load language from user data and save to localStorage
+        if (response.data.language) {
+          const languageCode = getLanguageCodeFromName(response.data.language)
+          setCurrentLanguage(languageCode)
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('midora-language', languageCode)
+          }
+        }
       }
 
       dispatch(setLoading(false))
@@ -566,6 +561,15 @@ export const useAuth = (): UseAuthReturn => {
             refreshToken: response.data.refresh_token,
             authMethod: provider
           }))
+
+          // Load language from user data and save to localStorage
+          if (response.data.user.language) {
+            const languageCode = getLanguageCodeFromName(response.data.user.language)
+            setCurrentLanguage(languageCode)
+            if (typeof window !== 'undefined') {
+              localStorage.setItem('midora-language', languageCode)
+            }
+          }
           
           // Redirect to chat page
           router.push('/chat')
@@ -642,6 +646,16 @@ export const useAuth = (): UseAuthReturn => {
           )
           
           setTokens(loginResponse.data.access_token, loginResponse.data.refresh_token)
+
+          // Load language from user data and save to localStorage
+          if (userResponse.data.language) {
+            const languageCode = getLanguageCodeFromName(userResponse.data.language)
+            setCurrentLanguage(languageCode)
+            if (typeof window !== 'undefined') {
+              localStorage.setItem('midora-language', languageCode)
+            }
+          }
+
           router.push('/chat')
         } else {
           const errorObject = {

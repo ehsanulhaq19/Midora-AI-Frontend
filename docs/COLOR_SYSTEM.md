@@ -69,7 +69,14 @@ Base color scales that form the foundation of the system:
 --primitive-light-gray-100: rgba(242, 242, 242, 0.1);
 ```
 
-### 3. Semantic Surface Colors
+### 3. Light Mode Colors
+Dedicated tokens that mirror design tooling names for light mode references:
+
+```css
+--light-mode-colors-dark-gray-900: rgba(41, 50, 65, 0.9); /* #293241 at 90% */
+```
+
+### 4. Semantic Surface Colors
 Colors for different surface types and contexts:
 
 ```css
@@ -90,7 +97,7 @@ Colors for different surface types and contexts:
 --surface-button-disabled: var(--primitive-light-gray-400);
 ```
 
-### 4. Semantic Text Colors
+### 5. Semantic Text Colors
 Colors for different text contexts:
 
 ```css
@@ -107,7 +114,7 @@ Colors for different text contexts:
 --text-info: #3b82f6;                           /* Info messages */
 ```
 
-### 5. Border Colors
+### 6. Border Colors
 Colors for borders and dividers:
 
 ```css
@@ -118,7 +125,7 @@ Colors for borders and dividers:
 --border-success: var(--text-success);
 ```
 
-### 6. Shadow Colors
+### 7. Shadow Colors
 Predefined shadow values:
 
 ```css
@@ -129,7 +136,7 @@ Predefined shadow values:
 --shadow-glow: 0 0 20px rgba(168, 85, 247, 0.4);
 ```
 
-### 7. Gradient Colors
+### 8. Gradient Colors
 Predefined gradient combinations:
 
 ```css

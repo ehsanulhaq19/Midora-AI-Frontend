@@ -6,11 +6,10 @@ interface CopyProps {
 }
 
 export const Copy: React.FC<CopyProps> = ({ 
-  className = "w-6 h-6", 
-  color = "currentColor" 
+  className = ""
 }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none">
-    <path d="M15 6.75H8.25C7.42157 6.75 6.75 7.42157 6.75 8.25V15C6.75 15.8284 7.42157 16.5 8.25 16.5H15C15.8284 16.5 16.5 15.8284 16.5 15V8.25C16.5 7.42157 15.8284 6.75 15 6.75Z" stroke={color} stroke-opacity="0.9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M3.75 11.25H3C2.60218 11.25 2.22064 11.092 1.93934 10.8107C1.65804 10.5294 1.5 10.1478 1.5 9.75V3C1.5 2.60218 1.65804 2.22064 1.93934 1.93934C2.22064 1.65804 2.60218 1.5 3 1.5H9.75C10.1478 1.5 10.5294 1.65804 10.8107 1.93934C11.092 2.22064 11.25 2.60218 11.25 3V3.75" stroke={color} stroke-opacity="0.9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <path d="M15.2715 7.38574H8.52148C7.69306 7.38574 7.02148 8.05731 7.02148 8.88574V15.6357C7.02148 16.4642 7.69306 17.1357 8.52148 17.1357H15.2715C16.0999 17.1357 16.7715 16.4642 16.7715 15.6357V8.88574C16.7715 8.05731 16.0999 7.38574 15.2715 7.38574Z" stroke="#1F1740" stroke-opacity="0.9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M4.02148 11.8857H3.27148C2.87366 11.8857 2.49213 11.7277 2.21082 11.4464C1.92952 11.1651 1.77148 10.7836 1.77148 10.3857V3.63574C1.77148 3.23792 1.92952 2.85639 2.21082 2.57508C2.49213 2.29378 2.87366 2.13574 3.27148 2.13574H10.0215C10.4193 2.13574 10.8008 2.29378 11.0821 2.57508C11.3634 2.85639 11.5215 3.23792 11.5215 3.63574V4.38574" stroke="#1F1740" stroke-opacity="0.9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
   </svg>
 )

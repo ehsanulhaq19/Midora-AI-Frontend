@@ -96,11 +96,19 @@ module.exports = {
           error: 'var(--border-error)',
           success: 'var(--border-success)',
         },
+
+        // ===== LIGHT MODE COLOR TOKENS =====
+        'light-mode-colors': {
+          'dark-gray': {
+            900: 'var(--light-mode-colors-dark-gray-900)',
+          },
+        },
         
         // ===== LEGACY COMPATIBILITY =====
         'gray0-white': 'var(--gray0-white)',
         'premitives-color-light-gray-1000': 'var(--premitives-color-light-gray-1000)',
         'premitives-color-light-gray-300': 'var(--premitives-color-light-gray-300)',
+        'premitives-color-light-gray-700': 'var(--premitives-color-light-gray-700)',
         'tokens-color-surface-surface-button': 'var(--tokens-color-surface-surface-button)',
         'tokens-color-surface-surface-button-inactive': 'var(--tokens-color-surface-surface-button-inactive)',
         'tokens-color-surface-surface-button-pressed': 'var(--tokens-color-surface-surface-button-pressed)',
@@ -194,6 +202,8 @@ module.exports = {
         // Legacy Signup Module Fonts (for backward compatibility)
         'h01-heading-01': 'var(--h01-heading-01-font-family)',
         'h02-heading02': 'var(--h02-heading02-font-family)',
+        'h03-heading03': 'var(--h03-heading-light-font-family)',
+        'SF-Pro' : 'var(--text-large-font-family)',
         'text': 'var(--text-font-family)',
         'text-large': 'var(--text-large-font-family)',
         'text-xs-bold': 'var(--text-xs-bold-font-family)',
@@ -293,6 +303,9 @@ module.exports = {
       backdropBlur: {
         xs: '2px',
       },
+      boxShadow: {
+    'purple-soft': '-6px 4px 33.2px 0 #4D30711A',
+  },
     },
   },
   plugins: [],

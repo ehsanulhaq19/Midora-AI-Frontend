@@ -73,7 +73,12 @@ class AuthApiClient {
     return this.baseClient.get<UserResponse>('/api/v1/auth/me')
   }
 
-  // Forgot password method removed since forgot password functionality is removed
+  /**
+   * Forgot password - send reset code to email
+   */
+  async forgotPassword(data: ForgotPasswordRequest): Promise<ApiResponse<ForgotPasswordResponse>> {
+    return this.baseClient.post<ForgotPasswordResponse>('/api/v1/auth/forgot-password', data)
+  }
 
   /**
    * Reset password with OTP
@@ -159,8 +164,15 @@ class AuthApiClient {
   /**
    * Update user profile
    */
-  async updateProfile(data: { first_name: string; last_name: string; profession: string }): Promise<ApiResponse<UserResponse>> {
-    return this.baseClient.put<UserResponse>('/api/v1/auth/profile', data)
+  async updateProfile(data: { first_name?: string; last_name?: string; profession?: string; language?: string | null }): Promise<ApiResponse<UserResponse>> {
+    return this.baseClient.put<UserResponse>('/api/v1/user/profile', data)
+  }
+
+  /**
+   * Delete user account (soft delete)
+   */
+  async deleteAccount(): Promise<ApiResponse<{ message: string }>> {
+    return this.baseClient.delete<{ message: string }>('/api/v1/auth/delete-account')
   }
 
 }
